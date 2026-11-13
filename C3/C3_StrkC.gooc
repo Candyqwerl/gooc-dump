@@ -1,0 +1,293 @@
+#gool StrkC 46 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C3_FruiC.gooh"
+//gooc -c 3 -r pal "C3\C3_StrkC.gooc" "C3\Out\C3_StrkC.nsentry"
+
+#anim STROKER_ROW   [St1dV] [St1dG] 18 1 2
+#anim STROKER_TURN  [St2dV] [St1dG] 25 1 2
+#anim STROKER_BREAK [St3dV] [St2dG] 12 1 2
+#anim STROKER_BONK  [St4dV] [St3dG] 58 1 2
+
+#spawn S_STROKER     Stroker_Init
+#spawn S_BONK        Stroker_Bonk
+
+event EventJumpedOn      => state Stroker_Die
+event EventHitInvincible => state Stroker_Die
+event EventSlamHit       => state Stroker_Die
+
+var PathSpeed, TrackOffset, CycleLength, CycleOffset, MaxTrackOffset
+
+state Stroker_Init { // 0
+    stateflag 0x1
+    statusc 0x12
+    code(limit, speed, prog, offs, timed) {
+        MaxTrackOffset = limit
+        PathSpeed = speed
+        pathprog = prog
+        TrackOffset = offs
+        health = 0
+        zindex = 25
+        yzapproach = 20deg
+        statusb = FLAG_TRACK_PATH_SIGN
+        trotx = 180deg
+        statusb = FLAG_ROT_Y | FLAG_TRACK_PATH_ROT | FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | 0x2000 | FLAG_SOLID_ALL | 0x20000000
+        roty = troty
+        if (timed) {
+            CycleLength = speed
+            CycleOffset = prog
+            changestate(Stroker_RowTimed)
+        }
+        else {
+            changestate(Stroker_Row)
+        }
+    }
+}
+
+state Stroker_Row { // 1
+    stateflag 0x5
+    statusc 0x0
+    code() {
+        do {
+            soundpitch(3.263)
+            soundsetup(6, self, 8)
+            soundplay([st1dA], 0.8V)
+            if (!rand(8)) {
+                sounddelay(1)
+                SoundPitchDefault()
+                soundsetup(6, self, 8)
+                soundplay([st3dA], 0.8V)
+            }
+            playframes(STROKER_ROW, 0.0, 17.0)
+        } while (1)
+    }
+    trans {
+        once {
+            trotx = 180deg
+            statusb |= (FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN | 0x20000000)
+            statusb &= ~FLAG_ROT_Y2
+            statusa &= ~FLAG_PATH_END
+        }
+        LoopPathProg(spd(PathSpeed))
+        changestateif(Stroker_Turn, STATUS_PATH_END)
+        {
+            var v1 = 0
+            var deg_to_player = 0deg
+            var pathrot = troty
+            save (troty, statusa, statusb, x, y, z, pathprog) {
+                statusb = FLAG_PATH_CALCS | FLAG_TRACK_PATH_SIGN
+                x = player -> x
+                y = player -> y
+                z = player -> z
+                calcpath(0)
+                v1 = troty
+                troty += 90deg
+                setvel(TrackOffset, vvel)
+            }
+            x += velx
+            z += velz
+            if (abs(TrackOffset - vecy) > 0.1m) {
+                deg_to_player = degdist(troty, atan2(player -> trans))
+                if (abs(deg_to_player) < 60deg) {
+                    if (deg_to_player < -45deg) {
+                        deg_to_player = -45deg
+                    }
+                    else if (deg_to_player > 45deg) {
+                        deg_to_player = 45deg
+                    }
+                    troty += deg_to_player
+                }
+            }
+            TrackOffset = seek(TrackOffset, vecy, spd(2.5m))
+            if (TrackOffset < -MaxTrackOffset) {
+                troty = pathrot
+                TrackOffset = -MaxTrackOffset
+            }
+            else if (TrackOffset > MaxTrackOffset) {
+                troty = pathrot
+                TrackOffset = MaxTrackOffset
+            }
+        }
+        y = ins79(x, vecx)
+        {
+            var pitch, roll, v3
+            ins80(vecx, pitch)
+            rotx = pitch
+            rotz = degseek(rotz, roll, 90deg)
+        }
+        sendevent(EventHit, collider, 100.0)
+        changestateif(Stroker_Capsize, eventaccepted)
+    }
+}
+
+state Stroker_Turn { // 2
+    stateflag 0x5
+    statusc 0x0
+    code() {
+        if (!(animseq == getanim(STROKER_ROW) && animframe == 17.0)) {
+            playframes4(STROKER_ROW, -1.0, 17.0)
+        }
+        statusb |= FLAG_ROT_Y2
+        playframes(STROKER_TURN, 0.0, 24.0)
+        changestate(Stroker_Row)
+    }
+    trans {
+        once {
+            statusb &= ~(FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN | 0x20000000)
+            trotx = 180deg
+        }
+        calcpath(abs(pathprog), vtrans)
+        {
+            var v1 = 0
+            var deg_to_player = 0deg
+            var pathrot = troty
+            save (troty, statusa, statusb, x, y, z, pathprog) {
+                statusb = FLAG_PATH_CALCS | FLAG_TRACK_PATH_SIGN
+                x = player -> x
+                y = player -> y
+                z = player -> z
+                calcpath(0)
+                v1 = troty
+                troty += 90deg
+                setvel(TrackOffset, vvel)
+            }
+            x += velx
+            z += velz
+            if (abs(TrackOffset - vecy) > 0.1m) {
+                deg_to_player = degdist(troty, atan2(player -> trans))
+                if (abs(deg_to_player) < 60deg) {
+                    if (deg_to_player < -45deg) {
+                        deg_to_player = -45deg
+                    }
+                    else if (deg_to_player > 45deg) {
+                        deg_to_player = 45deg
+                    }
+                    troty += deg_to_player
+                }
+            }
+            TrackOffset = seek(TrackOffset, vecy, spd(2.5m))
+            if (TrackOffset < -MaxTrackOffset) {
+                troty = pathrot
+                TrackOffset = -MaxTrackOffset
+            }
+            else if (TrackOffset > MaxTrackOffset) {
+                troty = pathrot
+                TrackOffset = MaxTrackOffset
+            }
+        }
+        y = ins79(x, vecx)
+        {
+            var pitch, roll, v3
+            ins80(vecx, pitch)
+            rotx = pitch
+            rotz = degseek(rotz, roll, 90deg)
+        }
+        sendevent(EventHit, collider, 100.0)
+        changestateif(Stroker_Capsize, eventaccepted)
+    }
+}
+
+state Stroker_RowTimed { // 3
+    stateflag 0x5
+    statusc 0x0
+    code => state Stroker_Row
+    trans {
+        once {
+            trotx = 180deg
+            statusb |= FLAG_ROT_Y | 0x20000000
+            statusa &= ~FLAG_PATH_END
+        }
+        {
+            var span = CycleLength
+            var cycletime = time(CycleLength, CycleOffset)
+            var elapsed = 0
+            if (CycleLength > 0 && cycletime >= 0 && cycletime <= CycleLength) {
+                elapsed = cycletime
+                var prog = (cycletime * (pathlen - 1.0)) / CycleLength
+                calcpath(prog)
+                pathprog = prog
+            }
+        }
+        y = ins79(x, null)
+        sendevent(EventHit, collider, 100.0)
+        changestateif(Stroker_Capsize, eventaccepted)
+    }
+}
+
+state Stroker_Die { // 4
+    stateflag 0x7
+    statusc 0x2
+    code(h) {
+        KillEntity()
+        if (!(player -> stateflag & 0x20)) {
+            if (eventreceived == EventJumpedOn) {
+                spawn2(FruiC, FruiC_S_FRUIT_AUTO, 1, 97.0, 0)
+            }
+            else {
+                sendevent(EventCombo, player, h)
+            }
+        }
+        soundpitch(1.183)
+        soundplay([brk0A], 1V)
+        playframes(STROKER_BREAK, 0.0, 11.0)
+    }
+}
+
+state Stroker_Capsize { // 5
+    stateflag 0x7
+    statusc 0x2
+    code() {
+        KillEntity()
+        soundpitch(1.183)
+        soundplay([brk0A], 1V)
+        spawn(StrkC, S_BONK)
+        playframes(STROKER_BREAK, 0.0, 11.0)
+        WaitChildNull()
+    }
+    event(e, a) {
+        accevif (e == EventHitInvincible) {
+            sendevent(EventHitInvincible, child, a[0])
+        }
+    }
+}
+
+state Stroker_Bonk { // 6
+    stateflag 0x5
+    statusc 0x22
+    code() {
+        statusb |= FLAG_ROT_Y
+        trotx = 360deg
+        troty = atan2(player -> trans) + 180deg
+        setanim(STROKER_BONK, -1.0)
+        do {
+            animframe += 1.0
+            if (animframe == 51.0 && tpc) {
+                save (x, y, z) {
+                    CopyPlayerTrans()
+                    spawn(15, 22, 1, 3m)
+                }
+                sounddecay(8s)
+                soundpitch(2.177)
+                soundplay([sht0A], 1V)
+                GLOBAL_101 = 5
+                GLOBAL_100 = 0xFF
+                player -> vely = -60m
+                setfield(player, 79.0, -60m)
+            }
+            playframe()
+        } while (animframe + 1.0 <= 57.0)
+        sleep()
+    }
+    event(e, a) {
+        accevif (e == EventHitInvincible) {
+            statusb |= FLAG_PHYSICS_ENGINE
+            SetVel(0, -10m, 0m)
+            tpc = 0
+        }
+    }
+    trans {
+        y = ins79(x, null)
+        rotx = degseek(rotx, 0deg, 360deg)
+        rotz = degseek(rotz, 0deg, 360deg)
+    }
+}

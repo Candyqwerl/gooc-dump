@@ -1,0 +1,315 @@
+#gool TitOC 51 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C2_ShadC.gooh"
+//gooc -c 2 -r pal "C2\C2_TitOC.gooc" "C2\Out\C2_TitOC.nsentry"
+
+#anim ANIM_0x000  [CR1YV] 45 0
+#anim ANIM_0x300  [CR2YV] 45 0
+#anim ANIM_0x600  [CR3YV] 47 0
+#anim ANIM_0x900  [CR4YV] 39 0
+#anim ANIM_0xC00  [CR5YV] 38 0
+#anim ANIM_0xF00  [CR6YV] 38 0
+#anim ANIM_0x1200 [NE1YV] 1 0
+#anim ANIM_0x1500 [SO1PV] 51 0
+#anim ANIM_0x1800 [SO2PV] 26 0
+#anim ANIM_0x1B00 [UI1YV] 1 1
+#anim ANIM_0x1E00 [PL1YV] 26 0
+#anim ANIM_0x2100 [PL2YV] 34 0
+#anim ANIM_0x2400 [TC1YV] 24 1
+#anim ANIM_0x2700 [TC2YV] 34 1
+#anim ANIM_0x2A00 [CS1YV] 26 0
+#anim ANIM_0x2D00 [CS2YV] 34 0
+#anim ANIM_0x3000 [CS3YV] 1 0
+#anim ANIM_0x3300 [BA1YV] 22 0
+#anim ANIM_0x3600 [BA2YV] 1 0
+#anim ANIM_0x3900 [BA3YV] 6 0
+#anim ANIM_0x3C00 [BA4YV] 15 0
+#anim ANIM_0x3F00 [BA5YV] 1 0
+#anim ANIM_0x4200 [HO1YV] 34 0
+#anim ANIM_0x4500 [MO1YV] 31 0
+#anim ANIM_0x4800 [TW1YV] 34 0
+
+#sprite ANIM_0x4B00 [LogoT]
+#tex 0x808080 0 2 0 4 64 16 16 16
+
+#sprite ANIM_0x5100 [LogoT]
+#tex 0xC0C0C0 0 3 1 4 80 16 16 16
+#tex 0x808080 0 3 1 4 80 16 16 16
+#tex 0xC0C0C0 1 3 0 2 64 64 64 64
+#tex 0x808080 0 3 2 4 576 32 32 32
+#tex 0xD0D0D0 0 3 2 4 576 32 32 32
+#tex 0xC0C0C0 0 3 1 4 80 16 16 16
+#tex 0xC0C0C0 0 3 3 4 96 16 16 16
+#tex 0xC0C0C0 0 3 4 4 832 64 64 64
+#tex 0xC0C0C0 0 3 5 4 608 32 32 32
+
+#anim ANIM_0x7700 [WB1YV] 11 0
+#anim ANIM_0x7A00 [BB1YV] 11 0
+#anim ANIM_0x7D00 [WE1YV] 11 0
+#anim ANIM_0x8000 [DD1YV] 52 1
+#anim ANIM_0x8300 [DD2YV] 52 1
+#anim ANIM_0x8600 [DD3YV] 32 1
+#anim ANIM_0x8900 [PM1YV] 5 0
+#anim ANIM_0x8C00 [PD1YV] 22 0
+#anim ANIM_0x8F00 [LI1YV] 22 0
+#anim ANIM_0x9200 [WL1YV] 1 0
+#anim ANIM_0x9500 [WR1YV] 1 0
+#anim ANIM_0x9800 [BL1YV] 1 0
+#anim ANIM_0x9B00 [BR1YV] 1 0
+#anim ANIM_0x9E00 [WF1YV] 1 0
+#anim ANIM_0xA100 [NN1YV] 1 0
+#anim ANIM_0xA400 [NG2YV] 1 0
+#anim ANIM_0xA700 [NA1YV] 1 0
+#anim ANIM_0xAA00 [NO1YV] 1 0
+#anim ANIM_0xAD00 [NU1YV] 1 0
+#anim ANIM_0xB000 [NG1YV] 1 0
+#anim ANIM_0xB300 [ND1YV] 1 0
+#anim ANIM_0xB600 [NH1YV] 1 0
+#anim ANIM_0xB900 [NT1YV] 1 0
+#anim ANIM_0xBC00 [NY1YV] 1 0
+#anim ANIM_0xBF00 [PA1YV] 1 0
+#anim ANIM_0xC200 [CL1YV] 1 0
+#anim ANIM_0xC500 [WL5YV] 38 0
+#anim ANIM_0xC800 [WR5YV] 38 0
+#anim ANIM_0xCB00 [BL5YV] 38 0
+#anim ANIM_0xCE00 [BR5YV] 38 0
+#anim ANIM_0xD100 [WF5YV] 38 0
+#anim ANIM_0xD400 [NN5YV] 38 0
+#anim ANIM_0xD700 [NG6YV] 38 0
+#anim ANIM_0xDA00 [NA5YV] 38 0
+#anim ANIM_0xDD00 [NO5YV] 38 0
+#anim ANIM_0xE000 [NU5YV] 38 0
+#anim ANIM_0xE300 [NG5YV] 38 0
+#anim ANIM_0xE600 [ND5YV] 38 0
+#anim ANIM_0xE900 [NH5YV] 38 0
+#anim ANIM_0xEC00 [NT5YV] 38 0
+#anim ANIM_0xEF00 [NY5YV] 38 0
+#anim ANIM_0xF200 [PA5YV] 38 0
+#anim ANIM_0xF500 [CL5YV] 38 0
+
+#font FONT_0xF800 [1170I]
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+
+#text TEXT_0x14A00    FONT_SMALL[1172I]
+"NOUVELLE PARTIE"     // 0.0
+"CHARGER UNE PARTIE"  // 1.0
+"LANGUE: FRANCAIS"    // 2.0
+"NEUES SPIEL"         // 3.0
+"SPIEL LADEN"         // 4.0
+"SPRACHE: DEUTSCH"    // 5.0
+"JUEGO NUEVO"         // 6.0
+"CARGAR JUEGO"        // 7.0
+"LENGUA: ESPANOL"     // 8.0
+"NUOVA PARTITA"       // 9.0
+"CARICA PARTITA"      // 10.0
+"LINGUA: ITALIANO"    // 11.0
+"NEW GAME"            // 12.0
+"LOAD GAME"           // 13.0
+"LANGUAGE: ENGLISH"   // 14.0
+
+#spawn S_SPAWN_0 STATE_0
+#spawn S_SPAWN_1 STATE_30
+#spawn S_SPAWN_2 STATE_7
+#spawn S_3 __s_3
+#spawn S_4 __s_4
+#spawn S_5 __s_5
+#spawn S_SPAWN_6 STATE_8
+#spawn S_SPAWN_7 STATE_16
+#spawn S_SPAWN_8 STATE_18
+#spawn S_SPAWN_9 STATE_20
+#spawn S_SPAWN_10 STATE_24
+#spawn S_SPAWN_11 STATE_26
+#spawn S_SPAWN_12 STATE_28
+#spawn S_SPAWN_13 STATE_22
+#spawn S_SPAWN_14 STATE_11
+#spawn S_SPAWN_15 STATE_9
+#spawn S_SPAWN_16 STATE_2
+#spawn S_SPAWN_17 STATE_10
+#spawn S_SPAWN_18 STATE_4
+#spawn S_SPAWN_19 STATE_15
+#spawn S_SPAWN_20 STATE_12
+#spawn S_SPAWN_21 STATE_13
+#spawn S_SPAWN_22 STATE_14
+#spawn S_SPAWN_23 STATE_3
+#spawn S_SPAWN_24 STATE_5
+
+var mem1, mem2, mem3, mem4, mem5, mem6, mem7, mem8, mem9
+var mem10, mem11, mem12, mem13, mem14, mem15
+
+state STATE_0 { // 0
+    stateflag 0x1
+    statusc 0x2
+    code() {}
+}
+state STATE_1 { // 1
+    stateflag 0x1
+    statusc 0x2
+    code() {}
+}
+state STATE_2 { // 2
+    stateflag 0x1
+    statusc 0x2
+    code() {}
+}
+state STATE_3 { // 3
+    stateflag 0x1
+    statusc 0x2
+    code() {}
+}
+state STATE_4 { // 4
+    stateflag 0x1
+    statusc 0x2
+    code() {}
+}
+state STATE_5 { // 5
+    stateflag 0x1
+    statusc 0x2
+    code() {}
+}
+state STATE_6 { // 6
+    stateflag 0x1
+    statusc 0x2
+    code() {}
+}
+state STATE_7 { // 7
+    stateflag 0x1
+    statusc 0x2
+    code() {}
+}
+state STATE_8 { // 8
+    stateflag 0x1
+    statusc 0x2
+    code() {}
+}
+state STATE_9 { // 9
+    stateflag 0x1
+    statusc 0x2
+    code() {}
+}
+state STATE_10 { // 10
+    stateflag 0x1
+    statusc 0x2
+    code() {}
+}
+state STATE_11 { // 11
+    stateflag 0x1
+    statusc 0x2
+    code() {}
+}
+state STATE_12 { // 12
+    stateflag 0x1
+    statusc 0x2
+    code() {}
+}
+state STATE_13 { // 13
+    stateflag 0x1
+    statusc 0x2
+    code() {}
+}
+state STATE_14 { // 14
+    stateflag 0x1
+    statusc 0x2
+    code() {}
+}
+state STATE_15 { // 15
+    stateflag 0x1
+    statusc 0x2
+    code() {}
+}
+state STATE_16 { // 16
+    stateflag 0x1
+    statusc 0x2
+    code() {}
+}
+state STATE_17 { // 17
+    stateflag 0x1
+    statusc 0x0
+    code() {}
+}
+state STATE_18 { // 18
+    stateflag 0x1
+    statusc 0x2
+    code() {}
+}
+state STATE_19 { // 19
+    stateflag 0x1
+    statusc 0x0
+    code() {}
+}
+state STATE_20 { // 20
+    stateflag 0x1
+    statusc 0x2
+    code() {}
+}
+state STATE_21 { // 21
+    stateflag 0x1
+    statusc 0x0
+    code() {}
+}
+state STATE_22 { // 22
+    stateflag 0x1
+    statusc 0x2
+    code() {}
+}
+state STATE_23 { // 23
+    stateflag 0x1
+    statusc 0x0
+    code() {}
+}
+state STATE_24 { // 24
+    stateflag 0x1
+    statusc 0x2
+    code() {}
+}
+state STATE_25 { // 25
+    stateflag 0x1
+    statusc 0x0
+    code() {}
+}
+state STATE_26 { // 26
+    stateflag 0x1
+    statusc 0x2
+    code() {}
+}
+state STATE_27 { // 27
+    stateflag 0x1
+    statusc 0x0
+    code() {}
+}
+state STATE_28 { // 28
+    stateflag 0x1
+    statusc 0x2
+    code() {}
+}
+state STATE_29 { // 29
+    stateflag 0x1
+    statusc 0x0
+    code() {}
+}
+state STATE_30 { // 30
+    stateflag 0x1
+    statusc 0x2
+    code() {}
+}
+state STATE_31 { // 31
+    stateflag 0x1
+    statusc 0x0
+    code() {}
+}
+

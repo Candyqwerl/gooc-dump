@@ -1,0 +1,370 @@
+#gool DpAOC 19 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_DpAOC.gooc" "C3\Out\C3_DpAOC.nsentry"
+
+#anim DEEPASS_SUBMERGED  [DA1cV] [DA1cG] 09 1 2
+#anim DEEPASS_ATTACK     [DA2cV] [DA1cG] 12 0 2
+#anim SPLASH             [DS1cV] [DS1cG] 12 1 2
+#anim DEEPASS_MOG        [DS2cV] [DS1cG] 29 1 2
+#anim BUBBLES            [DB1cV] [DB1cG] 14 1 2
+
+#spawn S_DEEPASS DeepAss_Init
+#spawn S_SPLASH  Splash
+#spawn S_BUBBLES Bubbles
+
+var TrackOffsetTable, TrackOffsetDefault, MoveSpeed, TriggerRange, PursuitLimit,
+    SurfaceY, HomeX, HomeZ, PathStartIndex, PathStartTrackOffset,
+    PathStartX, PathStartZ, PathEndIndex, PathEndTrackOffset, PathEndX,
+    PathEndZ, RetreatOffsetX, RetreatOffsetZ, RetreatOriginX, RetreatOriginZ,
+    AttackSuccessful, SplashFade
+
+state DeepAss_Init { // 0
+    statusc 0
+    code(range, pathoffs, unused, limit, speed) {
+        TriggerRange = range
+        pathprog = pathoffs
+        TrackOffsetDefault = limit
+        MoveSpeed = speed / 25
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | FLAG_NO_CAMERA_CLIP
+        TrackOffsetTable = 0
+        PursuitLimit = TriggerRange + 2m
+        AttackSuccessful = false
+        y += 0.1m
+        SurfaceY = y
+        InitializePath()
+        changestate(DeepAss_Wait)
+    }
+    event(e, a) {
+        accevcstate(DeepAss_Squash, e == EventJumpedOn || e == EventSlamHit || e == EventHit || e == EventFling)
+        accevcstate(DeepAss_Squash, e == EventSpinHit || e == EventSlideHit || e == EventHitInvincible)
+
+    }
+}
+
+sub InitializePath() {
+    PathStartIndex = pathprog >> 8
+    PathEndIndex = PathStartIndex + 1
+    calcpath(PathStartIndex << 8, vvec)
+    PathStartX = vecx
+    PathStartZ = vecz
+    v0 = PathEndIndex << 8
+    if (v0 >= pathlen) {
+        v0 = pathlen - 1
+    }
+    calcpath(v0, vvec)
+    PathEndX = vecx
+    PathEndZ = vecz
+    if (TrackOffsetTable) {
+        PathStartTrackOffset = TrackOffsetTable[PathStartIndex << 8]
+        PathEndTrackOffset = TrackOffsetTable[PathEndIndex << 8]
+    }
+    else {
+        PathStartTrackOffset = TrackOffsetDefault
+        PathEndTrackOffset = TrackOffsetDefault
+    }
+    calcpath(pathprog, vvec)
+    x = vecx
+    z = vecz
+    HomeX = x
+    HomeZ = z
+}
+
+sub PathConstrain() {
+    do {
+        if (PathEndZ < z) {
+            if (PathEndIndex >= pathlen >> 8) {
+                z = PathEndZ
+                break
+            }
+            PathStartZ = PathEndZ
+            PathStartX = PathEndX
+            PathStartIndex = PathEndIndex
+            PathStartTrackOffset = PathEndTrackOffset
+            PathEndIndex += 1
+            v0 = PathEndIndex << 8
+            if (v0 >= pathlen) {
+                v0 = pathlen - 1
+            }
+            calcpath(v0, vvec)
+            PathEndX = vecx
+            PathEndZ = vecz
+            if (TrackOffsetTable) {
+                PathEndTrackOffset = TrackOffsetTable[PathEndIndex << 8]
+            }
+            else {
+                PathEndTrackOffset = TrackOffsetDefault
+            }
+        }
+        else if (z < PathStartZ) {
+            if (PathStartIndex < 1) {
+                z = PathStartZ
+                break
+            }
+            PathEndTrackOffset = PathStartTrackOffset
+            PathEndZ = PathStartZ
+            PathEndIndex = PathStartIndex
+            PathEndX = PathStartX
+            PathStartIndex -= 1
+            calcpath(PathStartIndex << 8, vvec)
+            PathStartX = vecx
+            PathStartZ = vecz
+            if (TrackOffsetTable) {
+                PathStartTrackOffset = TrackOffsetTable[PathStartIndex << 8]
+            }
+            else {
+                PathStartTrackOffset = TrackOffsetDefault
+            }
+        }
+        else {
+            break
+        }
+    } while (1)
+
+    var seg_prog = 0
+    var lateral_limit = 0
+    seg_prog = ((z - PathStartZ) << 8) / (PathEndZ - PathStartZ)
+    pathprog = (PathStartIndex << 8) + seg_prog
+    if (pathprog >= pathlen) {
+        pathprog = pathlen - 1
+    }
+    calcpath(pathprog, vvec)
+    lateral_limit = PathStartTrackOffset + (((PathEndTrackOffset - PathStartTrackOffset) * seg_prog) >> 8)
+    z = vecz
+    v0 = x - vecx
+    if (lateral_limit < v0) {
+        v0 = lateral_limit
+    }
+    if (v0 < -lateral_limit) {
+        v0 = -lateral_limit
+    }
+    x = vecx + v0
+}
+
+state DeepAss_Wait { // 1
+    statusc 0
+    event => state DeepAss_Init
+    code() {
+        do {
+            setanim(DEEPASS_SUBMERGED, 0)
+            do {
+                playframe(animframe + 1.0)
+            } while (animframe + 1.0 <= 8.0)
+            playframesback(DEEPASS_SUBMERGED, 7.0, 0.0)
+        } while (1)
+    }
+    trans {
+        changestateif(DeepAss_Active, distance(player, DIST_NO_Y) <= TriggerRange && !(player -> stateflag & 0x20))
+        troty = atan2(player -> trans)
+        roty += degdist(roty, troty) >> 2
+    }
+}
+
+state DeepAss_Active { // 2
+    statusc 0
+    event => state DeepAss_Init
+    code() {
+        voice = 0
+        soundpitch(2.2)
+        soundplay([DA2cA], 1V)
+        do {
+            soundcheck(voice)
+            if (!!misc == -1) {
+                soundpitch(2.2)
+                soundplay([DA2cA], 1V)
+            }
+            setanim(DEEPASS_SUBMERGED, 0)
+            do {
+                playframe(animframe + 1.0)
+            } while (animframe + 1.0 <= 8.0)
+            playframesback(DEEPASS_SUBMERGED, 7.0, 0.0)
+        } while (1)
+    }
+    trans {
+        sendevent(Event20, collider, 0x57)
+        var swim_x, swim_z, player_distance, target_x, target_z
+        player_distance = distance(player, DIST_NO_Y)
+        changestateif(DeepAss_Attack, player_distance <= 1.4m && !(player -> stateflag & 0x20))
+        if (player_distance >= PursuitLimit || player -> stateflag & 0x20) {
+            target_x = HomeX
+            target_z = HomeZ
+            vecx = target_x - x
+            vecz = target_z - z
+            misc = abs(vecx) <= 0.5m && abs(vecz) <= 0.5m
+            changestateif(DeepAss_Wait, misc)
+            troty = atan(vecx, vecz)
+        }
+        else {
+            target_x = player -> x
+            target_z = player -> z
+            troty = atan2(player -> trans)
+        }
+        roty += degdist(roty, troty) >> 2
+        v0 = MoveSpeed >> 8
+        swim_z = (v0 * cos(roty)) >> 4
+        swim_x = (v0 * sin(roty)) >> 4
+        velx = target_x - x
+        velz = target_z - z
+        if (abs(swim_x) < abs(velx) || abs(swim_z) < abs(velz)) {
+            velx = swim_x
+            velz = swim_z
+        }
+        x += velx
+        z += velz
+        PathConstrain()
+    }
+}
+
+state DeepAss_Attack { // 3
+    statusc 0
+    event => state DeepAss_Init
+    code() {
+        soundpitch(2.2)
+        soundsetup(0, self, 5)
+        soundplay([DA1cA], 1V)
+        playframes(DEEPASS_ATTACK, 0.0, 11.0)
+        spawn(DpAOC, S_SPLASH, 1)
+        if (AttackSuccessful) {
+            changestate(DeepAss_Mog)
+        }
+        else {
+            changestate(DeepAss_Retreat)
+        }
+    }
+    trans {
+        sendevent(Event20, collider, 0x57)
+        if (!player -> health && player -> stateflag & 0x20) {
+            AttackSuccessful = true >> 8
+        }
+    }
+}
+
+state DeepAss_Retreat { // 4
+    statusc 0
+    event => state DeepAss_Init
+    code() {
+        RetreatOriginX = x
+        RetreatOriginZ = z
+        RetreatOffsetX = (73.75deg * sin(roty)) >> 4
+        RetreatOffsetZ = (73.75deg * cos(roty)) >> 4
+        settrans(RetreatUpdate)
+        RetreatUpdate()
+        sleepnull()
+    }
+}
+
+sub RetreatUpdate() {
+    v0 = frametime - statetime
+    v0 = (v0 << 8) / 37
+    if (v0 > 1.0) {
+        x = RetreatOriginX
+        z = RetreatOriginZ
+        changestate(DeepAss_Resurface)
+    }
+    v0 = 1.0 - v0
+    x = RetreatOriginX + ((v0 * RetreatOffsetX) >> 8)
+    z = RetreatOriginZ + ((v0 * RetreatOffsetZ) >> 8)
+    spawn(DpAOC, S_BUBBLES, 1, x + 0.5m - rand(1m), y, z + 0.5m + rand(1m))
+}
+
+state DeepAss_Resurface { // 5
+    statusc 0
+    event => state DeepAss_Init
+    code() {
+        do {
+            setanim(DEEPASS_SUBMERGED, 0)
+            do {
+                playframe(animframe + 1.0)
+            } while (animframe + 1.0 <= 8.0)
+            playframesback(DEEPASS_SUBMERGED, 7.0, 0.0)
+        } while (1)
+    }
+    trans {
+        once {
+            y -= 1m
+        }
+        y = seek(y, SurfaceY, 0.08m)
+        changestateif(DeepAss_Active, y == SurfaceY)
+    }
+}
+
+state DeepAss_Mog { // 6
+    statusc 0
+    code() {
+        playnull(0.85s)
+        playframes(DEEPASS_MOG, 0.0, 28.0)
+        sleep()
+    }
+    trans {
+        if (frametime - statetime >= 1.5s) {
+            v0 = degdist(roty, CAMROTY) >> 3
+            if (v0 > 3.55deg) {
+                v0 = 3.55deg
+            }
+            if (v0 < -3.55deg) {
+                v0 = -3.55deg
+            }
+            roty += v0
+        }
+    }
+}
+
+state DeepAss_Squash { // 7
+    stateflag 0x23
+    statusc 0x32
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        playframe()
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        playframe()
+        WaitChildNull()
+    }
+}
+
+sub SetParticleColor() {
+    vfx = (vfx & 0xFFFF00FF) | 4.0
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x64, 0x64, 0x64)
+    }
+    else if (r == 1) {
+        SetColor1(0x3C, 0x3C, 0x3C)
+    }
+    else if (r == 2) {
+        SetColor1(0x96, 0x96, 0x96)
+    }
+}
+
+state Splash { // 8
+    statusc 0
+    code() {
+        soundpitch(3.263)
+        sounddecay(7.2s)
+        soundsetup(0, self, 5)
+        soundplay([SplcA], 1V)
+        playframes(SPLASH, 0.0, 11.0)
+    }
+    trans {
+        once {
+            SplashFade = 16.0
+        }
+        moda = 16.0 - SplashFade
+        SplashFade -= 1.335
+        if (SplashFade < 0) {
+            SplashFade = 0
+        }
+    }
+}
+
+state Bubbles { // 9
+    statusc 0
+    code(px, py, pz) {
+        SetTrans(px, py, pz)
+        SetScale(0.35S)
+        playframes(BUBBLES, 0.0, 13.0)
+    }
+    trans {
+        roty = CAMROTY
+    }
+}

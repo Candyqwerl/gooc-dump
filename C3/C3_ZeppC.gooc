@@ -1,0 +1,590 @@
+#gool ZeppC 36 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C3_FruiC.gooh"
+#include "..\\Includes\\C3_DispC.gooh"
+//gooc -c 3 -r pal "C3\C3_ZeppC.gooc" "C3\Out\C3_ZeppC.nsentry"
+
+#anim ZEPPELIN_HIGH      [Zp1jV] [Zp1jG] 01 1 2
+#anim ZEPPELIN_MEDIUM    [Zp2jV] [Zp2jG] 01 1 2
+#anim ZEPPELIN_LOW       [Zp3jV] [Zp3jG] 01 1 2
+#anim ZEPPELIN_VLOW      [Zp4jV] [Zp4jG] 01 1 2
+#anim ZEPPELIN_DESTROYED [ZpDjV] [ZpDjG] 34 1 2
+
+#fraganim BARON_BALLOON_LOW [Ba3jT] 1
+#frag 0x808080 0 1 1 0 512 32 64 32 { 63 32 63 63 0 32 0 63 } -200 -600 200 200
+#frag 0x808080 0 1 1 9 576 32 64 32 { 127 32 127 63 64 32 64 63 } -200 -600 200 200
+#frag 0x808080 0 1 14 10 640 32 64 32 { 191 32 191 63 128 32 128 63 } -200 -600 200 200
+#frag 0x808080 0 1 15 10 704 32 64 32 { 255 32 255 63 192 32 192 63 } -200 -600 200 200
+
+#sprite BARON_BALLOON_MEDIUM [Ba3jT]
+#tex 0x808080 1 1 0 2 0 64 64 64
+#tex 0x808080 1 1 0 8 256 64 64 64
+#tex 0x202080 1 1 0 2 0 64 64 64
+#tex 0x808080 1 1 0 2 0 64 64 64
+
+#fraganim BARON_BALLOON_HIGH [Ba3jT] 3
+#frag 0x808080 1 1 0 3 64 64 64 64 -198 -202 202 198
+#frag 0x808080 1 1 0 3 64 64 64 64 -202 -198 198 202
+#frag 0x808080 1 0 0 2 0 64 64 64 -200 -200 200 200
+#frag 0x808080 1 1 0 7 192 64 64 64 -198 -202 202 198
+#frag 0x808080 1 1 0 7 192 64 64 64 -202 -198 198 202
+#frag 0x808080 1 0 0 8 256 64 64 64 -200 -200 200 200
+#frag 0x202080 1 1 0 3 64 64 64 64 -198 -202 202 198
+#frag 0x202080 1 1 0 3 64 64 64 64 -202 -198 198 202
+#frag 0x202080 1 0 0 2 0 64 64 64 -200 -200 200 200
+#frag 0x808080 1 1 0 3 64 64 64 64 -198 -202 202 198
+#frag 0x808080 1 1 0 3 64 64 64 64 -202 -198 198 202
+#frag 0x808080 1 0 0 2 0 64 64 64 -200 -200 200 200
+
+#anim BOX_PICKUP  [Bp1jV] [Bp1jG] 01 0 2
+#anim BOX_EXPLODE [BE10V] [BE10G] 12 0 2
+#anim BOX_CLOCK   [Bc1jV] [Bc1jG] 01 0 2
+#anim BOX_NITRO   [Bn1jV] [Bn1jG] 01 0 2
+
+#spawn S_ZEPPELIN         Zeppelin_Init
+#spawn S_BALLOON          Balloon
+#spawn S_BOX              Balloon_Box
+#spawn S_REWARD_BALLOON   Balloon_Reward
+#spawn S_CLOCK            Balloon
+
+var ViewDistance, BalloonType, RewardItem
+
+expr ZeppelinVoice = field_63
+
+state Zeppelin_Init { // 0
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        statusb = 0x2000
+        groundy = y
+        health = 0
+        trotz = 0
+        yzapproach = 60deg
+        playnull()
+        creator = GLOBAL_97
+        SetColor2(0x80, 0x80, 0x80)
+        ZeppelinVoice = 0
+        changestate(Zeppelin)
+    }
+}
+
+state Zeppelin { // 1
+    stateflag 0x1
+    statusc 0x0
+    trans => sub ZeppelinTrans
+    code() {
+        do {
+            if (abs(degdist(atan2(creator -> trans), CAMROTY)) > 55deg && ViewDistance > 20m) {
+                playnull()
+            }
+            else if (ViewDistance > 60m) {
+                playanim(0, ZEPPELIN_VLOW)
+            }
+            else if (ViewDistance > 20m) {
+                playanim(0, ZEPPELIN_LOW)
+            }
+            else if (ViewDistance > 10m) {
+                if (SFXVOL) {
+                    if (ZeppelinVoice >= 1) {
+                        soundcheck(ZeppelinVoice)
+                    }
+                    if (ZeppelinVoice < 1 || misc == -1) {
+                        soundpitch(3.625)
+                        sounddecay(10.12s)
+                        soundplay([Zp6jA], 1V)
+                        ZeppelinVoice = voice
+                    }
+                }
+                playanim(0, ZEPPELIN_MEDIUM)
+            }
+            else {
+                if (SFXVOL) {
+                    if (ZeppelinVoice >= 1) {
+                        soundcheck(ZeppelinVoice)
+                    }
+                    if (ZeppelinVoice < 1 || misc == -1) {
+                        soundpitch(3.625)
+                        sounddecay(10.12s)
+                        soundplay([Zp6jA], 1V)
+                        ZeppelinVoice = voice
+                    }
+                }
+                velx = x - player -> x
+                vely = y - player -> y
+                velz = (z - player -> z) >> 2
+                if (distance(velx, self, 9) < 1.4m) {
+                    player -> collider = self
+                }
+                playanim(0, ZEPPELIN_HIGH)
+            }
+        } while (1)
+    }
+    event(e, a) {
+        accevif (e == EventHit) {
+            trotz += 7
+            health += 1.0
+            groundy -= 0.2m
+            if (interrupter) {
+                save (x, y, z) {
+                    CopyInterrupterTrans()
+                    spawn2(FruiC, FruiC_S_FRUIT_AUTO, 1, 76.0, 0)
+                }
+            }
+            settrans(ZeppelinHitFlash)
+            soundpitch(4.353)
+            soundplay([Zp1jA], 1V)
+            interrupter = objectget(50.0)
+            sendevent(EventHit, interrupter, 100.0)
+            entitysetspawn(50.0, 0)
+            accevcstate(Zeppelin_Destroyed, health >= 10.0)
+        }
+    }
+}
+
+sub ZeppelinTrans() { // S-249
+    ViewDistance = distance(x, player, 0)
+    y = seek(y, groundy, 16.0)
+    modb = 0
+    if (ViewDistance > 100m) {
+        moda = 14.4
+    }
+    else {
+        moda = ((ViewDistance >> 8) * 14.4) / 156.25
+    }
+}
+
+sub ZeppelinHitFlash() { // S-293
+    ViewDistance = distance(x, player, 0)
+    y = seek(y, groundy, 16.0)
+    moda = 0
+    modb = 16.0
+    settrans(ZeppelinTrans)
+}
+
+state Zeppelin_Destroyed { // 2
+    stateflag 0x21
+    statusc 0x0
+    code() {
+        soundpitch(4.0)
+        sounddecay(9.6s)
+        soundsetup(0, self, 8)
+        soundplay([Zp3jA], 1V)
+        soundpitch(4.0)
+        sounddelay(1s)
+        soundcount(3)
+        sounddecay(9.6s)
+        soundsetup(0, self, 8)
+        soundplay([Zp4jA], 1V)
+        playframes(ZEPPELIN_DESTROYED, 0.0, 33.0)
+        sleep()
+    }
+    trans {
+        once {
+            modb = 0
+            statusb = FLAG_PHYSICS_ENGINE
+            SetVel(0m, -5m, 0m)
+            KillEntity()
+            interrupter = GLOBAL_11
+            sendevent(EventTriggered, interrupter)
+            if (!var0) {
+                interrupter = GLOBAL_110
+                sendevent(Event20, interrupter, 0)
+                if (!(player -> stateflag & 0x20)) {
+                    var owned
+                    if (LEVEL == LEVEL_RingsOfPower) {
+                        owned = 0x200 & SAVEDGEMPOOL1
+                    }
+                    else {
+                        CheckItemPool(LEVEL >> 8, SAVEDCRYSTALPOOL1, SAVEDCRYSTALPOOL2)
+                        owned = misc
+                    }
+                    if (owned) {
+                        sendevent(EventWarp, player, 0)
+                    }
+                    else if (LEVEL == LEVEL_RingsOfPower) {
+                        spawn2(FruiC, FruiC_S_FRUIT_AUTO, 1, 309.0, 0)
+                    }
+                    else if (200.0 + LEVEL) {
+                        spawn2(FruiC, FruiC_S_FRUIT_AUTO, 1, 200.0 + LEVEL, 0)
+                    }
+                }
+            }
+        }
+        if (y > 2m) {
+            vely = spd(vely, -1m)
+            rotx = degseek(rotx, 50deg, 20deg)
+            if (FRAMETIME < 36 || !time(5)) {
+                save (x, y, z) {
+                    x += randi(-3m, 3m)
+                    y += randi(-3m, 3m)
+                    z += randi(-3m, 3m)
+                    if (!rand(3)) {
+                        spawn(9, 4, 1, 0, 1)
+                        soundpitch(4.0)
+                        sounddecay(9.6s)
+                        soundsetup(7, self, 8)
+                        soundplay([Zp5jA], 1V)
+                    }
+                    else {
+                        spawn(9, 4, 1, 0, 1)
+                    }
+                }
+            }
+        }
+        else {
+            scalex = seek(scalex, 0.1S, spd(5S))
+            scaley = seek(scaley, 0.1S, spd(5S))
+            scalez = seek(scalez, 0.1S, spd(5S))
+            changestateif(Kill, scaley <= 0.1S && (animseq == getanim(ZEPPELIN_DESTROYED) && animframe == 33.0) && !child)
+        }
+    }
+}
+
+state Balloon { // 3
+    stateflag 0x1
+    statusc 0x0
+    code(type, item, vx, vy, vz) {
+        BalloonType = type
+        if (spawn == S_CLOCK) {
+            BalloonType = 2.0
+            CheckItemPool(LEVEL >> 8, SAVEDCRYSTALPOOL1, SAVEDCRYSTALPOOL2)
+            if (!(misc || (LEVEL == LEVEL_EggipusRex || LEVEL == LEVEL_Area51 || LEVEL == LEVEL_HotCoco || LEVEL == LEVEL_SkiCrazed || LEVEL == LEVEL_RingsOfPower))) {
+                KillEntity()
+                return
+            }
+        }
+        if (item) {
+            RewardItem = item
+        }
+        else {
+            if (var type = BalloonType; type == 3.0) {
+                RewardItem = 0
+            }
+            else if (type == 1.0) {
+                RewardItem = 97.0
+            }
+            else {
+                RewardItem = 100.0
+            }
+        }
+        if (vy) {
+            SetRot(0deg)
+            stateflag |= 0x10000
+            movetolist(4.0, self)
+            misc5(vx, 5m)
+            settrans(BalloonDrift)
+        }
+        SetScale(2S)
+        groundy = y
+        zindex = 10
+        stateflag = 9
+        BalloonUpdate()
+    }
+    event(e, a) {
+        if (interrupter) {
+            accevcstate(Balloon_Pop, e == EventHit && (child || (interrupter -> spawn == S_ZEPPELIN || interrupter -> spawn == 0x370000)))
+        }
+        accevcstate(Balloon_FlyAway, e == Event21)
+    }
+}
+
+sub BalloonDrift(type, item, vx, vy, vz) __trans { // S-641
+    x = spd(x, vx)
+    vx = (vx * 254) >> 8
+    z = spd(z, vz)
+    vz = (vz * 254) >> 8
+    groundy = spd(groundy, vy)
+    if (groundy > 35m) {
+        vy = (vy * 204) >> 8
+    }
+}
+
+sub BalloonUpdate() { // S-687
+    do {
+        creator = GLOBAL_97
+        ViewDistance = distance(creator)
+        if (!(child || stateflag & 8)) {
+            spawn(ZeppC, S_BOX, 1, -2.5m, BalloonType)
+        }
+        if (ViewDistance > 200m) {
+            y = groundy
+            stateflag = 9
+            playnull()
+        }
+        else if (ViewDistance > 30m) {
+            y = groundy
+            stateflag = 9
+            setanim(BARON_BALLOON_LOW)
+            playframe(BalloonType)
+        }
+        else if (ViewDistance > 10m) {
+            stateflag = 1
+            y = groundy - (cos(frametime << 6) << 2)
+            setanim(BARON_BALLOON_MEDIUM)
+            playframe(BalloonType)
+        }
+        else if (ViewDistance > 3.2m) {
+            stateflag = 1
+            y = groundy - (cos(frametime << 6) << 2)
+            setanim(BARON_BALLOON_HIGH)
+            playframe(BalloonType)
+        }
+        else {
+            stateflag = 1
+            y = groundy - (cos(frametime << 6) << 2)
+            if (ViewDistance < 1.2m) {
+                changestate(Balloon_Pop)
+            }
+            else if (player -> y < y - 1m) {
+                sendeventif(EventHit, child, (BalloonType != 3.0) | (distance(player, DIST_NO_Y) < 1.5m), 0)
+            }
+            setanim(BARON_BALLOON_HIGH)
+            playframe(BalloonType)
+        }
+    } while (1)
+}
+
+state Balloon_Pop { // 4
+    stateflag 0x3
+    statusc 0x0
+    code(hit) {
+        KillEntity()
+        if (spawn == S_REWARD_BALLOON) {
+            sendevent(Event2, child, 0)
+        }
+        else {
+            sendevent(Event14, child, hit)
+        }
+        spawn(9, 4, 1, getins(InitPopParticle), 1)
+        if (BalloonType == 1.0) {
+            soundpitch(3.625)
+            sounddecay(8s)
+            soundplay([1up0A], 1V)
+            if (player -> health + 50.0 < 100.0) {
+                player -> health += 50.0
+            }
+            else {
+                player -> health = 100.0
+            }
+        }
+        soundpitch(3.263)
+        sounddecay(8.4s)
+        soundsetup(7, self, 8)
+        soundplay([Ba1jA], 1V)
+        WaitChildNull()
+    }
+}
+
+sub InitPopParticle() { // S-939
+    SetColor1(0x64, 0x64, 0x05)
+    SetScale(1S)
+    SetVel(0m)
+}
+
+state Balloon_FlyAway { // 5
+    stateflag 0x3
+    statusc 0x0
+    event => state Balloon
+    code() {
+        statusb = FLAG_PHYSICS_ENGINE
+        KillEntity()
+        if (BalloonType == 1.0) {
+            if (player -> health + 50.0 < 100.0) {
+                player -> health += 50.0
+            }
+            else {
+                player -> health = 100.0
+            }
+        }
+        do {
+            vely = spd(vely, 10m)
+            setanim(BARON_BALLOON_HIGH)
+            playframe(BalloonType)
+        } until (y > 50m)
+    }
+}
+
+state Balloon_Box { // 6
+    stateflag 0x1
+    statusc 0x0
+    code(offs, type) {
+        SetColor1(0x80, 0x80, 0x80)
+        SetColor2(0x80, 0x80, 0x80)
+        SetScale(0.7S)
+        BalloonType = type
+        if (type == 2.0) {
+            setanim(BOX_CLOCK)
+        }
+        else if (type == 3.0) {
+            setanim(BOX_NITRO)
+        }
+        else {
+            setanim(BOX_PICKUP)
+        }
+        do {
+            vecx = parent -> x
+            x = vecx
+            vecz = parent -> z
+            z = vecz
+            y = parent -> y + (offs + 0.7m)
+            vecy = parent -> y - 1m
+            ins81(x, vecx)
+            y -= 0.7m
+            playframe(animframe)
+        } while (!(parent -> stateflag & 8))
+    }
+    event(e, a) {
+        accevcstate(Balloon_BoxBreak, e == EventHit)
+        accevcstate(Balloon_BoxFall, e == Event14)
+    }
+}
+
+state Balloon_BoxFall { // 7
+    stateflag 0x3
+    statusc 0x0
+    code(hit) {
+        changestateif(Balloon_BoxBreak, hit == 0 && BalloonType == 2.0, 0)
+        groundy = 1m
+        statusb = (FLAG_GRAVITY | FLAG_PHYSICS_ENGINE | FLAG_SOLID_GROUND)
+        WaitFrameGroundLand()
+        changestate(Balloon_BoxBreak, 100.0)
+    }
+    event(e, a) {
+        accevcstate(Balloon_BoxBreak, e == EventHit)
+    }
+}
+
+state Balloon_BoxBreak { // 8
+    stateflag 0x1
+    statusc 0x0
+    code(hit) {
+        sendeventif(Event21, creator, !STATUS_GROUNDLAND, 0)
+        if (!hit) {
+            if (BalloonType == 2.0) {
+                KillEntity()
+                settrans(SoundClockTick)
+                soundpitch(3.625)
+                sounddecay(9.6s)
+                soundplay([1up0A], 0.8V)
+                soundsetup(0, voice, 5)
+                GLOBAL_101 = 12
+                GLOBAL_100 = 0x7F
+                spawn(9, 43, 1, 0.5m, 0x6C, 0x69, 4, 1S, 0, 0)
+                spawn(DispC, DispC_S_TIMETRIAL)
+                playnull(42)
+                return
+            }
+            if (creator -> RewardItem) {
+                spawn2(FruiC, FruiC_S_FRUIT_AUTO, 1, creator -> RewardItem, creator -> id)
+            }
+        }
+        if (BalloonType != 2.0) {
+            sendevent(EventBoxBreak, player, self)
+            SoundPitchDefault(0.23)
+            sounddecay(0xA0)
+            soundplay([brk0A], 1V)
+        }
+        moda = 16.0
+        if (BalloonType == 3.0) {
+            spawn(9, 40, 1, getins(SetNitroExplosionColor), 0)
+            SetColor1(0x51, 0xA9, 0x00)
+            spawn(9, 43, 1, 0.5m, 0, 0x60, 0, 1S, 0, 0)
+            spawn(9, 46, 1, 20, 45, 2, 0, 0)
+            sendeventif(EventHit, player, distance(player) < 4m, 100.0)
+        }
+        else {
+            SetColor1(0xE6, 0x69, 0x08)
+        }
+        if (BOXCOUNT == LEVELBOXCOUNT && !(player -> stateflag & 0x20)) {
+            CheckItemPool(LEVEL >> 8, SAVEDGEMPOOL1, SAVEDGEMPOOL2)
+            if (!misc) {
+                CheckItemPool(LEVEL >> 8, GEMPOOL1, GEMPOOL2)
+                if (!misc) {
+                    if (300.0 + LEVEL) {
+                        spawn2(FruiC, FruiC_S_FRUIT_AUTO, 1, 300.0 + LEVEL, 0)
+                    }
+                }
+            }
+        } 
+        playframes(BOX_EXPLODE, 0.0, 11.0)
+    }
+}
+
+sub SoundClockTick() { // S-1200
+    if (!time(5)) {
+        if (!time(10)) {
+            soundpitch(0x399)
+            sounddecay(8s)
+            soundplay([Clt0A], 1V)
+        }
+        else {
+            soundpitch(0x266)
+            sounddecay(8s)
+            soundplay([Clt0A], 1V)
+        }
+    }
+}
+
+sub SetNitroExplosionColor() { // S-1212
+    if (var r = rand(5); r == 0) {
+        SetColor1(0x4B, 0x4B, 0x00)
+    }
+    else if (r == 1) {
+        SetColor1(0x00, 0x4B, 0x00)
+    }
+    else if (r == 2) {
+        SetColor1(0x19, 0x2F, 0x06)
+    }
+    else if (r == 3) {
+        SetColor1(0x4B, 0x33, 0x00)
+    }
+    else if (r == 4) {
+        SetColor1(0x00, 0x4B, 0x2C)
+    }
+    SetScale(2.5S)
+}
+
+state Balloon_Reward { // 9
+    stateflag 0x1
+    statusc 0x0
+    event => state Balloon
+    code() {
+        SetScale(2S)
+        groundy = y
+        zindex = 10
+        stateflag = 9
+        movetolist(4.0, self)
+        if (LEVEL == LEVEL_RingsOfPower) {
+            spawn(FruiC, FruiC_S_CRYSTAL, 1, 9.0, -12.8, -8.0, 0)
+        }
+        else {
+            spawn(FruiC, FruiC_S_CRYSTAL, 1, 0, -12.8, -8.0, 0, 0x80, 0x80, 0x80)
+        }
+        child -> y -= 2.5m
+        do {
+            ViewDistance = distance(player)
+            changestateifn(Balloon_FlyAway, child)
+            if (ViewDistance > 3m) {
+                stateflag = 1
+                playanim(0, BARON_BALLOON_HIGH)
+            }
+            else {
+                stateflag = 1
+                if (ViewDistance < 1.2m) {
+                    changestate(Balloon_Pop)
+                }
+                else {
+                    sendeventif(Event2, child, player -> y < y - 1m, 0)
+                }
+                playanim(0, BARON_BALLOON_HIGH)
+            }
+        } while (1)
+    }
+}
+
+state Kill { // 10
+    stateflag 0x1
+    statusc 0x0
+    code() {}
+}

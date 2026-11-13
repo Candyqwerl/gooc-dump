@@ -1,0 +1,953 @@
+#gool FruiC 3 4
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C2_ShadC.gooh"
+//gooc -c 2 -r pal "C2\C2_FruiC.gooc" "C2\Out\C2_FruiC.nsentry"
+//gooc -c 2 -r pal -h "Includes\C2_FruiC.gooh" "C2\C2_FruiC.gooc" "C2\Out\C2_FruiC.nsentry"
+
+#sprite FRUIT_WUMPA   [Cr10T]
+#tex 0x808080 1 1 0 3 32 32 32 32
+#tex 0x808080 1 1 0 3 64 96 32 32
+#tex 0x808080 1 1 0 3 64 64 32 32
+#tex 0x808080 1 1 0 3 64 32 32 32
+#tex 0x808080 1 1 0 3 96 96 32 32
+#tex 0x808080 1 1 0 3 96 64 32 32
+#tex 0x808080 1 1 0 3 96 32 32 32
+#tex 0x808080 1 1 0 3 128 96 32 32
+#tex 0x808080 1 1 0 3 128 64 32 32
+#tex 0x808080 1 1 0 3 128 32 32 32
+#tex 0x808080 1 1 0 3 160 96 32 32
+#tex 0x808080 1 1 0 3 160 64 32 32
+#tex 0x808080 1 1 0 3 160 32 32 32
+#tex 0x808080 1 1 0 3 192 96 32 32
+
+#sprite PICKUP_WILLY  [Cr10T]
+#tex 0x808080 0 1 7 6 64 64 64 32
+
+#anim PICKUP_DOCTOR   [WD10V] 1 0
+#anim CRYSTAL         [Cry1V] 1 0
+#anim GEM_1           [Ge10V] 1 0
+#anim GEM_3           [Ge30V] 1 0
+#anim GEM_4           [Ge40V] 1 0
+
+#spawn S_FRUIT_LIME               Fruit_Lime           // S0
+#spawn S_FRUIT_COCONUT            Fruit_Coconut        // S1
+#spawn S_FRUIT_PINEAPPLE          Fruit_Pineapple      // S2
+#spawn S_FRUIT_STRAWBERRY         Fruit_Strawberry     // S3
+#spawn S_FRUIT_MANGO              Fruit_Mango          // S4
+#spawn S_PICKUP_WILLY             Pickup_Willy         // S5
+#spawn S_PICKUP_DOCTOR            Pickup_Doctor        // S6
+#spawn S_FRUIT_LEMON              Fruit_Lemon          // S7
+#spawn S_PICKUP_YYY               Pickup_YYY           // S8
+#spawn S_FRUIT_SHROOM1            Fruit_Shroom         // S9
+#spawn S_FRUIT_SHROOM2            Fruit_Shroom         // S10
+#spawn S_FRUIT_GRAPE              Fruit_Grape          // S11
+#spawn S_FRUIT_HOP                Fruit_Generic        // S12
+#spawn S_FRUIT_AUTO               Fruit_Generic        // S13
+#spawn S_FRUIT_GOTO_HUD           Fruit_Goto_HUD       // S14
+#spawn S_1UP_GOTO_HUD             Fruit_Goto_HUD       // S15
+#spawn S_FRUIT_WUMPA              Fruit_Wumpa          // S16
+#spawn S_FRUIT_NONE               Fruit_None           // S17
+#spawn S_PICKUP_CORTEX            Pickup_Cortex        // S18
+#spawn S_PICKUP_BRIO              Pickup_Brio          // S19
+#spawn S_PICKUP_TAWNA             Pickup_Tawna         // S20
+#spawn S_WUMPA_IDLEANIM           Wumpa_IdleAnim       // S21
+#spawn S_WUMPA_IDLEANIM_PART      Wumpa_IdleAnim_Part  // S22
+#spawn S_FRUIT_BONUS_DEAD         Fruit_Bonus_Dead     // S23
+#spawn S_CRYSTAL                  Crystal              // S24
+#spawn S_GEM                      Gem                  // S25
+#spawn S_WUMPA_BONUS_GOTO_HUD     Fruit_Goto_HUD       // S26
+#spawn S_GEM_WARP                 Warp_Gems            // S27
+
+event EventHit           => state Fruit_Collect
+event EventSpinHit       => state Fruit_Fling
+event EventHitInvincible => state Fruit_Collect
+event Event12            => state Kill
+
+var mem1, mem2, mem3, FruitAmount, FruitFrame, FruitGroundY, FruitEvent, FruitReward, FruitCounted, FruitParentID,
+    FruitParentDoctorID, FruitItemID, FruitDetached, FruitTransFunc, FruitVar15
+
+expr FRUIT_ID_GEM = 300.0
+expr FRUIT_ID_CRYSTAL = 200.0
+expr FRUIT_ID_DOCTOR = 102.0
+expr FRUIT_ID_1UP = 97.0
+expr FRUIT_ID_WUMPA = 76.0
+expr FRUIT_ID_NONE = -106.0
+
+expr GEM_RED = 58.0
+expr GEM_GREEN = 59.0
+expr GEM_PURPLE = 60.0
+expr GEM_BLUE = 61.0
+expr GEM_YELLOW = 62.0
+
+state Fruit_Wumpa { // 0
+    code() {
+        FruitInit(FRUIT_ID_WUMPA, 0)
+    }
+}
+
+state Fruit_None { // 1
+    code() {
+        FruitInit(FRUIT_ID_NONE, 0)
+    }
+}
+
+state Pickup_Willy { // 2
+    code() {
+        if (entitygetstate(3)) {
+            FruitInit(FRUIT_ID_NONE, 0)
+        }
+        else {
+            FruitInit(FRUIT_ID_1UP, id)
+        }
+    }
+}
+
+state Pickup_Doctor { // 3
+    code() {
+        FruitInit(FRUIT_ID_DOCTOR, -1)
+    }
+}
+
+state Crystal { // 4
+    code(item_id, nx, ny, nz, cr, cg, cb) {
+        SetColor1(cr, cg, cb)
+        SetColor2(nx, ny, nz)
+        if (item_id) {
+            FruitItemID = item_id
+        }
+        else {
+            FruitItemID = LEVEL
+        }
+        CheckItemPool(FruitItemID >> 8, SAVEDCRYSTALPOOL1, SAVEDCRYSTALPOOL2)
+        v0 = misc
+        CheckItemPool(FruitItemID >> 8, CRYSTALPOOL1, CRYSTALPOOL2)
+        field_61 = misc
+        unless (entitygetstate(3), v0, field_61) {
+            spawn(ShadC, ShadC_S_SHADOW, 1, 0, 1S, 0)
+            FruitInit(FRUIT_ID_CRYSTAL, id)
+        }
+        KillEntity()
+        
+    }
+}
+
+state Gem { // 5
+    code(item_id, nx, ny, nz) {
+        SetColor2(nx, ny, nz)
+        if (item_id) {
+            FruitItemID = item_id
+        }
+        else {
+            FruitItemID = LEVEL
+        }
+        CheckItemPool(FruitItemID >> 8, SAVEDGEMPOOL1, SAVEDGEMPOOL2)
+        v0 = misc
+        CheckItemPool(FruitItemID >> 8, GEMPOOL1, GEMPOOL2)
+        field_61 = misc
+        if (!(entitygetstate(3) || v0 || field_61) || LEVEL == LEVEL_GameWin) {
+            FruitInit(FRUIT_ID_GEM, id)
+        }
+        KillEntity()
+    }
+}
+
+sub SetGemColor(reward) {
+    if (reward == GEM_RED) {
+        SetColor1(0x6C, 0x08, 0x08)
+        setanim(GEM_1)
+    }
+    else if (reward == GEM_GREEN) {
+        SetColor1(0x08, 0x6C, 0x08)
+        setanim(GEM_3)
+    }
+    else if (reward == GEM_PURPLE) {
+        SetColor1(0x6C, 0x08, 0x6C)
+        setanim(GEM_4)
+    }
+    else if (reward == GEM_BLUE) {
+        SetColor1(0x00, 0x00, 0x80)
+        if (animseq != getanim(GEM_1)) {
+            scalex = scalex * 1.2 >> 8
+            scaley = scaley * 0.6 >> 8
+            scalez = scalez * 1.2 >> 8
+        }
+        setanim(GEM_1)
+    }
+    else if (reward == GEM_YELLOW) {
+        SetColor1(0x80, 0x80, 0x00)
+        if (animseq != getanim(GEM_1)) {
+            scalex = scalex * 0.9 >> 8
+            scaley = scaley * 1.2 >> 8
+            scalez = scalez * 0.9 >> 8
+        }
+        setanim(GEM_1)
+    }
+    else {
+        SetColor1(0x5A, 0x5A, 0x6C)
+        setanim(GEM_1)
+    }
+    moda = 4.0
+    SetColor2(0x00, 0x259, 0xFD4)
+}
+
+inline sub FruitPlayNextFrame() {
+    if (FruitReward <= 96.0) {
+        animframe = (animframe + 1.0) % 14.0
+        playframe()
+    }
+    else {
+        playframe(FruitFrame)
+    }
+}
+
+sub FruitHop(p) {
+    if (p) {
+        save (statusb, groundy) {
+            statusb = FLAG_PHYSICS_ENGINE | FLAG_GRAVITY | FLAG_SOLID_GROUND
+            groundy = FruitGroundY
+            vely = p
+            if (FruitReward == 96.0) {
+                velx = randi(-0.75m, 0.75m)
+                velz = randi(-0.75m, 0.75m)
+            }
+            FruitPlayNextFrame()
+            FruitPlayNextFrame()
+            FruitPlayNextFrame()
+            do {
+                FruitPlayNextFrame()
+            } until (STATUS_GROUNDLAND)
+        }
+    }
+}
+
+inline sub FruitUpdateFloat(p, c) {
+    playframe()
+    y += (sin((p * 360deg + 180deg) / 62) * 0.0125m >> 12) + c * (1m / 102400)
+}
+
+state Fruit_Idle { // 6
+    stateflag 0x801
+    statusc 0x0
+    code() {
+        do (var v1, v2 = FruitGroundY + 0.3m) {
+            y = v2
+            FruitUpdateFloat(0, -4)
+            FruitUpdateFloat(1, 1)
+            FruitUpdateFloat(2, -17)
+            FruitUpdateFloat(3, -9)
+            FruitUpdateFloat(4, -5)
+            FruitUpdateFloat(5, -10)
+            FruitUpdateFloat(6, -20)
+            FruitUpdateFloat(7, -9)
+            FruitUpdateFloat(8, -25)
+            FruitUpdateFloat(9, -21)
+            FruitUpdateFloat(10, -16)
+            FruitUpdateFloat(11, -25)
+            FruitUpdateFloat(12, -21)
+            FruitUpdateFloat(13, -30)
+            FruitUpdateFloat(14, -25)
+            FruitUpdateFloat(15, -9)
+            FruitUpdateFloat(16, -14)
+            FruitUpdateFloat(17, -29)
+            FruitUpdateFloat(18, -23)
+            FruitUpdateFloat(19, -25)
+            FruitUpdateFloat(20, -17)
+            FruitUpdateFloat(21, -21)
+            FruitUpdateFloat(22, -14)
+            FruitUpdateFloat(23, -23)
+            FruitUpdateFloat(24, -9)
+            FruitUpdateFloat(25, -24)
+            FruitUpdateFloat(26, -8)
+            FruitUpdateFloat(27, -9)
+            FruitUpdateFloat(28, -7)
+            FruitUpdateFloat(29, -1)
+            FruitUpdateFloat(30, 7)
+            FruitUpdateFloat(31, -8)
+            FruitUpdateFloat(32, 0)
+            FruitUpdateFloat(33, 6)
+            FruitUpdateFloat(34, 9)
+            FruitUpdateFloat(35, 7)
+            FruitUpdateFloat(36, 23)
+            FruitUpdateFloat(37, 8)
+            FruitUpdateFloat(38, 23)
+            FruitUpdateFloat(39, 14)
+            FruitUpdateFloat(40, 21)
+            FruitUpdateFloat(41, 17)
+            FruitUpdateFloat(42, 25)
+            FruitUpdateFloat(43, 23)
+            FruitUpdateFloat(44, 30)
+            FruitUpdateFloat(45, 15)
+            FruitUpdateFloat(46, 9)
+            FruitUpdateFloat(47, 26)
+            FruitUpdateFloat(48, 31)
+            FruitUpdateFloat(49, 23)
+            FruitUpdateFloat(50, 27)
+            FruitUpdateFloat(51, 18)
+            FruitUpdateFloat(52, 22)
+            FruitUpdateFloat(53, 27)
+            FruitUpdateFloat(54, 11)
+            FruitUpdateFloat(55, 23)
+            FruitUpdateFloat(56, 13)
+            FruitUpdateFloat(57, 7)
+            FruitUpdateFloat(58, 11)
+            FruitUpdateFloat(59, 20)
+            FruitUpdateFloat(60, 2)
+            FruitUpdateFloat(61, 7)
+            playframe()
+        } while (1)
+    }
+    event(e, a) {
+        rejevret(FruitReward >= FRUIT_ID_CRYSTAL && (e == EventSpinHit || e == EventHit || e == EventHitInvincible))
+        accevcstate(Fruit_Collect, (e == EventHit || e == EventHitInvincible) && a[0] == 0)
+        accevcstate(Fruit_Fling, (e == EventHit || e == EventHitInvincible || e == Event14) && a[0])
+        if (e == EventDespawn) {
+            if (distance(player) < 5m) {
+                gamefunc4(self)
+            }
+        }
+        accevcstate(Kill, e == Event1)
+    }
+    trans {
+        changestateif(Fruit_Collect, !STATUS_FIRSTFRAME && collider, 0)
+        if (FruitReward <= 96.0) {
+            animframe = (animframe + 1.0) % 14.0
+        }
+        else {
+            animframe = FruitFrame
+        }
+        call(FruitTransFunc)
+    }
+}
+
+sub FruitRotate() {
+    roty = spd(roty, 45deg)
+}
+
+inline sub FruitFloatSpace(v, s) {
+    s = v >> 5
+    if (v > 0m) {
+        v -= s
+        if (!s || v < 0m) {
+            v = 0m
+        }
+    }
+    else {
+        v -= s
+        if (!s || v > 0m) {
+            v = 0m
+        }
+    }
+}
+
+state Fruit_Space_Idle { // 7
+    stateflag 0x801
+    event => state Fruit_Idle
+    trans => state Fruit_Idle
+    code() {
+        statusb |= FLAG_PHYSICS_ENGINE
+        scalez = 2S
+        SetVel(randi(-0.35m, 0.35m))
+        do {
+            playframe()
+            if (frametime - statetime >= 1s) {
+                statusc &= ~0x2
+                break
+            }
+        } while (1)
+        do (var s) {
+            playframe()
+            if (!!velx) { FruitFloatSpace(velx, s) }
+            if (!!vely) { FruitFloatSpace(vely, s) }
+            if (!!velz) { FruitFloatSpace(velz, s) }
+        } while (1)
+    }
+}
+
+state Fruit_Collect { // 8
+    stateflag 0x2
+    statusc 0x0
+    code(a) {
+        KillEntity()
+        FruitCounted = true
+        if (FruitAmount) {
+            sendeventif(Event42, player, !(spawn == S_FRUIT_AUTO || FruitReward >= FRUIT_ID_CRYSTAL), 0)
+            if (FruitReward == FRUIT_ID_DOCTOR) {
+                changestate(Doctor_Collect)
+            }
+            else if (FruitReward == FRUIT_ID_CRYSTAL || FruitReward == FRUIT_ID_GEM) {
+                if (FruitParentID) {
+                    entitysetstate(FruitParentID, 3)
+                }
+            }
+            else if (FruitReward == FRUIT_ID_1UP) {
+                if (FruitParentID && !(GLOBAL_119 & 0x2000 && BONUSSTATE != BONUS_COMPLETED)) {
+                    entitysetstate(FruitParentID, 5)
+                }
+            }
+            SetVFX2D()
+            moveto2d()
+            vecx = (scalex / (FruitAmount >> 8)) >> 3
+            vecy = (scaley / (FruitAmount >> 8)) >> 3
+            vecz = (scalez / (FruitAmount >> 8)) >> 3
+            while (FruitAmount) {
+                changestateif(Fruit_Goto_HUD, FruitAmount == 1.0)
+                spawn2(FruiC, S_FRUIT_GOTO_HUD, 1)
+                FruitCounted += 1.0
+                FruitAmount += -1.0
+                if (FruitAmount) {
+                    FruitPlayNextFrame()
+                    FruitPlayNextFrame()
+                    FruitPlayNextFrame()
+                    FruitPlayNextFrame()
+                }
+            }
+            statusb = FLAG_INVISIBLE
+            FruitPlayNextFrame()
+        }
+    }
+    trans {
+        nofirst {
+            scalex -= vecx
+            scaley -= vecy
+            scalez -= vecz
+        }
+    }
+}
+
+state Doctor_Collect { // 9
+    stateflag 0x2
+    code() {
+        creator = player -> creator
+        sendevent(Event6, creator, self, FruitParentDoctorID)
+        if (!eventaccepted) {
+            if (spawn == S_FRUIT_AUTO) {
+                return
+            }
+            else {
+                changestate(Fruit_Idle)
+            }
+        }
+        KillEntity()
+    }
+}
+
+state Fruit_Fling { // 10
+    stateflag 0x2
+    code() {
+        KillEntity()
+        if (!rand(3)) {
+            troty = GAMEDIR + randi(-50deg, 50deg)
+        }
+        else {
+            troty = rand(360deg)
+        }
+        speed = 10m
+        statusb = FLAG_PHYSICS_ENGINE
+        zindex = 0
+        soundpitch(4.0)
+        sounddecay(5.8s - 1)
+        soundplay([spa0A], 0.25V)
+        do {
+            FruitPlayNextFrame()
+        } until (frametime - statetime >= 2s)
+    }
+    trans {
+        if (!STATUS_FIRSTFRAME) {
+            y += 0.2m
+            speed += 2m
+            setvel(speed)
+        }
+    }
+}
+
+inline sub SetFruitScale(sx, sy, sz) {
+    if (!vecx) {
+        vecx = 1S
+    }
+    scalex = sx * vecx >> 12
+    scaley = sy * vecx >> 12
+    scalez = sz * vecx >> 12
+}
+
+inline sub SetScaleWumpa() {
+    SetFruitScale(0.675S, 0.84375S, 1.2S)
+    y += 0.45m
+}
+
+inline sub SetScale1Up() {
+    SetFruitScale(1.8S, 1.125S, 1.6S)
+    y += 0.6m
+}
+
+inline sub SetScaleFruitNone() {
+    SetFruitScale(0.9S, 1.125S, 1.6S)
+    y += 0.6m
+}
+
+inline sub SetFruitAnim(anim, frame) {
+    setanim(anim)
+    FruitFrame = 0
+}
+
+sub FruitInit(item_id, parent_id) {
+    if (parent == player) {
+        FruitDetached = false
+    }
+    else {
+        FruitDetached = true
+    }
+    FruitTransFunc = 0
+    FruitParentID = parent_id
+    y += 0.2m
+    FruitGroundY = y
+    SetVel(0m)
+    SetRot(0deg)
+    
+    if (item_id < 30.0) return;
+    if (item_id == 100.0) item_id = (x ^ ((y << 2) ^ (z >> 3))) % 97.0;
+    if (item_id == 101.0) item_id = (x ^ ((y << 2) ^ (z >> 3))) % 18.0 + 76.0;
+
+    SetZindexField(24)
+    statusb = FLAG_COLLIDABLE | 0x4000000
+    SetFruitScale(0.7S, 0.7S, 0.7S)
+
+    FruitAmount = 1.0
+    if (item_id <= 76.0) {
+        setanim(FRUIT_WUMPA, rand(14.0))
+        FruitReward = FRUIT_ID_WUMPA
+        SetScaleWumpa()
+    }
+    else if (item_id < 96.0) {
+        if (spawn == S_FRUIT_AUTO) {
+            SetScaleWumpa()
+            FruitReward = FRUIT_ID_NONE
+            setanim(FRUIT_WUMPA)
+            FruitFrame = 0
+            FruitAmount = ((96.0 - item_id) >> 1) + 1.0 & -1.0
+        }
+        else {
+            do (var fruit = 0) {
+                spawn2(FruiC, S_FRUIT_HOP, 1, 96.0, 0)
+            } while ({ fruit += 1.0 }; fruit < ((96.0 - item_id) >> 1) + 1.0)
+            playnull()
+            return
+        }
+    }
+    else if (item_id < 97.0) {
+        animframe = rand(14.0)
+        SetScaleWumpa()
+        SetFruitAnim(FRUIT_WUMPA, 0)
+        FruitReward = 96.0
+    }
+    else if (item_id <= 97.0) {
+        SetFruitAnim(PICKUP_WILLY, 0)
+        SetScale1Up()
+        FruitReward = FRUIT_ID_1UP
+    }
+    else if (item_id == 102.0) {
+        FruitParentDoctorID = FruitParentID
+        FruitParentID = 0
+        SetFruitAnim(PICKUP_DOCTOR, 0)
+        SetScale1Up()
+        FruitReward = FRUIT_ID_DOCTOR
+    }
+    else if (item_id == -106.0) {
+        FruitAmount = 10.0
+        SetFruitAnim(FRUIT_WUMPA, 0)
+        SetScaleFruitNone()
+        FruitReward = FRUIT_ID_NONE
+    }
+    else if (item_id == 200.0) {
+        vfx = (vfx & 0xFFFFFF00) | 0xA
+        vfx = (vfx & 0xFF00FFFF) | 0x40000
+        if (spawn == S_FRUIT_HOP) {
+            FruitItemID = LEVEL
+        }
+        FruitTransFunc = getins(FruitRotate)
+        if (spawn != S_CRYSTAL) {
+            SetColor1(0x00, 0x80, 0x00)
+            SetColor2(-0xCCC, -0x800, 0x000)
+        }
+        moda = 4.0
+        SetFruitAnim(CRYSTAL, 0)
+        SetFruitScale(1S, 1S, 1S)
+        FruitReward = FRUIT_ID_CRYSTAL
+        if (LEVEL != LEVEL_Intro) {
+            if (var level = LEVEL; level == LEVEL_HangEight || level == LEVEL_PlantFood) 
+                                                  { v0 = 1 }
+            else if (level == LEVEL_AirCrash)     { v0 = 2 }
+            else if (level == LEVEL_HanginOut)    { v0 = 3 }
+            else if (level == LEVEL_SewerOrLater) { v0 = 4 }
+            else { v0 = 0}
+            spawn(9, 47, 1, v0) 
+        }
+    }
+    else if (item_id >= 300.0) {
+        vfx = (vfx & 0xFFFFFF00) | 0xA
+        vfx = (vfx & 0xFF00FFFF) | 0x40000
+        FruitTransFunc = getins(FruitRotate)
+        if (spawn == S_FRUIT_HOP) {
+            FruitDetached = 0
+            FruitItemID = item_id - FRUIT_ID_GEM
+            FruitReward = FRUIT_ID_GEM
+        }
+        if (spawn != S_GEM) {
+            SetColor2(0x000, 0x61F, 0xEC8)
+        }
+        SetFruitScale(1S, 1S, 1S)
+        SetGemColor(FruitItemID)
+        FruitReward = FRUIT_ID_GEM
+        FruitFrame = 0
+    }
+    else {
+        return
+    }
+    if (FruitDetached) {
+        movetolist(3.0)
+    }
+    if (spawn == S_FRUIT_AUTO) {
+        statusc &= ~0x12
+        changestate(Fruit_Collect, 0)
+    }
+    else if (spawn == S_FRUIT_HOP) {
+        if ((LEVEL == LEVEL_RockIt || LEVEL == LEVEL_PackAttack) && FruitReward < FRUIT_ID_CRYSTAL) {
+            statusc &= ~0x12
+            changestate(Fruit_Space_Idle)
+        }
+        else {
+            FruitHop(12.64912m)
+            statusc &= ~0x12
+            changestate(Fruit_Idle)
+        }
+    }
+    else {
+        changestate(Fruit_Idle)
+    }
+}
+
+state Fruit_Generic { // 11
+    statusc 0x12
+    code => sub FruitInit
+    event(e, a) {
+        if (e == EventDespawn) {
+            if (distance(player) < 5m) {
+                gamefunc4(self)
+            }
+        }
+    }
+}
+
+state Fruit_Bonus_Dead { // 12
+    stateflag 0x40001
+    code(item_id) {
+        movetolist(3.0)
+        SetVFX2D()
+        if (item_id == 97.0) {
+            SetFruitAnim(PICKUP_WILLY, 0)
+            FruitReward = FRUIT_ID_1UP
+        }
+        else if (item_id == 76.0) {
+            setanim(FRUIT_WUMPA, rand(14.0))
+            FruitReward = FRUIT_ID_WUMPA
+        }
+        groundy = y - 0.075m
+        statusb = FLAG_PHYSICS_ENGINE
+        vely = 0.7m + rand(0.1m)
+        if (x < 0m) {
+            velx = rand(0.375m)
+            velz = rand(0.375m)
+        }
+        else {
+            velx = -rand(0.375m)
+            velz = -rand(0.375m)
+        }
+        do {
+            FruitPlayNextFrame()
+        } until (y < groundy)
+    }
+    trans {
+        vely = spd(vely, -1.25m)
+    }
+}
+
+inline sub Set1UpVel(v) {
+    setvel(v)
+    if (abs(velx) < 2.0) {
+        velx = 2.0
+    }
+    if (abs(vely) < 2.0) {
+        vely = 2.0
+    }
+}
+
+state Fruit_Goto_HUD { // 13
+    stateflag 0x40001
+    code() {
+        movetolist(3.0)
+        SetVFX2D()
+        var0 = 0
+        if (spawn == S_FRUIT_GOTO_HUD) {
+            if ((creator -> vfx & 0xFF) != 6) {
+                moveto2d()
+            }
+            FruitReward = getfield(creator, offsetof(FruitReward))
+            animseq = creator -> animseq
+            animframe = creator -> animframe
+            FruitFrame = getfield(creator, offsetof(FruitFrame))
+            FruitCounted = getfield(creator, offsetof(FruitCounted))
+            FruitAmount = 1.0
+            vecz = 0.1S
+        }
+        else if (spawn == S_WUMPA_BONUS_GOTO_HUD) {
+            setanim(FRUIT_WUMPA, rand(14.0))
+            FruitFrame = animframe
+            FruitReward = FRUIT_ID_WUMPA
+            FruitCounted = 1.0
+            FruitAmount = 1.0
+            vecz = 0.1S
+        }
+        else if (spawn == S_1UP_GOTO_HUD) {
+            if ((creator -> vfx & 0xFF) != 6) {
+                moveto2d()
+            }
+            SetFruitAnim(PICKUP_WILLY, 0)
+            scalex <<= 1
+            FruitReward = FRUIT_ID_1UP
+            FruitAmount = 1.0
+            FruitCounted = FruitAmount
+            vecz = scalex
+        }
+        else {
+            vecz = scalex
+        }
+        if (FruitReward == FRUIT_ID_CRYSTAL || FruitReward == FRUIT_ID_GEM) {
+            FruitEvent = EventCombo
+            creator = PICKUPDISPLAY
+            soundpitch(3.625)
+            soundsetup(0, 11)
+            sounddecay(9.6s)
+            soundplay([1up0A], 0.9V)
+            vecz = 0.0625S
+            FruitAmount = FruitReward + FruitItemID
+            if (FruitReward == FRUIT_ID_GEM && (FruitItemID < 10.0 || FruitItemID >= 57.0)) {
+                var0 = FRUIT_ID_GEM + 1.0
+            }
+            else {
+                var0 = FruitReward
+            }
+            vecy = -102.0
+        }
+        else if (FruitReward == FRUIT_ID_1UP) {
+            FruitEvent = Event17
+            soundpitch(3.625)
+            soundsetup(0, 11)
+            sounddecay(9.6s)
+            soundplay([1up0A], 0.5V)
+            if (BONUSSTATE == BONUS_CURRENT) {
+                creator = BONUSLIFECOUNTER
+                vecz = 0.1S
+            }
+            else {
+                creator = LIFEDISPLAY
+                vecz = 0.2S
+            }
+            if (BONUSSTATE == BONUS_CURRENT) {
+                vecy = creator -> y
+            }
+            else {
+                vecy = 102.0
+            }
+        }
+        else {
+            if (spawn == S_FRUIT_AUTO) {
+                FruitEvent = Event36
+            }
+            else {
+                FruitEvent = Event2
+            }
+            soundsetup(0, 11)
+            soundpitch((16.0 + (0.8 * (FruitCounted - 1.0) >> 8)) * 0.23 >> 8)
+            sounddecay(2.58s)
+            soundplay([frt0A], 0.35V)
+            if (BONUSSTATE == BONUS_CURRENT) {
+                creator = BONUSFRUITCOUNTER
+                if (FruitReward <= 96.0) {
+                    vecz = 0.05S
+                }
+            }
+            else {
+                creator = FRUITDISPLAY
+                if (FruitReward <= 96.0) {
+                    vecz = 0.1S
+                }
+            }
+            if (BONUSSTATE == BONUS_CURRENT) {
+                vecy = creator -> y
+            }
+            else {
+                vecy = 102.0
+            }
+        }
+        soundsetup(0, voice, 5)
+        if (FruitReward == FRUIT_ID_1UP) {
+            LIFEICONTRANSX -= 50.0
+            vecx = LIFEICONTRANSX
+            troty = atan2(self, vecx)
+            Set1UpVel(2.25m)
+
+            do { 
+                FruitPlayNextFrame()
+            } until (x >> 8 == vecx >> 8 && y >> 8 == vecy >> 8)
+
+            do (var i = 0) {
+                sendevent(EventHit, creator, 0)
+                playframe(FruitFrame, 0.1s)
+                vfx = (vfx & 0xFFFFFF00) | 1
+                playframe(FruitFrame, 0.1s)
+                vfx = (vfx & 0xFFFFFF00) | 6
+            } while ({ i += 1.0 }; i < 6.0)
+
+            if (LIFEICONTRANSX == vecx) {
+                LIFEICONTRANSX = 100.0
+            }
+        }
+        sendevent(Event32, creator, v0, FruitParentID)
+        vecx = creator -> x
+        troty = atan2(self, vecx)
+        Set1UpVel(FruitReward == FRUIT_ID_1UP ? 0.75m : 2.25m)
+        do {
+            FruitPlayNextFrame()
+        } until (x >> 8 == vecx >> 8 && y >> 8 == vecy >> 8)
+        sendevent(FruitEvent, player, FruitAmount)
+    }
+    event(e, a) {
+        accevif (e == Event41) {
+            if (FruitReward == FRUIT_ID_1UP) {
+                LIFECOUNT += 1.0
+            }
+        }
+    }
+    trans {
+        if (!STATUS_FIRSTFRAME) {
+            x = seek(x, vecx, spd(velx))
+            y = seek(y, vecy, spd(vely))
+            if (scalex > vecz) {
+                scalex = scalex * 0.9 >> 8
+                scaley = scaley * 0.9 >> 8
+            }
+            else if (scalex < vecz - 0.08) {
+                scalex = scalex * 1.1 >> 8
+                scaley = scaley * 1.1 >> 8
+            }
+        }
+    }
+}
+
+state Kill { // 14
+    stateflag 0x22
+    statusc 0x0
+    code() {}
+}
+
+inline sub KillIfNotCollected() {
+    if (!misc) {
+        KillEntity()
+        return
+    }
+}
+
+inline sub SetPosIfCollected() {
+    if (misc) {
+        SetVec(x, y, z)
+        v0 = true
+    }
+}
+
+state Warp_Gems { // 15
+    __transargs
+    trans => sub WarpGemRotate
+    code(item_id, nx, ny, nz, cr, cg, cb) {
+        var0 = 0
+        playnull()
+        if (item_id >= FRUIT_ID_GEM) {
+            {
+                var v1 = SAVEDGEMPOOL1 | GEMPOOL1
+                var v2 = SAVEDGEMPOOL2 | GEMPOOL2
+                CheckItemPool((item_id - FRUIT_ID_GEM) >> 8, v1, v2)
+                KillIfNotCollected()
+                CheckItemPool((item_id - FRUIT_ID_GEM) >> 8, GEMPOOL1, GEMPOOL2)
+                SetPosIfCollected()
+            }
+            SetScale(0.6S)
+            SetGemColor(item_id - FRUIT_ID_GEM)
+        }
+        else if (item_id >= FRUIT_ID_CRYSTAL) {
+            {
+                var v1 = SAVEDCRYSTALPOOL1 | CRYSTALPOOL1
+                var v2 = SAVEDCRYSTALPOOL2 | CRYSTALPOOL2
+                CheckItemPool((item_id - FRUIT_ID_CRYSTAL) >> 8, v1, v2)
+                KillIfNotCollected()
+                CheckItemPool((item_id - FRUIT_ID_CRYSTAL) >> 8, CRYSTALPOOL1, CRYSTALPOOL2)
+                SetPosIfCollected()
+            }
+            SetScale(0.65S)
+            if (!v0) {
+                spawn(9, 47, 1, 0)
+            }
+        }
+        setanim(CRYSTAL)
+        SetColor2(nx, ny, nz)
+        vfx = (vfx & 0xFFFFFF00) | 0xA
+        vfx = (vfx & 0xFF00FFFF) | 0x40000
+        moda = 4.0
+        zindex = 40
+        save (animseq) {
+            while (v0) {
+                playnull()
+            }
+        }
+        sleepframe(0)
+    }
+    event(e, a) {
+        accevif (e == Event79 && item_id == a[0]) {
+            player = interrupter
+            player -> v0 = self
+            v0 = false
+            settrans(WarpGemAttach)
+        }
+        accevif (e == EventTriggered) {
+            settrans(WarpGemGotoSlot)
+        }
+    }
+}
+
+sub WarpGemRotate() {
+    roty = spd(roty, 90deg)
+}
+
+sub WarpGemAttach(item_id, nx, ny, nz, cr, cg, cb) __trans {
+    once {
+        if (item_id < FRUIT_ID_GEM) {
+            spawn(9, 47, 1, 0)
+        }
+    }
+    getvert(vtrans, player, 0.0)
+    WarpGemRotate()
+}
+
+sub WarpGemGotoSlot(item_id, nx, ny, nz, cr, cg, cb) __trans {
+    once {
+        velx = (vecx - x) * 1s / 2s
+        vely = (vecy - y) * 1s / 2s
+        velz = (vecz - z) * 1s / 2s
+        statetime = frametime
+        statusb = FLAG_PHYSICS_ENGINE
+        spawn(9, 52, 2, colr1 >> 1, colg1 >> 1, colb1 >> 1, 1.0, 0.6S)
+    }
+    if (frametime - statetime >= 2s) {
+        statusb = 0
+        settrans(WarpGemRotate)
+    }
+    WarpGemRotate()
+}

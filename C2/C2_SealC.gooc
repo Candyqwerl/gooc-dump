@@ -1,0 +1,333 @@
+#gool SealC 24 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 2 -r pal "C2\C2_SealC.gooc" "C2\Out\C2_SealC.nsentry"
+
+#anim SEAL_SCOOT    [Se1eV] 29 1
+#anim SEAL_SLIDE    [Se2eV] 84 1
+
+#spawn S_SEAL               Seal_Init
+#spawn S_SEAL_PATH          Seal_Path_Init
+#spawn S_SEAL_PATH_CHILD    Seal_Path_Child
+
+event EventJumpedOn         => state Seal_Squash
+event EventHit              => state Seal_Squash
+event EventSpinHit          => state Seal_Fling
+event EventHitInvincible    => state Seal_Squash
+event EventFling            => state Seal_Squash
+event EventSlideHit         => state Seal_Fling
+event EventSlamHit          => state Seal_Squash
+
+var ReflectionFlag, CycleLength, CycleOffset, PathSpeed, SealTrackOffset, SealFrame, ChildSpawnMinDist, TargetZindex,
+    TurnDuration, SealVar10, FlingCollateralDist, ZindexPathprogThresh, ZindexSeekSpeed
+    
+inline sub SoundSealBark() {
+    unless (rand(2)) {
+        sounddelay(rand(1s) + 0.05s)
+        sounddecay(6.4s)
+        soundpitch((15.68 + rand(1.28)) * 0.09 >> 8)
+        soundplay([SBaGA], 0.3V)
+    }
+}
+
+inline sub WaitForSpawnCycle(cyclelen, cycleoffs) {
+    while (time(cyclelen, cycleoffs)) {
+        playframe(0)
+    }
+}
+
+inline sub SealScootCycle() {
+    do {
+        SoundSealBark()
+        playframes(SEAL_SCOOT, 0.0, 28.0)
+    } while (1)
+}
+
+inline sub SetReflectionVFX(reflection) {
+    if (reflection) {
+        if (ZONEFLAGS & 0x800) {
+            spawn(9, 28, 1)
+        }
+        else {
+            vfx = (vfx & 0xFFFF00FF) | 0xC00
+        }
+    }
+}
+
+state Seal_Path_Init { // 0
+    statusc 0x32
+    code(count, speed, cyclelen, cycleoffs, limit, zindex_target, colldist, reflection, ppthresh, zindex_spd) {
+        PathSpeed = speed
+        statusb = FLAG_INVISIBLE
+        calcpath(pathlen - 1.0, vvec)
+        setanim(SEAL_SCOOT)
+        SealFrame = 29.0
+        ChildSpawnMinDist = 15m
+        pathdist = limit
+        TargetZindex = zindex_target
+        FlingCollateralDist = colldist
+        ReflectionFlag = reflection
+        ZindexPathprogThresh = ppthresh
+        ZindexSeekSpeed = zindex_spd
+        if (ZindexPathprogThresh < 0) {
+            ZindexPathprogThresh = (pathlen - ZindexPathprogThresh) - 1
+        }
+        do {
+            do (var seals = 0) {
+                WaitForSpawnCycle(cyclelen, cycleoffs)
+                if (distance(player, DIST_EXACT | DIST_NO_Y) > ChildSpawnMinDist && player -> z < vecz + 15m) {
+                    spawn(SealC, S_SEAL_PATH_CHILD, 1)
+                }
+                playframe(0)
+                seals += 1.0
+            } while (seals < count)
+            WaitForSpawnCycle(cyclelen, cycleoffs)
+            playframe(0)
+            WaitForSpawnCycle(cyclelen, cycleoffs)
+            playframe(0)
+            WaitForSpawnCycle(cyclelen, cycleoffs)
+            playframe(0)
+            WaitForSpawnCycle(cyclelen, cycleoffs)
+            playframe(0)
+        } while (1)
+    }
+}
+
+state Seal_Path_Child { // 1
+    code() {
+        zindex = 55
+        yzapproach = 180deg
+        trotx = 180deg
+        pathprog = 0
+        statusb = FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | FLAG_SOLID_TOP | 0x800 | 0x2000
+        CycleLength = 50
+        CycleOffset = rand(50)
+        SealTrackOffset = 0
+        density = 0.1m
+        PathSpeed = parent -> PathSpeed
+        entity = parent -> entity
+        pathlen = parent -> pathlen
+        animseq = parent -> animseq
+        SealFrame = parent -> SealFrame
+        pathdist = parent -> pathdist
+        TargetZindex = parent -> TargetZindex
+        ReflectionFlag = parent -> ReflectionFlag
+        ZindexPathprogThresh = parent -> ZindexPathprogThresh
+        ZindexSeekSpeed = parent -> ZindexSeekSpeed
+        SetReflectionVFX(ReflectionFlag)
+        do (var scale = 0S) {
+            SetScale(scale)
+            playframe(0)
+            scale += 0.2S
+        } while (scale < 1.2S)
+        changestate(Seal_Path)
+    }
+}
+
+state Seal_Path { // 2
+    stateflag 0x81
+    statusc 0
+    code() {
+        playframes(SEAL_SLIDE, 0.0, 24.0)
+        do (var i = 0) {
+            playframes(25.0, 65.0)
+            i += 1.0
+        } while (i < 2.0)
+        playframes(SEAL_SLIDE, 66.0, 83.0)
+        SealScootCycle()
+    }
+    trans {
+        if (pathprog >= ZindexPathprogThresh) {
+            zindex = seek(zindex, TargetZindex, ZindexSeekSpeed)
+        }
+        sendeventif(EventHit, collider, player -> statusa \ FLAG_GROUNDLAND, 100.0)
+        changestateif(Seal_Kill, STATUS_PATH_END)
+        {
+            var v1 = 0
+            var deg_to_player = 0deg
+            var pathrot = troty
+            pathprog = spd(pathprog, PathSpeed)
+            calcpath(pathprog)
+            save (troty, statusa, statusb, x, y, z, pathprog) {
+                statusb = FLAG_PATH_CALCS | FLAG_TRACK_PATH_SIGN
+                x = player -> x
+                y = player -> y
+                z = player -> z
+                calcpath(0)
+                v1 = troty
+                troty += 90deg
+                setvel(SealTrackOffset)
+            }
+            x += velx
+            z += velz
+            if (pathlen - pathprog >= 3.0) {
+                if (abs(SealTrackOffset - vecy) > 0.1m) {
+                    deg_to_player = degdist(troty, atan2(player -> trans))
+                    if (abs(deg_to_player) < 60deg) {
+                        if (deg_to_player < -45deg) {
+                            deg_to_player = -45deg
+                        }
+                        else if (deg_to_player > 45deg) {
+                            deg_to_player = 45deg
+                        }
+                        troty += deg_to_player
+                    }
+                }
+                SealTrackOffset = seek(SealTrackOffset, vecy, spd(2m))
+                if (SealTrackOffset < -pathdist) {
+                    troty = pathrot
+                    SealTrackOffset = -pathdist
+                }
+                else if (SealTrackOffset > pathdist) {
+                    troty = pathrot
+                    SealTrackOffset = pathdist
+                }
+            }
+        }
+        groundy = y
+    }
+}
+
+state Seal_Kill { // 3
+    stateflag 0x20
+    statusc 0
+    code() {}
+}
+
+state Seal_Squash { // 4
+    stateflag 0x21
+    statusc 0x32
+    code(h) {
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        playframe()
+    }
+}
+
+sub SetParticleColor() {
+    var r = rand(5)
+    if (r == 0 || r == 1) {
+        SetColor1(0x57, 0x2B, 0x2D)
+    }
+    else if (r == 2 || r == 3) {
+        SetColor1(0x72, 0x47, 0x47)
+    }
+    else if (r == 4) {
+        SetColor1(0x80, 0x80, 0x80)
+    }
+}
+
+
+state Seal_Fling { // 5
+    stateflag 0x30
+    statusc 0x12
+    code(h) {
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir()
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    } 
+    trans {
+        EnemyFlingTrans(parent -> FlingCollateralDist, EventFling)
+    }
+}
+
+state Seal_Init { // 6
+    statusc 0x12
+    code(limit, cyclelen, cycleoffs, turnspd, reflection) {
+        pathdist = limit
+        CycleLength = cyclelen
+        CycleOffset = cycleoffs
+        TurnDuration = turnspd
+        density = 0.15m
+        zindex = 25
+        SealVar10 = 0
+        SealTrackOffset = 0m
+        statusb = FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | 0x800 | FLAG_SOLID_SIDES | 0x2000 | 0x20000000
+        SetReflectionVFX(reflection)
+        changestate(Seal)
+    }
+}
+
+state Seal { // 7
+    stateflag 0x5
+    statusc 0
+    code() {
+        trotx = 180deg
+        yzapproach = 120deg
+        playanim(28, SEAL_SCOOT)
+        SealScootCycle()
+    }
+    trans {
+        var travel = (CycleLength - (TurnDuration << 1)) >> 1
+        var cycletime = time(CycleLength, CycleOffset)
+        var phase = 0
+        var prog = pathprog
+        if (TurnDuration > 0 && cycletime >= 0 && cycletime <= TurnDuration) {
+            phase = cycletime
+            roty = troty - ((phase * 180deg) / TurnDuration)
+            statusb &= ~(FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN)
+        }
+        else if (cycletime >= TurnDuration && cycletime <= TurnDuration + travel) {
+            phase = cycletime - TurnDuration
+            prog = (phase * (pathlen - 1.0)) / travel
+            statusb |= FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN
+            calcpath(prog)
+            pathprog = prog
+        }
+        else if (TurnDuration > 0 && cycletime >= TurnDuration + travel && cycletime <= (TurnDuration << 1) + travel) {
+            phase = cycletime - (TurnDuration + travel)
+            roty = troty - ((phase * 180deg) / TurnDuration)
+            statusb &= ~(FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN)
+        }
+        else if (cycletime >= (TurnDuration << 1) + travel && cycletime <= CycleLength) {
+            phase = cycletime - ((TurnDuration << 1) + travel)
+            prog = (pathlen - 1.0) + ((phase * -(pathlen - 1.0)) / (CycleLength - ((TurnDuration << 1) + travel)))
+            statusb |= FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN
+            calcpath(prog)
+            pathprog = prog
+            troty += 180deg
+        }
+        if (pathdist) {
+            var deg_to_player = 0deg
+            var pathrot = troty
+            save (troty, statusa, statusb, x, y, z, pathprog) {
+                statusb = FLAG_PATH_CALCS | FLAG_TRACK_PATH_SIGN
+                x = player -> x
+                y = player -> y
+                z = player -> z
+                calcpath(0)
+                troty += 90deg
+                setvel(SealTrackOffset, vvel)
+            }
+            x += velx
+            z += velz
+            if (abs(SealTrackOffset - vecy) > 0.1m) {
+                deg_to_player = degdist(troty, atan2(player -> trans))
+                if (abs(deg_to_player) < 60deg) {
+                    if (deg_to_player < -45deg) {
+                        deg_to_player = -45deg
+                    }
+                    else if (deg_to_player > 45deg) {
+                        deg_to_player = 45deg
+                    }
+                    troty += deg_to_player
+                }
+            }
+            SealTrackOffset = seek(SealTrackOffset, vecy, spd(2m))
+            if (SealTrackOffset < -pathdist) {
+                troty = pathrot
+                SealTrackOffset = -pathdist
+            }
+            else if (SealTrackOffset > pathdist) {
+                troty = pathrot
+                SealTrackOffset = pathdist
+            }
+        }
+        sendevent(EventHit, collider, 100.0)
+    }
+}
+
+

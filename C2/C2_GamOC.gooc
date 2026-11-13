@@ -1,0 +1,467 @@
+#gool GamOC 62 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C2_DispC.gooh"
+//gooc -c 2 -r pal "C2\C2_GamOC.gooc" "C2\Out\C2_GamOC.nsentry"
+
+#anim CORTEX_BG             [Cb1YV] 1 1
+#anim CORTEX_SIDE_EYE_1     [C40YV] 6 1
+#anim CORTEX_SIDE_EYE_2     [C41YV] 6 1
+#anim CORTEX_SIDE_EYE_3     [C42YV] 6 1
+#anim CORTEX_SIDE_EYE_4     [C43YV] 6 1
+#anim CORTEX_SIDE_EYE_5     [C44YV] 6 1
+#anim CORTEX_SIDE_EYE_6     [C45YV] 6 1
+#anim CORTEX_SIDE_EYE_LOOP  [C32YV] 100 1
+  
+#anim CORTEX_NO_EN          [C10YV] 80 1
+#anim CORTEX_YES_EN         [C20YV] 50 1
+#anim CORTEX_GAME_OVER_EN   [C30YV] 186 1
+#anim CORTEX_WARP_IN_EN     [C31YV] 18 1
+  
+#anim CORTEX_NO_FR          [C10FV] 80 1
+#anim CORTEX_YES_FR         [C20FV] 50 1
+#anim CORTEX_GAME_OVER_FR   [C30FV] 186 1
+#anim CORTEX_WARP_IN_FR     [C31FV] 18 1
+  
+#anim CORTEX_NO_DE          [C10GV] 80 1
+#anim CORTEX_YES_DE         [C20GV] 50 1
+#anim CORTEX_GAME_OVER_DE   [C30GV] 186 1
+#anim CORTEX_WARP_IN_DE     [C31GV] 18 1
+  
+#anim CORTEX_NO_ES          [C10SV] 80 1
+#anim CORTEX_YES_ES         [C20SV] 50 1
+#anim CORTEX_GAME_OVER_ES   [C30SV] 186 1
+#anim CORTEX_WARP_IN_ES     [C31SV] 18 1
+  
+#anim CORTEX_NO_IT          [C10IV] 80 1
+#anim CORTEX_YES_IT         [C20IV] 50 1
+#anim CORTEX_GAME_OVER_IT   [C30IV] 186 1
+#anim CORTEX_WARP_IN_IT     [C31IV] 18 1
+
+#include "..\\Includes\\Fonts\\C2_FONT_SMALL.gooc"
+
+#text TEXT           FONT_SMALL[Cr20T]
+">"                  // 0.0
+"CONTINUER?"         // 1.0
+"OUI"                // 2.0
+"NON"                // 3.0
+"WEITER?"            // 4.0
+"JA"                 // 5.0
+"NEIN"               // 6.0
+"CONTINUA?"          // 7.0
+"SI"                 // 8.0
+"NO"                 // 9.0
+"?CONTINUAR?"        // 10.0
+"CONTINUE?"          // 11.0
+"YES"                // 12.0
+
+#spawn S_SPEECH      GameOver_Speech
+#spawn S_LOAD        GameOver_LoadLevel
+#spawn S_BACKGROUND  GameOver_Background
+#spawn S_MENU        GameOver_Menu
+
+var HologramStatic, SavedMusicVolume
+
+expr ButtonCount = field_61
+expr ButtonIndex = stalltime
+
+state GameOver_Background { // 0
+    code() {
+        SetRot(0deg)
+        SetScale(1.5S)
+        zindex = -200
+        y += 0.3m
+        sleepanim(0, CORTEX_BG)
+    }
+}
+
+state GameOver_Menu { // 1
+    code() {
+        movetolist(3.0)
+        SetTrans(-112.0, -71.0, -000.0)
+        if (var lang = GLOBAL_151; lang == LANG_FR) {
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -2.0, getanim(TEXT), 00.0, 176.0, -00.0, 1)
+            player = objectspawned
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -1.0, getanim(TEXT), 01.0, 000.0, -00.0, player)
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -0.0, getanim(TEXT), 02.0, 192.0, -00.0, player)
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, +1.0, getanim(TEXT), 03.0, 192.0, -18.0, player)
+        }
+        else if (lang == LANG_DE) {
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -2.0, getanim(TEXT), 00.0, 160.0, -00.0, 1)
+            player = objectspawned
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -1.0, getanim(TEXT), 04.0, 000.0, -00.0, player)
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -0.0, getanim(TEXT), 05.0, 176.0, -00.0, player)
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, +1.0, getanim(TEXT), 06.0, 176.0, -18.0, player)
+        }
+        else if (lang == LANG_IT) {
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -2.0, getanim(TEXT), 00.0, 160.0, -00.0, 1)
+            player = objectspawned
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -1.0, getanim(TEXT), 07.0, 000.0, -00.0, player)
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -0.0, getanim(TEXT), 08.0, 176.0, -00.0, player)
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, +1.0, getanim(TEXT), 09.0, 176.0, -18.0, player)
+        }
+        else if (lang == LANG_ES) {
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -2.0, getanim(TEXT), 00.0, 192.0, -00.0, 1)
+            player = objectspawned
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -1.0, getanim(TEXT), 10.0, 000.0, -00.0, player)
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -0.0, getanim(TEXT), 08.0, 208.0, -00.0, player)
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, +1.0, getanim(TEXT), 09.0, 208.0, -18.0, player)
+        }
+        else {
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -2.0, getanim(TEXT), 00.0, 160.0, -00.0, 1)
+            player = objectspawned
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -1.0, getanim(TEXT), 11.0, 000.0, -00.0, player)
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -0.0, getanim(TEXT), 12.0, 176.0, -00.0, player)
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, +1.0, getanim(TEXT), 09.0, 176.0, -18.0, player)
+        }
+        sleepnull()
+    }
+    event(e, a) {
+        accevif (e == Event12) {
+            var0 = true
+        }
+    }
+    trans {
+        once {
+            TextDefaultScale()
+            SetRot(0deg)
+            ButtonIndex = 0.0
+            ButtonCount = 2.0
+        }
+        unless (STATUS_FIRSTFRAME) {
+            unless (stateflag & 0x400000) {
+                if (dirpress(PAD_UP) && ButtonIndex > 0.0) {
+                    save (vfx) {
+                        SetVFX2D()
+                        soundpitch(0.5 - 1)
+                        sounddecay(9.6s)
+                        soundplay([Mb10A], 0.5V)
+                    }
+                    ButtonIndex -= 1.0
+                }
+                if (dirpress(PAD_DOWN) && ButtonIndex < ButtonCount - 1.0) {
+                    save (vfx) {
+                        SetVFX2D()
+                        soundpitch(0.5 - 1)
+                        sounddecay(9.6s)
+                        soundplay([Mb10A], 0.5V)
+                    }
+                    ButtonIndex += 1.0
+                }
+                if (buttonpress(PAD_START | PAD_X)) {
+                    save (vfx) {
+                        SetVFX2D()
+                        soundpitch(4.0)
+                        sounddecay(9.6s)
+                        soundplay([tal0A], 0.8V)
+                    }
+                    sendevent(Event3, creator, ButtonIndex)
+                    stateflag |= 0x400000
+                }
+            }
+        }
+    }
+}
+
+inline sub PlayCortexGameOverSpeech(intro, audio1, audio2, clip, appear, anim) {
+    save (MUSVOL, GLOBAL_74) {
+        GLOBAL_74 = 0
+        MUSVOL = 0
+        field_61 = 0
+        loadfile([CrtxT])
+        loadfile(intro)
+        loadfile([Co1YG])
+        spawn2(9, 44, 1, audio1, audio2, 2.0, 1000s, 8.0)
+        creator = objectspawned
+        loadfile(clip)
+        loadfile([Co1YG])
+        playnull()
+        until (isloaded([Co1YG]) && isloaded(clip) && isloaded(audio1) && isloaded([Co1YG]) && isloaded(intro)) {
+            playnull()
+        }
+        sendevent(EventTriggered, creator)
+        playframes(appear, 0.0, 17.0)
+        while (creator -> pathprog < 17) {
+            playframe()
+        }
+        field_62 = 0
+        deloadfile(intro)
+        deloadfile([Co1YG])
+        setanim(anim)
+        do {
+            animframe = creator -> pathprog - 17 << 8
+            if (animframe > 185.0) {
+                break
+            }
+            else {
+                playframe()
+            }
+        } while (1)
+        animframe = 185.0
+        deloadfile(clip)
+        deloadfile([Co1YG])
+        cascadeevent(Event12, self)
+        deloadfile([CrtxT])
+    }
+}
+
+state GameOver_Speech { // 2
+    stateflag 0x20000001
+    code() {
+        SetTrans(0, 0, 0)
+        SavedMusicVolume = MUSVOL
+        SetRot(5deg, 0deg, 0deg)
+        y = CAMTRANSY
+        x = CAMTRANSX
+        z = CAMTRANSZ - 7.5m
+        spawn(GamOC, S_BACKGROUND, 1)
+        GLOBAL_74 = 0
+        GAMEFLAGS &= ~0x800001
+        playnull()
+        playnull()
+        playnull()
+        playnull()
+        spawn(GamOC, S_MENU, 1)
+        statusb = 0x100000
+        HologramStatic = 0
+        if (var lang = GLOBAL_151; lang == LANG_FR) {
+            PlayCortexGameOverSpeech([C31FV], [C30FO], [C31FO], [C30FV], CORTEX_WARP_IN_FR, CORTEX_GAME_OVER_FR)
+        }
+        else if (lang == LANG_DE) {
+            PlayCortexGameOverSpeech([C31GV], [C30GO], [C31GO], [C30GV], CORTEX_WARP_IN_DE, CORTEX_GAME_OVER_DE)
+        }
+        else if (lang == LANG_IT) {
+            PlayCortexGameOverSpeech([C31IV], [C30IO], [C31IO], [C30IV], CORTEX_WARP_IN_IT, CORTEX_GAME_OVER_IT)
+        }
+        else if (lang == LANG_ES) {
+            PlayCortexGameOverSpeech([C31SV], [C30SO], [C31SO], [C30SV], CORTEX_WARP_IN_ES, CORTEX_GAME_OVER_ES)
+        }
+        else {
+            PlayCortexGameOverSpeech([C31YV], [C30YO], [C31YO], [C30YV], CORTEX_WARP_IN_EN, CORTEX_GAME_OVER_EN)
+        }
+        stateflag &= ~0x20000000
+        sleepframes(CORTEX_SIDE_EYE_LOOP, 0.0, 99.0)
+    }
+    event(e, a) {
+        if (e == Event3) {
+            if (stateflag & 0x20000000) {
+                if (a[0]) {
+                    spawn(GamOC, S_LOAD, 1, 4.0)
+                }
+                else {
+                    spawn(GamOC, S_LOAD, 1, 1.0)
+                }
+                epc = 0
+            }
+            else {
+                accevcstate(GameOver_Continue, a[0] == 0.0)
+                accevcstate(GameOver_Exit, a[0] == 1.0)
+            }
+        }
+    }
+    trans {
+        stalltime = HologramStatic & -4 | GAMETICK & 3
+        if (animseq) {
+            moda = seek(moda, 0.0, 0x222)
+        }
+        else {
+            moda = 16.0
+        }
+    }
+}
+
+inline sub PlayCortexChoiceSpeech(clip, audio, anim, frames) {
+    loadfile(clip)
+    loadfile([Co1YG])
+    loadfile(audio)
+    soundpitch(8.0)
+    soundplay(audio, 0V)
+    CortexFaceScreenCenter()
+    save (MUSVOL, GLOBAL_74) {
+        GLOBAL_74 = 0
+        MUSVOL = 0
+        field_61 = 0
+        loadfile([CrtxT])
+        loadfile(clip)
+        loadfile([Co1YG])
+        spawn2(9, 44, 1, audio, 1.0, 1000s, 8.0)
+        creator = objectspawned
+        playframe()
+        until (isloaded(audio) && isloaded([Co1YG]) && isloaded(clip)) {
+            playframe()
+        }
+        sendevent(EventTriggered, creator)
+        playframe()
+        field_62 = 0
+        setanim(anim)
+        do {
+            animframe = creator -> pathprog << 8
+            if (animframe > frames) {
+                break
+            }
+            else {
+                playframe()
+            }
+        } while (1)
+        animframe = frames
+        deloadfile(clip)
+        deloadfile([Co1YG])
+        cascadeevent(Event12, self)
+        deloadfile([CrtxT])
+    }
+    deloadfile(clip)
+    deloadfile([Co1YG])
+    deloadfile(audio)
+}
+
+
+state GameOver_Exit { // 3
+    code() {
+        if (var lang = GLOBAL_151; lang == LANG_FR) {
+            PlayCortexChoiceSpeech([C10FV], [C10FO], CORTEX_NO_FR, 79.0)
+        }
+        else if (lang == LANG_DE) {
+            PlayCortexChoiceSpeech([C10GV], [C10GO], CORTEX_NO_DE, 79.0)
+        }
+        else if (lang == LANG_IT) {
+            PlayCortexChoiceSpeech([C10IV], [C10IO], CORTEX_NO_IT, 79.0)
+        }
+        else if (lang == LANG_ES) {
+            PlayCortexChoiceSpeech([C10SV], [C10SO], CORTEX_NO_ES, 79.0)
+        }
+        else {
+            PlayCortexChoiceSpeech([C10YV], [C10YO], CORTEX_NO_EN, 79.0)
+        }
+        spawn(GamOC, S_LOAD, 1, 3.0)
+        sleep()
+    }
+}
+
+inline sub PlayCortexSideEyeFrames(anim) {
+    playanim(0, anim)
+    playanim(1, anim)
+    playanim(2, anim)
+    playanim(3, anim)
+    playanim(4, anim)
+    playanim(5, anim)
+}
+
+sub CortexFaceScreenCenter() { // S-867
+    do {
+        if (animframe == 12.0) {
+            PlayCortexSideEyeFrames(CORTEX_SIDE_EYE_1)
+            return
+        }
+        else if (animframe == 29.0) {
+            PlayCortexSideEyeFrames(CORTEX_SIDE_EYE_2)
+            return
+        }
+        else if (animframe == 46.0) {
+            PlayCortexSideEyeFrames(CORTEX_SIDE_EYE_3)
+            return
+        }
+        else if (animframe == 62.0) {
+            PlayCortexSideEyeFrames(CORTEX_SIDE_EYE_4)
+            return
+        }
+        else if (animframe == 79.0) {
+            PlayCortexSideEyeFrames(CORTEX_SIDE_EYE_5)
+            return
+        }
+        else if (animframe == 96.0) {
+            PlayCortexSideEyeFrames(CORTEX_SIDE_EYE_6)
+            return
+        }
+        else {
+            if (animseq != getanim(CORTEX_SIDE_EYE_LOOP)) {
+                setanim(CORTEX_SIDE_EYE_LOOP, -1.0)
+            }
+            playframe((animframe + 1.0) % 100.0)
+        }
+    } while (1)
+}
+
+state GameOver_Continue { // 4
+    code() {
+        if (var lang = GLOBAL_151; lang == LANG_FR) {
+            PlayCortexChoiceSpeech([C20FV], [C20FO], CORTEX_YES_FR, 49.0)
+        }
+        else if (lang == LANG_DE) {
+            PlayCortexChoiceSpeech([C20GV], [C20GO], CORTEX_YES_DE, 49.0)
+        }
+        else if (lang == LANG_IT) {
+            PlayCortexChoiceSpeech([C20IV], [C20IO], CORTEX_YES_IT, 49.0)
+        }
+        else if (lang == LANG_ES) {
+            PlayCortexChoiceSpeech([C20SV], [C20SO], CORTEX_YES_ES, 49.0)
+        }
+        else {
+            PlayCortexChoiceSpeech([C20YV], [C20YO], CORTEX_YES_EN, 49.0)
+        }
+        spawn(GamOC, S_LOAD, 1, 1.0)
+        sleep()
+    }
+}
+
+state GameOver_LoadLevel { // 5
+    code(mode) {
+        if (mode == 0.0) {
+            GLOBAL_131 = 0
+            GLOBAL_17 = 6.0
+            GLOBAL_10 = 6.0
+            GAMEFLAGS &= ~0x2
+            startgame()
+            if (var demo = GLOBAL_114; demo == 0) { var0 = LEVEL_TurtleWoods }
+            else if (demo == 1) { var0 = LEVEL_PlantFood }
+            else if (demo == 2) { var0 = LEVEL_SnowGo }
+            else if (demo == 3) { var0 = LEVEL_RockIt }
+            else if (demo == 4) { var0 = LEVEL_TheEelDeal }
+            else if (demo == 5) { var0 = LEVEL_BearIt }
+            else if (demo == 6) { var0 = LEVEL_BossNGin }
+            GLOBAL_114 = (GLOBAL_114 + 1) % 7
+        }
+        else if (mode == 1.0) {
+            LIFECOUNT = STARTLIVES
+            CURRENTLEVEL = 99
+            var0 = LEVEL_WarpRoom
+        }
+        else if (mode == 2.0) {
+            startgame()
+            GLOBAL_131 = 0
+            GLOBAL_10 = 0
+            var0 = LEVEL_Intro
+        }
+        else if (mode == 3.0) {
+            startgame()
+            GLOBAL_90 |= 1
+            LIFECOUNT = STARTLIVES
+            CURRENTLEVEL = 99
+            var0 = LEVEL_WarpRoom
+        }
+        else if (mode == 4.0) {
+            GLOBAL_131 = 0
+            GLOBAL_17 = 6.0
+            GLOBAL_10 = 6.0
+            GAMEFLAGS &= ~0x2
+            startgame()
+            var0 = LEVEL_Title
+        }
+        startgame()
+        GLOBAL_90 |= 1
+        LIFECOUNT = STARTLIVES
+        CURRENTLEVEL = 99
+        var0 = LEVEL_WarpRoom
+        FadeToBlack()
+        WaitFadeFrame()
+        if (parent -> spawn == S_SPEECH) {
+            MUSVOL = parent -> SavedMusicVolume
+        }
+        loadlevel(var0)
+        sleepnull()
+    }
+}
+
+state Kill { // 6
+    statusc 0x0
+    code() {}
+}

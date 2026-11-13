@@ -1,0 +1,500 @@
+#gool DioOC 16 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_DioOC.gooc" "C3\Out\C3_DioOC.nsentry"
+
+#anim TERY_SCREECH                   [Pt1cV] [Pt1cG] 18 1 2
+#anim TERY_FLY                       [Pt2cV] [Pt1cG] 17 1 2
+#anim FALLEN_TREE                    [FT1cV] [FT1cG] 01 1 2
+#anim FALLEN_TREE_REFLECTION         [FT2cV] [FT2cG] 01 1 2
+#anim FALLEN_TREE_BREAK              [FT3cV] [FT3cG] 21 1 2
+#anim FALLEN_TREE_REFLECTION_BREAK   [FT4cV] [FT4cG] 29 1 2
+
+#sprite SMOKE [Pr1cT]
+#tex 0x3C3C3C 0 3 4 3 000 64 64 64
+#tex 0x3C3C3C 0 3 4 3 544 32 32 32
+#tex 0x3C3C3C 0 3 4 3 576 96 32 32
+#tex 0x3C3C3C 0 3 4 3 576 64 32 32
+#tex 0x3C3C3C 0 3 4 3 576 32 32 32
+#tex 0x3C3C3C 0 3 4 3 608 96 32 32
+#tex 0x3C3C3C 0 3 4 3 608 64 32 32
+#tex 0x3C3C3C 0 3 4 3 608 32 32 32
+
+#spawn S_0                   __s_0
+#spawn S_1                   __s_1
+#spawn S_TERRY_3D            Tery_3D_Init
+#spawn S_SMOKE               Smoke_Spawner
+#spawn S_CURRENT             Current
+#spawn S_5                   __s_5
+#spawn S_TREE                Fallen_Tree
+#spawn S_TREE_REFLECTION     Fallen_Tree_Reflection
+#spawn S_SMOKE_PARTICLE      Smoke_Particle
+#spawn S_TERRY_2D            Tery_2D_Init
+
+var PreVar1, TeryVar2, TeryVar3, TeryBaseY, TeryTargetY, TeryRiseSpeed, TeryFaceAway, TeryAbductPlayer
+
+expr TeryBaseYaw         = PreVar1
+expr TeryTurnDistance    = TeryVar2
+expr TeryWakeDistance    = TeryVar3
+expr TeryShouldTurn      = misc
+expr TeryPlayerYaw       = vecy
+expr TeryChaserGapZ      = var0
+expr TeryCycleLength     = PreVar1
+expr TeryCycleOffset     = TeryVar2
+expr TeryHalfCycle       = TeryVar3
+expr TreeReflection      = PreVar1
+
+state Tery_3D_Init { // 0
+    statusc 0
+    code(angle, turndist, wakedist, faceaway, abduct) {
+        TeryBaseYaw = angle
+        TeryTurnDistance = turndist
+        TeryWakeDistance = wakedist
+        TeryFaceAway = faceaway
+        TeryAbductPlayer = abduct
+        if (abs(degdist(TeryBaseYaw, atan2(player -> trans))) >= 90deg) {
+            TeryBaseYaw = (TeryBaseYaw + 180deg) % 360deg
+        }
+        if (TeryFaceAway) {
+            TeryBaseYaw = (TeryBaseYaw + 180deg) % 360deg
+        }
+        roty = TeryBaseYaw
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_SIDES | FLAG_NO_CAMERA_CLIP
+        zindex = 35
+        TeryBaseY = y
+        TeryTargetY = TeryBaseY
+        SetScale(0.9S)
+        changestate(Tery_Sleep)
+    }
+}
+
+state Tery_Sleep { // 1
+    statusc 0
+    code() {
+        sleepanim(0, TERY_SCREECH)
+    }
+    event(e, a) {
+        accevcstate(Tery_Squash, e == EventHit && collider != player)
+        accevcstate(Tery_Squash, e == EventSlamHit || e == EventHitInvincible || e == EventFling || e == EventHit)
+        accevcstate(Tery_Fling, e == EventSpinHit)
+        rejevret(e == EventHit || e == EventJumpedOn || e == EventSlideHit)
+    }
+    trans {
+        unless (player -> statusa & FLAG_GROUNDLAND) {
+            if (TeryAbductPlayer) {
+                sendevent(EventHit, collider, 0)
+                if (eventaccepted) {
+                    statusb = 0
+                    changestate(Tery_Wake, -48.0)
+                }
+            }
+            else {
+                sendevent(EventHit, collider, 100.0)
+                if (eventaccepted) {
+                    statusb = 0
+                    changestate(Tery_Wake, -48.0)
+                }
+            }
+        }
+        changestateif(Tery_Wake, abs(z - player -> z) < TeryWakeDistance, 0)
+    }
+}
+
+state Tery_Wake { // 2
+    statusc 0
+    __transargs
+    code(rise) {
+        soundpitch(3.263)
+        sounddecay(10s - 1)
+        soundsetup(6, self, 8)
+        soundplay([Pt1cA], 1V)
+        playframes(TERY_SCREECH, 0.0, 17.0)
+        TeryTargetY = TeryBaseY + 20m
+        setanim(TERY_FLY, -1.0)
+        do {
+            if (statusb & FLAG_COLLIDABLE) {
+                playframe((animframe + 1.0) % 17.0)
+                if (animframe == 0) {
+                    soundpitch(3.263)
+                    soundplay([Pt2cA], 1V)
+                }
+            }
+            else {
+                playframe((animframe + 3.0) % 17.0)
+                if (animframe < 3.0) {
+                    soundpitch(3.263)
+                    soundplay([Pt2cA], 1V)
+                }
+            }
+        } while (1)
+    }
+    event(e, a) {
+        rejevret(e == EventHit && collider != player && !interrupter && !(interrupter -> stateflag & 0x1000000))
+        accevcstate(Tery_Squash, e == EventSlamHit || e == EventHitInvincible || e == EventFling || e == EventHit)
+        accevcstate(Tery_Fling, e == EventSpinHit)
+        rejevret(e == EventHit || e == EventJumpedOn || e == EventSlideHit)
+    }
+    trans {
+        if (statusa & FLAG_FIRSTFRAME) {
+            KillEntity()
+            TeryRiseSpeed = rise
+        }
+        if (!(player -> stateflag & 0x20) && !player -> invincible && !(player -> statusa & FLAG_GROUNDLAND)) {
+            if (TeryAbductPlayer) {
+                sendevent(EventHit, collider, 0)
+                if (eventaccepted) {
+                    soundpitch(3.263)
+                    sounddecay(10s - 1)
+                    soundsetup(6, self, 8)
+                    soundplay([Pt1cA], 1V)
+                    TeryRiseSpeed = -48.0
+                    statusb = 0
+                    epc = 0
+                }
+            }
+            else {
+                sendevent(EventHit, collider, 100.0)
+                if (eventaccepted) {
+                    soundpitch(3.263)
+                    sounddecay(10s - 1)
+                    soundsetup(6, self, 8)
+                    soundplay([Pt1cA], 1V)
+                    TeryRiseSpeed = -48.0
+                    statusb = 0
+                    epc = 0
+                }
+            }
+        }
+        if (y != TeryTargetY) {
+            TeryRiseSpeed += 4.0
+            y += TeryRiseSpeed
+            changestateif(Terry_Kill, y > TeryTargetY)
+            rotx = degseek(rotx, 60deg, 45deg)
+        }
+        if (GLOBAL_126) {
+            creator = GLOBAL_126
+            if (creator -> spawn == 0x110000) { // TriOC-0
+                TeryChaserGapZ = z - creator -> z
+                if (TeryChaserGapZ < 2m) {
+                    z += (2m - TeryChaserGapZ) >> 2
+                }
+            }
+        }
+        TeryPlayerYaw = atan2(player -> trans)
+        unless (TeryFaceAway) {
+            var0 = degdist(TeryBaseYaw, TeryPlayerYaw)
+            TeryShouldTurn = abs(var0) >= 90deg
+            if (TeryShouldTurn) {
+                TeryShouldTurn = abs(z - player -> z) >= TeryTurnDistance
+                unless (TeryShouldTurn) {
+                    TeryShouldTurn = 0
+                }
+            }
+            if (TeryShouldTurn) {
+                TeryBaseYaw = (TeryBaseYaw + 180deg) % 360deg
+            }
+        }
+        var0 = degdist(TeryBaseYaw, TeryPlayerYaw)
+        if (var0 > 15deg) {
+            var0 = 15deg
+        }
+        if (var0 < -15deg) {
+            var0 = -15deg
+        }
+        var0 = degdist(roty, TeryBaseYaw + var0) >> 2
+        if (var0 > 14.35deg) {
+            var0 = 14.35deg
+        }
+        if (var0 < -14.35deg) {
+            var0 = -14.35deg
+        }
+        rotz = (roty + var0) % 360deg
+        roty = rotz
+    }
+}
+
+state Tery_2D_Init { // 3
+    statusc 0
+    code(cyclelen, cycleoffs) {
+        TeryCycleLength = cyclelen * 1s / 1.2s
+        TeryCycleOffset = cycleoffs
+        TeryHalfCycle = TeryCycleLength >> 1
+        TeryCycleLength = TeryHalfCycle << 1
+        TeryCycleOffset = (TeryCycleOffset * TeryCycleLength) >> 8
+        if (TeryCycleOffset < 0) {
+            TeryCycleOffset = 0
+        }
+        if (TeryCycleOffset >= TeryCycleLength) {
+            TeryCycleOffset = TeryCycleLength - 1
+        }
+        SetRot(0deg)
+        SetZindexField(26)
+        statusb = FLAG_COLLIDABLE
+        changestate(Tery_2D)
+    }
+}
+
+state Tery_2D { // 4
+    statusc 0
+    code() {
+        sleepframes(TERY_FLY, 0.0, 16.0)
+    }
+    event(e, a) {
+        if (e == EventJumpedOn && interrupter == player) {
+            sendevent(Event21, interrupter, 17.88854m)
+            rejevcstate(Tery_Squash, eventaccepted)
+        }
+        accevcstate(Tery_Squash, e == EventSlamHit || e == EventJumpedOn || e == EventFling || e == EventHit)
+        accevcstate(Tery_Fling, e == EventSpinHit || e == EventSlideHit)
+    }
+    trans {
+        {
+            var cycletime, returning
+            cycletime = time(TeryCycleLength, TeryCycleOffset)
+            if (cycletime >= TeryHalfCycle) {
+                returning = 1
+                cycletime -= TeryHalfCycle
+                pathprog = (pathlen - 1) - ((cycletime * pathlen) / TeryHalfCycle)
+                trotz = 0deg
+            }
+            else {
+                pathprog = (cycletime * pathlen) / TeryHalfCycle
+                trotz = 30deg
+            }
+            calcpath(pathprog)
+        }
+        troty = degdist(0deg, atan2(player -> trans))
+        if (troty > 80deg) {
+            troty = 80deg
+        }
+        else if (troty < -80deg) {
+            troty = -80deg
+        }
+        vecy = degdist(roty, troty) >> 3
+        if (abs(vecy) >= 7.15deg) {
+            if (vecy >= 0deg) {
+                vecy = 7.15deg
+            }
+            else {
+                vecy = -7.15deg
+            }
+        }
+        roty += vecy
+        rotz = roty
+        rotx = degseek(rotx, trotz, 15deg)
+        sendevent(EventHit, collider, 100.0)
+    }
+}
+
+state Fallen_Tree { // 5
+    stateflag 0x4004081
+    statusc 0
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_SIDES | FLAG_SOLID_TOP | FLAG_NO_CAMERA_CLIP | 0x40000000
+        zindex = 24
+        spawn(DioOC, S_TREE_REFLECTION, 1)
+        TreeReflection = objectspawned
+        do {
+            var0 = player -> z - z
+            if (var0 >= 0) {
+                zindex = 4
+            }
+            else {
+                zindex = 35
+            }
+            playanim(0, FALLEN_TREE)
+        } while (1)
+    }
+    event(e, a) {
+        rejevret(interrupter == player)
+        accevcstate(Fallen_Tree_Break, e == EventHit)
+    }
+}
+
+state Fallen_Tree_Break { // 6
+    statusc 0
+    code() {
+        statusb = 0
+        soundpitch(2.54)
+        soundsetup(7, self, 8)
+        soundplay([TS1cA], 1V)
+        unless (SHAKEY) {
+            SHAKEY = 10.0
+        }
+        interrupter = TreeReflection
+        sendevent(EventTriggered, interrupter)
+        KillEntity()
+        playframes(FALLEN_TREE_BREAK, 0.0, 20.0)
+        soundsetup(7, self, 8)
+        soundpitch(1.183)
+        soundplay([ld00A], 1V)
+        sleep()
+    }
+}
+
+state Fallen_Tree_Reflection { // 7
+    statusc 0
+    code() {
+        statusb = 0x40000000
+        zindex = -20
+        sleepanim(0, FALLEN_TREE_REFLECTION)
+    }
+    event(e, a) {
+        accevcstate(Fallen_Tree_Reflection_Break, e == EventTriggered)
+    }
+}
+
+state Fallen_Tree_Reflection_Break { // 8
+    statusc 0
+    code() {
+        statusb = 0
+        KillEntity()
+        playframes(FALLEN_TREE_REFLECTION_BREAK, 0.0, 28.0)
+        soundsetup(7, self, 8)
+        soundpitch(1.813)
+        soundplay([ld00A], 1V)
+        sleep()
+    }
+}
+
+state Smoke_Spawner { // 9
+    statusc 0
+    code() {
+        soundpitch(0.724)
+        soundcount(0xFFFF)
+        sounddecay(10s)
+        soundsetup(7, self, 8)
+        soundsetup(50, self, 2, 0)
+        soundsetup(1V, self, 2, 0)
+        soundplay([ts3cA], 0.01V)
+        SetVec(x, y, z) 
+        do {
+            if (FRAMETIME < 32) {
+                x = vecx + randi(-1m, 1m)
+                z = vecz + randi(-1m, 1m)
+                spawn(DioOC, S_SMOKE_PARTICLE, 1, -1.0, 1.7S, 0)
+            }
+            unless (rand(20)) {
+                SoundPitchDefault()
+                soundsetup(8, self, 0, 8)
+                soundsetup(0, self, 0, 5)
+                soundplay([ts4cA], 0.7V + rand(0.3V))
+            }
+            playnull(13)
+        } while (1)
+    }
+    event(e, a) {
+        accevif (e == EventDespawn || e == EventRespawn) {
+            voice = -1
+            soundfadet(1s, voice)
+            soundfadev(0V, voice)
+            voice = -1
+            soundsetup(0, voice, 5)
+        }
+    }
+}
+
+state Smoke_Particle { // 10
+    stateflag 0x20040
+    code(vertex, scale, arg) {
+        if (vertex != -1.0) {
+            getvert(vtrans, creator, vertex)
+        }
+        trotz = rand(45)
+        SetScale(scale)
+        vecx = 0.32
+        SetRot(0deg, 0deg, rand(360deg))
+        zindex = 24
+        if (creator -> statusb & 0x2000000 || creator == player) {
+            statusb = FLAG_PHYSICS_ENGINE | 0x2000000
+        }
+        else {
+            statusb = FLAG_PHYSICS_ENGINE
+        }
+        velx = -rand(0.4m)
+        vely = 0.8m + rand(0.4m)
+        velz = randi(-0.2m, 0.2m)
+        playanim(0, SMOKE, 42)
+        playanim(0, SMOKE, 7)
+    }
+    trans {
+        rotz += trotz
+        scaley = scalex + vecx
+        scalex = scaley
+        if (frametime - statetime >= 2s) {
+            moda = seek(moda, 16.0, 1.6)
+        }
+    }
+}
+
+state Current { // 11
+    statusc 0
+    event => state Smoke_Spawner
+    code(velocity, range) {
+        pathdist = range
+        statusb = FLAG_TRACK_PATH_SIGN | FLAG_PHYSICS_ENGINE | FLAG_PATH_CALCS
+        soundpitch(2.54)
+        soundcount(0xFFFF)
+        sounddecay(10s)
+        soundsetup(0.5s, self, 6)
+        soundsetup(0.5V, self, 2, 0)
+        soundplay([ts2cA], 0.01V)
+        do {
+            if (misc != pathlen - 1.0 && frametime - player -> groundtime < 5 && !(statusa & FLAG_INVALID_PATH) && groundy - 1m < y && y < groundy + 1m) {
+                setvel(velocity, vvel)
+                player -> x = spd(player -> x, velx)
+                player -> y = spd(player -> y, vely)
+                player -> z = spd(player -> z, velz)
+            }
+            x = player -> x
+            y = player -> y
+            z = player -> z
+            playnull()
+        } while (1)
+    }
+}
+
+state Tery_Squash { // 12
+    stateflag 0x23
+    statusc 0x32
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        playframe()
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        playframe()
+    }
+}
+
+sub SetParticleColor() {
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x05, 0xBD, 0xBE)
+    }
+    else if (r == 1) {
+        SetColor1(0x0D, 0x4C, 0x4C)
+    }
+    else if (r == 2) {
+        SetColor1(0xE7, 0x85, 0x81)
+    }
+}
+
+state Tery_Fling { // 13
+    stateflag 0x30
+    statusc 0x32
+    code(h) {
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir(0x80000)
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    } 
+    trans {
+        EnemyFlingTrans(2m, EventFling)
+    }
+}
+
+state Terry_Kill { // 14
+    statusc 0
+    code() {}
+}

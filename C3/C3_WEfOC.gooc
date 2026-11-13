@@ -1,0 +1,1294 @@
+#gool WEfOC 30 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal -e  "C3\Out\C3_WEf2C.nsentry" "C3\C3_WEfOC.gooc" "C3\Out\C3_WEfOC.nsentry"
+//gooc -c 3 -r pal -e "C3\Out\C3_WEf2C.nsentry" -h "Includes\C3_WEfOC.gooh" "C3\C3_WEfOC.gooc" "C3\Out\C3_WEfOC.nsentry"
+
+#iflev 2
+#anim WARP_ORB      [BCH2V] [BCH2G] 1 1 2
+#else
+#anim WARP_ORB      [BCH0V] [BCH0G] 1 1 2
+#endif
+#anim WARP_LIGHT_1  [BCi2V] [BCi2G] 1 1 2
+#anim WARP_LIGHT_2  [BHa2V] [BHa2G] 1 1 2
+#anim WARP_SPARK_1  [BLi2V] [BLi2G] 25 1 2
+#anim WARP_SPARK_2  [BSL2V] [BSL2G] 25 1 2
+
+#sprite ORB_TEXTURE [Cr30T]
+#tex 0x808080 1 2 0 1 128 64 64 64
+#tex 0x808080 1 2 0 2 192 64 64 64
+#tex 0x808080 1 2 0 3 256 64 64 64
+#tex 0x808080 1 2 0 4 320 64 64 64
+
+#spawn S_WARP_ROOM       WarpRoom_Init
+#spawn S_ORB             Orb_Init
+#spawn S_ORB_LIGHT       Orb_Light
+#spawn S_ORB_GLOW        Orb_Glow_Init
+#spawn S_SPARK_1         Sparks_Init
+#spawn S_SPARK_2         Spark_Growing
+#spawn S_SPARK_3         Spark_Idle
+#spawn S_ORB_FLASH       Orb_Flash
+#spawn S_WARP_OUT        Warp_Out
+#spawn S_WARP_IN         Warp_In
+#spawn S_WARP_OUT_ALT    Warp_Out
+
+event Event19 => sub KillLightSource
+event Event26 => sub KillLightSource
+event Event80 => sub KillLightSource
+
+var TargetLevel, OrbOBJ, AppearDistance, DisappearDistance, OrbVoice, WarpHub, WarpStatsOBJ, DisplayDelay, PreviousLevel
+var ReturnValue, PendingReturnValue, ReturnFinished, ExitRewardID, LevelLocked, OrbImage0, OrbImage1, OrbImage2, OrbImage3
+var OrbBaseX, OrbBaseY, GlowOBJ, SparksOBJ, NextSparkTime, FlashTargetScale, FlashAlpha
+
+expr OrbScale = stalltime
+
+#module [WEf2C]
+state WarpRoom_Init { // 0
+    stateflag 0x1
+    statusc 0
+    code(yoff, arg, hub, obj) {
+        WarpHub = hub
+        WarpStatsOBJ = obj
+        ExitRewardID = 0
+        y += yoff
+        TargetLevel = 0
+        ReturnFinished = 0
+        LevelLocked = 0
+        SetZindexField(60)
+        vfx = (vfx & 0xFFFF00FF) | 0x600
+        spawn(WEfOC, S_ORB, 1, 2S)
+        OrbOBJ = objectspawned
+        if (spawn == S_WARP_ROOM) {
+            if (player -> stateflag & 0x2000) {
+                changestate(WarpRoom_PlayerWarping)
+            }
+            else {
+                changestate(WarpRoom_Sleep)
+            }
+        }
+        changestate(WarpOut_Sleep)
+    }
+}
+
+sub ReceiveLevelSelection(e, a) {
+    if (e == Event78) {
+        accev()
+        TargetLevel = a[0]
+    }
+}
+
+sub CheckRelicRequirement() {
+    LevelLocked = 0
+    if (TargetLevel, GLOBAL_119 & 0x200) {
+        var relics, bit
+        bit = 63
+        while (bit >= 0) {
+            CheckItemPool(bit, GLOBAL_175, GLOBAL_176)
+            if (!misc) {
+                CheckItemPool(bit, GLOBAL_177, GLOBAL_178)
+            }
+            if (misc) {
+                relics += 1
+            }
+            bit -= 1
+        }
+        if (var level = TargetLevel; level == LEVEL_SkiCrazed) {
+            SetVec(5, 0, 0)
+        }
+        else if (level == LEVEL_HangEmHigh) {
+            SetVec(10, 0, 0)
+        }
+        else if (level == LEVEL_Area51) {
+            SetVec(15, 0, 0)
+        }
+        else if (level == LEVEL_FutureFrenzy) {
+            SetVec(20, 0, 0)
+        }
+        else if (level == LEVEL_RingsOfPower) {
+            SetVec(25, 0, 0)
+        }
+        else if (level == LEVEL_HotCoco) {
+            SetVec(0, 0, 0)
+        }
+        else {
+            SetVec(0, 0, 0)
+        }
+        if (relics < vecx) {
+            LevelLocked = 1
+        }
+    } 
+}
+
+state WarpRoom_Sleep { // 1
+    stateflag 0x1
+    statusc 0
+    event => sub ReceiveLevelSelection
+    code() {
+        sleepnull()
+    } 
+    trans {
+        changestateif(WarpRoom_ButtonSelected, TargetLevel)
+    }
+}
+state WarpRoom_PlayerWarping { // 2
+    stateflag 0x1
+    statusc 0
+    code() {
+        playnull()
+        playnull()
+        playnull()
+        playnull()
+        TargetLevel = CURRENTLEVEL
+        do {
+            playnull()
+        } until (frametime - statetime >= 5s && !(player -> stateflag & 0x2000))
+        TargetLevel = 0
+        playnull()
+        changestate(WarpRoom_Sleep)
+    }
+    event(e, a) {
+        accevif (e == Event79) {
+            ReturnValue = a[0]
+        }
+        accevcstate(WarpRoom_PlayerReturning, e == Event79)
+        accevif (e == Event78) {
+            TargetLevel = a[0]
+        }
+    }
+    trans {
+        if (player -> stateflag & 0x2000 && !(player -> stateflag & 0x100000)) {
+            player -> roty = CAMROTY
+            player -> troty = player -> roty
+        }
+    }
+}
+
+state WarpRoom_PlayerReturning { // 3
+    stateflag 0x1
+    statusc 0
+    code() {
+        sleepnull()   
+    }
+    event(e, a) {
+        accevif (e == Event79) {
+            if (!a[0]) {
+                ReturnFinished = 1
+            }
+            else {
+                PendingReturnValue = a[0]
+            }
+        }
+    }
+    trans {
+        once {
+            ReturnValue = 0
+            PendingReturnValue = ReturnValue
+            if (WarpStatsOBJ) {
+                interrupter = objectget(WarpStatsOBJ)
+                sendevent(Event78, interrupter, TargetLevel, 0)
+            }
+        }
+        if (PendingReturnValue != ReturnValue) {
+            ReturnValue = PendingReturnValue
+            if (WarpStatsOBJ) {
+                interrupter = objectget(WarpStatsOBJ)
+                sendevent(Event14, interrupter, ReturnValue)
+            }
+        }
+        changestateif(WarpRoom_PlayerReturned, ReturnFinished)
+    }
+}
+
+state WarpRoom_PlayerReturned { // 4
+    stateflag 0x1
+    statusc 0
+    code() {
+        if (WarpStatsOBJ) {
+            interrupter = objectget(WarpStatsOBJ)
+            sendevent(Event78, interrupter, 0, 0)
+        }
+        TargetLevel = 0
+        playnull()
+        changestate(WarpRoom_Sleep)
+    }
+}
+
+state WarpRoom_ButtonSelected { // 5
+    stateflag 0x1
+    statusc 0
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        accevif (e == Event78) {
+            TargetLevel = a[0]
+            if (TargetLevel == PreviousLevel, WarpStatsOBJ) {
+                save (interrupter) {
+                    interrupter = objectget(WarpStatsOBJ)
+                    sendevent(Event78, interrupter, TargetLevel, 0)
+                }
+            }
+        }
+    }
+    trans {
+        once {
+            PreviousLevel = TargetLevel
+            CheckRelicRequirement()
+            if (LevelLocked) {
+                DisplayDelay = 1
+            }
+            else {
+                DisplayDelay = 20
+            }
+            if (TargetLevel == LEVEL_EggipusRex || TargetLevel == LEVEL_Area51 || TargetLevel == LEVEL_HotCoco || TargetLevel == LEVEL_SkiCrazed || TargetLevel == LEVEL_RingsOfPower) {
+                GLOBAL_150 |= 0x4000000
+            }
+        }
+        if (TargetLevel != PreviousLevel) {
+            CheckRelicRequirement()
+            PreviousLevel = TargetLevel
+            if (WarpStatsOBJ) {
+                interrupter = objectget(WarpStatsOBJ)
+                sendevent(Event78, interrupter, 0, 0)
+            }
+            if (LevelLocked) {
+                DisplayDelay = 1
+            }
+            else {
+                DisplayDelay = 37
+            }
+        }
+        var0 = distance(player, DIST_NO_Y)
+        changestateif(WarpRoom_WarpIn, TargetLevel && !LevelLocked && var0 <= 2.2m)
+        changestateif(WarpRoom_ClearSelection, var0 >= 10.5m)
+        if (DisplayDelay > 0) {
+            DisplayDelay -= 1
+            if (!DisplayDelay) {
+                if (WarpStatsOBJ) {
+                    interrupter = objectget(WarpStatsOBJ)
+                    sendevent(Event78, interrupter, TargetLevel, 0)
+                }
+            }
+        }
+    }
+}
+
+state WarpRoom_ClearSelection { // 6
+    stateflag 0x1
+    statusc 0
+    code() {
+        TargetLevel = 0
+        if (WarpStatsOBJ) {
+            interrupter = objectget(WarpStatsOBJ)
+            sendevent(Event78, interrupter, TargetLevel, 0)
+        }
+        playnull()
+        changestate(WarpRoom_Sleep)
+    }
+}
+
+sub WarpIn() {
+    statusb = 0
+    preloadlevel(TargetLevel)
+    if (TargetLevel == LEVEL_BossNGin2
+        || TargetLevel == LEVEL_ByeByeBlimps
+        || TargetLevel == LEVEL_HotCoco
+        || TargetLevel == LEVEL_SkiCrazed
+        || TargetLevel == LEVEL_TellNoTales
+        || TargetLevel == LEVEL_MakinWaves
+        || TargetLevel == LEVEL_MidnightRun
+        || TargetLevel == LEVEL_OrientExpress) {
+            var0 = 0
+            if (TargetLevel == LEVEL_EggipusRex 
+                || TargetLevel == LEVEL_Area51
+                || TargetLevel == LEVEL_HotCoco
+                || TargetLevel == LEVEL_SkiCrazed 
+                || TargetLevel == LEVEL_RingsOfPower) {
+                    spawn2(84, 1, 1, self, 100m) // CocoC-1
+                }
+            else {
+                spawn2(84, 1, 1, self, 0) // CocoC-1
+            }
+            sendevent(Event78, player, self, 1.0)
+            do {
+                playnull()
+            } until (var0)
+        }
+    else {
+        sendevent(Event78, player, self, 0)
+        playnull(29)
+    }
+    GLOBAL_193 = 0
+    if (GLOBAL_119 & 0x200, !(TargetLevel == LEVEL_HangEmHigh || TargetLevel == LEVEL_FutureFrenzy)) {
+        GLOBAL_131 = 1
+    }
+    else {
+        GLOBAL_131 = 0
+    }
+    CURRENTLEVEL = TargetLevel
+    GLOBAL_191 = -1
+    
+    if (var crystals, completed, level, hub; !GLOBAL_131 && (SFXVOL && (!DEBUG || !pad(2, 2, 0, 8)))) {
+        misc = 0
+        CountPoolBits(SAVEDCRYSTALPOOL1)
+        CountPoolBits(SAVEDCRYSTALPOOL2)
+        crystals = misc
+        CheckItemPool(TargetLevel >> 8, GLOBAL_27, GLOBAL_28)
+        completed = misc
+        GetLevelNumber(TargetLevel)
+        level = misc
+        if (level > 0) {
+            hub = (level - 1) / 5
+        }
+        else {
+            hub = -1
+        }
+        if (!(0x8 & PREVBOXCOUNT)) {
+            GLOBAL_191 = 3
+        }
+        else if (!(0x10 & PREVBOXCOUNT), crystals >= 3) {
+            GLOBAL_191 = 4
+        }
+        else if (!(0x20 & PREVBOXCOUNT), !completed, TargetLevel == LEVEL_BossTiny) {
+            GLOBAL_191 = 5
+        }
+        else if (!(0x80 & PREVBOXCOUNT), GLOBAL_27 & 0x40) {
+            GLOBAL_191 = 7
+        }
+        else if (!(0x100 & PREVBOXCOUNT), crystals >= 8, !completed, hub == 1) {
+            GLOBAL_191 = 8
+        }
+        else if (!(0x200 & PREVBOXCOUNT), !completed, TargetLevel == LEVEL_BossDingodile) {
+            GLOBAL_191 = 9
+        }
+        else if (!(0x400 & PREVBOXCOUNT), crystals >= 10, !completed, hub == 2) {
+            GLOBAL_191 = 10
+        }
+        else if (!(0x800 & PREVBOXCOUNT), crystals >= 12, !completed, hub == 2) {
+            GLOBAL_191 = 11
+        }
+        else if (!(0x1000 & PREVBOXCOUNT), crystals >= 14, !completed, hub == 2, TargetLevel != LEVEL_BossNTropy) {
+            GLOBAL_191 = 12
+        }
+        else if (!(0x2000 & PREVBOXCOUNT), !completed, TargetLevel == LEVEL_BossNTropy) {
+            GLOBAL_191 = 13
+        }
+        else if (!(0x8000 & PREVBOXCOUNT), crystals >= 18, !completed, hub == 3, TargetLevel != LEVEL_BossNGin2) {
+            GLOBAL_191 = 15
+        }
+        else if (!(0x10000 & PREVBOXCOUNT), !completed, TargetLevel == LEVEL_BossNGin2) {
+            GLOBAL_191 = 16
+        }
+        else if (!(0x40000 & PREVBOXCOUNT), crystals >= 23, !completed, hub == 4) {
+            GLOBAL_191 = 18
+        }
+        else if (!(0x80000 & PREVBOXCOUNT), !completed, TargetLevel == LEVEL_BossCortex2) {
+            GLOBAL_191 = 19
+        }
+        else if (!(0x100000 & PREVBOXCOUNT)) {
+            CheckItemPool(TargetLevel >> 8, SAVEDCRYSTALPOOL1, SAVEDCRYSTALPOOL2)
+            if (misc) {
+                if (!(TargetLevel == LEVEL_BossCortex2
+                    || TargetLevel == LEVEL_BossNGin2
+                    || TargetLevel == LEVEL_BossNTropy 
+                    || TargetLevel == LEVEL_BossDingodile 
+                    || TargetLevel == LEVEL_BossTiny 
+                    || TargetLevel == LEVEL_EggipusRex 
+                    || TargetLevel == LEVEL_Area51 
+                    || TargetLevel == LEVEL_HotCoco
+                    || TargetLevel == LEVEL_SkiCrazed
+                    || TargetLevel == LEVEL_RingsOfPower)) {
+                        GLOBAL_191 = 20
+                    }
+            }
+        }
+        if (GLOBAL_191 == -1) {
+            loadlevel(TargetLevel)
+        }
+        else {
+            GLOBAL_190 = TargetLevel
+            loadlevel(LEVEL_IntermissionVortex)
+        }
+    }
+    sleepnull()
+}
+
+sub ReceiveDepartureReady(e, a) {
+    if (e == EventTriggered) {
+        accev()
+        var0 = 1.0
+    }
+}
+
+sub GetLevelNumber(level) {
+    misc = 0
+    if (level == LEVEL_WarpRoom)       misc = 0;
+    if (level == LEVEL_ToadVillage)    misc = 1;
+    if (level == LEVEL_UnderPressure)  misc = 2;
+    if (level == LEVEL_OrientExpress)  misc = 3;
+    if (level == LEVEL_BoneYard)       misc = 4;
+    if (level == LEVEL_MakinWaves)     misc = 5;
+    if (level == LEVEL_GeeWiz)         misc = 6;
+    if (level == LEVEL_HangEmHigh)     misc = 7;
+    if (level == LEVEL_HogRide)        misc = 8;
+    if (level == LEVEL_TombTime)       misc = 9;
+    if (level == LEVEL_MidnightRun)    misc = 10;
+    if (level == LEVEL_DinoMight)      misc = 11;
+    if (level == LEVEL_DeepTrouble)    misc = 12;
+    if (level == LEVEL_HighTime)       misc = 13;
+    if (level == LEVEL_RoadCrash)      misc = 14;
+    if (level == LEVEL_DoubleHeader)   misc = 15;
+    if (level == LEVEL_Sphynxinator)   misc = 16;
+    if (level == LEVEL_ByeByeBlimps)   misc = 17;
+    if (level == LEVEL_TellNoTales)    misc = 18;
+    if (level == LEVEL_FutureFrenzy)   misc = 19;
+    if (level == LEVEL_TombWader)      misc = 20;
+    if (level == LEVEL_GoneTomorrow)   misc = 21;
+    if (level == LEVEL_OrangeAsphalt)  misc = 22;
+    if (level == LEVEL_FlamingPassion) misc = 23;
+    if (level == LEVEL_MadBombers)     misc = 24;
+    if (level == LEVEL_BugLite)        misc = 25;
+    if (level == LEVEL_SkiCrazed)      misc = 26;
+    if (level == LEVEL_Area51)         misc = 28;
+    if (level == LEVEL_RingsOfPower)   misc = 30;
+    if (level == LEVEL_HotCoco)        misc = 31;
+    if (level == LEVEL_EggipusRex)     misc = 32;
+    if (level == LEVEL_BossTiny)       misc = -1;
+    if (level == LEVEL_BossDingodile)  misc = -2;
+    if (level == LEVEL_BossNTropy)     misc = -3;
+    if (level == LEVEL_BossNGin2)      misc = -4;
+    if (level == LEVEL_BossCortex2)    misc = -5;
+}
+
+state WarpRoom_WarpIn { // 7
+    stateflag 0x3
+    statusc 0
+    code => sub WarpIn
+    event => sub ReceiveDepartureReady
+}
+#module default
+
+state Warp_Out { // 8
+    stateflag 0x1
+    statusc 0
+    code(yoff, unused, near, far, size, reward) {
+        ExitRewardID = reward
+        if (!entity) {
+            movetolist(3.0, self)
+            statusb = 0x1000000
+        }
+        AppearDistance = near
+        DisappearDistance = far
+        y += yoff
+        SetZindexField(60)
+        vfx = (vfx & 0xFFFF00FF) | 0x600
+        TargetLevel = 0
+        LevelLocked = 0
+        spawn(WEfOC, S_ORB, 1, size)
+        OrbOBJ = objectspawned
+        changestate(WarpOut_Sleep)
+    }
+}
+state WarpOut_Sleep { // 9
+    stateflag 0x1
+    statusc 0
+    code() {
+        sleepnull()
+    }
+    trans {
+        unless (LEVEL == LEVEL_BoneYard || LEVEL == LEVEL_DinoMight) {
+            changestateif(WarpOut_Ready, distance(player) <= AppearDistance && player -> y - y <= 1.1m)
+        }
+    }
+}
+
+state WarpOut_Ready { // 10
+    stateflag 0x1
+    statusc 0
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(WarpOut_Deactivate, e == Event20)
+    }
+    trans {
+        once {
+            TargetLevel = LEVEL_WarpRoom
+        }
+        var0 = distance(player, DIST_NO_Y | DIST_EXACT)
+        if (var0 < 2.2m || (GLOBAL_30 & 0x400000)) {
+            sendevent(Event22, player, ExitRewardID)
+            changestateif(WarpOut_Exit_Transition, eventaccepted)
+        }
+        changestateif(WarpOut_Deactivate, var0 >= DisappearDistance)
+    }
+}
+state WarpOut_Deactivate { // 11
+    stateflag 0x1
+    statusc 0
+    code() {
+        TargetLevel = 0
+        playnull()
+        changestate(WarpOut_Sleep)
+    }
+}
+
+state WarpOut_Exit_Transition { // 12
+    stateflag 0x1
+    statusc 0
+    code() {
+        statusb = 0
+        GLOBAL_20 = LEVEL
+        if (player -> invincible == 5) {
+            player -> invincible = 0
+        }
+        WaitFadeNull()
+        sleepnull()
+    }
+}
+
+inline sub WaitNull2(t) {
+    do {
+        playnull()
+    } until (frametime - statetime >= t)
+}
+
+state Warp_In { // 13
+    stateflag 0x1
+    statusc 0
+    code(yoff, zoff, unused, appear, launch, hide, yaw, speed, vy, facing, size) {
+        unless (player -> stateflag & 0x2000) {
+            KillEntity()
+            changestate(Kill)
+        }
+        appear = appear * 1s / 1.2s
+        launch = launch * 1s / 1.2s
+        hide = hide * 1s / 1.2s
+        y += yoff
+        z += zoff
+        ExitRewardID = 0
+        SetZindexField(60)
+        vfx = (vfx & 0xFFFF00FF) | 0x600
+        TargetLevel = 0
+        LevelLocked = 0
+        spawn(WEfOC, S_ORB, 1, size)
+        OrbOBJ = objectspawned
+        player -> troty = yaw
+        player -> roty = player -> troty
+        playnull()
+        playnull()
+        statetime = frametime
+        if (RESPAWNCOUNT) {
+            KillEntity()
+            changestate(Kill)
+        }
+        unless (LEVEL == LEVEL_HotCoco || LEVEL == LEVEL_SkiCrazed || LEVEL == LEVEL_TellNoTales 
+            || LEVEL == LEVEL_MakinWaves || LEVEL == LEVEL_Area51 || LEVEL == LEVEL_OrangeAsphalt
+            || LEVEL == LEVEL_RoadCrash || LEVEL == LEVEL_HogRide) {
+                player -> x = x
+                player -> y = y
+                player -> z = z
+            }
+        WaitNull2(appear)
+        TargetLevel = LEVEL_WarpRoom
+        WaitNull2(launch)
+        sendevent(Event11, player, self, yaw, speed, vy, facing)
+        WaitNull2(hide)
+        TargetLevel = 0
+        playnull()
+        KillEntity()
+        playnull(21)
+    }
+}
+
+state Orb_Init { // 14
+    stateflag 0x1
+    statusc 0
+    code(size) {
+        OrbImage0 = 0
+        OrbImage1 = 0
+        OrbImage2 = 0
+        OrbImage3 = 0
+        OrbBaseY = y
+        OrbBaseX = x
+        OrbVoice = 0
+        OrbScale = size
+        SetScale(0S)
+        vfx = (vfx & 0xFFFF00FF) | 0x600
+        zindex = creator -> zindex
+        WarpHub = creator -> WarpHub
+        spawn(WEfOC, S_ORB_LIGHT)
+        spawn(WEfOC, S_ORB_GLOW, 1, OrbScale)
+        GlowOBJ = objectspawned
+        spawn(WEfOC, S_SPARK_1)
+        SparksOBJ = objectspawned
+        playnull()
+        changestate(Orb_Hidden)
+    }
+}
+
+sub UpdateOrbFloatMotion() {
+    var phase
+    phase = time(100)
+    rotz = ((cos((360deg * phase) / 100) * -56) >> 12) + CAMROTY
+    roty = rotz
+    x = OrbBaseX + ((cos((360deg * phase) / 100) * 40.0) >> 12)
+    phase = time(57)
+    rotx = (cos((360deg * phase) / 57) * -56) >> 12
+    y = OrbBaseY + ((cos((360deg * phase) / 57) * 40.0) >> 12)
+}
+
+sub LoadOrbImages() {
+    if (var hub = WarpHub; hub == 1) {
+        if (!OrbImage0) {
+            OrbImage0 = ins74([w102D], null)
+        }
+        if (!OrbImage1) {
+            OrbImage1 = ins74([w112D], null)
+        }
+        if (!OrbImage2) {
+            OrbImage2 = ins74([w122D], null)
+        }
+        if (!OrbImage3) {
+            OrbImage3 = ins74([w132D], null)
+        }
+    }
+    else if (hub == 2) {
+        if (!OrbImage0) {
+            OrbImage0 = ins74([w202D], null)
+        }
+        if (!OrbImage1) {
+            OrbImage1 = ins74([w212D], null)
+        }
+        if (!OrbImage2) {
+            OrbImage2 = ins74([w222D], null)
+        }
+        if (!OrbImage3) {
+            OrbImage3 = ins74([w232D], null)
+        }
+    }
+    else if (hub == 3) {
+        if (!OrbImage0) {
+            OrbImage0 = ins74([w302D], null)
+        }
+        if (!OrbImage1) {
+            OrbImage1 = ins74([w312D], null)
+        }
+        if (!OrbImage2) {
+            OrbImage2 = ins74([w322D], null)
+        }
+        if (!OrbImage3) {
+            OrbImage3 = ins74([w332D], null)
+        }
+    }
+    else if (hub == 4) {
+        if (!OrbImage0) {
+            OrbImage0 = ins74([w402D], null)
+        }
+        if (!OrbImage1) {
+            OrbImage1 = ins74([w412D], null)
+        }
+        if (!OrbImage2) {
+            OrbImage2 = ins74([w422D], null)
+        }
+        if (!OrbImage3) {
+            OrbImage3 = ins74([w432D], null)
+        }
+    }
+    else if (hub == 5) {
+        if (!OrbImage0) {
+            OrbImage0 = ins74([w502D], null)
+        }
+        if (!OrbImage1) {
+            OrbImage1 = ins74([w512D], null)
+        }
+        if (!OrbImage2) {
+            OrbImage2 = ins74([w522D], null)
+        }
+        if (!OrbImage3) {
+            OrbImage3 = ins74([w532D], null)
+        }
+    }
+    else {
+        if (!OrbImage0) {
+            OrbImage0 = ins74([w602D], null)
+        }
+        if (!OrbImage1) {
+            OrbImage1 = ins74([w612D], null)
+        }
+        if (!OrbImage2) {
+            OrbImage2 = ins74([w622D], null)
+        }
+        if (!OrbImage3) {
+            OrbImage3 = ins74([w632D], null)
+        }
+    }
+}
+
+sub DeloadOrbImages() {
+    if (OrbImage0) {
+        ins75(OrbImage0, null)
+        OrbImage0 = 0
+    }
+    if (OrbImage1) {
+        ins75(OrbImage1, null)
+        OrbImage1 = 0
+    }
+    if (OrbImage2) {
+        ins75(OrbImage2, null)
+        OrbImage2 = 0
+    }
+    if (OrbImage3) {
+        ins75(OrbImage3, null)
+        OrbImage3 = 0
+    }
+}
+
+state Orb_Hidden { // 15
+    stateflag 0x1
+    statusc 0
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        if (e == Event26) {
+            DeloadOrbImages()
+        }
+    }
+    trans {
+        TargetLevel = creator -> TargetLevel
+        LevelLocked = creator -> LevelLocked
+        changestateif(Orb_Appear, TargetLevel && !LevelLocked)
+    }
+}
+
+state Orb_Appear { // 16
+    stateflag 0x1
+    statusc 0
+    event => state Orb_Hidden
+    code() {
+        interrupter = GlowOBJ
+        sendevent(EventTriggered, interrupter)
+        spawn(WEfOC, S_ORB_FLASH)
+        playnull()
+        interrupter = SparksOBJ
+        sendevent(EventTriggered, interrupter)
+        playnull(8)
+        changestate(Orb_Idle)
+    }
+    trans {
+        once {
+            if (TargetLevel != LEVEL_WarpRoom) {
+                LoadOrbImages()
+                if (GLOBAL_119 & 0x200) {
+                    if (var level = TargetLevel; level == LEVEL_SkiCrazed) {
+                        var0 = 0
+                    }
+                    else if (level == LEVEL_HangEmHigh) {
+                        var0 = 1.0
+                    }
+                    else if (level == LEVEL_Area51) {
+                        var0 = 2.0
+                    }
+                    else if (level == LEVEL_FutureFrenzy) {
+                        var0 = 3.0
+                    }
+                    else if (level == LEVEL_RingsOfPower) {
+                        var0 = 4.0
+                    }
+                    else if (level == LEVEL_HotCoco) {
+                        var0 = 5.0
+                    }
+                    else {
+                        var0 = 0.0
+                    }
+                }
+                else {
+                    if (var level = TargetLevel; level == LEVEL_ToadVillage || level == LEVEL_GeeWiz || level == LEVEL_DinoMight || level == LEVEL_Sphynxinator || level == LEVEL_GoneTomorrow || level == LEVEL_EggipusRex) {
+                        var0 = 0
+                    }
+                    else if (level == LEVEL_UnderPressure || level == LEVEL_HangEmHigh || level == LEVEL_DeepTrouble || level == LEVEL_ByeByeBlimps || level == LEVEL_OrangeAsphalt) {
+                        var0 = 1.0
+                    }
+                    else if (level == LEVEL_OrientExpress || level == LEVEL_HogRide || level == LEVEL_HighTime || level == LEVEL_TellNoTales || level == LEVEL_FlamingPassion) {
+                        var0 = 2.0
+                    }
+                    else if (level == LEVEL_BoneYard || level == LEVEL_TombTime || level == LEVEL_RoadCrash || level == LEVEL_FutureFrenzy || level == LEVEL_MadBombers || level == LEVEL_HotCoco) {
+                        var0 = 3.0
+                    }
+                    else if (level == LEVEL_MakinWaves || level == LEVEL_MidnightRun || level == LEVEL_DoubleHeader || level == LEVEL_TombWader || level == LEVEL_BugLite) {
+                        var0 = 4.0
+                    }
+                    else if (level == LEVEL_BossTiny || level == LEVEL_BossDingodile || level == LEVEL_BossNTropy || level == LEVEL_BossNGin2 || level == LEVEL_BossCortex2) {
+                        var0 = 5.0
+                    }
+                    else {
+                        var0 = 0.0
+                    }
+                }
+                if (OrbImage0 & (OrbImage1 & (OrbImage2 & OrbImage3))) {
+                    ins76(OrbImage0, var0)
+                    ins77(0.0, misc, OrbImage0, ORB_TEXTURE)
+                    ins76(OrbImage1, var0)
+                    ins77(1.0, misc, OrbImage1, ORB_TEXTURE)
+                    ins76(OrbImage2, var0)
+                    ins77(2.0, misc, OrbImage2, ORB_TEXTURE)
+                    ins76(OrbImage3, var0)
+                    ins77(3.0, misc, OrbImage3, ORB_TEXTURE)
+                }
+                soundpitch(2.54)
+                soundplay([WAp2A], 1V)
+                soundpitch(2.54)
+                soundcount(0xFFFF)
+                soundplay([WHu2A], 1V)
+                OrbVoice = voice
+                if (GLOBAL_119 & 0x4) {
+                    var0 = 0
+                    if (GLOBAL_54) {
+                        if (!GLOBAL_120) {
+                            GLOBAL_120 = self
+                            var0 = 1
+                        }
+                    }
+                    else {
+                        GLOBAL_54 = self
+                        var0 = 1
+                    }
+                    if (var0) {
+                        if (GLOBAL_54) {
+                            if (GLOBAL_120) {
+                                GLOBAL_55 = 2.0
+                            }
+                            else {
+                                GLOBAL_55 = 1.0
+                            }
+                        }
+                        else if (GLOBAL_120) {
+                            GLOBAL_54 = GLOBAL_120
+                            GLOBAL_120 = 0
+                            GLOBAL_55 = 1.0
+                        }
+                        else {
+                            GLOBAL_55 = 0
+                        }
+                    }
+                }
+            }
+        }
+        var0 = TargetLevel
+        TargetLevel = creator -> TargetLevel
+        changestateifn(Orb_Disappear, TargetLevel == var0)
+        UpdateOrbFloatMotion()
+    }
+}
+
+state Orb_Idle { // 17
+    stateflag 0x1
+    statusc 0
+    event => state Orb_Hidden
+    code() {
+        sleepanim(WARP_ORB, 0)
+    }
+    trans {
+        var0 = TargetLevel
+        TargetLevel = creator -> TargetLevel
+        changestateifn(Orb_Disappear, TargetLevel == var0)
+        scale = seek(scalex, OrbScale, OrbScale / 10)
+        scaley = scalex
+        scalez = scalex
+        UpdateOrbFloatMotion()
+    }
+}
+
+state Orb_Disappear { // 18
+    stateflag 0x1
+    statusc 0
+    event => state Orb_Hidden
+    code() {
+        playanim(0, WARP_ORB, 4)
+        interrupter = GlowOBJ
+        sendevent(Event14, interrupter, 0)
+        playanim(0, WARP_ORB, 6)
+        interrupter = SparksOBJ
+        sendevent(Event14, interrupter, 0)
+        playanim(0, WARP_ORB, 4)
+        if (!TargetLevel) {
+            DeloadOrbImages()
+        }
+        changestate(Orb_Hidden)
+    }
+    trans {
+        once {
+            soundpitch(2.54)
+            soundplay([WRe2A], 1V)
+            if (OrbVoice) {
+                voice = OrbVoice
+                soundsetup(5, voice, 6)
+                soundsetup(0, voice, 3, 0)
+                OrbVoice = 0
+            }
+            if (GLOBAL_54 == self) {
+                GLOBAL_54 = 0
+            }
+            if (GLOBAL_120 == self) {
+                GLOBAL_120 = 0
+            }
+        }
+        scale = seek(scalex, 0S, OrbScale / 10)
+        scaley = scalex
+        scalez = scalex
+        UpdateOrbFloatMotion()
+    }
+}
+
+state Orb_Light { // 19
+    stateflag 0x1
+    statusc 0
+    code() {
+        vfx = (vfx & 0xFFFF00FF) | 0x600
+        do {
+            if (parent -> animseq) {
+                playanim(0, WARP_LIGHT_1)
+            }
+            else {
+                playnull()
+            }
+        } while (1)
+    }
+    trans {
+        once {
+            zindex = creator -> zindex
+            zindex += 5
+        }
+        x = creator -> x
+        y = creator -> y 
+        z = creator -> z
+        scalex = creator -> scalex
+        scaley = creator -> scaley
+        scalez = creator -> scalez
+        roty = CAMROTY
+        rotz = roty
+        rotx = CAMROTX
+    }
+}
+
+state Orb_Glow_Init { // 20
+    stateflag 0x1
+    statusc 0
+    code(size) {
+        OrbScale = size
+        zindex = creator -> zindex
+        vfx = (vfx & 0xFFFF00FF) | 0x600
+        zindex -= 44
+        SetScale(0S)
+        changestate(Orb_Glow_Sleep)
+    }
+}
+
+state Orb_Glow_Sleep { // 21
+    stateflag 0x1
+    statusc 0
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Orb_Glow_Appear, e == EventTriggered)
+    }
+}
+
+state Orb_Glow_Appear { // 22
+    stateflag 0x1
+    statusc 0
+    code() {
+        sleepanim(0, WARP_LIGHT_2)
+    }
+    event(e, a) {
+        accevcstate(Orb_Glow_Hide, e == Event14)
+    }
+    trans {
+        x = creator -> x
+        y = creator -> y
+        z = creator -> z
+        rotx = CAMROTX
+        rotz = CAMROTY
+        roty = rotz
+        scalez = seek(scalex, OrbScale, OrbScale / 10)
+        scaley = scalez
+        scalex = scalez
+        var0 = time(75)
+        moda = ((cos((16.0 * var0) / 75) * 3.2) >> 12) + 3.2
+    }
+}
+
+state Orb_Glow_Hide { // 23
+    stateflag 0x1
+    statusc 0
+    code() {
+        sleepanim(0, WARP_LIGHT_2)
+    }
+    event(e, a) {
+        accevcstate(Orb_Glow_Appear, e == EventTriggered)
+    }
+    trans {
+        x = creator -> x
+        y = creator -> y
+        z = creator -> z
+        scalez = seek(scalex, 0S, OrbScale / 10)
+        scaley = scalez
+        scalex = scalez
+        changestateifn(Orb_Glow_Sleep, scalex)
+        var0 = time(75)
+        moda = ((cos((16.0 * var0) / 75) * 3.2) >> 12) + 3.2
+    }
+}
+
+state Orb_Flash { // 24
+    stateflag 0x1
+    statusc 0
+    code() {
+        sleepanim(0, WARP_LIGHT_2)
+    }
+    trans {
+        once {
+            zindex = 300
+            SetScale(0S)
+            FlashTargetScale = 4.5S
+            FlashAlpha = 0
+            vfx = (vfx & 0xFFFF00FF) | 0x600
+        }
+        rotz = CAMROTY
+        roty = rotz
+        rotx = CAMROTX
+        scalez = seek(scalex, FlashTargetScale, 1S)
+        scaley = scalez
+        scalex = scalez
+        moda = seek(FlashAlpha, 16.0, 1.6)
+        FlashAlpha = moda
+        if (FlashTargetScale == scalex) {
+            changestateifn(Kill, scalex)
+            FlashTargetScale = 0
+        }
+    }
+}
+
+state Sparks_Init { // 25
+    stateflag 0x1
+    statusc 0
+    code() {
+        zindex = creator -> zindex
+        OrbScale = creator -> OrbScale
+        zindex -= 35
+        changestate(Sparks_Hidden)
+    }
+}
+
+state Sparks_Hidden { // 26
+    stateflag 0x1
+    statusc 0
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Sparks_Start, e == EventTriggered)
+    }
+}
+
+state Sparks_Start { // 27
+    stateflag 0x1
+    statusc 0
+    code() {
+        spawn(WEfOC, S_SPARK_2)
+        spawn(WEfOC, S_SPARK_2)
+        NextSparkTime = frametime
+        changestate(Sparks_Growing)
+    }
+    event(e, a) {
+        accevcstate(Sparks_Stop, e == Event14)
+    }
+}
+
+state Sparks_Growing { // 28
+    stateflag 0x1
+    statusc 0
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Sparks_Stop, e == Event14)
+    }
+    trans {
+        x = creator -> x
+        y = creator -> y
+        z = creator -> z
+        scalex = creator -> scalex
+        changestateif(Sparks_Idle, scalex == creator -> OrbScale)
+        if (frametime >= NextSparkTime) {
+            NextSparkTime = frametime + rand(12)
+            spawn(WEfOC, S_SPARK_2)
+        }
+    }
+}
+
+state Sparks_Idle { // 29
+    stateflag 0x1
+    statusc 0
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Sparks_Stop, e == Event14)
+    }
+    trans {
+        x = creator -> x
+        y = creator -> y
+        z = creator -> z
+        scalex = creator -> scalex
+        if (scalex != creator -> OrbScale) {
+            cascadeevent(Event21, self, 0)
+            changestate(Sparks_Growing)
+        }
+        if (frametime >= NextSparkTime) {
+            NextSparkTime = frametime + rand(12)
+            spawn(WEfOC, S_SPARK_3)
+        }
+    }
+}
+
+state Sparks_Stop { // 30
+    stateflag 0x1
+    statusc 0
+    code() {
+        cascadeevent(Event14, self, 0)
+        changestate(Sparks_Hidden)
+    }
+}
+
+state Spark_Growing { // 31
+    stateflag 0x1
+    statusc 0
+    code() {
+        var lifetime
+        lifetime = rand(21) + 4
+        animframe = rand(25) << 8
+        animseq = getanim(WARP_SPARK_1)
+        while (lifetime) {
+            lifetime -= 1
+            playframe(animframe, 1)
+            animframe += 1.0
+            if (animframe > 24.0) {
+                animframe = 0
+            }
+        }
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event14)
+    }
+    trans {
+        once {
+            soundpitch(((12.8 + rand(6.4)) * 0.18) >> 8)
+            soundplay([WSp2A], 0.08V + rand(0.05V))
+            OrbScale = creator -> OrbScale
+            zindex = creator -> zindex - 10
+            vfx = (vfx & 0xFFFFFF00) | 0x5
+            vfx = (vfx & 0xFFFF00FF) | 0x600
+            roty = (CAMROTY + (100deg - rand(200deg))) - 90deg
+            rotx = 0deg
+            rotz = CAMROTX + (60deg - rand(120deg))
+            if (rand(2)) {
+                troty = 3.55deg - rand(7.15deg)
+                trotz = 3.55deg - rand(7.15deg)
+            }
+            else {
+                troty = 0deg
+                trotz = 0deg
+            }
+            if (rand(4)) {
+                moda = 4.0 + rand(12.0)
+            }
+            else {
+                moda = 8.0 + rand(8.0)
+            }
+            scalez = (0.375 * OrbScale) >> 8
+            scaley = scalez
+            scalex = scalez
+        }
+        x = creator -> x
+        y = creator -> y
+        z = creator -> z
+        roty += troty
+        rotz += trotz
+    }
+}
+
+state Spark_Idle { // 32
+    stateflag 0x1
+    statusc 0
+    code() {
+        var lifetime
+        lifetime = rand(21) + 4
+        animframe = rand(25) << 8
+        animseq = getanim(WARP_SPARK_2)
+        while (lifetime) {
+            lifetime -= 1
+            playframe(animframe, 1)
+            animframe += 1.0
+            if (animframe > 24.0) {
+                animframe = 0
+            }
+        }
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event21 || e == Event14)
+    }
+    trans {
+        once {
+            soundpitch(((12.8 + rand(6.4)) * 0.18) >> 8)
+            soundplay([WSp2A], 0.08V + rand(0.05V))
+            OrbScale = creator -> OrbScale
+            zindex = creator -> zindex + 80
+            vfx = (vfx & 0xFFFFFF00) | 0x5
+            vfx = (vfx & 0xFFFF00FF) | 0x600
+            roty = (CAMROTY + (100deg - rand(200deg))) - 90deg
+            rotx = 0deg
+            rotz = CAMROTX + (60deg - rand(120deg))
+            if (rand(2)) {
+                troty = 3.55deg - rand(7.15deg)
+                trotz = 3.55deg - rand(7.15deg)
+            }
+            else {
+                troty = 0deg
+                trotz = 0deg
+            }
+            if (rand(4)) {
+                moda = 4.0 + rand(12.0)
+            }
+            else {
+                moda = 8.0 + rand(8.0)
+            }
+            scalez = (0.375 * OrbScale) >> 8
+            scaley = scalez
+            scalex = scalez
+        }
+        x = creator -> x
+        y = creator -> y
+        z = creator -> z
+        roty += troty
+        rotz += trotz
+    }
+}
+
+sub KillLightSource() {
+    if (GLOBAL_54 == self) {
+        GLOBAL_54 = 0
+    }
+    if (GLOBAL_120 == self) {
+        GLOBAL_120 = 0
+    }
+    changestate(Kill)
+}
+
+state Kill { // 33
+    stateflag 0x20
+    statusc 0
+    code() {}
+}

@@ -1,0 +1,13 @@
+expr ShadC = 29
+
+expr ShadC_S_SHADOW = 0
+expr ShadC_S_SHADOW_STATIONARY = 1
+expr ShadC_S_2 = 2
+expr ShadC_S_SHADOW_GROUND = 3
+expr ShadC_S_SHADOW_NIGHT = 4
+expr ShadC_S_ANIMATED_SHADOW_GROUND = 5
+expr ShadC_S_SHADOW_ZONE = 6
+expr ShadC_S_WILLY_VIDO = 7
+expr ShadC_S_BOSS_VIDO = 8
+expr ShadC_S_WILLY_VIDO_GROUND = 9
+expr ShadC_S_BOSS_VIDO_GROUND = 10

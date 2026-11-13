@@ -1,0 +1,10 @@
+expr DoctC = 5
+
+expr DoctC_S_DOCTOR = 0
+expr DoctC_S_1 = 1
+expr DoctC_S_DOCTOR_FEATHER = 2
+expr DoctC_S_DOCTOR_SPARKLE = 3
+expr DoctC_S_DOCTOR_PARTICLE = 4
+expr DoctC_S_DOCTOR_PARTICLE_DECEL = 5
+expr DoctC_S_6 = 6
+expr DoctC_S_7 = 7

@@ -1,0 +1,460 @@
+#gool PengC 25 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C2_ShadC.gooh"
+
+//gooc -c 2 -r pal "C2\C2_PengC.gooc" "C2\Out\C2_PengC.nsentry"
+
+#anim PENGUIN_SPIN         [Pe1eV] 1 1
+#anim PENGUIN_WALK         [Pe2eV] 30 1
+#anim PENGUIN_SHAKE        [Pe3eV] 49 1
+#anim PENGUIN_SPIN_START   [Pe4eV] 91 1
+#anim PENGUIN_SLIDE_START  [Pe3hV] 48 1
+#anim PENGUIN_SLIDE        [Pe4hV] 32 1
+
+#spawn S_PENGUIN           Penguin_Init
+#spawn S_PENGUIN_PULSE     Penguin_Pulse_Init
+#spawn S_PENGUIN_PATH      Penguin_Slide_Spawner
+#spawn S_PENGUIN_CHILD     Penguin_Slide_Init
+
+event EventJumpedOn        => state Penguin_Squash
+event EventHit             => state Penguin_Squash
+event EventSpinHit         => state Penguin_Fling
+event EventHitInvincible   => state Penguin_Squash
+event EventFling           => state Penguin_Squash
+event EventSlideHit        => state Penguin_Fling
+event EventSlamHit         => state Penguin_Squash
+
+var PenguinPathSpeed, TargetPathSpeed, PenguinWaddle, ChildSpawnMinDist, PenguinTrackOffset, PenguinVar6
+
+inline sub SoundPenguinSpin() {
+    sounddelay(0.15s)
+    sounddecay(6.4s)
+    SoundPitchDefault(0.23)
+    soundplay([PSpGA], 0.4V)
+}
+
+inline sub SoundPenguinShake() {
+    sounddelay(0.9s)
+    sounddecay(6.4s)
+    SoundPitchDefault(0.23)
+    soundplay([PShGA], 0.35V)
+    soundfadet(0.25s, voice)
+    soundfadev(0V, voice, 3)
+}
+
+inline sub SoundPenguinShake2() {
+    sounddelay(0.2s)
+    sounddecay(6.4s)
+    SoundPitchDefault(0.23)
+    soundplay([PShGA], 0.35V)
+}
+
+inline sub SoundPenguinSlideStart() {
+    sounddelay(0.2s)
+    sounddecay(6.4s)
+    SoundPitchDefault(0.23)
+    soundplay([PLaGA], 0.3V)
+}
+
+inline sub SoundPenguinSlide() {
+    sounddelay(0.8s)
+    sounddecay(6.4s)
+    SoundPitchDefault(0.23)
+    soundplay([PSlGA], 0.1V)
+}
+
+state Penguin_Init { // 0
+    statusc 0x12
+    code(limit, speed, reflection) {
+        if (reflection) {
+            if (ZONEFLAGS & 0x800) {
+                spawn(9, 28, 1)
+            }
+            else {
+                vfx = (vfx & 0xFFFF00FF) | 0xC00
+            }
+        }
+        pathdist = limit
+        TargetPathSpeed = speed
+        PenguinTrackOffset = 0m
+        density = 0.15m
+        zindex = 25
+        PenguinWaddle = 0deg
+        PenguinVar6 = 0
+        spawn(ShadC, ShadC_S_SHADOW_STATIONARY, 1, 0, 1S, 10)
+        statusb = FLAG_ROT_Y | FLAG_TRACK_PATH_ROT | FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | FLAG_SOLID_ALL | 0x800 | 0x2000 | 0x20000000
+        changestate(Penguin_Walk)
+    }
+}
+
+state Penguin_Walk { // 1
+    stateflag 0x5
+    statusc 0x0
+    code() {
+        trotx = 180deg
+        yzapproach = 120deg
+        sleepframes(PENGUIN_WALK, 0.0, 29.0)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            PenguinPathSpeed = 0
+        }
+        if (STATUS_PATH_END) {
+            if (STATUS_REACHED_TROT) {
+                trotx = 180deg
+                statusb |= 0x20000000
+                statusa &= ~FLAG_PATH_END
+            }
+        }
+        else {
+            if (animseq == getanim(PENGUIN_WALK)) {
+                PenguinPathSpeed = seek(PenguinPathSpeed, TargetPathSpeed, TargetPathSpeed >> 3)
+                PenguinPathSpeed = seek(PenguinPathSpeed, pathlen + spd(PenguinPathSpeed) - 1.0, TargetPathSpeed >> 3)
+                calcpath(loopseek(pathprog, pathlen + spd(PenguinPathSpeed) - 1.0, spd(PenguinPathSpeed)))
+            }
+            else {
+                calcpath(abs(pathprog))
+            }
+            {
+                var v1 = 0
+                var deg_to_player = 0deg
+                var pathrot = troty
+                save (troty, statusa, statusb, x, y, z, pathprog) {
+                    statusb = FLAG_PATH_CALCS | FLAG_TRACK_PATH_SIGN
+                    x = player -> x
+                    y = player -> y
+                    z = player -> z
+                    calcpath(0)
+                    v1 = troty
+                    troty += 90deg
+                    setvel(PenguinTrackOffset, vvel)
+                }
+                x += velx
+                z += velz
+                if (abs(PenguinTrackOffset - vecy) > 0.1m) {
+                    deg_to_player = degdist(troty, atan2(player -> trans))
+                    if (abs(deg_to_player) < 60deg) {
+                        if (deg_to_player < -45deg) {
+                            deg_to_player = -45deg
+                        }
+                        else if (deg_to_player > 45deg) {
+                            deg_to_player = 45deg
+                        }
+                        troty += deg_to_player
+                    }
+                }
+                PenguinTrackOffset = seek(PenguinTrackOffset, vecy, spd(2m))
+                if (PenguinTrackOffset < -pathdist) {
+                    troty = pathrot
+                    PenguinTrackOffset = -pathdist
+                }
+                else if (PenguinTrackOffset > pathdist) {
+                    troty = pathrot
+                    PenguinTrackOffset = pathdist
+                }
+            }
+            troty += loopseek(PenguinWaddle, 4deg, 0.1s) - 2deg
+            if (STATUS_PATH_END) {
+                trotx = 720deg
+                statusb &= ~0x20000000
+            }
+        }
+        changestateifn(Penguin_Spin, STATUS_PATH_END || abs(pathprog) <= 4.0 || abs(pathprog) >= pathlen - 4.0 || frametime - statetime < 0.9s || animframe)
+        sendeventif(EventHit, collider, player -> statusa \ FLAG_GROUNDLAND, 100.0)
+    }
+}
+
+state Penguin_Spin { // 2
+    stateflag 0x85
+    statusc 0x0
+    trans => sub sub_174
+    code() {
+        PenguinDoSpin(false)
+        changestate(Penguin_Walk)
+    }
+}
+
+sub sub_174() {
+    sendevent(EventHit, collider, 100.0)
+}
+
+sub PenguinSpinEvents(e, a) {
+    if (interrupter == player) {
+        if (e == EventSlamHit) {
+            rejevcstate(Penguin_Squash)
+        }
+        if (e == EventJumpedOn) {
+            sendevent(EventBounce, interrupter, 15.495m)
+            rejevret(eventaccepted)
+        }
+        if (interrupter -> statusa \ FLAG_GROUNDLAND && (e == EventSpinHit || e == EventSlideHit)) {
+            rejev()
+            sendevent(Event24, interrupter, 100.0)
+        }
+    }
+}
+
+sub PenguinSpinTrans() {
+    field_61 = seek(field_61, 60deg, 12deg)
+    roty += field_61
+    sendevent(EventHit, collider, 100.0)
+}
+
+sub PenguinDoSpin(skip_shake) {
+    pathdist = 0
+    if (!skip_shake) {
+        playframes(PENGUIN_SHAKE, 0.0, 9.0)
+    }
+    save (statusb) {
+        statusb &= ~FLAG_ROT_Y
+        if (!skip_shake) {
+            playframes(10.0, 14.0)
+        }
+        setevent(PenguinSpinEvents)
+        settrans(PenguinSpinTrans)
+        stateflag |= 0x80
+        statetime = frametime
+        SoundPenguinSpin()
+        do {
+            playanim(0, PENGUIN_SPIN)
+        } until (frametime - statetime >= 0.8s && abs(degdist(roty, GAMEDIR)) <= 60deg)
+        roty = GAMEDIR + randi(-15deg, 15deg)
+        settrans(sub_174)
+        epc = 0
+        if (!skip_shake) {
+            playframes(PENGUIN_SHAKE, 15.0, 20.0)
+            playframes(21.0, 32.0)
+        }
+        if (spawn == S_PENGUIN_PULSE) {
+            SoundPenguinShake()
+        }
+        else {
+            SoundPenguinShake2()
+        }
+        if (!skip_shake) {
+            do (var shakes = 0) {
+                playframes(33.0, 38.0)
+                shakes += 1.0
+            } while (shakes < 3.0)
+        }
+    }
+    if (!skip_shake) {
+        playframes(39.0, 48.0)
+    }
+}
+
+state Penguin_Pulse_Init { // 3
+    statusc 0x32
+    code(constant) {
+        density = 0.15m
+        zindex = 25
+        PenguinVar6 = 0
+        spawn(ShadC, ShadC_S_SHADOW_STATIONARY, 1, 0, 1S, 10)
+        statusb = FLAG_ROT_Y | FLAG_COLLIDABLE | FLAG_SOLID_ALL | 0x20000000
+        if (constant) {
+            changestate(Penguin_Spin_Const)
+        }
+        else {
+            changestate(Penguin_Pulse)
+        }
+    }
+}
+
+state Penguin_Pulse { // 4
+    statusc 0x0
+    code() {
+        do {
+            playframes(PENGUIN_SPIN_START, 0.0, 15.0)
+            PenguinDoSpin(true)
+            playframes(PENGUIN_SPIN_START, 16.0, 89.0)
+        } while (1)
+    }
+}
+
+state Penguin_Spin_Const { // 5
+    statusc 0x0
+    code() {
+        do {
+            SoundPenguinSpin()
+            playanim(0, PENGUIN_SPIN)
+        } while (1)
+    }
+    event(e, a) {
+        if (interrupter == player) {
+            if (e == EventJumpedOn) {
+                sendevent(EventBounce, interrupter, 15.495m)
+                rejevret(eventaccepted)
+            }
+            rejevif (interrupter -> statusa \ FLAG_GROUNDLAND && (e == EventSpinHit || e == EventSlideHit)) {
+                sendevent(Event24, interrupter, 100.0)
+            }
+            rejevret(e == EventSpinHit)
+        }
+    }
+    trans {
+        sendevent(EventHit, collider, 100.0)
+        roty += spd(1800deg)
+    }
+}
+
+inline sub WaitForSpawnCycle(cyclelen, cycleoffs) {
+    while (time(cyclelen, cycleoffs)) {
+        playframe(0)
+    }
+}
+
+state Penguin_Slide_Spawner { // 6
+    statusc 0x32
+    code(count, speed, cyclelen, cycleoffs, limit) {
+        PenguinPathSpeed = speed
+        statusb = FLAG_INVISIBLE
+        calcpath(pathlen - 1.0, vvec)
+        ChildSpawnMinDist = 10m
+        pathdist = limit
+        do {
+            do (var penguins = 0) {
+                WaitForSpawnCycle(cyclelen, cycleoffs)
+                if (distance(player, DIST_EXACT | DIST_NO_Y) > ChildSpawnMinDist && player -> z < vecz + 15m) {
+                    spawn(PengC, S_PENGUIN_CHILD, 1)
+                }
+                playframe(0)
+                penguins += 1.0
+            } while (penguins < count)
+            WaitForSpawnCycle(cyclelen, cycleoffs)
+            playframe(0)
+            WaitForSpawnCycle(cyclelen, cycleoffs)
+            playframe(0)
+            WaitForSpawnCycle(cyclelen, cycleoffs)
+            playframe(0)
+            WaitForSpawnCycle(cyclelen, cycleoffs)
+            playframe(0)
+        } while (1)
+    }
+}
+
+state Penguin_Slide_Init { // 7
+    code() {
+        zindex = 55
+        yzapproach = 180deg
+        trotx = 180deg
+        pathprog = 0
+        statusb = FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | FLAG_SOLID_TOP | 0x800 | 0x2000
+        PenguinTrackOffset = 0m
+        density = 0.1m
+        PenguinPathSpeed = parent -> PenguinPathSpeed
+        entity = parent -> entity
+        pathlen = parent -> pathlen
+        pathdist = parent -> pathdist
+        playframes(PENGUIN_SLIDE_START, 0.0, 6.0)
+        changestate(Penguin_Slide)
+    }
+    trans {
+        once {
+            SetScale(0S)
+        }
+        scalex = seek(scalex, 1S, 0x555)
+        scaley = seek(scaley, 1S, 0x555)
+        scalez = seek(scalez, 1S, 0x555)
+    }
+}
+
+state Penguin_Slide { // 8
+    stateflag 0x81
+    statusc 0x0
+    code() {
+        SoundPenguinSlideStart()
+        SoundPenguinSlide()
+        playframes(PENGUIN_SLIDE_START, 7.0, 47.0)
+        sleepframes(PENGUIN_SLIDE, 0.0, 31.0)
+    }
+    trans {
+        sendeventif(EventHit, collider, player -> statusa \ FLAG_GROUNDLAND, 100.0)
+        changestateif(Penguin_Kill, STATUS_PATH_END)
+        var v1 = 0
+        var deg_to_player = 0deg
+        var pathrot = troty
+        pathprog = spd(pathprog, PenguinPathSpeed)
+        calcpath(pathprog)
+        save (troty, statusa, statusb, x, y, z, pathprog) {
+            statusb = FLAG_PATH_CALCS | FLAG_TRACK_PATH_SIGN
+            x = player -> x
+            y = player -> y
+            z = player -> z
+            calcpath(0)
+            v1 = troty
+            troty += 90deg
+            setvel(PenguinTrackOffset, vvel)
+        }
+        x += velx
+        z += velz
+        if (pathlen - pathprog >= 3.0) {
+            if (abs(PenguinTrackOffset - vecy) > 0.1m) {
+                deg_to_player = degdist(troty, atan2(player -> trans))
+                if (abs(deg_to_player) < 60deg) {
+                    if (deg_to_player < -45deg) {
+                        deg_to_player = -45deg
+                    }
+                    else if (deg_to_player > 45deg) {
+                        deg_to_player = 45deg
+                    }
+                    troty += deg_to_player
+                }
+            }
+            PenguinTrackOffset = seek(PenguinTrackOffset, vecy, spd(2m))
+            if (PenguinTrackOffset < -pathdist) {
+                troty = pathrot
+                PenguinTrackOffset = -pathdist
+            }
+            else if (PenguinTrackOffset > pathdist) {
+                troty = pathrot
+                PenguinTrackOffset = pathdist
+            }
+        }
+    }
+}
+
+state Penguin_Kill { // 9
+    stateflag 0x20
+    statusc 0x0
+    code() {}
+}
+
+state Penguin_Squash { // 10
+    stateflag 0x21
+    statusc 0x32
+    code(h) {
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        playframe()
+    }
+}
+
+sub SetParticleColor() {
+    var r = rand(3)
+    if (r == 0 || r == 1) {
+        SetColor1(0x1B, 0x2E, 0x60)
+    }
+    else if (r == 2 || r == 3) {
+        SetColor1(0xA5, 0x6E, 0x29)
+    }
+    else if (r == 4) {
+        SetColor1(0xDB, 0xD7, 0xC5)
+    }
+}
+
+state Penguin_Fling { // 11
+    stateflag 0x30
+    statusc 0x12
+    code(h) {
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir()
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    } 
+    trans {
+        EnemyFlingTrans(2m, EventFling)
+    }
+}

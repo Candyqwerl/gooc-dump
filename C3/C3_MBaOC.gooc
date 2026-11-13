@@ -1,0 +1,158 @@
+#gool MBaOC 53 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_MBaOC.gooc" "C3\Out\C3_MBaOC.nsentry"
+
+#anim MED_BANNER_A0  [MA1bV] [MA1bG] 19 0 2
+#anim MED_BANNER_A1  [MA1bV] [MA2bG] 19 0 2
+#anim MED_BANNER_A2  [MA1bV] [MA3bG] 19 0 2
+#anim MED_BANNER_A3  [MA1bV] [MA4bG] 19 0 2
+#anim MED_BANNER_A4  [MA1bV] [MA5bG] 19 0 2
+#anim MED_BANNER_A5  [MA1bV] [MA6bG] 19 0 2
+#anim MED_BANNER_A6  [MA1bV] [MA7bG] 19 0 2
+#anim MED_BANNER_A7  [MA1bV] [MA8bG] 19 0 2
+#anim MED_BANNER_A8  [MA1bV] [MA9bG] 19 0 2
+#anim MED_BANNER_A9  [MA1bV] [MAabG] 19 0 2
+#anim MED_BANNER_A10 [MA1bV] [MAbbG] 19 0 2
+#anim MED_BANNER_A11 [MA1bV] [MAcbG] 19 0 2
+#anim MED_BANNER_A12 [MA1bV] [MAdbG] 19 0 2
+#anim MED_BANNER_A13 [MA1bV] [MAebG] 19 0 2
+#anim MED_BANNER_A14 [MA1bV] [MAfbG] 19 0 2
+#anim MED_BANNER_A15 [MA1bV] [MAgbG] 19 0 2
+#anim MED_BANNER_A16 [MA1bV] [MAhbG] 19 0 2
+#anim MED_BANNER_A17 [MA1bV] [MAibG] 19 0 2
+#anim MED_BANNER_A18 [MA1bV] [MAjbG] 19 0 2
+
+#anim MED_BANNER_B0  [MB1bV] [MB1bG] 19 0 2
+#anim MED_BANNER_B1  [MB1bV] [MB2bG] 19 0 2
+#anim MED_BANNER_B2  [MB1bV] [MB3bG] 19 0 2
+#anim MED_BANNER_B3  [MB1bV] [MB4bG] 19 0 2
+#anim MED_BANNER_B4  [MB1bV] [MB5bG] 19 0 2
+#anim MED_BANNER_B5  [MB1bV] [MB6bG] 19 0 2
+#anim MED_BANNER_B6  [MB1bV] [MB7bG] 19 0 2
+#anim MED_BANNER_B7  [MB1bV] [MB8bG] 19 0 2
+#anim MED_BANNER_B8  [MB1bV] [MB9bG] 19 0 2
+#anim MED_BANNER_B9  [MB1bV] [MBabG] 19 0 2
+#anim MED_BANNER_B10 [MB1bV] [MBbbG] 19 0 2
+#anim MED_BANNER_B11 [MB1bV] [MBcbG] 19 0 2
+#anim MED_BANNER_B12 [MB1bV] [MBdbG] 19 0 2
+#anim MED_BANNER_B13 [MB1bV] [MBebG] 19 0 2
+#anim MED_BANNER_B14 [MB1bV] [MBfbG] 19 0 2
+#anim MED_BANNER_B15 [MB1bV] [MBgbG] 19 0 2
+#anim MED_BANNER_B16 [MB1bV] [MBhbG] 19 0 2
+#anim MED_BANNER_B17 [MB1bV] [MBibG] 19 0 2
+#anim MED_BANNER_B18 [MB1bV] [MBjbG] 19 0 2
+
+#spawn S_BANNER_B   Medieval_Banner
+#spawn S_BANNER_A   Medieval_Banner
+#spawn S_BANNER_C   Medieval_Banner
+
+inline sub SoundBannerFlap() {
+    if (frametime - statetime >= 1.1s) {
+        statetime = frametime
+        SoundPitchDefault(0.295)
+        soundplay([Fl1aA], 0.2V + rand(0.1V))
+    }
+}
+
+state Medieval_Banner {
+    statusc 0
+    code(yaw) {
+        roty = yaw
+        statusb = 0
+        SetScale(0.5S)
+        animframe = 0
+        SetZindexField(24)
+        var0 = ((x >> 17) + (z >> 17)) % 19
+        if (spawn != S_BANNER_A) {
+            {
+                var frame = var0
+                if (frame == 0) { goto FA0 } 
+                if (frame == 1) { goto FA1 } 
+                if (frame == 2) { goto FA2 } 
+                if (frame == 3) { goto FA3 } 
+                if (frame == 4) { goto FA4 } 
+                if (frame == 5) { goto FA5 } 
+                if (frame == 6) { goto FA6 } 
+                if (frame == 7) { goto FA7 } 
+                if (frame == 8) { goto FA8 } 
+                if (frame == 9) { goto FA9 } 
+                if (frame == 10) { goto FA10 }
+                if (frame == 11) { goto FA11 }
+                if (frame == 12) { goto FA12 }
+                if (frame == 13) { goto FA13 }
+                if (frame == 14) { goto FA14 }
+                if (frame == 15) { goto FA15 }
+                if (frame == 16) { goto FA16 }
+                if (frame == 17) { goto FA17 }
+                if (frame == 18) { goto FA18 }
+            }
+            do {
+                SoundBannerFlap()
+                FA0: playanim(0, MED_BANNER_A0)
+                FA1: playanim(1, MED_BANNER_A1)
+                FA2: playanim(2, MED_BANNER_A2)
+                FA3: playanim(3, MED_BANNER_A3)
+                FA4: playanim(4, MED_BANNER_A4)
+                FA5: playanim(5, MED_BANNER_A5)
+                FA6: playanim(6, MED_BANNER_A6)
+                FA7: playanim(7, MED_BANNER_A7)
+                FA8: playanim(8, MED_BANNER_A8)
+                FA9: playanim(9, MED_BANNER_A9)
+                FA10: playanim(10, MED_BANNER_A10)
+                FA11: playanim(11, MED_BANNER_A11)
+                FA12: playanim(12, MED_BANNER_A12)
+                FA13: playanim(13, MED_BANNER_A13)
+                FA14: playanim(14, MED_BANNER_A14)
+                FA15: playanim(15, MED_BANNER_A15)
+                FA16: playanim(16, MED_BANNER_A16)
+                FA17: playanim(17, MED_BANNER_A17)
+                FA18: playanim(18, MED_BANNER_A18)
+            } while (1)
+        }
+        {
+            var frame = var0
+            if (frame == 0) { goto FB0 }
+            if (frame == 1) { goto FB1 }
+            if (frame == 2) { goto FB2 }
+            if (frame == 3) { goto FB3 }
+            if (frame == 4) { goto FB4 }
+            if (frame == 5) { goto FB5 }
+            if (frame == 6) { goto FB6 }
+            if (frame == 7) { goto FB7 }
+            if (frame == 8) { goto FB8 }
+            if (frame == 9) { goto FB9 }
+            if (frame == 10) { goto FB10 }
+            if (frame == 11) { goto FB11 }
+            if (frame == 12) { goto FB12 }
+            if (frame == 13) { goto FB13 }
+            if (frame == 14) { goto FB14 }
+            if (frame == 15) { goto FB15 }
+            if (frame == 16) { goto FB16 }
+            if (frame == 17) { goto FB17 }
+            if (frame == 18) { goto FB18 }
+        }
+        do {
+            SoundBannerFlap()
+            FB0: playanim(0, MED_BANNER_B0)
+            FB1: playanim(1, MED_BANNER_B1)
+            FB2: playanim(2, MED_BANNER_B2)
+            FB3: playanim(3, MED_BANNER_B3)
+            FB4: playanim(4, MED_BANNER_B4)
+            FB5: playanim(5, MED_BANNER_B5)
+            FB6: playanim(6, MED_BANNER_B6)
+            FB7: playanim(7, MED_BANNER_B7)
+            FB8: playanim(8, MED_BANNER_B8)
+            FB9: playanim(9, MED_BANNER_B9)
+            FB10: playanim(10, MED_BANNER_B10)
+            FB11: playanim(11, MED_BANNER_B11)
+            FB12: playanim(12, MED_BANNER_B12)
+            FB13: playanim(13, MED_BANNER_B13)
+            FB14: playanim(14, MED_BANNER_B14)
+            FB15: playanim(15, MED_BANNER_B15)
+            FB16: playanim(16, MED_BANNER_B16)
+            FB17: playanim(17, MED_BANNER_B17)
+            FB18: playanim(18, MED_BANNER_B18)
+        } while (1)
+    }
+}

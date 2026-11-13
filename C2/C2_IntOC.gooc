@@ -1,0 +1,948 @@
+#gool IntOC 50 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C2_FruiC.gooh"
+#include "..\\Includes\\C2_DispC.gooh"
+//gooc -c 2 -r pal "C2\C2_IntOC.gooc" "C2\Out\C2_IntOC.nsentry"
+
+#anim CORTEX_FALLING     [XI1sV] 126 1
+#anim INTRO_SLED         [Xs1sV] 32 1
+#anim SHIP_LIGHT         [Li1sV] 9 1
+#anim CORTEX_CAVE_1      [Xc1sV] 129 1
+#anim CORTEX_CAVE_2      [Xc2sV] 128 1
+
+#sprite FLARE [Int3T]
+#tex 0xC0C0C0 1 3 0 1 0 64 64 64
+
+#sprite FLAME [Int1T]
+#tex 0xE0E0E0 0 3 6 5 864 16 16 16
+#tex 0xE0E0E0 0 3 7 5 880 16 16 16
+#tex 0xE0E0E0 0 3 8 5 896 16 16 16
+#tex 0xE0E0E0 0 3 9 5 912 16 16 16
+#tex 0xE0E0E0 0 3 10 5 928 112 16 16
+#tex 0xE0E0E0 0 3 11 5 928 96 16 16
+#tex 0xE0E0E0 0 3 12 5 928 80 16 16
+#tex 0xE0E0E0 0 3 13 5 928 64 16 16
+
+#anim CORTEX_INTRO_1 [Xb1sV] 237 1
+#anim CORTEX_INTRO_2 [Xf1sV] 63 1
+#anim SKYBOX_1       [Sb1sV] 1 0
+#anim WINDOW         [Sw1sV] 1 1
+#anim LIGHTRAY       [Cl1sV] 18 1
+#anim NGIN_INTRO     [NI1sV] 251 1
+#anim BRANCH_1       [Il1sV] 103 0
+#anim BRANCH_2       [Il2sV] 103 0
+#anim BRANCH_3       [Il3sV] 103 0
+#anim BRANCH_4       [Il4sV] 103 0
+#anim BRANCH_5       [Il5sV] 103 0
+#anim BRANCH_6       [Il6sV] 103 0
+#anim BRANCH_7       [Il7sV] 103 0
+#anim BRANCH_8       [Il8sV] 103 0
+#anim BRANCH_9       [Il9sV] 103 0
+#anim BRANCH_10      [IlasV] 103 0
+#anim BRANCH_11      [IlbsV] 103 0
+#anim BRANCH_12      [IlcsV] 103 0
+#anim BRANCH_13      [IldsV] 103 0
+#anim BRANCH_14      [IlesV] 103 0
+#anim BRANCH_15      [IlfsV] 103 0
+#anim SIS_INTRO_1    [St1sV] 167 1
+#anim SIS_INTRO_2    [St2sV] 142 1
+#anim SIS_HEAD       [Sh1sV] 1 1
+#anim SIS_BODY       [SB1sV] 8 1
+#anim LAPTOP_ON      [Lt1sV] 1 1
+#anim LAPTOP_OFF     [Lt2sV] 1 1
+
+#font FONT_0x8800 [1147I]
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+#char 0x000000 0 0 0 0 0 0 1 1 400 400
+
+#text TEXT     FONT_SMALL[1149I]
+"UN AN PLUS TARD"
+"EIN JAHR SPAETER"
+"DOCE MESES MAS TARDE"
+"UN ANNO DOPO"
+"ONE YEAR LATER"
+
+#spawn S_INTRO            Intro_Controller
+#spawn S_INTRO_CORTEX     Intro_Cortex
+#spawn S_INTRO_SLED       Intro_Sled
+#spawn S_INTRO_SIS        Intro_Sis
+#spawn S_LAPTOP           Laptop
+#spawn S_CAVE             Cortex_Cave
+#spawn S_CRYSTAL          Master_Crystal
+#spawn S_NGIN             Intro_NGin
+#spawn S_LIGHTRAY         LightRay
+#spawn S_CORTEX_B         Intro_Cortex_Back
+#spawn S_WINDOW           Window
+#spawn S_BRANCH_SPAWNER   Branch_Spawner
+#spawn S_CORTEX_F         Intro_Cortex_Front
+#spawn S_BRANCH           Branch
+#spawn S_CAVE_LIGHT       Cave_Light_Init
+#spawn S_SKYBOX           Skybox
+#spawn S_FLARE            Flare
+#spawn S_FLAME            Flame
+#spawn S_TEXT             Text
+#spawn S_SHIPLIGHT        Ship_Light
+#spawn S_SIS_HEAD         Sis_Head
+
+var LightTargetX, LightTargetY, LightTargetZ
+var LightOffsetX, LightOffsetY, LightOffsetZ
+var LightBrightness, LightTargetBrightness, LightBaseBrightness
+var IntroVar10, CaveFlameDimmed, TargetVertex, LightFadeSpeed
+var TargetScaleX, TargetScaleY
+var LastPlayerX, LastPlayerY, LastPlayerZ, HeadLookMode
+
+expr SledBurstSpawned    = IntroVar10
+expr CaveFlameStarted    = IntroVar10
+expr LightFadePhase      = IntroVar10
+expr HeadSnapPending     = IntroVar10
+
+expr SavedMusicVolume    = var0
+expr AnimationPhase      = var0
+expr LightValue          = var0
+expr CrystalLightAmount  = var0
+expr HeadAngleDelta      = field_61
+
+inline sub WaitIntroTime(len) {
+    until (frametime - statetime >= len) {
+        UpdateIntroTimeline()
+        playnull()
+    }
+}
+
+state Intro_Controller { // 0
+    stateflag 0x40001
+    statusc 0x2
+    code() {
+        SavedMusicVolume = MUSVOL
+        GLOBAL_74 = 0
+        settrans(HoldIntroFadeAndCheckSkip)
+        HoldIntroFadeAndCheckSkip()
+        if (var lang = GLOBAL_151; lang == LANG_FR) {
+            spawn(9, 44, 1, [I00FO], [I01FO], [I02FO], [I03FO], [I04FO], [I05FO], [I06FO], [I07FO], [I08FO], [I09FO], [I0aFO], [I0bFO], 12.0, 1000s, 0x6E4)
+        }
+        else if (lang == LANG_ES) {
+            spawn(9, 44, 1, [I00SO], [I01SO], [I02SO], [I03SO], [I04SO], [I05SO], [I06SO], [I07SO], [I08SO], [I09SO], [I0aSO], [I0bSO], 12.0, 1000s, 0x6E4)
+        }
+        else if (lang == LANG_DE) {
+            spawn(9, 44, 1, [I00GO], [I01GO], [I02GO], [I03GO], [I04GO], [I05GO], [I06GO], [I07GO], [I08GO], [I09GO], [I0aGO], [I0bGO], 12.0, 1000s, 0x6E4)
+        }
+        else if (lang == LANG_IT) {
+            spawn(9, 44, 1, [I00IO], [I01IO], [I02IO], [I03IO], [I04IO], [I05IO], [I06IO], [I07IO], [I08IO], [I09IO], [I0aIO], [I0bIO], 12.0, 1000s, 0x6E4)
+        }
+        else {
+            spawn(9, 44, 1, [I00sO], [I01sO], [I02sO], [I03sO], [I04sO], [I05sO], [I06sO], [I07sO], [I08sO], [I09sO], [I0asO], [I0bsO], 12.0, 1000s, 0x6E4)
+        }
+        playnull()
+        GAMEFLAGS &= ~0x100
+        playnull(13)
+        sendevent(EventTriggered, child)
+        statetime = frametime
+        settrans(__Intro_Controller_TRANS)
+        GAMEFLAGS |= 0x2
+        WaitIntroTime(5s)
+        ins72(0, 0x100)
+        ins72(0x400, 0x100)
+        statetime = frametime - 20s
+        settrans(HoldIntroFadeAndCheckSkip)
+        WaitIntroTime(24s)
+        GAMEFLAGS |= 0x2
+        settrans(__Intro_Controller_TRANS)
+        UpdateIntroTimeline()
+        playnull()
+        WaitIntroTime(0x36C)
+        FadeToBlack()
+        WaitFadeNull()
+        GAMEFLAGS &= ~0x1
+        WaitIntroTime(0x3A3)
+        GAMEFLAGS |= 0x1
+        ins72(0, 0x100)
+        ins72(0x400, 0x100)
+        GLOBAL_50 = 0xFFFFFF
+        GLOBAL_51 = 0xFFFFFF
+        statetime = frametime - 40s
+        FadeFromBlack(16)
+        WaitIntroTime(0x432)
+        FadeToBlack(16)
+        WaitIntroTime(0x43F)
+        ins72(0, 0x100)
+        ins72(0x400, 0x100)
+        statetime = frametime - 60s
+        FadeFromBlack(16)
+        WaitIntroTime(0x68B)
+        statetime = frametime - 67s
+        WaitIntroTime(0x8B9)
+        FadeToBlack(16)
+        WaitIntroTime(0x8D3)
+        while (FADECONTROL != -1) {
+            UpdateIntroTimeline()
+            playnull()
+        }
+        playnull(10)
+        ins72(0, 0x100)
+        ins72(0x400, 0x100)
+        FadeFromBlack()
+        do {
+            UpdateIntroTimeline()
+            playnull()
+        } until (child -> stateflag & 0x20)
+    }
+    trans {
+        CheckIntroSkip()
+    }
+}
+
+sub HoldIntroFadeAndCheckSkip() {
+    GAMEFLAGS &= ~0x800002
+    FADECONTROL = 0x120
+    CheckIntroSkip()
+}
+
+sub UpdateIntroTimeline() {
+    pathprog = frametime - statetime
+}
+
+sub CheckIntroSkip() {
+    if (frametime - statetime >= 4.5s, pad(0x940, 3, 0, 8)) {
+        changestate(Skip_Intro)
+    }
+}
+
+state Skip_Intro { // 1
+    stateflag 0x40001
+    statusc 0x2
+    code() {
+        voice = -2
+        soundfadet(0.1s, voice)
+        soundfadev(0V, voice, 3)
+        FadeToBlack()
+        WaitFadeNull()
+        loadlevel(LEVEL_WarpRoom)
+    }
+}
+
+state Intro_Cortex { // 2
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        statusb = FLAG_NO_CAMERA_CLIP
+        zindex = 26
+        playnull()
+        creator = GLOBAL_126
+        setanim(CORTEX_FALLING)
+        do {
+            if (creator -> pathprog < 0) {
+                animframe = 0
+            }
+            else if (creator -> pathprog >= 126) {
+                animframe = 125.0
+            }
+            else {
+                animframe = creator -> pathprog << 8
+            }
+            playframe()
+            if (animframe >= 75.0) {
+                zindex = 400
+            }
+        } while (1)
+    }
+}
+
+state Intro_Sled { // 3
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        statusb = FLAG_NO_CAMERA_CLIP
+        zindex = 200
+        playnull()
+        creator = GLOBAL_126
+        setanim(INTRO_SLED)
+        SledBurstSpawned = 0
+        do {
+            if (creator -> pathprog < 0) {
+                AnimationPhase = -1
+                animframe = 0
+            }
+            else if (creator -> pathprog >= 32) {
+                AnimationPhase = 1
+                animframe = 31.0
+            }
+            else {
+                AnimationPhase = 0
+                animframe = creator -> pathprog << 8
+            }
+            if (AnimationPhase > 0) {
+                break
+            }
+            if (AnimationPhase == 0) {
+                if (animframe <= 31.0) {
+                    spawn(9, 21, 1, 0, 0, 0, 0, 0.6S, 0, 24, 0)
+                }
+                if (!SledBurstSpawned && animframe >= 25.0) {
+                    SledBurstSpawned = 1
+                    SetVec(x, y, z)
+                    getvert(vtrans, self, 0)
+                    spawn(9, 40, 1, 0, 4)
+                    getvert(vtrans, self, 1.0)
+                    spawn(9, 40, 1, 0, 4)
+                    getvert(vtrans, self, 2.0)
+                    spawn(9, 40, 1, 0, 4)
+                    SetTrans(vecx, vecy, vecz)
+                }
+            }
+            playframe()
+        } while (1)
+        playnull(21)
+        playnull(21)
+        playnull(21)
+        playnull(21)
+    }
+}
+
+state Cortex_Cave { // 4
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        SetScale(0.6S)
+        roty = -60deg
+        zindex = 140
+        spawn(IntOC, S_CAVE_LIGHT, 1, 0)
+        creator = GLOBAL_126
+        vfx = (vfx & 0xFFFF00FF) | 0xC00
+        groundy = -3.9m
+        CaveFlameStarted = 0
+        CaveFlameDimmed = 0
+        do {
+            if (creator -> pathprog < 0x258) {
+                AnimationPhase = -1
+                animframe = 0
+            }
+            else if (creator -> pathprog >= 0x359) {
+                AnimationPhase = 1
+                animframe = 256.0
+            }
+            else {
+                AnimationPhase = 0
+                animframe = (creator -> pathprog - 0x258) << 8
+            }
+            if (animframe < 129.0) {
+                setanim(CORTEX_CAVE_1)
+                if (!CaveFlameStarted && animframe >= 3.0) {
+                    CaveFlameStarted = 1
+                    cascadeevent(EventTriggered, self)
+                    spawn(IntOC, S_FLARE, 1, 0)
+                    spawn(IntOC, S_FLAME, 1, 0)
+                }
+            }
+            else {
+                animframe -= 129.0
+                setanim(CORTEX_CAVE_2)
+                if (!CaveFlameDimmed && animframe >= 82.0) {
+                    CaveFlameDimmed = 1
+                    cascadeevent(Event14, self)
+                }
+            }
+            playframe()
+        } while (1)
+    }
+    trans {
+        once {
+            moda = 16.0
+        }
+        unless (STATUS_FIRSTFRAME) {
+            moda = 16.0 - ((GLOBAL_51 & 0xFF) << 12 >> 8)
+        }
+    }
+}
+
+state Cave_Light_Init { // 5
+    stateflag 0x1
+    statusc 0x2
+    code(vertex) {
+        TargetVertex = vertex
+        GLOBAL_54 = self
+        GLOBAL_120 = 0
+        GLOBAL_55 = 1.0
+        GLOBAL_50 = 0
+        GLOBAL_51 = 0
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Cave_Light_Flicker, e == EventTriggered)
+    }
+}
+
+state Cave_Light_Flicker { // 6
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        sleep()
+    }
+    event(e, a) {
+        accevif (e == Event14) {
+            LightFadePhase = 1
+            LightTargetBrightness = 2.0
+        }
+    }
+    trans {
+        once {
+            LightTargetX = 0
+            LightTargetY = 0
+            LightTargetZ = 0
+            LightOffsetX = 0
+            LightOffsetY = 0
+            LightOffsetZ = 0
+            LightBrightness = 0
+            LightTargetBrightness = 16.0
+            LightFadeSpeed = 136
+            LightFadePhase = 0
+            LightBaseBrightness = 8.0
+        }
+        if (LightFadePhase > 0) {
+            LightBaseBrightness = seek(LightBaseBrightness, 0, 40)
+            if (!LightBaseBrightness) {
+                LightFadePhase = -1
+                LightTargetBrightness = 0
+            }
+        }
+        if (LightBrightness == LightTargetBrightness) {
+            changestateif(Kill, !LightBrightness && LightFadePhase == -1)
+            LightFadeSpeed = 182
+            LightValue = rand(LightBaseBrightness >> 1)
+            if (LightBrightness >= LightBaseBrightness) {
+                LightValue = -LightValue
+            }
+            LightTargetBrightness = LightBaseBrightness + LightValue
+            if (LightTargetBrightness < 0) {
+                LightTargetBrightness = 0
+            }
+            if (LightTargetBrightness > 16.0) {
+                LightTargetBrightness = 16.0
+            }
+        }
+        LightBrightness = seek(LightBrightness, LightTargetBrightness, LightFadeSpeed)
+        LightValue = (0x10 * LightBrightness) >> 12
+        GLOBAL_50 = LightValue | ((LightValue << 8) | (LightValue << 16))
+        LightValue = (0xFF * LightBrightness) >> 12
+        GLOBAL_51 = LightValue | ((LightValue << 8) | (LightValue << 16))
+        if (LightTargetX == LightOffsetX && LightTargetY == LightOffsetY && LightTargetZ == LightOffsetZ) {
+            LightTargetX = -0.5m + rand(1m)
+            LightTargetY = -0.5m + rand(1m)
+            LightTargetZ = -0.5m + rand(1m)
+        }
+        LightOffsetX = seek(LightOffsetX, LightTargetX, 2S)
+        LightOffsetY = seek(LightOffsetY, LightTargetY, 2S)
+        LightOffsetZ = seek(LightOffsetZ, LightTargetZ, 2S)
+        getvert(vtrans, creator, TargetVertex)
+        x += LightOffsetX
+        y += LightOffsetY
+        z += LightOffsetZ
+    }
+}
+
+state Flare { // 7
+    stateflag 0x1
+    statusc 0x2
+    code(vertex) {
+        TargetVertex = vertex
+        zindex = 165
+        SetVFX2D()
+        SetRot(0deg)
+        setanim(FLARE)
+        sleepframe(0)
+    }
+    event(e, a) {
+        accevif (e == Event14) {
+            TargetScaleY = 0x9B
+        }
+    }
+    trans {
+        once {
+            moda = 16.0
+            TargetScaleY = 0x30B
+            scaley = TargetScaleY
+            scalex = scaley
+        }
+        unless (STATUS_FIRSTFRAME) {
+            moda = 16.0 - ((GLOBAL_51 & 0xFF) << 12 >> 8)
+            getvert(vtrans, creator, TargetVertex)
+            moveto2d(null, 0, 0)
+        }
+        rotz = (rotz + 2.4deg) % 360deg
+        scaley = seek(scaley, TargetScaleY, 24)
+        scalex = scaley
+    }
+}
+
+state Flame { // 8
+    stateflag 0x1
+    statusc 0x2
+    code(vertex) {
+        TargetVertex = vertex
+        SetVFX2D()
+        SetRot(0deg)
+        setanim(FLAME)
+        do {
+            playframe(0.0)
+            playframe(1.0)
+            playframe(2.0)
+            playframe(3.0)
+            playframe(4.0)
+            playframe(5.0)
+            playframe(6.0)
+            playframe(7.0)
+        } while (1)
+    }
+    event(e, a) {
+        accevif (e == Event14) {
+            TargetScaleX = 40
+            TargetScaleY = 31
+        }
+    }
+    trans {
+        once {
+            moda = 16.0
+            TargetScaleX = 0x47
+            TargetScaleY = 0x92
+            scalex = TargetScaleX
+            scaley = TargetScaleY
+        }
+        unless (STATUS_FIRSTFRAME) {
+            moda = 16.0 - ((GLOBAL_51 & 0xFF) << 12 >> 8)
+            getvert(vtrans, creator, TargetVertex)
+            moveto2d(null, 0, 0)
+        }
+        scalex = seek(scalex, TargetScaleX, 1)
+        scaley = seek(scaley, TargetScaleY, 4)
+    }
+}
+
+state Master_Crystal { // 9
+    stateflag 0x1
+    statusc 0x2
+    code(scale) {
+        spawn(FruiC, FruiC_S_CRYSTAL, 1, 0, -0xCCC, -0x800, 0, 0xE9, 0x5F, 0xFF)
+        creator = objectspawned
+        playnull()
+        creator -> scalex = scale
+        creator -> scaley = scale
+        creator -> scalez = scale
+        do {
+            CrystalLightAmount = (GLOBAL_51 & 0xFF) << 12 >> 7
+            if (CrystalLightAmount > 12.0) {
+                CrystalLightAmount = 12.0
+            }
+            creator -> moda = 16.0 - CrystalLightAmount
+            playnull()
+        } while (1)
+    }
+}
+
+state Text { // 10
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        statusb = FLAG_NO_CAMERA_CLIP
+        SetTrans(0, 0, 0)
+        TextDefaultScale()
+        statusb = FLAG_STRING_CENTER
+        if (var lang = GLOBAL_151; lang == LANG_FR) {
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -1.0, getanim(TEXT), 0.0, 0, 0, 0)
+        }
+        else if (lang == LANG_DE) {
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -1.0, getanim(TEXT), 1.0, 0, 0, 0)
+        }
+        else if (lang == LANG_ES) {
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -1.0, getanim(TEXT), 2.0, 0, 0, 0)
+        }
+        else if (lang == LANG_IT) {
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -1.0, getanim(TEXT), 3.0, 0, 0, 0)
+        }
+        else {
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -1.0, getanim(TEXT), 4.0, 0, 0, 0)
+        }
+        sleepnull()
+    }
+}
+
+state Ship_Light { // 11
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        SetScale(0.5S)
+        vfx = (vfx & 0xFFFFFF00) | 0x2
+        zindex = 20
+        do {
+            playframes(SHIP_LIGHT, 0.0, 8.0)
+            playframe(animframe, 23)
+        } while (1)
+    }
+}
+
+state Intro_NGin { // 12
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        roty = -40deg
+        SetScale(2S)
+        statusb = FLAG_NO_CAMERA_CLIP
+        setanim(NGIN_INTRO)
+        playframe(0, 3)
+        playframes(NGIN_INTRO, 0.0, 250.0)
+        sleep()
+    }
+}
+
+state LightRay { // 13
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        statusb = FLAG_NO_CAMERA_CLIP
+        sleepframes(LIGHTRAY, 0.0, 17.0)
+    }
+    trans {
+        roty = (roty + 1.15deg) % 360deg
+    }
+}
+
+state Intro_Cortex_Back { // 14
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        statusb = FLAG_NO_CAMERA_CLIP
+        roty = 158deg
+        SetScale(2S)
+        playframes(CORTEX_INTRO_1, 0.0, 236.0)
+        sleep()
+    }
+}
+
+state Intro_Cortex_Front { // 15
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        statusb = FLAG_NO_CAMERA_CLIP
+        roty = 38deg
+        SetScale(2.6S)
+        setanim(CORTEX_INTRO_2)
+        if (var lang = GLOBAL_151; lang == 2.0) {
+            playframes(14.0, 62.0)
+        }
+        else if (lang == 3.0) {
+            playframes(14.0, 62.0)
+        }
+        else if (lang == 4.0) {
+            playframes(26.0, 62.0)
+        }
+        else if (lang == 1.0) {
+            playframes(14.0, 62.0)
+        }
+        else {
+            playframes(9.0, 62.0)
+        }
+        sleep()
+    }
+}
+
+state Window { // 16
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        statusb = FLAG_NO_CAMERA_CLIP
+        moda = 8.0
+        sleepanim(0, WINDOW)
+    }
+    trans {
+        once {
+            roty = 45deg
+        }
+        roty = spd(roty, 56)
+    }
+}
+
+state Skybox { // 17
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        zindex = -1000
+        statusb = FLAG_NO_CAMERA_CLIP
+        moda = 8.0
+        sleepanim(0, SKYBOX_1)
+    }
+    trans {
+        once {
+            roty = 8deg
+            rotx = 0deg
+        }
+        roty = spd(roty, -45)
+    }
+}
+
+state Branch_Spawner { // 18
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        spawn(IntOC, S_BRANCH, 1, 1)
+        spawn(IntOC, S_BRANCH, 1, 2)
+        spawn(IntOC, S_BRANCH, 1, 3)
+        spawn(IntOC, S_BRANCH, 1, 4)
+        spawn(IntOC, S_BRANCH, 1, 5)
+        spawn(IntOC, S_BRANCH, 1, 6)
+        spawn(IntOC, S_BRANCH, 1, 7)
+        spawn(IntOC, S_BRANCH, 1, 8)
+        spawn(IntOC, S_BRANCH, 1, 9)
+        spawn(IntOC, S_BRANCH, 1, 10)
+        spawn(IntOC, S_BRANCH, 1, 11)
+        spawn(IntOC, S_BRANCH, 1, 12)
+        spawn(IntOC, S_BRANCH, 1, 13)
+        spawn(IntOC, S_BRANCH, 1, 14)
+        spawn(IntOC, S_BRANCH, 1, 15)
+        WaitChildNull()
+    }
+}
+
+state Branch { // 19
+    stateflag 0x1
+    statusc 0x2
+    code(part) {
+        statusb = FLAG_NO_CAMERA_CLIP
+        zindex = 200
+        if (part == 1) {
+            setanim(BRANCH_1)
+        }
+        else if (part == 2) {
+            setanim(BRANCH_2)
+        }
+        else if (part == 3) {
+            setanim(BRANCH_3)
+        }
+        else if (part == 4) {
+            setanim(BRANCH_4)
+        }
+        else if (part == 5) {
+            setanim(BRANCH_5)
+        }
+        else if (part == 6) {
+            setanim(BRANCH_6)
+        }
+        else if (part == 7) {
+            setanim(BRANCH_7)
+        }
+        else if (part == 8) {
+            setanim(BRANCH_8)
+        }
+        else if (part == 9) {
+            setanim(BRANCH_9)
+        }
+        else if (part == 10) {
+            setanim(BRANCH_10)
+        }
+        else if (part == 11) {
+            setanim(BRANCH_11)
+        }
+        else if (part == 12) {
+            setanim(BRANCH_12)
+        }
+        else if (part == 13) {
+            setanim(BRANCH_13)
+        }
+        else if (part == 14) {
+            setanim(BRANCH_14)
+        }
+        else if (part == 15) {
+            setanim(BRANCH_15)
+        }
+        playframes(0.0, 102.0)
+    }
+}
+
+state Intro_Sis { // 20
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_SIDES
+        zindex = 50
+        if (entitygetstate(2)) {
+            spawn(IntOC, S_LAPTOP, 1, 1)
+            changestate(Sis_Body)
+        }
+        entitysetstate(1)
+        spawn(IntOC, S_LAPTOP, 1, 0)
+        playframes(SIS_INTRO_1, 0.0, 92.0)
+        cascadeevent(Event14, self)
+        animframe = 92.0
+        do {
+            animframe += 1.0
+            sendeventif(EventTriggered, player, animframe == 97.0 || animframe == 148.0)
+            playframe()
+        } while (animframe + 1.0 <= 166.0)
+        playframes(SIS_INTRO_2, 0.0, 141.0)
+        changestate(Sis_Body)
+    }
+}
+
+state Sis_Body { // 21
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_SIDES
+        zindex = 50
+        spawn(IntOC, S_SIS_HEAD)
+        playanim(0, SIS_BODY)
+        playanim(1, SIS_BODY)
+        playanim(2, SIS_BODY)
+        playanim(3, SIS_BODY)
+        playanim(4, SIS_BODY)
+        playanim(4, SIS_BODY)
+        playanim(5, SIS_BODY)
+        playanim(6, SIS_BODY)
+        sleep()
+    }
+}
+
+state Sis_Head { // 22
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_SIDES
+        zindex = 50
+        sleepanim(0, SIS_HEAD)
+    }
+    trans {
+        once {
+            LastPlayerX = player -> x
+            LastPlayerY = player -> y
+            LastPlayerZ = player -> z
+            HeadLookMode = 1
+            HeadSnapPending = 1
+        }
+        if (LastPlayerX != player -> x || LastPlayerY != player -> y || LastPlayerZ != player -> z) {
+            HeadLookMode = 1
+            statetime = frametime
+            LastPlayerX = player -> x
+            LastPlayerY = player -> y
+            LastPlayerZ = player -> z
+        }
+        if (var mode = HeadLookMode; mode == 1) {
+            if (frametime - statetime >= 5s) {
+                HeadLookMode = 2
+                statetime = frametime
+            }
+        }
+        else if (mode == 2) {
+            if (frametime - statetime >= 2.72s) {
+                HeadLookMode = 1
+                statetime = frametime
+            }
+        }
+        if (var mode = HeadLookMode; mode == 1) {
+            vecx = atan2_3d(self, player -> trans)
+            vecy = (atan2(player -> trans) - 45deg) % 360deg
+        }
+        else if (mode == 2) {
+            vecx = 0
+            vecy = -45deg
+        }
+        var0 = vecx
+        if (var0 > 0deg) {
+            var0 = 0deg
+        }
+        if (var0 < -9.7deg) {
+            var0 = -9.7deg
+        }
+        HeadAngleDelta = degdist(rotx, var0)
+        if (HeadAngleDelta) {
+            var0 = HeadAngleDelta >> 3
+            if (!var0) {
+                if (HeadAngleDelta > 0) {
+                    var0 = 1
+                }
+                else {
+                    var0 = -1
+                }
+            }
+            rotx += var0
+        }
+        var0 = vecy
+        if (var0 >= 180deg) {
+            var0 -= 360deg
+        }
+        if (var0 > 52.75deg) {
+            var0 = 52.75deg
+        }
+        if (var0 < -136deg - 1) {
+            var0 = -136deg - 1
+        }
+        if (roty >= 180deg) {
+            roty -= 360deg
+        }
+        if (HeadSnapPending) {
+            HeadSnapPending = 0
+            roty = var0
+        }
+        {
+            var increment
+            HeadAngleDelta = var0 - roty
+            increment = HeadAngleDelta >> 2
+            if (HeadAngleDelta && !increment) {
+                if (HeadAngleDelta > 0) {
+                    increment = 1
+                }
+                else {
+                    increment = -1
+                }
+            }
+            if (increment >= 0) {
+                if (increment > 9.4deg + 1) {
+                    increment = 9.4deg + 1
+                }
+            }
+            else if (increment < -9.4deg - 1) {
+                increment = -9.4deg - 1
+            }
+            roty = (roty + increment) % 360deg
+        }
+        rotz = (roty + 45deg) % 360deg
+    }
+}
+
+state Laptop { // 23
+    stateflag 0x1
+    statusc 0x0
+    code(off) {
+        zindex = 50
+        changestateif(Laptop_Off, off)
+        sleepanim(0, LAPTOP_ON)
+    }
+    event(e, a) {
+        accevcstate(Laptop_Off, e == Event14)
+    }
+}
+
+state Laptop_Off { // 24
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepanim(0, LAPTOP_OFF)
+    }
+}
+
+state Kill { // 25
+    stateflag 0x1
+    statusc 0x0
+    code() {}
+}

@@ -1,0 +1,358 @@
+#gool NgiOC 24 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_NgiOC.gooc" "C3\Out\C3_NgiOC.nsentry"
+
+#sprite SPARKLE_WHITE [Cr10T]
+#tex 0xFFFFFF 0 3 4 10 928 32 32 32
+
+#sprite SMOKE [Cr10T]
+#tex 0x3C3C3C 0 3 14 7 672 64 32 32
+#tex 0x3C3C3C 0 3 15 7 672 32 32 32
+#tex 0x3C3C3C 0 3 0 8 704 96 32 32
+#tex 0x3C3C3C 0 3 1 8 704 64 32 32
+#tex 0x3C3C3C 0 3 2 8 704 32 32 32
+#tex 0x3C3C3C 0 3 3 8 736 96 32 32
+#tex 0x3C3C3C 0 3 4 8 736 64 32 32
+#tex 0x3C3C3C 0 3 5 8 736 32 32 32
+#tex 0x3C3C3C 0 3 6 8 768 96 32 32
+#tex 0x3C3C3C 0 3 7 8 768 64 32 32
+#tex 0x3C3C3C 0 3 14 7 768 32 32 32
+#tex 0x3C3C3C 0 3 8 8 800 96 32 32
+#tex 0x3C3C3C 0 3 9 8 800 64 32 32
+#tex 0x3C3C3C 0 3 10 8 640 16 32 16
+#tex 0x3C3C3C 0 3 11 8 672 16 32 16
+#tex 0x3C3C3C 0 3 11 8 672 16 32 16
+
+#anim BULLET_1 [Sl15V] [Sl15G] 01 0 2
+#anim BULLET_2 [Sl25V] [Sl25G] 01 0 2
+#anim SHOCKWAVE_BLUE [bn15V] [bn15G] 10 0 2
+#anim SHOCKWAVE_RED  [bn25V] [bn25G] 10 0 2
+
+#fraganim CROSSHAIR [Cr10T] 4
+#frag 0x00FFFF 0 1 6 9 864 96 32 32 -200 0 0 200
+#frag 0x00FFFF 0 1 6 9 864 96 32 32 { 96 127 96 96 127 127 127 96 } 0 0 200 200
+#frag 0x00FFFF 0 1 6 9 864 96 32 32 { 127 96 127 127 96 96 96 127 } -200 -200 0 0
+#frag 0x00FFFF 0 1 6 9 864 96 32 32 { 127 127 96 127 127 96 96 96 } 0 -200 200 0
+
+#anim SKYBOX   [Sk15V] [Sk15G] 01 0 2
+#anim PURA_POD [St15V] [St15G] 01 0 2
+
+#sprite LIGHT [Cr10T]
+#tex 0xFFFFFF 0 2 2 9 800 32 32 32
+
+#spawn S_CAMERA       Boss_Camera_Init
+#spawn S_BULLET       Bullet
+#spawn S_CROSSHAIR    Crosshair
+#spawn S_SKYBOX       SkyBox
+#spawn S_PURA         Pura_Pod
+#spawn S_UNUSED_5     __s_5
+#spawn S_UNUSED_6     __s_6
+#spawn S_SHOCKWAVE    Shockwave
+
+var CameraYaw, NginVar2, CameraPitch, NginVar4, NginVar5, CameraTargetDistance, CameraOffsetX, CameraOffsetY
+
+expr CameraDistance        = NginVar5
+expr BulletPlayerZDistance = NginVar5
+expr PuraPodOBJ            = field_63
+expr FlightOffsetX         = field_60
+expr FlightOffsetY         = field_61
+
+state Boss_Camera_Init { // 0
+    stateflag 0x10001
+    statusc 0x0
+    code() {
+        ins72(0xA00, self)
+        GLOBAL_97 = self
+        player = parent
+        statusb = FLAG_ROT_Y | 0x2000
+        trotx = 180deg
+        yzapproach = 500deg
+        speed = parent -> speed
+        playnull()
+        field_63 = 0
+        CameraPitch = 0
+        CameraYaw = player -> roty + 180deg
+        CameraDistance = 5m
+        CameraTargetDistance = CameraDistance
+        CameraOffsetX = 0
+        CameraOffsetY = 0
+        changestate(Boss_Camera_Follow)
+    }
+}
+
+state Boss_Camera_Follow { // 1
+    stateflag 0x10001
+    statusc 0x0
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Boss_Camera_Init, e == EventRespawn)
+        accevcstate(Boss_Camera_Death, e == Event9)
+        accevif (e == Event76) {
+            CameraTargetDistance = a[0]
+        }
+    }
+    trans {
+        GAMEFLAGS |= 0x40000000
+        CopyPlayerVec()
+        CameraYaw = parent -> troty + 180deg
+        CameraDistance = seek(CameraDistance, CameraTargetDistance, spd(3m))
+        CameraOffsetX = parent -> FlightOffsetX / 3 
+        CameraOffsetY = parent -> FlightOffsetY >> 1
+        save (trotx, troty, trotz, vecx, vecy, vecz) {
+            SetTRot(CameraPitch, CameraYaw, CameraYaw)
+            vectransf2(vvec, vtrans, CameraDistance, CameraOffsetX, CameraOffsetY)
+        }
+        if (y < 15m) {
+            y = 15m
+        }
+        vecx = parent -> x
+        vecy = parent -> y 
+        vecz = parent -> z
+        troty = parent -> troty + ((degdist(parent -> troty, atan2(parent -> trans)) << 1) / 5)
+        roty = troty
+        trotz = -atan2_3d(self, vecx) >> 1
+        if (trotz < -25deg) {
+            trotz = -25deg
+        }
+        ins72(0xB00, self)
+    }
+}
+
+state Boss_Camera_Death { // 2
+    stateflag 0x10001
+    statusc 0x0
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Boss_Camera_Init, e == Event19)
+    }
+    trans {
+        troty = troty + ((degdist(troty, atan2(player -> trans)) << 1) / 3)
+        vecx = player -> x
+        vecy = player -> y
+        vecz = player -> z
+        vecy += 0.8m
+        trotz = -atan2_3d(self, vecx)
+        setvel(-1m)
+        x = spd(x, velx)
+        z = spd(z, velz)
+        ins72(0xB00, self)
+    }
+}
+
+state SkyBox { // 3
+    stateflag 0x10001
+    statusc 0x0
+    code() {
+        movetolist(1.0, self)
+        statusb = FLAG_NO_CAMERA_CLIP
+        SetScale(1S, 1S, 1.75S)
+        zindex = -4000
+        sleepanim(0, SKYBOX)
+    }
+    trans {
+        x = CAMTRANSX
+        z = CAMTRANSZ
+        y = CAMTRANSY - (24.0 + ((CAMTRANSY - 16m)) * 0x8C / 0x36B0)
+        rotx = ((player -> vecy - 26m) >> 8) * -30deg / 146.875
+    }
+}
+
+state Bullet { // 4
+    stateflag 0x20001
+    statusc 0x0
+    code(vertex, vx, vy, vz, damage) {
+        movetolist(6.0, self)
+        var0 = 0
+        misc = creator -> PuraPodOBJ
+        interrupter = misc
+        if (misc) {
+            misc = interrupter -> stateflag & 0x100000
+            if (!misc) {
+                misc = 0
+            }
+        }
+        if (misc) {
+            setanim(BULLET_2)
+        }
+        else {
+            setanim(BULLET_1)
+        }
+        if (SECTIONDEATHCOUNT >= 5.0) {
+            damage <<= 1
+        }
+        zindex = -60
+        vfx = (vfx & 0xFFFFFF00) | 0x5
+        SoundPitchDefault(0.293)
+        sounddecay(1.2s)
+        soundplay([Gu15A], 0.7V)
+        getvert(vtrans, creator, vertex)
+        SetVel(vx, vy, vz)
+        vecx = x + (vx >> 5)
+        vecy = y + (vy >> 5)
+        vecz = z + (vz >> 5)
+        roty = miscfunc(velx, self, 1, 2)
+        rotz = creator -> rotz
+        rotx = atan2_3d(self, vecx)
+        do {
+            sp = collider
+            broadcastevent(EventHit, 6, damage >> 8)
+            collider = misc
+            changestateif(Shockwave, collider, sp)
+            playframe(0)
+            x = spd(x, velx)
+            y = spd(y, vely)
+            z = spd(z, velz)
+            BulletPlayerZDistance = abs(z - player -> z)
+            if (BulletPlayerZDistance > 20m) {
+                moda = seek(moda, 16.0, 2.133)
+            }
+        } while (moda != 16.0)
+    }
+}
+
+inline sub PlayFramesFade(anim, start, end) {
+    setanim(anim)
+    animframe = start - 1.0
+    do {
+        animframe += 1.0
+        moda = seek(moda, 16.0, 1.6)
+        playframe()
+    } while (animframe + 1.0 <= end)
+}
+
+state Shockwave { // 5
+    stateflag 0x20001
+    statusc 0x0
+    code() {
+        z -= 4m
+        SetVel(0m, 0m, player -> speed)
+        statusb = FLAG_PHYSICS_ENGINE
+        SoundPitchDefault(0.25)
+        sounddecay(1.2s)
+        soundplay([Rc1jA], 1V)
+        SetRot(0deg)
+        zindex = 40
+        moda = 0
+        SetColor1(0x00, 0x00, 0x00)
+        if (var0) {
+            PlayFramesFade(SHOCKWAVE_RED, 0.0, 9.0)
+        }
+        else {
+            PlayFramesFade(SHOCKWAVE_BLUE, 0.0, 9.0)
+        }
+    }
+}
+
+state Shockwave_Red { // 6
+    stateflag 0x20001
+    statusc 0x0
+    code() {
+        SetVel(0m, 0m, player -> speed)
+        statusb = FLAG_PHYSICS_ENGINE
+        soundpitch((16.0 + rand(3.2)) * 0.25 >> 8)
+        sounddecay(2.4s)
+        soundplay([No15A], 1V)
+        soundsetup(0, voice, 5)
+        vfx = (vfx & 0xFFFFFF00) | 0x5
+        SetRot(0deg, 0deg, rand(360deg))
+        zindex = 40
+        moda = 0
+        SetColor1(0, 0, 0)
+        SetScale(0.5S)
+        PlayFramesFade(SHOCKWAVE_RED, 0.0, 9.0)
+    }
+}
+
+state Crosshair { // 7
+    stateflag 0x10001
+    statusc 0x0
+    __transargs
+    code(vertex, xoffs, yoffs, zoffs) {
+        SetColor1(0xFF, 0x00, 0x00)
+        SetColor3(0x00, 0x00, 0x00)
+        SetScale(2S)
+        SetRot(0deg)
+        zindex = 60
+        do {
+            getvert(vtrans, parent, vertex)
+            x += xoffs
+            y += yoffs
+            z += zoffs
+            playanim(0, CROSSHAIR)
+        } while (1)
+    }
+    event(e, a) {
+        accevif (e == Event50) {
+            xoffs = a[0]
+            yoffs = a[1.0]
+            zoffs = a[2.0]
+        }
+        accevcstate(Kill, e == Event12 || e == Event19)
+    }
+}
+
+state Pura_Pod { // 8
+    stateflag 0x1
+    statusc 0x0
+    trans => state Pura_Pod_Attached
+    code() {
+        stateflag |= 0x100000
+        interrupter = GLOBAL_97
+        sendevent(Event76, interrupter, 8m)
+        statusb = FLAG_NO_CAMERA_CLIP
+        do (var start = frametime) {
+            vectransf(vtrans, vtrans, (1s - (frametime - start)) * -5m / 1s, 0, 0)
+            playanim(0, PURA_POD)
+        } while (frametime - start < 1s)
+        soundpitch(4.0)
+        sounddecay(9.2s)
+        soundsetup(7, self, 8)
+        soundplay([Tl15A], 1V)
+        changestate(Pura_Pod_Attached)
+    }
+}
+
+state Pura_Pod_Attached { // 9
+    stateflag 0x100001
+    statusc 0x0
+    code() {
+        interrupter = GLOBAL_97
+        sendevent(Event76, interrupter, 7m)
+        sleepanim(0, PURA_POD)
+    }
+    event(e, a) {
+        accevcstate(Pura_Pod_Detach, e == Event12)
+    }
+    trans {
+        vfx = parent -> vfx
+        zindex = parent -> zindex
+        CopyParentTrans()
+        CopyParentRot()
+        CopyParentScale()
+    }
+}
+
+state Pura_Pod_Detach { // 10
+    stateflag 0x100001
+    statusc 0x0
+    code() {
+        do (var start = frametime) {
+            vectransf(vtrans, vtrans, frametime - start * -5m / 2s, 0, 0)
+            playanim(0, PURA_POD)
+        } while (frametime - start < 2s)
+        interrupter = GLOBAL_97
+        sendevent(Event76, interrupter, 5m)
+        player -> PuraPodOBJ = 0
+    }
+}
+
+state Kill { // 11
+    stateflag 0x1
+    statusc 0x0
+    code() {}
+}

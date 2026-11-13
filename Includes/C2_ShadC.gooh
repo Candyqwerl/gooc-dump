@@ -1,0 +1,8 @@
+expr ShadC = 29
+
+expr ShadC_S_SHADOW = 0
+expr ShadC_S_SHADOW_STATIONARY = 1
+expr ShadC_S_2 = 2
+expr ShadC_S_SHADOW_GROUND = 3
+expr ShadC_S_NIGHT_SHADOW = 4
+expr ShadC_S_NIGHT_SHADOW_GROUND = 5

@@ -1,0 +1,300 @@
+#gool ApusC 56 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 2 -r pal "C2\C2_ApusC.gooc" "C2\Out\C2_ApusC.nsentry"
+
+#anim PUSHER_PUSH          [AP1gV] 9 1
+#anim PUSHER_PEEK          [AP2gV] 31 1
+#anim PUSHER_KNOCK_BACK    [AP3gV] 8 1
+#anim PUSHER_STEP_FORWARD  [AP4gV] 13 1
+#anim PUSHER_STAND         [AP5gV] 7 1
+#anim PUSHER_FALL          [AP6gV] 10 1
+
+#spawn S_ASS_PUSHER  Pusher_Init
+
+var Cooldown, PusherPathPoint, PushState, PushDirInverted, EntityID, InversePath
+
+state Pusher_Init { // 0
+    statusc 0
+    code(startpoint, obj, inverse) {
+        zindex = 35
+        EntityID = obj
+        InversePath = inverse
+        Cooldown = 0s
+        PushState = 0
+        PushDirInverted = 0
+        trotx = 360deg
+        statusb = FLAG_ROT_Y | FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        density = 0.1m
+        pathprog = startpoint
+        calcpath(pathprog)
+        if (InversePath) {
+            troty = 91deg
+        }
+        else {
+            troty = -89deg
+        }
+        roty = troty
+        rotz = troty
+        RecalcDirection()
+        roty = troty
+        rotz = troty
+        playanim(0, PUSHER_PEEK)
+        changestate(Pusher_Peek)
+    }
+}
+
+sub PushCooldown() {
+    if (Cooldown) {
+        if (frametime >= Cooldown) {
+            Cooldown = 0s
+            sendevent(EventBounce, player)
+        }
+    }
+}
+
+sub RecalcDirection() {
+    if (abs(degdist(troty, atan2(player -> trans))) >= 105deg) {
+        if (PushDirInverted) {
+            PushDirInverted = 0
+            if (InversePath) {
+                troty = (troty + 178deg) % 360deg
+            }
+            else {
+                troty = (troty + 182deg) % 360deg
+            }
+        }
+        else {
+            PushDirInverted = 1
+            if (InversePath) {
+                troty = (troty - 178deg) % 360deg
+            }
+            else {
+                troty = (troty - 182deg) % 360deg
+            }
+        }
+    }
+}
+
+state Pusher_Peek { // 1
+    statusc 0
+    code() {
+        statusb = FLAG_ROT_Y | FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        playframes(PUSHER_PEEK, 0.0, 30.0)
+        changestate(Pusher_Push)
+    }
+    event(e, a) {
+        if (interrupter == player) {
+            accevcstate(Pusher_Attacked, e == EventSlideHit || e == EventSpinHit)
+            accevcstate(Pusher_Attacked, (e == EventJumpedOn || e == EventSlamHit) && player -> y - y >= 3.8m)
+            rejevret(e == EventJumpedOn || e == EventSlamHit)
+        }
+        accevcstate(Pusher_Fling, e == EventHitInvincible)
+    }
+    trans {
+        PushCooldown()
+        RecalcDirection()
+    }
+}
+
+state Pusher_Push { // 2
+    stateflag 0x10001
+    statusc 0
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        soundpitch(3.263)
+        sounddecay(10.22s)
+        soundplay([MBLyA], 1V)
+        playframes(PUSHER_PUSH, 0.0, 8.0)
+        if (PushState) {
+            if ((PushDirInverted && !(pathprog >> 8)) || (!PushDirInverted && (pathprog >> 8) >= (pathlen >> 8) - 1)) {
+                PushState = 0
+                changestate(Pusher_Peek)
+            }
+            PushState = 0
+            changestate(Pusher_Advance)
+        }
+        changestate(Pusher_Peek)
+    }
+    event(e, a) {
+        if (interrupter == player) {
+            accevif (e == EventSlideHit || e == EventSpinHit) {
+                if (PushState == 0 && Cooldown == 0s) {
+                    PushState = 1
+                }
+            }
+        }
+        accevcstate(Pusher_Fling, e == EventHitInvincible)
+        rejevret(e == EventJumpedOn || e == EventSlamHit)
+    }
+    trans {
+        once {
+            PushState = 0
+        }
+        PushCooldown()
+        RecalcDirection()
+        if (collider == player && PushState == 0 && Cooldown == 0s) {
+            PushState = 1
+        }
+        if (PushState == 1) {
+            PushState = 2
+            if (Cooldown == 0s) {
+                sendevent(EventPushed, player, roty, 9m)
+                Cooldown = frametime + 0.4s
+            }
+        }
+    }
+}
+
+state Pusher_Advance { // 3
+    stateflag 0x10001
+    statusc 0
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        playframes(PUSHER_STEP_FORWARD, 0.0, 12.0)
+        if (PushDirInverted) {
+            pathprog = PusherPathPoint - 1.0
+        }
+        else {
+            pathprog = PusherPathPoint + 1.0
+        }
+        calcpath(pathprog)
+        settrans(PusherTrans)
+        playanim(0, PUSHER_STAND)
+        playanim(1, PUSHER_STAND)
+        playanim(2, PUSHER_STAND)
+        playanim(3, PUSHER_STAND)
+        playanim(4, PUSHER_STAND)
+        playanim(5, PUSHER_STAND)
+        playanim(6, PUSHER_STAND)
+        changestate(Pusher_Push)
+    }
+    event(e, a) {
+        if (interrupter == player) {
+            rejevret(e == EventSlideHit || e == EventSpinHit)
+        }
+        accevcstate(Pusher_Fling, e == EventHitInvincible)
+        rejevret(e == EventJumpedOn || e == EventSlamHit)
+    }
+    trans {
+        once {
+            PusherPathPoint = pathprog
+            setanim(PUSHER_STEP_FORWARD, 0)
+        }
+        v0 = (animframe + 1.0 << 8) / 13.0
+        if (PushDirInverted) {
+            v0 = -v0
+        }
+        pathprog = PusherPathPoint + v0
+        calcpath(pathprog)
+        PushCooldown()
+    }
+}
+
+sub PusherTrans() {
+    PushCooldown()
+}
+
+state Pusher_Knock_Back { // 4
+    stateflag 0x10001
+    statusc 0
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        playanim(0, PUSHER_KNOCK_BACK)
+        playanim(1, PUSHER_KNOCK_BACK)
+        playanim(2, PUSHER_KNOCK_BACK)
+        playanim(3, PUSHER_KNOCK_BACK)
+        playanim(4, PUSHER_KNOCK_BACK)
+        playanim(5, PUSHER_KNOCK_BACK)
+        playanim(6, PUSHER_KNOCK_BACK)
+        playanim(7, PUSHER_KNOCK_BACK)
+        if (PushDirInverted) {
+            pathprog = PusherPathPoint + 1.0
+        }
+        else {
+            pathprog = PusherPathPoint - 1.0
+        }
+        calcpath(pathprog)
+        changestate(Pusher_Peek)
+    }
+    event(e, a) {
+        if (interrupter == player) {
+            rejevret(e == EventSlideHit || e == EventSpinHit)
+        }
+        accevcstate(Pusher_Fling, e == EventHitInvincible)
+        rejevret(e == EventJumpedOn || e == EventSlamHit)
+    }
+    trans {
+        once {
+            PusherPathPoint = pathprog
+            setanim(PUSHER_KNOCK_BACK, 0)
+        }
+        v0 = (animframe + 1.0 << 8) >> 11
+        if (!PushDirInverted) {
+            v0 = -v0
+        }
+        pathprog = PusherPathPoint + v0
+        calcpath(pathprog)
+        PushCooldown()
+    }
+}
+
+state Pusher_Attacked { // 5
+    statusc 0
+    code() {
+        changestateif(Pusher_Fall, (PushDirInverted && (pathprog >> 8) >= (pathlen >> 8) - 1) || !PushDirInverted && pathprog == 0)
+        changestate(Pusher_Knock_Back)
+    }
+    trans {
+        PushCooldown()
+    }
+}
+
+state Pusher_Fall { // 6
+    stateflag 0x30
+    statusc 0
+    code(h) {
+        changestateif(Pusher_Fling, PushDirInverted && !InversePath || !PushDirInverted && InversePath)
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        KillEntity()
+        health = h + 1.0
+        sendevent(EventCombo, player, h)
+        var ass_voice, collided
+        soundpitch((15.2 + rand(0.8)) * 0.205 >> 8)
+        soundplay([ASciA], 0.5V + rand(0.2V))
+        ass_voice = voice
+        playframes(PUSHER_FALL, 0.0, 5.0)
+        if (EntityID) {
+            interrupter = objectget(EntityID)
+            if (interrupter) {
+                sendevent(EventHit, interrupter, 100.0)
+                collided = true
+                do (var i = 0) {
+                    playnull()
+                    i += 1.0
+                } while (i < 6.0)
+            }
+        }
+        if (!collided) {
+            playframes(6.0, 9.0)
+            voice = ass_voice
+            soundsetup(0, voice, 5)
+        }
+    }
+}
+
+state Pusher_Fling { // 7
+    stateflag 0x30
+    statusc 0x32
+    code(h) {
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir()
+        troty += 22deg
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    }
+    trans {
+        EnemyFlingTrans(2m, EventFling)
+    }
+}
+

@@ -1,0 +1,3072 @@
+#gool NGinC 58 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C2_BosBC.gooh"
+
+//gooc -c 2 -r pal "C2\C2_NGinC.gooc" "C2\Out\C2_NGinC.nsentry"
+
+#anim NGIN_BOSS_0[N0a9V] 176 1
+#anim NGIN_BOSS_1[N1a9V] 249 1
+#anim NGIN_BOSS_2[N2a9V] 85 1
+#anim NGIN_BOSS_3[N4a9V] 130 1
+#anim NGIN_BOSS_4[N5a9V] 120 1
+#anim NGIN_BOSS_5[N6a9V] 120 1
+#anim NGIN_BOSS_6[N7a9V] 130 1
+#anim NGIN_BOSS_7[N8a9V] 30 0
+
+#anim ROBOT_MAIN_0[N0b9V] 176 1
+#anim ROBOT_MAIN_1[N1b9V] 249 1
+#anim ROBOT_MAIN_2[N2b9V] 85 1
+#anim ROBOT_MAIN_3[N5b9V] 120 1
+#anim ROBOT_MAIN_4[N6b9V] 120 1
+#anim ROBOT_MAIN_5[N7b9V] 130 1
+
+#anim ROBOT_SHOULDER_LEFT_0[N0c9V] 176 1
+#anim ROBOT_SHOULDER_LEFT_1[N1c9V] 249 1
+#anim ROBOT_SHOULDER_LEFT_2[N2c9V] 85 1
+#anim ROBOT_SHOULDER_LEFT_3[N5c9V] 120 1
+#anim ROBOT_SHOULDER_LEFT_4[N6c9V] 120 1
+#anim ROBOT_SHOULDER_LEFT_5[N7c9V] 130 1
+
+#anim ROBOT_SHOULDER_LEFT_BREAK_0[N7d9V] 15 1
+#anim ROBOT_SHOULDER_LEFT_BREAK_1[N7e9V] 34 1
+
+#anim ROBOT_ARM_LEFT_0[N0f9V] 176 1
+#anim ROBOT_ARM_LEFT_1[N1f9V] 249 1
+#anim ROBOT_ARM_LEFT_2[N5f9V] 120 1
+#anim ROBOT_ARM_LEFT_3[N6f9V] 120 1
+
+#anim ROBOT_HAND_LEFT_0[N0g9V] 176 1
+#anim ROBOT_HAND_LEFT_1[N1g9V] 249 1
+#anim ROBOT_HAND_LEFT_2[N5g9V] 120 1
+#anim ROBOT_HAND_LEFT_3[N6g9V] 120 1
+
+#anim ROBOT_SHOULDER_RIGHT_0[N0h9V] 176 1
+#anim ROBOT_SHOULDER_RIGHT_1[N1h9V] 249 1
+#anim ROBOT_SHOULDER_RIGHT_2[N2h9V] 85 1
+#anim ROBOT_SHOULDER_RIGHT_3[N5h9V] 120 1
+#anim ROBOT_SHOULDER_RIGHT_4[N6h9V] 120 1
+#anim ROBOT_SHOULDER_RIGHT_5[N7h9V] 130 1
+
+#anim ROBOT_SHOULDER_RIGHT_BREAK_0[N7i9V] 15 1
+#anim ROBOT_SHOULDER_RIGHT_BREAK_1[N7j9V] 34 1
+
+#anim ROBOT_ARM_RIGHT_0[N0k9V] 176 1
+#anim ROBOT_ARM_RIGHT_1[N1k9V] 249 1
+#anim ROBOT_ARM_RIGHT_2[N5k9V] 120 1
+#anim ROBOT_ARM_RIGHT_3[N6k9V] 120 1
+
+#anim ROBOT_HAND_RIGHT_0[N0l9V] 176 1
+#anim ROBOT_HAND_RIGHT_1[N1l9V] 249 1
+#anim ROBOT_HAND_RIGHT_2[N5l9V] 120 1
+#anim ROBOT_HAND_RIGHT_3[N6l9V] 120 1
+
+#anim ROBOT_SHOULDER_PAD_RIGHT_0[N0m9V] 176 1
+#anim ROBOT_SHOULDER_PAD_RIGHT_1[N1m9V] 249 1
+#anim ROBOT_SHOULDER_PAD_RIGHT_2[N2m9V] 85 1
+#anim ROBOT_SHOULDER_PAD_RIGHT_3[N5m9V] 120 1
+#anim ROBOT_SHOULDER_PAD_RIGHT_4[N6m9V] 120 1
+#anim ROBOT_SHOULDER_PAD_RIGHT_5[N7m9V] 130 1
+
+#anim ROCKET_LAUNCHER_0[N2n9V] 85 0
+#anim ROCKET_LAUNCHER_1[N2o9V] 85 0
+
+#anim ROBOT_ARM_BROKEN_LEFT_0[N1p9V] 249 1
+#anim ROBOT_ARM_BROKEN_LEFT_1[N2p9V] 85 1
+#anim ROBOT_ARM_BROKEN_LEFT_2[N5p9V] 120 1
+#anim ROBOT_ARM_BROKEN_LEFT_3[N6p9V] 120 1
+#anim ROBOT_ARM_BROKEN_LEFT_4[N7p9V] 130 1
+
+#anim ROBOT_ARM_BROKEN_RIGHT_0[N1q9V] 249 1
+#anim ROBOT_ARM_BROKEN_RIGHT_1[N2q9V] 85 1
+#anim ROBOT_ARM_BROKEN_RIGHT_2[N5q9V] 120 1
+#anim ROBOT_ARM_BROKEN_RIGHT_3[N6q9V] 120 1
+#anim ROBOT_ARM_BROKEN_RIGHT_4[N7q9V] 130 1
+
+#anim ROBOT_PART_U1[N4x9V] 130 1
+#anim ROBOT_PART_U2[N8x9V] 30 0
+#anim ROBOT_PART_U3[N4y9V] 130 1
+#anim ROBOT_PART_U4[N8y9V] 30 0
+
+#anim ROBOT_MAIN_FIRE[N4z9V] 130 1
+#anim ROBOT_MAIN_BREAKING[N8z9V] 30 0
+
+#anim NGIN_BOSS_8 [N4A9V] 130 1
+#anim NGIN_BOSS_9 [N8A9V] 30 0
+#anim NGIN_BOSS_10[N4B9V] 40 1
+#anim NGIN_BOSS_11[N4C9V] 20 1
+
+#anim ROBOT_MAIN_BREAK_0[NGD9V] 30 1
+#anim ROBOT_MAIN_BREAK_1[NGE9V] 30 1
+#anim ROBOT_MAIN_BREAK_2[NGF9V] 30 1
+#anim ROBOT_MAIN_BREAK_3[NGG9V] 30 1
+#anim ROBOT_MAIN_BREAK_4[NGH9V] 30 1
+#anim ROBOT_MAIN_BREAK_5[NGI9V] 30 1
+#anim ROBOT_MAIN_BREAK_6[NGJ9V] 30 1
+
+#anim ROBOT_ARM_RIGHT_4[N1K9V] 249 1
+#anim ROBOT_HAND_RIGHT_4[N1L9V] 249 1
+
+#anim LAZER_GREEN[NBB9V] 100 0
+
+#anim PLATFORM_LEFT[NP09V] 1 0
+#anim PLATFORM_MIDDLE[NP19V] 1 0
+#anim PLATFORM_RIGHT[NP29V] 1 0
+#anim PLATFORM_INTRO[NP39V] 1 0
+#anim PLATFORM_BREAK[NP49V] 40 0
+
+#anim LAZER_RED_0[NL09V] 14 0
+#anim LAZER_RED_1[NL19V] 14 0
+#anim LAZER_RED_2[NL29V] 14 0
+
+#anim ROCKET[NR09V] 9 0
+
+#sprite SPARKLE[Cr10T]
+#tex 0xFFFFFF 0 3 8 6 704 32 32 32
+
+#sprite FRUIT_PROJECTILE[NJi3T]
+#tex 0x808080 1 3 0 1 00 96 32 32
+#tex 0x808080 1 3 0 1 00 64 32 32
+#tex 0x808080 1 3 0 1 00 32 32 32
+#tex 0x808080 1 3 0 1 32 96 32 32
+#tex 0x808080 1 3 0 1 32 64 32 32
+#tex 0x808080 1 3 0 1 32 32 32 32
+#tex 0x808080 1 3 0 2 64 96 32 32
+#tex 0x808080 1 3 0 2 64 64 32 32
+#tex 0x808080 1 3 0 2 64 32 32 32
+#tex 0x808080 1 3 0 2 96 96 32 32
+#tex 0x808080 1 3 0 2 96 64 32 32
+#tex 0x808080 1 3 0 2 96 32 32 32
+#tex 0x808080 1 3 0 3 128 96 32 32
+#tex 0x808080 1 3 0 3 128 64 32 32
+#tex 0x808080 1 3 0 3 128 32 32 32
+#tex 0x808080 1 3 0 3 160 96 32 32
+#tex 0x808080 1 3 0 3 160 64 32 32
+#tex 0x808080 1 3 0 3 160 32 32 32
+#tex 0x808080 1 3 0 4 192 96 32 32
+#tex 0x808080 1 3 0 4 192 64 32 32
+#tex 0x808080 1 3 0 4 192 32 32 32
+#tex 0x808080 1 3 0 4 224 96 32 32
+#tex 0x808080 1 3 0 4 224 64 32 32
+#tex 0x808080 1 3 0 4 224 32 32 32
+#tex 0x808080 1 3 0 5 256 96 32 32
+#tex 0x808080 1 3 0 5 256 64 32 32
+#tex 0x808080 1 3 0 5 256 32 32 32
+#tex 0x808080 1 3 0 5 288 96 32 32
+#tex 0x808080 1 3 0 5 288 64 32 32
+#tex 0x808080 1 3 0 5 288 32 32 32
+#tex 0x808080 1 3 0 5 320 96 32 32
+#tex 0x808080 1 3 0 5 320 64 32 32
+
+#sprite FRUIT_WUMPA[Cr10T]
+#tex 0x808080 1 3 0 3 32 32 32 32
+
+#sprite ANIM_0x1A500[NJinT]
+#tex 0x808080 0 0 2 7 544 16 16 16
+#tex 0x808080 0 0 3 7 560 16 16 16
+
+#sprite FRUIT_PROJECTILE_HIT_0[NJi5T]
+#tex 0x808080 1 3 0 1 00 64 64 64
+#tex 0x808080 1 3 0 2 64 64 64 64
+#tex 0x808080 1 3 0 3 128 64 64 64
+#tex 0x808080 1 3 0 4 192 64 64 64
+#tex 0x808080 1 3 0 5 256 64 64 64
+#tex 0x808080 1 3 0 6 320 64 64 64
+#tex 0x808080 1 3 0 7 384 64 64 64
+#tex 0x808080 1 3 0 8 448 64 64 64
+
+#sprite FRUIT_PROJECTILE_HIT_1[NJi4T]
+#tex 0x808080 1 3 0 1 00 64 64 64
+#tex 0x808080 1 3 0 2 64 64 64 64
+#tex 0x808080 1 3 0 3 128 64 64 64
+#tex 0x808080 1 3 0 4 192 64 64 64
+#tex 0x808080 1 3 0 5 256 64 64 64
+#tex 0x808080 1 3 0 6 320 64 64 64
+#tex 0x808080 1 3 0 7 384 64 64 64
+#tex 0x808080 0 3 7 8 960 64 64 64
+
+#anim ROCKET_SHADOW[Sha0V] 10 0
+
+#sprite ELECTRICITY_SPARKS[NJi3T]
+#tex 0x505050 0 3 4 0 704 32 64 32
+#tex 0x505050 0 3 4 0 768 96 64 32
+#tex 0x505050 0 3 4 0 768 64 64 32
+#tex 0x505050 0 3 4 0 768 32 64 32
+#tex 0x505050 0 3 4 0 832 96 64 32
+#tex 0x505050 0 3 4 0 832 64 64 32
+#tex 0x505050 0 3 4 0 832 32 64 32
+#tex 0x505050 0 3 4 0 896 96 64 32
+#tex 0x505050 0 3 4 0 896 64 64 32
+
+#sprite EXPLOSION_SMOKE[Cr10T]
+#tex 0x00C0C0 0 3 0 9 768 96 32 32
+#tex 0x008FC0 0 3 1 9 768 64 32 32
+#tex 0x005FC0 0 3 2 9 768 32 32 32
+#tex 0x002FC0 0 3 3 9 800 96 32 32
+#tex 0x0000C0 0 3 4 9 800 64 32 32
+#tex 0x0000C0 0 3 5 9 800 32 32 32
+#tex 0x0000C0 0 3 6 9 832 96 32 32
+#tex 0x0000C0 0 3 7 9 832 64 32 32
+#tex 0x0000C0 0 3 8 9 832 32 32 32
+#tex 0x0000C0 0 3 9 9 864 96 32 32
+#tex 0x2F2F8F 0 3 0 9 864 64 32 32
+#tex 0x606060 0 3 10 9 864 32 32 32
+#tex 0x484848 0 3 11 9 896 96 32 32
+#tex 0x2F2F2F 0 3 12 9 896 64 32 32
+#tex 0x181818 0 3 13 9 896 32 32 32
+#tex 0x0C0C0C 0 3 13 9 896 32 32 32
+
+#font FONT_SMALL [Cr20T]
+#char 0x000000 0 0 0 0 0 0 1 1 400 420 //  
+#char 0x808080 0 0 1 0 608 16 16 16 400 0 // !
+#char 0x000000 0 0 0 0 0 0 1 1 400 420 // "
+#char 0x000000 0 0 0 0 0 0 1 1 400 420 // #
+#char 0x808080 0 0 1 0 976 16 16 16 400 0 // $
+#char 0x000000 0 0 0 0 0 0 1 1 400 420 // %
+#char 0x141414 0 1 7 10 136 12 4 4 400 0 // &
+#char 0x808080 0 0 1 0 992 80 16 16 300 0 // '
+#char 0x000000 0 0 0 0 0 0 1 1 400 420 // (
+#char 0x000000 0 0 0 0 0 0 1 1 400 420 // )
+#char 0x000000 0 0 0 0 0 0 1 1 400 420 // *
+#char 0x000000 0 0 0 0 0 0 1 1 400 420 // +
+#char 0x808080 0 0 1 0 992 64 16 16 300 0 // ,
+#char 0x808080 0 0 1 0 992 112 16 16 400 0 // -
+#char 0x808080 0 0 1 0 992 96 16 16 250 0 // .
+#char 0x808080 0 0 4 0 832 96 32 32 400 0 // /
+#char 0x808080 0 0 1 0 448 16 16 16 400 0 // 0
+#char 0x808080 0 0 1 0 464 16 16 16 400 0 // 1
+#char 0x808080 0 0 1 0 480 16 16 16 400 0 // 2
+#char 0x808080 0 0 1 0 496 16 16 16 400 0 // 3
+#char 0x808080 0 0 1 0 512 16 16 16 400 0 // 4
+#char 0x808080 0 0 1 0 528 16 16 16 400 0 // 5
+#char 0x808080 0 0 1 0 544 16 16 16 400 0 // 6
+#char 0x808080 0 0 1 0 560 16 16 16 400 0 // 7
+#char 0x808080 0 0 1 0 576 16 16 16 400 0 // 8
+#char 0x808080 0 0 2 0 592 16 16 16 400 0 // 9
+#char 0x808080 0 0 1 0 992 48 16 16 300 0 // :
+#char 0x000000 0 0 0 0 0 0 1 1 400 420 // ;
+#char 0x808080 0 0 1 0 992 16 16 16 400 0 // <
+#char 0x808080 0 2 3 0 416 8 8 8 400 0 // =
+#char 0x808080 0 0 4 0 384 16 32 16 400 0 // >
+#char 0x808080 0 0 1 0 992 32 16 16 400 0 // ?
+#char 0x000000 0 0 0 0 0 0 1 1 400 420 // @
+#char 0x808080 0 0 1 0 624 16 16 16 400 0 // A
+#char 0x808080 0 0 1 0 640 16 16 16 400 0 // B
+#char 0x808080 0 0 1 0 656 16 16 16 400 0 // C
+#char 0x808080 0 0 1 0 672 16 16 16 400 0 // D
+#char 0x808080 0 0 1 0 688 16 16 16 400 0 // E
+#char 0x808080 0 0 1 0 704 16 16 16 400 0 // F
+#char 0x808080 0 0 1 0 720 16 16 16 400 0 // G
+#char 0x808080 0 0 1 0 736 16 16 16 400 0 // H
+#char 0x808080 0 0 1 0 752 16 16 16 400 0 // I
+#char 0x808080 0 0 1 0 768 16 16 16 400 0 // J
+#char 0x808080 0 0 1 0 784 16 16 16 400 0 // K
+#char 0x808080 0 0 1 0 800 16 16 16 400 0 // L
+#char 0x808080 0 0 1 0 816 16 16 16 400 0 // M
+#char 0x808080 0 0 1 0 832 16 16 16 400 0 // N
+#char 0x808080 0 0 1 0 848 16 16 16 400 0 // O
+#char 0x808080 0 0 1 0 864 16 16 16 400 0 // P
+#char 0x808080 0 0 1 0 880 16 16 16 400 0 // Q
+#char 0x808080 0 0 1 0 896 16 16 16 400 0 // R
+#char 0x808080 0 0 1 0 912 16 16 16 400 0 // S
+#char 0x808080 0 0 1 0 928 16 16 16 400 0 // T
+#char 0x808080 0 0 1 0 944 16 16 16 400 0 // U
+#char 0x808080 0 0 1 0 960 48 16 16 400 0 // V
+#char 0x808080 0 0 1 0 960 32 16 16 400 0 // W
+#char 0x808080 0 0 1 0 960 16 16 16 400 0 // X
+#char 0x808080 0 0 1 0 976 48 16 16 400 0 // Y
+#char 0x808080 0 0 1 0 976 32 16 16 400 0 // Z
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x808080 0 0 1 0 1008 112 16 16 400 0
+#char 0x808080 0 0 1 0 992 80 16 16 300 0
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+#char 0x000000 0 0 0 0 0 0 1 1 400 420
+
+#text TEXT                         FONT_SMALL[Cr20T]
+"%04d.%03d INTRO"                  // 0.0
+"%04d.%03d STAGE 1 INTRO"          // 1.0
+"%04d.%03d STAGE 1 DEBUG"          // 2.0
+"%04d.%03d STAGE 1 LOOP"           // 3.0
+"%04d.%03d STAGE 1 FIRE LEFT"      // 4.0
+"%04d.%03d STAGE 1 FIRE RIGHT"     // 5.0
+"%04d.%03d STAGE 1 MAD L TRANS"    // 6.0
+"%04d.%03d STAGE 1 MAD LEFT"       // 7.0
+"%04d.%03d STAGE 1 R TRANS"        // 8.0
+"%04d.%03d STAGE 1 MAD RIGHT"      // 9.0
+"%04d.%03d STAGE 1 MAD BOTH"       // 10.0
+"%04d.%03d STAGE 2 SETUP"          // 11.0
+"%04d.%03d STAGE 2 DEBUG"          // 12.0
+"%04d.%03d STAGE 2 LOOP"           // 13.0
+"%04d.%03d STAGE 2 PHASE 1"        // 14.0
+"%04d.%03d STAGE 2 PHASE 2"        // 15.0
+"%04d.%03d STAGE 2 PHASE 3"        // 16.0
+"%04d.%03d STAGE 2 PHASE 4"        // 17.0
+"%04d.%03d STAGE 2 MAD LEFT"       // 18.0
+"%04d.%03d STAGE 2 MAD RIGHT"      // 19.0
+"%04d.%03d STAGE 2 MAD BOTH"       // 20.0
+"%04d.%03d STAGE 4 LEFT"           // 21.0
+"%04d.%03d STAGE 4 MIDDLE"         // 22.0
+"%04d.%03d STAGE 4 RIGHT"          // 23.0
+"%04d.%03d STAGE 4 DYING"          // 24.0
+"%04d.%03d STAGE 4 DEATH"          // 25.0
+
+#spawn S_NGIN_BOSS           Boss_Intro
+#spawn S_NGIN_ROBOT          Robot
+#spawn S_PLATFORM_L          Platform
+#spawn S_PLATFORM_R          Platform
+#spawn S_PLATFORM_M          Platform
+#spawn S_FRUIT               Fruit_Projectile
+#spawn S_NONE                None
+#spawn S_PLATFORM_INTRO      Platform
+#spawn S_DEBUG_TEXT          Debug_Text
+#spawn S_LAZER_SPAWNER       Lazer_Spawner
+#spawn S_ROCKET_SPAWNER      Rocket_Spawner
+#spawn S_LAZER_RED           Lazer_Red
+#spawn S_LAZER_GREEN         Lazer_Green
+#spawn S_SPARKS              Electricity_Sparks
+#spawn S_ROCKET_SHADOW       Rocket_Shadow
+#spawn S_ROCKET_EXPLOSION    Rocket_Explosion
+#spawn S_OUTRO_VOICE         Outro_Voice
+
+event Event12 => state Kill
+event Event19 => sub DeloadCurrentAnimGroup
+
+var FaceForward, NGinVar2, NGinVar3, NGinVar4, NGinVar5, NGinVar6, NGinVar7, DestroyedParts,
+    NGinVar9, NGinVar10, NGinVar11, NGinVar12, NGinVar13, BossBaseY, DebugPhaseID
+    
+expr LeftDamage             = NGinVar2
+expr RightDamage            = NGinVar3
+expr PartsVulnerable        = NGinVar9
+expr AttackCycle            = NGinVar11
+expr AnimGroup              = NGinVar12
+
+expr IntroVoiceOBJ          = NGinVar5
+expr IntroPhase             = NGinVar7
+
+expr LeftHandOBJ            = NGinVar5
+expr RightHandOBJ           = NGinVar6
+expr DetachedHandOBJ        = NGinVar5
+expr SecondaryHandOBJ       = NGinVar6
+expr LazerAnimPhase         = NGinVar13
+
+expr LeftShoulderOBJ        = NGinVar5
+expr RightShoulderOBJ       = NGinVar6
+expr DetachedShoulderOBJ    = NGinVar5
+expr DetachedArmOBJ         = NGinVar6
+expr SecondaryShoulderOBJ   = NGinVar7
+expr SecondaryArmOBJ        = NGinVar4
+expr ShoulderMotion         = NGinVar10
+
+expr CoreDamage             = NGinVar2
+expr NGinModelOBJ           = NGinVar5
+expr PlatformSequence       = NGinVar13
+
+expr DetachVelX             = NGinVar2
+expr DetachVelY             = NGinVar3
+expr DetachVelZ             = NGinVar4
+expr ColorStepR             = NGinVar5
+expr ColorStepG             = NGinVar6
+expr ColorStepB             = NGinVar7
+expr ColorStart             = NGinVar9
+expr FlashStart             = NGinVar10
+expr SparksSpawned          = NGinVar11
+expr Initializing           = NGinVar12
+
+expr SparkOffsetX           = NGinVar2
+expr SparkOffsetY           = NGinVar3
+expr SparkOffsetZ           = NGinVar4
+
+expr OBJ_NGIN   = 100.0
+expr OBJ_PLAT_L = 200.0
+expr OBJ_PLAT_M = 201.0
+expr OBJ_PLAT_R = 202.0
+
+expr EventTriggerRocket = Event59
+
+expr S1_LEFT_ARM_BROKEN = DestroyedParts & (DestroyedParts & 1)
+expr S1_RIGHT_ARM_BROKEN = DestroyedParts & (DestroyedParts & 2)
+expr S2_LEFT_SHOULDER_BROKEN = DestroyedParts & (DestroyedParts & 4)
+expr S2_RIGHT_SHOULDER_BROKEN = DestroyedParts & (DestroyedParts & 8)
+
+inline sub DetachRobotPart(part, vx, vy, vz) {
+    interrupter = part
+    interrupter -> stateflag |= 0x100
+    interrupter -> DetachVelX = vx
+    interrupter -> DetachVelY = vy
+    interrupter -> DetachVelZ = vz
+}
+
+inline sub FollowParentUnlessDetached() {
+    unless (stateflag & 0x100) {
+        x = parent -> x
+        y = parent -> y
+        z = parent -> z
+    }
+}
+
+inline sub UpdateBossPathPosition() {
+    if ((pathprog & 255) == 0.5) {
+        calcpath(pathprog + 0.5, vvec)
+        x = vecx + velx >> 1
+        y = vecy + vely >> 1
+        z = vecz + velz >> 1
+    }
+    else {
+        calcpath(pathprog, vvel)
+        x = velx
+        y = vely
+        z = velz
+    }
+}
+
+inline sub DebugPathScrub(start) {
+    do (var prog = start) {
+        UpdateBossPathPosition()
+        playframe()
+        if (buttonhold(PAD_R1)) {
+            pathprog = start
+        }
+        else {
+            pathprog = prog
+        }
+        if (buttonhold(PAD_L1)) {
+            print(prog, 0)
+        }
+        if (buttonhold(PAD_CIRCLE)) {
+            prog += 1.0
+        }
+        if (buttonhold(PAD_TRIANGLE)) {
+            prog += 25.0
+        }
+        if (buttonhold(PAD_SQUARE)) {
+            prog -= 1.0
+        }
+        if (buttonhold(PAD_X)) {
+            prog -= 25.0
+        }
+    } while (1)
+}
+
+
+inline sub SoundRobotBreak() {
+    save (vfx) {
+        vfx = (vfx & 0xFFFFFF00) | 0x6
+        soundpitch(3.263)
+        sounddecay(7.7s)
+        soundplay([NAb9A], 10V)
+    }
+}
+
+sub LoadAnimGroup(group) {
+    if (group == 0) {
+        LoadAnim([N0a9V], [NGa9G])
+        LoadAnim([N0b9V], [NGb9G])
+        LoadAnim([N0c9V], [NGc9G])
+        LoadAnim([N0f9V], [NGf9G])
+        LoadAnim([N0g9V], [NGg9G])
+        LoadAnim([N0h9V], [NGh9G])
+        LoadAnim([N0k9V], [NGk9G])
+        LoadAnim([N0l9V], [NGl9G])
+        LoadAnim([N0m9V], [NGm9G])
+    }
+    else if (group == 1.0) {
+        LoadAnim([N1a9V], [NGa9G])
+        LoadAnim([N5a9V], [NGa9G])
+        LoadAnim([N6a9V], [NGa9G])
+        LoadAnim([N1b9V], [NGb9G])
+        LoadAnim([N5b9V], [NGb9G])
+        LoadAnim([N6b9V], [NGb9G])
+        LoadAnim([N1c9V], [NGc9G])
+        LoadAnim([N5c9V], [NGc9G])
+        LoadAnim([N6c9V], [NGc9G])
+        LoadAnim([N1h9V], [NGh9G])
+        LoadAnim([N5h9V], [NGh9G])
+        LoadAnim([N6h9V], [NGh9G])
+        LoadAnim([N1m9V], [NGm9G])
+        LoadAnim([N5m9V], [NGm9G])
+        LoadAnim([N6m9V], [NGm9G])
+        LoadAnim([N1p9V], [NGp9G])
+        LoadAnim([N5p9V], [NGp9G])
+        LoadAnim([N6p9V], [NGp9G])
+        LoadAnim([N1q9V], [NGq9G])
+        LoadAnim([N5q9V], [NGq9G])
+        LoadAnim([N6q9V], [NGq9G])
+        LoadAnim([N1K9V], [NGK9G])
+        LoadAnim([N1L9V], [NGL9G])
+        LoadAnim([NL09V], [NL09G])
+        LoadAnim([NL19V], [NL19G])
+        LoadAnim([NL29V], [NL29G])
+    }
+    else if (group == 2.0) {
+        LoadAnim([N1f9V], [NGf9G])
+        LoadAnim([N5f9V], [NGf9G])
+        LoadAnim([N6f9V], [NGf9G])
+        LoadAnim([N1g9V], [NGg9G])
+        LoadAnim([N5g9V], [NGg9G])
+        LoadAnim([N6g9V], [NGg9G])
+    }
+    else if (group == 3.0) {
+        LoadAnim([N1k9V], [NGk9G])
+        LoadAnim([N5k9V], [NGk9G])
+        LoadAnim([N6k9V], [NGk9G])
+        LoadAnim([N1l9V], [NGl9G])
+        LoadAnim([N5l9V], [NGl9G])
+        LoadAnim([N6l9V], [NGl9G])
+    }
+    else if (group == 4.0) {
+        LoadAnim([N2a9V], [NGa9G])
+        LoadAnim([N7a9V], [NGa9G])
+        LoadAnim([N2b9V], [NGb9G])
+        LoadAnim([N7b9V], [NGb9G])
+        LoadAnim([N2c9V], [NGc9G])
+        LoadAnim([N7c9V], [NGc9G])
+        LoadAnim([N7d9V], [NGd9G])
+        LoadAnim([N7e9V], [NGe9G])
+        LoadAnim([N2h9V], [NGh9G])
+        LoadAnim([N7h9V], [NGh9G])
+        LoadAnim([N7i9V], [NGi9G])
+        LoadAnim([N7j9V], [NGj9G])
+        LoadAnim([N2m9V], [NGm9G])
+        LoadAnim([N7m9V], [NGm9G])
+        LoadAnim([N2n9V], [NGn9G])
+        LoadAnim([N2o9V], [NGo9G])
+        LoadAnim([N2p9V], [NGp9G])
+        LoadAnim([N7p9V], [NGp9G])
+        LoadAnim([N2q9V], [NGq9G])
+        LoadAnim([N7q9V], [NGq9G])
+        LoadAnim([NR09V], [NR09G])
+    }
+    else if (group == 5.0) {
+        LoadAnim([N4a9V], [NGa9G])
+        LoadAnim([N4x9V], [NGx9G])
+        LoadAnim([N8x9V], [NGx9G])
+        LoadAnim([N4y9V], [NGy9G])
+        LoadAnim([N8y9V], [NGy9G])
+        LoadAnim([N4z9V], [NGz9G])
+        LoadAnim([N8z9V], [NGz9G])
+        LoadAnim([N4A9V], [NGA9G])
+        LoadAnim([N8A9V], [NGA9G])
+        LoadAnim([N4B9V], [NGB9G])
+        LoadAnim([N4C9V], [NGC9G])
+        LoadAnim([NGD9V], [NGD9G])
+        LoadAnim([NGE9V], [NGE9G])
+        LoadAnim([NGF9V], [NGF9G])
+        LoadAnim([NGG9V], [NGG9G])
+        LoadAnim([NGH9V], [NGH9G])
+        LoadAnim([NGI9V], [NGI9G])
+        LoadAnim([NGJ9V], [NGJ9G])
+        LoadAnim([NP49V], [NP49G])
+        LoadAnim([NBB9V], [NBB9G])
+    }
+}
+
+sub DeloadAnimGroup(group) {
+    if (group == 0) {
+        DeloadAnim([N0a9V], [NGa9G])
+        DeloadAnim([N0b9V], [NGb9G])
+        DeloadAnim([N0c9V], [NGc9G])
+        DeloadAnim([N0f9V], [NGf9G])
+        DeloadAnim([N0g9V], [NGg9G])
+        DeloadAnim([N0h9V], [NGh9G])
+        DeloadAnim([N0k9V], [NGk9G])
+        DeloadAnim([N0l9V], [NGl9G])
+        DeloadAnim([N0m9V], [NGm9G])
+    }
+    else if (group == 1.0) {
+        DeloadAnim([N1a9V], [NGa9G])
+        DeloadAnim([N5a9V], [NGa9G])
+        DeloadAnim([N6a9V], [NGa9G])
+        DeloadAnim([N1b9V], [NGb9G])
+        DeloadAnim([N5b9V], [NGb9G])
+        DeloadAnim([N6b9V], [NGb9G])
+        DeloadAnim([N1c9V], [NGc9G])
+        DeloadAnim([N5c9V], [NGc9G])
+        DeloadAnim([N6c9V], [NGc9G])
+        DeloadAnim([N1h9V], [NGh9G])
+        DeloadAnim([N5h9V], [NGh9G])
+        DeloadAnim([N6h9V], [NGh9G])
+        DeloadAnim([N1m9V], [NGm9G])
+        DeloadAnim([N5m9V], [NGm9G])
+        DeloadAnim([N6m9V], [NGm9G])
+        DeloadAnim([N1p9V], [NGp9G])
+        DeloadAnim([N5p9V], [NGp9G])
+        DeloadAnim([N6p9V], [NGp9G])
+        DeloadAnim([N1q9V], [NGq9G])
+        DeloadAnim([N5q9V], [NGq9G])
+        DeloadAnim([N6q9V], [NGq9G])
+        DeloadAnim([N1K9V], [NGK9G])
+        DeloadAnim([N1L9V], [NGL9G])
+        DeloadAnim([NL09V], [NL09G])
+        DeloadAnim([NL19V], [NL19G])
+        DeloadAnim([NL29V], [NL29G])
+    }
+    else if (group == 2.0) {
+        DeloadAnim([N1f9V], [NGf9G])
+        DeloadAnim([N5f9V], [NGf9G])
+        DeloadAnim([N6f9V], [NGf9G])
+        DeloadAnim([N1g9V], [NGg9G])
+        DeloadAnim([N5g9V], [NGg9G])
+        DeloadAnim([N6g9V], [NGg9G])
+    }
+    else if (group == 3.0) {
+        DeloadAnim([N1k9V], [NGk9G])
+        DeloadAnim([N5k9V], [NGk9G])
+        DeloadAnim([N6k9V], [NGk9G])
+        DeloadAnim([N1l9V], [NGl9G])
+        DeloadAnim([N5l9V], [NGl9G])
+        DeloadAnim([N6l9V], [NGl9G])
+    }
+    else if (group == 4.0) {
+        DeloadAnim([N2a9V], [NGa9G])
+        DeloadAnim([N7a9V], [NGa9G])
+        DeloadAnim([N2b9V], [NGb9G])
+        DeloadAnim([N7b9V], [NGb9G])
+        DeloadAnim([N2c9V], [NGc9G])
+        DeloadAnim([N7c9V], [NGc9G])
+        DeloadAnim([N7d9V], [NGd9G])
+        DeloadAnim([N7e9V], [NGe9G])
+        DeloadAnim([N2h9V], [NGh9G])
+        DeloadAnim([N7h9V], [NGh9G])
+        DeloadAnim([N7i9V], [NGi9G])
+        DeloadAnim([N7j9V], [NGj9G])
+        DeloadAnim([N2m9V], [NGm9G])
+        DeloadAnim([N7m9V], [NGm9G])
+        DeloadAnim([N2n9V], [NGn9G])
+        DeloadAnim([N2o9V], [NGo9G])
+        DeloadAnim([N2p9V], [NGp9G])
+        DeloadAnim([N7p9V], [NGp9G])
+        DeloadAnim([N2q9V], [NGq9G])
+        DeloadAnim([N7q9V], [NGq9G])
+        DeloadAnim([NR09V], [NR09G])
+    }
+    else if (group == 5.0) {
+        DeloadAnim([N4a9V], [NGa9G])
+        DeloadAnim([N4x9V], [NGx9G])
+        DeloadAnim([N8x9V], [NGx9G])
+        DeloadAnim([N4y9V], [NGy9G])
+        DeloadAnim([N8y9V], [NGy9G])
+        DeloadAnim([N4z9V], [NGz9G])
+        DeloadAnim([N8z9V], [NGz9G])
+        DeloadAnim([N4A9V], [NGA9G])
+        DeloadAnim([N8A9V], [NGA9G])
+        DeloadAnim([N4B9V], [NGB9G])
+        DeloadAnim([N4C9V], [NGC9G])
+        DeloadAnim([NGD9V], [NGD9G])
+        DeloadAnim([NGE9V], [NGE9G])
+        DeloadAnim([NGF9V], [NGF9G])
+        DeloadAnim([NGG9V], [NGG9G])
+        DeloadAnim([NGH9V], [NGH9G])
+        DeloadAnim([NGI9V], [NGI9G])
+        DeloadAnim([NGJ9V], [NGJ9G])
+        DeloadAnim([NP49V], [NP49G])
+        DeloadAnim([NBB9V], [NBB9G])
+    }
+}
+
+sub DeloadCurrentAnimGroup() {
+    if (spawn == S_NGIN_BOSS) {
+        if (var group = AnimGroup; group == 6.0) {
+            DeloadAnimGroup(0.0)
+        }
+        else if (group == 7.0) {
+            DeloadAnimGroup(0.0)
+            DeloadAnimGroup(1.0)
+            DeloadAnimGroup(2.0)
+            DeloadAnimGroup(3.0)
+        }
+        else if (group == 8.0) {
+            DeloadAnimGroup(1.0)
+            DeloadAnimGroup(2.0)
+            DeloadAnimGroup(3.0)
+        }
+        else if (group == 9.0) {
+            DeloadAnimGroup(1.0)
+            DeloadAnimGroup(2.0)
+            DeloadAnimGroup(4.0)
+        }
+        else if (group == 10.0) {
+            DeloadAnimGroup(1.0)
+            DeloadAnimGroup(3.0)
+            DeloadAnimGroup(4.0)
+        }
+        else if (group == 12.0) {
+            DeloadAnimGroup(4.0)
+        }
+        else if (group == 11.0) {
+            DeloadAnimGroup(4.0)
+            DeloadAnimGroup(5.0)
+        }
+    }
+}
+
+state Debug_Text { // 0
+    stateflag 0x60001
+    statusc 0x20
+    code(px, py, anim, frame, scax, scay, shadow, framefn, valuefn) {
+        SetTrans(px, py, 0)
+        SetScale(scax, scay, 0S)
+        TextDefaultColor()
+        vfx = (vfx & 0xFFFFFF00) | 0x6
+        setanim(anim)
+        if (shadow) {
+            statusb |= FLAG_HAS_SHADOW
+        }
+        do (var vl, vh) {
+            if (valuefn) {
+                call(valuefn)
+                vh = var0
+                vl = field_61
+            }
+            if (framefn) {
+                call(framefn)
+                frame = var0
+            }
+            playframe(frame)
+        } while (1)
+    }
+}
+
+state Robot { // 1
+    statusc 0
+    __transargs
+    code(useverts, depth, anim, vertex, ignorekill, hitfn, posfn, animfn) {
+        var v1 = (vertex + 1) << 8
+        var v2 = (vertex + 2) << 8
+        var v3 = (vertex + 3) << 8
+        Initializing = true
+        SparksSpawned = 0
+        if (hitfn) {
+            call(hitfn)
+        }
+        Initializing = false
+        zindex = depth
+        vertex <<= 8
+        statusb = FLAG_NO_CAMERA_CLIP
+        FlashStart = 0
+        ColorStart = false
+        if (useverts) {
+            vfx = (vfx & 0xFF00FF00) | 0x5000A
+            moda = 4.0
+            SetColor2(-0x6D2, -0x6D7, 0xCC1)
+            SetColor1(0x80, 0x80, 0x80)
+        }
+        setanim(anim)
+        do {
+            var0 = false
+            if (posfn) {
+                call(posfn)
+            }
+            else {
+                x = parent -> x
+                y = parent -> y
+                z = parent -> z
+            }
+            if (animfn) {
+                call(animfn)
+            }
+            else {
+                animframe = parent -> animframe
+            }
+            if (FlashStart && frametime - FlashStart >= 4) {
+                FlashStart = 0
+                if (useverts) {
+                    vfx = (vfx & 0xFF00FFFF) | 0x50000
+                    moda = 4.0
+                    SetColor2(-0x6D2, -0x6D7, 0xCC1)
+                    SetColor1(0x80, 0x80, 0x80)
+                }
+                else {
+                    SetColor1(0x80, 0x80, 0x80)
+                    moda = 0
+                }
+            }
+            if (useverts) {
+                if (!var0) {
+                    miscfunc(null, player, 21, 12)
+                    var0 = true
+                }
+                if (ColorStart && frametime - ColorStart < 5) {
+                    colr1 += ColorStepR
+                    colg1 += ColorStepG
+                    colb1 += ColorStepB
+                    if (frametime - ColorStart >= 4) {
+                        if (ColorStepR == 6) {
+                            SetColor1(0x9E, 0xFF, 0x40)
+                        }
+                        else {
+                            SetColor1(0x80, 0x80, 0x80)
+                        }
+                        ColorStart = 0
+                    }
+                }
+                save (rotx, roty, rotz) {
+                    getvert(vtrot, self, v1)
+                    getvert(vvec, self, v2)
+                    getvert(vvel, self, v3)
+                    getvert(vrot, self, vertex)
+                    trotx -= rotx
+                    vecx -= rotx
+                    velx -= rotx
+                    troty -= roty
+                    vecy -= roty
+                    vely -= roty
+                    trotz -= rotz
+                    vecz -= rotz
+                    velz -= rotz
+                }
+            }
+            playframe()
+        } while (1)
+    }
+    event(e, a) {
+        accevif (e == EventHit) {
+            if (hitfn && parent -> PartsVulnerable) {
+                call(hitfn)
+            }
+            else {
+                sendevent(Event53, interrupter)
+            }
+        }
+        accevif (e == EventExplode) {
+            setanim(a[0])
+        }
+        accevif (e == EventTriggered) {
+            statusb |= FLAG_INVISIBLE
+        }
+        accevif (e == Event53) {
+            if (useverts) {
+                ColorStart = frametime
+                ColorStepR = 6
+                ColorStepG = 25
+                ColorStepB = -13
+            }
+        }
+        accevif (e == Event51) {
+            if (useverts) {
+                ColorStart = frametime
+                ColorStepR = -6
+                ColorStepG = -25
+                ColorStepB = 13
+            }
+        }
+        if (e == Event12) {
+            unless (ignorekill) {
+                accevcstate(Kill)
+            }
+        }
+    }
+    trans {
+        roty = parent -> roty
+        if (stateflag & 0x100) {
+            x = spd(x, DetachVelX)
+            y = spd(y, DetachVelY)
+            z = spd(z, DetachVelZ)
+        }
+    }
+}
+
+sub RobotDamageFlash() {
+    FlashStart = frametime
+    vfx &= 0xFF00FFFF
+    SetColor1(0xFF, 0xFF, 0xFF)
+    moda = 16.0
+    sendevent(EventTriggered, interrupter)
+}
+
+state Boss_Intro { // 2
+    statusc 0x22
+    code() {
+        AnimGroup = -1
+        GLOBAL_3 = -1
+        health = 0
+        spawn(BosBC, BosBC_S_HEALTH, 1, 5.0, 1)
+        DebugPhaseID = 0
+        if (DEBUG) {
+            spawn(NGinC, S_DEBUG_TEXT, 1, -0xE000, 0x7DA1, TEXT, 0, 0xA3, 0x103, 0x100, getins(DebugR2), getins(DebugR1))
+        }
+        statusb |= (FLAG_ROT_Y | FLAG_INVISIBLE)
+        DestroyedParts = 0
+        FaceForward = 1
+        trotx = 90deg
+        if (!RESPAWNCOUNT) {
+            AnimGroup = 6.0
+            LoadAnimGroup(0.0)
+            if (var lang = GLOBAL_151; lang == LANG_FR) {
+                spawn(9, 44, 1, [Ni0FO], [Ni1FO], 2.0, 1000s, 4.0)
+                IntroVoiceOBJ = objectspawned
+            }
+            else if (lang == LANG_DE) {
+                spawn(9, 44, 1, [Ni0GO], [Ni1GO], 2.0, 1000s, 4.0)
+                IntroVoiceOBJ = objectspawned
+            }
+            else if (lang == LANG_ES) {
+                spawn(9, 44, 1, [Ni0SO], [Ni1SO], 2.0, 1000s, 4.0)
+                IntroVoiceOBJ = objectspawned
+            }
+            else if (lang == LANG_IT) {
+                spawn(9, 44, 1, [Ni0IO], [Ni1IO], 2.0, 1000s, 4.0)
+                IntroVoiceOBJ = objectspawned
+            }
+            else {
+                spawn(9, 44, 1, [Ni0EO], [Ni1EO], 2.0, 1000s, 4.0)
+                IntroVoiceOBJ = objectspawned
+            }
+            spawn(NGinC, S_NGIN_ROBOT, 1, 0, 110, NGIN_BOSS_0, 0, 0, 0, 0, 0)
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 110, ROBOT_MAIN_0, 0, 0, 0, 0, 0)
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 110, ROBOT_SHOULDER_LEFT_0, 4, 0, 0, 0, 0)
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 110, ROBOT_ARM_LEFT_0, 8, 0, 0, 0, 0)
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 110, ROBOT_HAND_LEFT_0, 12, 0, 0, 0, 0)
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 110, ROBOT_SHOULDER_RIGHT_0, 16, 0, 0, 0, 0)
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 110, ROBOT_ARM_RIGHT_0, 20, 0, 0, 0, 0)
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 110, ROBOT_HAND_RIGHT_0, 24, 0, 0, 0, 0)
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 110, ROBOT_SHOULDER_PAD_RIGHT_0, 0, 0, 0, 0, 0)
+            setanim(ROBOT_MAIN_0)
+            pathprog = 2400.0
+            do (var i = 0) {
+                pathprog += 1.0
+                calcpath(pathprog)
+                playframe(0)
+                i += 1.0
+            } while (i < 120.0)
+            interrupter = IntroVoiceOBJ
+            sendevent(EventTriggered, interrupter)
+            do (var i = 0) {
+                if (i >= 60.0 && AnimGroup == 6.0) {
+                    LoadAnimGroup(1.0)
+                    LoadAnimGroup(2.0)
+                    LoadAnimGroup(3.0)
+                    AnimGroup = 7.0
+                }
+                pathprog += 1.0
+                if (pathprog >= pathlen) {
+                    pathprog = pathlen - 1
+                }
+                calcpath(pathprog)
+                animframe += 1.0
+                if (animframe >= 176.0) {
+                    animframe -= 1.0
+                }
+                playframe()
+                i += 1.0
+            } while (i < 240.0)
+            interrupter = objectget(OBJ_PLAT_L)
+            sendevent(Event53, interrupter)
+            interrupter = objectget(OBJ_PLAT_M)
+            sendevent(Event53, interrupter)
+            interrupter = objectget(OBJ_PLAT_R)
+            sendevent(Event53, interrupter)
+            interrupter = objectget(OBJ_PLAT_M)
+            spawn(NGinC, S_PLATFORM_INTRO, 1)
+            child = objectspawned
+            child -> x = interrupter -> x
+            child -> y = interrupter -> y
+            child -> z = interrupter -> z
+        }
+        else {
+            ins72(0, 0x8000)
+        }
+        changestate(S1_Setup)
+    }
+    event(e, a) {
+        if (e == Event67) {
+            interrupter = objectget(OBJ_PLAT_L)
+            sendevent(Event53, interrupter)
+            interrupter = objectget(OBJ_PLAT_M)
+            sendevent(Event53, interrupter)
+            interrupter = objectget(OBJ_PLAT_R)
+            sendevent(Event53, interrupter)
+            accevcstate(S1_Setup)
+        }
+    }
+    trans {
+        once {
+            IntroPhase = 0
+        }
+        if (pathprog >= 2490.0 && IntroPhase < 1) {
+            IntroPhase += 1
+            interrupter = objectget(OBJ_PLAT_L)
+            sendevent(EventTriggered, interrupter)
+            interrupter = objectget(OBJ_PLAT_M)
+            sendevent(EventTriggered, interrupter)
+            interrupter = objectget(OBJ_PLAT_R)
+            sendevent(EventTriggered, interrupter)
+        }
+        if (pathprog >= 2700.0 && IntroPhase < 2) {
+            IntroPhase += 1
+            interrupter = objectget(OBJ_PLAT_L)
+            sendevent(Event53, interrupter)
+            interrupter = objectget(OBJ_PLAT_M)
+            sendevent(Event53, interrupter)
+            interrupter = objectget(OBJ_PLAT_R)
+            sendevent(Event53, interrupter)
+        }
+    }
+}
+
+sub DebugR1() {
+    var0 = parent -> pathprog >> 8
+    field_61 = parent -> pathprog & 0xFF
+}
+
+sub DebugR2() {
+    var0 = parent -> DebugPhaseID
+}
+
+sub FacePlayer() {
+    if (!FaceForward) {
+        troty = atan2(player -> trans)
+    }
+    else {
+        troty = 0deg
+    }
+}
+
+state S1_Setup { // 3
+    statusc 0x22
+    code() {
+        cascadeevent(Event12, self, 0)
+        playnull()
+        unless (AnimGroup == 8.0 || AnimGroup == 7.0) {
+            LoadAnimGroup(1.0)
+            LoadAnimGroup(2.0)
+            LoadAnimGroup(3.0)
+        }
+        if (AnimGroup == 6.0 || AnimGroup == 7.0) {
+            DeloadAnimGroup(0.0)
+        }
+        AnimGroup = 8.0
+        LeftDamage = 0
+        RightDamage = 0
+        calcpath(1.0, vvec)
+        BossBaseY = vecy
+        playnull(0.85s)
+        playnull(0.85s)
+        playnull(0.85s)
+        if (GLOBAL_105 == 2 || GLOBAL_105 == 1) {
+            playnull(0.85s)
+            playnull(0.85s)
+        }
+        changestate(S1_Intro)
+    }
+    trans {
+        FacePlayer()
+    }
+}
+
+state S1_Intro { // 4
+    statusc 0x22
+    code() {
+        spawn(NGinC, S_NGIN_ROBOT, 1, 0, 0, NGIN_BOSS_1, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_MAIN_1, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_LEFT_1, 4, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_LEFT_1, 8, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 0, 0, ROBOT_ARM_RIGHT_4, 0, 0, 0, 0, getins(VulnerablePartFlashRed))
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 16, ROBOT_HAND_LEFT_1, 12, 0, getins(RegisterDamage_Left_S1), 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_RIGHT_1, 16, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_RIGHT_1, 20, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 0, 0, ROBOT_HAND_RIGHT_4, 0, 0, 0, 0, getins(VulnerablePartFlashRed))
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 16, ROBOT_HAND_RIGHT_1, 24, 0, getins(RegisterDamage_Right_S1), 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_PAD_RIGHT_1, 0, 0, 0, 0, 0)
+        pathprog = 2770.0
+        DebugPhaseID = 1.0
+        setanim(ROBOT_MAIN_1)
+        FaceForward = 1
+        trotx = 90deg
+        PartsVulnerable = false
+        animframe = 0
+        while (pathprog <= 2839.0) {
+            UpdateBossPathPosition()
+            playframe()
+            pathprog += 1.0
+        }
+        changestate(S1_Build, 0.5)
+    }
+}
+
+state S1_Debug { // 5
+    statusc 0x22
+    code() {
+        cascadeevent(Event12, self, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 0, 0, NGIN_BOSS_1, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_MAIN_1, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_LEFT_1, 4, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_LEFT_1, 8, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_BROKEN_LEFT_0, 8, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 0, 0, ROBOT_ARM_RIGHT_4, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 16, ROBOT_HAND_LEFT_1, 12, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_RIGHT_1, 16, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_RIGHT_1, 20, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_BROKEN_RIGHT_0, 8, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 0, 0, ROBOT_HAND_RIGHT_4, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 16, ROBOT_HAND_RIGHT_1, 24, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_PAD_RIGHT_1, 0, 0, 0, 0, 0)
+        pathprog = 1.0
+        DebugPhaseID = 2.0
+        setanim(ROBOT_MAIN_1)
+        FaceForward = 1
+        trotx = 90deg
+        PartsVulnerable = false
+        animframe = 29.0
+        DebugPathScrub(0)
+    }
+}
+
+state S1_Build { // 6
+    statusc 0x22
+    code(startpoint) {
+        GLOBAL_3 = 0
+        AttackCycle = 0
+        cascadeevent(Event12, self, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 0, 0, NGIN_BOSS_1, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_MAIN_1, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_LEFT_1, 4, 0, 0, 0, 0)
+        unless (S1_LEFT_ARM_BROKEN) {
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_LEFT_1, 8, 0, 0, 0, 0)
+        }
+        if (S1_LEFT_ARM_BROKEN) {
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_BROKEN_LEFT_0, 8, 0, 0, 0, 0)
+        }
+        unless (S1_LEFT_ARM_BROKEN) {
+            spawn(NGinC, S_NGIN_ROBOT, 1, 0, 0, ROBOT_ARM_RIGHT_4, 0, 0, 0, 0, getins(VulnerablePartFlashRed))
+        }
+        unless (S1_LEFT_ARM_BROKEN) {
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 16, ROBOT_HAND_LEFT_1, 12, 0, getins(RegisterDamage_Left_S1), 0, 0)
+            LeftHandOBJ = objectspawned
+        }
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_RIGHT_1, 16, 0, 0, 0, 0)
+        unless (S1_RIGHT_ARM_BROKEN) {
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_RIGHT_1, 20, 0, 0, 0, 0)
+        }
+        if (S1_RIGHT_ARM_BROKEN) {
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_BROKEN_RIGHT_0, 8, 0, 0, 0, 0)
+        }
+        unless (S1_RIGHT_ARM_BROKEN) {
+            spawn(NGinC, S_NGIN_ROBOT, 1, 0, 0, ROBOT_HAND_RIGHT_4, 0, 0, 0, 0, getins(VulnerablePartFlashRed))
+        }
+        unless (S1_RIGHT_ARM_BROKEN) {
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 16, ROBOT_HAND_RIGHT_1, 24, 0, getins(RegisterDamage_Right_S1), 0, 0)
+            RightHandOBJ = objectspawned
+        }
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_PAD_RIGHT_1, 0, 0, 0, 0, 0)
+        changestate(S1_Loop, startpoint)
+    }
+}
+
+sub RegisterDamage_Right_S1() {
+    if (!Initializing) {
+        RobotDamageFlash()
+        parent -> RightDamage += 1
+    }
+    if (!SparksSpawned && parent -> RightDamage >= 10) {
+        SparksSpawned = true
+        spawn(NGinC, S_SPARKS, 1, 40.0, 0)
+        spawn(NGinC, S_SPARKS, 1, 41.0, 1)
+        spawn(NGinC, S_SPARKS, 1, 42.0, 2)
+        spawn(NGinC, S_SPARKS, 1, 43.0, 3)
+        spawn(NGinC, S_SPARKS, 1, 44.0, 0)
+        spawn(NGinC, S_SPARKS, 1, 45.0, 1)
+        spawn(NGinC, S_SPARKS, 1, 46.0, 2)
+        spawn(NGinC, S_SPARKS, 1, 47.0, 3)
+    }
+}
+
+sub RegisterDamage_Left_S1() {
+    if (!Initializing) {
+        RobotDamageFlash()
+        parent -> LeftDamage += 1
+    }
+    if (!SparksSpawned && parent -> LeftDamage >= 10) {
+        SparksSpawned = true
+        spawn(NGinC, S_SPARKS, 1, 32.0, 0)
+        spawn(NGinC, S_SPARKS, 1, 33.0, 1)
+        spawn(NGinC, S_SPARKS, 1, 34.0, 2)
+        spawn(NGinC, S_SPARKS, 1, 35.0, 3)
+        spawn(NGinC, S_SPARKS, 1, 36.0, 0)
+        spawn(NGinC, S_SPARKS, 1, 37.0, 1)
+        spawn(NGinC, S_SPARKS, 1, 38.0, 2)
+        spawn(NGinC, S_SPARKS, 1, 39.0, 3)
+    }
+}
+
+sub VulnerablePartFlashRed() {
+    animframe = parent -> animframe
+    SetColor1(0xFF, 0x00, 0x00)
+    if (parent -> PartsVulnerable) {
+        moda = time(0.2s) << 8 >> 2 << 4
+    }
+    else {
+        moda = 0
+    }
+}
+
+state S1_Loop { // 7
+    statusc 0x20
+    trans => state S1_Setup
+    code(startpoint) {
+        pathprog = startpoint
+        DebugPhaseID = 3.0
+        setanim(ROBOT_MAIN_1, 0)
+        FaceForward = false
+        trotx = 90deg
+        PartsVulnerable = false
+        do {
+            UpdateBossPathPosition()
+            if (pathprog == 1.0) {
+                AttackCycle += 1
+                if (AttackCycle > 2) {
+                    AttackCycle = 0
+                }
+            }
+            else if (pathprog == 13.5 || pathprog == 38.5 || pathprog == 73.5 || pathprog == 98.5) {
+                animframe = 1.0
+            }
+            else if (pathprog == 25.5 || pathprog == 51.5 || pathprog == 85.5 || pathprog == 111.5) {
+                animframe = 15.0
+            }
+            playframe()
+            if (pathprog == 0.5 || pathprog == 60.0 || pathprog == 120.0) {
+                changestateif(S1_Break_Both, LeftDamage >= 10 && RightDamage >= 10 && !(S1_LEFT_ARM_BROKEN) && !(S1_RIGHT_ARM_BROKEN))
+                if (!(S1_LEFT_ARM_BROKEN) && LeftDamage >= 10) {
+                    RightDamage >>= 1
+                    changestate(S1_Break_Left, S1_RIGHT_ARM_BROKEN)
+                }
+                if (!(S1_RIGHT_ARM_BROKEN) && RightDamage >= 10) {
+                    LeftDamage >>= 1
+                    changestate(S1_Break_Right, S1_LEFT_ARM_BROKEN)
+                }
+                if (S1_RIGHT_ARM_BROKEN) {
+                    if (AttackCycle > 0) {
+                        changestateif(S1_Fire_Left, pathprog == 120.0)
+                    }
+                }
+                else if (S1_LEFT_ARM_BROKEN) {
+                    if (AttackCycle > 0 && pathprog == 60.0) {
+                        AttackCycle = 0
+                        changestate(S1_Fire_Right)
+                    }
+                }
+                else {
+                    changestateif(S1_Fire_Left, AttackCycle == 1 && !(S1_LEFT_ARM_BROKEN) && pathprog == 120.0)
+                    if (AttackCycle == 2 && !(S1_RIGHT_ARM_BROKEN) && pathprog == 60.0) {
+                        AttackCycle = 1
+                        changestate(S1_Fire_Right)
+                    }
+                }
+            }
+            if (animframe == 6.0) {
+                soundpitch(0x6AC)
+                soundplay([sv16A], 1V)
+            }
+            else if (animframe == 20.0) {
+                soundpitch(0x6AC)
+                soundplay([sv16A], 1V)
+            }
+            if ((animframe >= 1.0 && animframe <= 13.0) || (animframe >= 15.0 && animframe <= 27.0)) {
+                animframe += 1.0
+            }
+            else if (animframe >= 28.0 || animframe < 1.0) {
+                animframe = 0
+            }
+            if (animframe >= 1.0 && animframe <= 27.0) {
+                PartsVulnerable = true
+            }
+            else {
+                PartsVulnerable = false
+            }
+            pathprog += 0.5
+            if (pathprog > 120.0) {
+                pathprog = 0.5
+            }
+        } while (1)
+    }
+}
+
+state S1_Fire_Left { // 8
+    statusc 0x20
+    trans => state S1_Setup
+    code() {
+        DebugPhaseID = 4.0
+        setanim(ROBOT_MAIN_1, 0)
+        FaceForward = 1
+        trotx = 90deg
+        PartsVulnerable = false
+        LazerAnimPhase = 0
+        pathprog = 120.5
+        do {
+            UpdateBossPathPosition()
+            if (pathprog == 132.5) {
+                animframe = 40.0
+            }
+            if (pathprog == 147.5) {
+                spawn(NGinC, S_LAZER_SPAWNER, 1, 30.0)
+                child = objectspawned
+            }
+            sendeventif(Event12, child, pathprog == 187.5, 0)
+            playframe()
+            if (LazerAnimPhase < 1 && animframe == 114.0) {
+                animframe -= 1.0
+                LazerAnimPhase = 1.0
+            }
+            else if (LazerAnimPhase < 1 && animframe >= 40.0 && animframe <= 113.0) {
+                animframe += 1.0
+            }
+            else if (LazerAnimPhase == 1.0 && animframe == 94.0) {
+                animframe += 1.0
+                LazerAnimPhase = 2.0
+            }
+            else if (LazerAnimPhase == 1.0) {
+                animframe -= 1.0
+            }
+            else if (LazerAnimPhase == 2.0 && animframe >= 95.0 && animframe <= 142.0) {
+                animframe += 1.0
+            }
+            else if (animframe >= 143.0 || animframe < 1.0) {
+                animframe = 0
+            }
+            if (animframe == 66.0) {
+                soundpitch(0xC04)
+                soundplay([sv16A], 1V)
+            }
+            else if (animframe == 114.0) {
+                soundpitch(0x602)
+                soundplay([sv16A], 1V)
+            }
+            if (animframe >= 66.0 && animframe <= 122.0) {
+                PartsVulnerable = true
+            }
+            else {
+                PartsVulnerable = false
+            }
+            pathprog += 0.5
+        } while (pathprog <= 240.0)
+        changestate(S1_Loop, 0.5)
+    }
+}
+
+state S1_Fire_Right { // 9
+    statusc 0x20
+    trans => state S1_Setup
+    code() {
+        DebugPhaseID = 5.0
+        setanim(ROBOT_MAIN_1, 0)
+        FaceForward = 1
+        trotx = 90deg
+        PartsVulnerable = false
+        LazerAnimPhase = 0
+        pathprog = 240.5
+        do {
+            UpdateBossPathPosition()
+            if (pathprog == 252.5) {
+                animframe = 145.0
+            }
+            if (pathprog == 267.5) {
+                spawn(NGinC, S_LAZER_SPAWNER, 1, 31.0)
+                child = objectspawned
+            }
+            sendeventif(Event12, child, pathprog == 307.5, 0)
+            playframe()
+            if (LazerAnimPhase < 1 && animframe == 219.0) {
+                animframe -= 1.0
+                LazerAnimPhase = 1.0
+            }
+            else if (LazerAnimPhase < 1 && animframe >= 145.0 && animframe <= 218.0) {
+                animframe += 1.0
+            }
+            else if (LazerAnimPhase == 1.0 && animframe == 199.0) {
+                animframe += 1.0
+                LazerAnimPhase = 2.0
+            }
+            else if (LazerAnimPhase == 1.0) {
+                animframe -= 1.0
+            }
+            else if (LazerAnimPhase == 2.0 && animframe >= 200.0 && animframe <= 247.0) {
+                animframe += 1.0
+            }
+            else if (animframe >= 248.0 || animframe < 1.0) {
+                animframe = 0
+            }
+            if (animframe == 170.0) {
+                soundpitch(0xA03)
+                soundplay([sv16A], 1V)
+            }
+            else if (animframe == 220.0) {
+                soundpitch(0x6AC)
+                soundplay([sv16A], 1V)
+            }
+            if (animframe >= 171.0 && animframe <= 227.0) {
+                PartsVulnerable = true
+            }
+            else {
+                PartsVulnerable = false
+            }
+            pathprog += 0.5
+        } while (pathprog <= 359.0)
+        changestate(S1_Loop, 59.5)
+    }
+}
+
+state S1_Break_Left { // 10
+    statusc 0x20
+    trans => state S1_Setup
+    code(otherbroken) {
+        cascadeevent(Event12, self, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 0, 0, NGIN_BOSS_4, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_MAIN_3, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_LEFT_3, 4, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 16, ROBOT_HAND_LEFT_2, 12, 0, 0, getins(SyncLeftArmParent), 0)
+        DetachedHandOBJ = objectspawned
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_BROKEN_LEFT_2, 8, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_RIGHT_3, 16, 0, 0, 0, 0)
+        if (!(S1_RIGHT_ARM_BROKEN)) {
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_RIGHT_2, 20, 0, 0, 0, 0)
+        }
+        else {
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_BROKEN_RIGHT_2, 20, 0, 0, 0, 0)
+        }
+        if (!(S1_RIGHT_ARM_BROKEN)) {
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 16, ROBOT_HAND_RIGHT_2, 24, 0, getins(RegisterDamage_Right_S1), 0, 0)
+        }
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_PAD_RIGHT_3, 0, 0, 0, 0, 0)
+        if (otherbroken) {
+            DebugPhaseID = 6.0
+        }
+        else {
+            DebugPhaseID = 7.0
+        }
+        setanim(ROBOT_MAIN_3, 0)
+        FaceForward = false
+        trotx = 90deg
+
+        if (otherbroken) {
+            pathprog = 480.0
+            setanim(ROBOT_MAIN_3, -1.0)
+            do {
+                animframe += 1.0
+                UpdateBossPathPosition()
+                if (animseq == getanim(ROBOT_MAIN_3) && animframe == 1.0) {
+                    SoundRobotBreak()
+                    DetachRobotPart(DetachedHandOBJ, 8m, -8m, 2m)
+                }
+                playframe()
+            } while (animframe + 1.0 <= 28.0)
+        }
+        else {
+            pathprog = 360.0
+            setanim(ROBOT_MAIN_3, -1.0)
+            do {
+                animframe += 1.0
+                UpdateBossPathPosition()
+                if (animseq == getanim(ROBOT_MAIN_3) && animframe == 1.0) {
+                    SoundRobotBreak()
+                    DetachRobotPart(DetachedHandOBJ, 8m, -8m, 2m)
+                }
+                playframe()
+            } while (animframe + 1.0 <= 13.0)
+        }
+
+        if (otherbroken) {
+            pathprog = 481.0
+        }
+        else {
+            pathprog = 361.0
+        }
+        do {
+            UpdateBossPathPosition()
+            playframe()
+            animframe += 1.0
+            if (animseq == getanim(ROBOT_MAIN_3) && animframe >= 119.0) {
+                animframe -= 1.0
+            }
+            if (animseq == getanim(ROBOT_MAIN_3) && animframe == 29.0) {
+                health += 1
+                interrupter = DetachedHandOBJ
+                sendevent(EventTriggered, interrupter)
+            }
+            pathprog += 1.0
+        } while ((!otherbroken && pathprog < 479.0) || (otherbroken && pathprog <= 569.0))
+        DestroyedParts |= 1
+        if (AnimGroup == 8.0) {
+            LoadAnimGroup(4.0)
+            DeloadAnimGroup(2.0)
+            AnimGroup = 10.0
+        }
+        changestateifn(S1_Build, otherbroken, 0.5)
+        changestate(S2_Setup)
+    }
+}
+
+sub SyncLeftArmParent() {
+    FollowParentUnlessDetached()
+}
+
+state S1_Break_Right { // 11
+    statusc 0x20
+    trans => state S1_Setup
+    code(otherbroken) {
+        cascadeevent(Event12, self, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 0, 0, NGIN_BOSS_5, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_MAIN_4, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_LEFT_4, 4, 0, 0, 0, 0)
+        if (!(S1_LEFT_ARM_BROKEN)) {
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 16, ROBOT_HAND_LEFT_3, 12, 0, getins(RegisterDamage_Left_S1), 0, 0)
+        }
+        if (!(S1_LEFT_ARM_BROKEN)) {
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_LEFT_3, 8, 0, 0, 0, 0)
+        }
+        else {
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_BROKEN_LEFT_3, 8, 0, 0, 0, 0)
+        }
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_RIGHT_4, 16, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 16, ROBOT_HAND_RIGHT_3, 24, 0, 0, getins(SyncRightArmParent), 0)
+        DetachedHandOBJ = objectspawned
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_BROKEN_RIGHT_3, 20, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_PAD_RIGHT_4, 0, 0, 0, 0, 0)
+        if (otherbroken) {
+            DebugPhaseID = 8.0
+        }
+        else {
+            DebugPhaseID = 9.0
+        }
+        setanim(ROBOT_MAIN_4, 0)
+        FaceForward = false
+        trotx = 90deg
+        if (otherbroken) {
+            pathprog = 480.0
+            setanim(ROBOT_MAIN_4, -1.0)
+            do {
+                animframe += 1.0
+                UpdateBossPathPosition()
+                if (animseq == getanim(ROBOT_MAIN_4) && animframe == 1.0) {
+                    SoundRobotBreak()
+                    DetachRobotPart(DetachedHandOBJ, -8m, -8m, 2m)
+                }
+                playframe()
+            } while (animframe + 1.0 <= 28.0)
+        }
+        else {
+            pathprog = 360.0
+            setanim(ROBOT_MAIN_4, -1.0)
+            do {
+                animframe += 1.0
+                UpdateBossPathPosition()
+                if (animseq == getanim(ROBOT_MAIN_4) && animframe == 1.0) {
+                    SoundRobotBreak()
+                    DetachRobotPart(DetachedHandOBJ, -8m, -8m, 2m)
+                }
+                playframe()
+            } while (animframe + 1.0 <= 13.0)
+        }
+        if (otherbroken) {
+            pathprog = 481.0
+        }
+        else {
+            pathprog = 361.0
+        }
+        do {
+            UpdateBossPathPosition()
+            playframe()
+            animframe += 1.0
+            if (animseq == getanim(ROBOT_MAIN_4) && animframe >= 119.0) {
+                animframe -= 1.0
+            }
+            if (animseq == getanim(ROBOT_MAIN_4) && animframe == 29.0) {
+                health += 1
+                interrupter = DetachedHandOBJ
+                sendevent(EventTriggered, interrupter)
+            }
+            pathprog += 1.0
+        } while ((!otherbroken && pathprog < 480.0) || (otherbroken && pathprog < 569.0))
+        DestroyedParts |= 2
+        if (AnimGroup == 8.0) {
+            LoadAnimGroup(4.0)
+            DeloadAnimGroup(3.0)
+            AnimGroup = 9.0
+        }
+        changestateifn(S1_Build, otherbroken, 0.5)
+        changestate(S2_Setup)
+    }
+}
+
+sub SyncRightArmParent() {
+    FollowParentUnlessDetached()
+}
+
+state S1_Break_Both { // 12
+    statusc 0x20
+    trans => state S1_Setup
+    code() {
+        cascadeevent(Event12, self, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 0, 0, NGIN_BOSS_5, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_MAIN_4, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_LEFT_4, 4, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 16, ROBOT_HAND_LEFT_3, 12, 0, 0, getins(SyncBothLeftArmParent), 0)
+        DetachedHandOBJ = objectspawned
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_BROKEN_LEFT_3, 8, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_RIGHT_4, 16, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 16, ROBOT_HAND_RIGHT_3, 24, 0, 0, getins(SyncBothRightArmParent), 0)
+        SecondaryHandOBJ = objectspawned
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_BROKEN_RIGHT_3, 20, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_PAD_RIGHT_4, 0, 0, 0, 0, 0)
+        DebugPhaseID = 10.0
+        setanim(ROBOT_MAIN_3, 0)
+        FaceForward = false
+        trotx = 90deg
+        pathprog = 480.0
+        setanim(ROBOT_MAIN_3, -1.0)
+        do {
+            animframe += 1.0
+            UpdateBossPathPosition()
+            if (animseq == getanim(ROBOT_MAIN_3) && animframe == 1.0) {
+                SoundRobotBreak()
+                DetachRobotPart(DetachedHandOBJ, 8m, -8m, 2m)
+                DetachRobotPart(SecondaryHandOBJ, -8m, -8m, 2m)
+            }
+            playframe()
+        } while (animframe + 1.0 <= 28.0)
+        pathprog = 481.0
+        do {
+            UpdateBossPathPosition()
+            playframe()
+            animframe += 1.0
+            if (animseq == getanim(ROBOT_MAIN_3) && animframe >= 119.0) {
+                animframe -= 1.0
+            }
+            if (animseq == getanim(ROBOT_MAIN_3) && animframe == 29.0) {
+                health += 2
+                interrupter = DetachedHandOBJ
+                sendevent(EventTriggered, interrupter)
+            }
+            pathprog += 1.0
+        } while (pathprog <= 569.0)
+        DestroyedParts |= 1
+        if (AnimGroup == 8.0) {
+            LoadAnimGroup(4.0)
+            DeloadAnimGroup(2.0)
+            AnimGroup = 10.0
+        }
+        changestate(S2_Setup)
+    }
+}
+
+sub SyncBothRightArmParent() {
+    FollowParentUnlessDetached()
+}
+
+sub SyncBothLeftArmParent() {
+    FollowParentUnlessDetached()
+}
+
+state S2_Setup { // 13
+    statusc 0x22
+    code() {
+        LoadAnimGroup(5.0)
+        if (AnimGroup == 9.0) {
+            DeloadAnimGroup(2.0)
+        }
+        if (AnimGroup == 10.0) {
+            DeloadAnimGroup(3.0)
+        }
+        DeloadAnimGroup(1.0)
+        AnimGroup = 11.0
+        LeftDamage = 0
+        RightDamage = 0
+        changestate(S2_Build)
+    }
+}
+
+state S2_Build { // 14
+    statusc 0x22
+    code() {
+        AttackCycle = 0
+        GLOBAL_3 = 2700.0
+        cascadeevent(Event12, self, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 0, 0, NGIN_BOSS_2, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_MAIN_2, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_LEFT_2, 4, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_BROKEN_LEFT_1, 8, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_RIGHT_2, 16, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_BROKEN_RIGHT_1, 8, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 0, -16, ROCKET_LAUNCHER_1, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 0, -16, ROCKET_LAUNCHER_0, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_PAD_RIGHT_2, 0, 0, 0, 0, 0)
+        pathprog = 569.0
+        DebugPhaseID = 11.0
+        setanim(ROBOT_MAIN_2, 0)
+        FaceForward = false
+        trotx = 90deg
+        do {
+            UpdateBossPathPosition()
+            playframe()
+            animframe += 1.0
+            pathprog += 1.0
+        } until (pathprog > 599.0)
+        calcpath(600.0, vvec)
+        BossBaseY = vecy
+        changestate(S2_Loop, 600.0)
+    }
+}
+
+state S2_Debug { // 15
+    statusc 0x22
+    code() {
+        cascadeevent(Event12, self, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 0, 0, NGIN_BOSS_2, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_MAIN_2, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_LEFT_2, 4, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_BROKEN_LEFT_1, 8, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 0, -16, ROCKET_LAUNCHER_0, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_RIGHT_2, 16, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_BROKEN_RIGHT_1, 8, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 0, -16, ROCKET_LAUNCHER_1, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_PAD_RIGHT_2, 0, 0, 0, 0, 0)
+        pathprog = 600.0
+        DebugPhaseID = 12.0
+        setanim(ROBOT_MAIN_2)
+        FaceForward = 1
+        trotx = 90deg
+        PartsVulnerable = false
+        animframe = 29.0
+        DebugPathScrub(601.0)
+    }
+}
+
+sub CheckRobotDamage_S2() {
+    if (pathprog == 601.0 || pathprog == 658.0 || pathprog == 811.0 || pathprog == 929.0) {
+        changestateif(S2_Break_Both, LeftDamage >= 5 && RightDamage >= 5 && !(S2_LEFT_SHOULDER_BROKEN) && !(S2_RIGHT_SHOULDER_BROKEN))
+        if (LeftDamage >= 5 && !(S2_LEFT_SHOULDER_BROKEN)) {
+            RightDamage >>= 1
+            changestate(S2_Break_Left, S2_RIGHT_SHOULDER_BROKEN)
+        }
+        if (RightDamage >= 5 && !(S2_RIGHT_SHOULDER_BROKEN)) {
+            LeftDamage >>= 1
+            changestate(S2_Break_Right, S2_LEFT_SHOULDER_BROKEN)
+        }
+    }
+}
+
+state S2_Loop { // 16
+    statusc 0x20
+    trans => state S1_Setup
+    code(startpoint) {
+        cascadeevent(Event12, self, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 0, 0, NGIN_BOSS_2, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_MAIN_2, 0, 0, 0, 0, 0)
+        unless (S2_LEFT_SHOULDER_BROKEN) {
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_LEFT_2, 4, 0, getins(RegisterDamage_Left_S2), 0, 0)
+        }
+        LeftShoulderOBJ = objectspawned
+        unless (S2_LEFT_SHOULDER_BROKEN) {
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_BROKEN_LEFT_1, 8, 0, 0, 0, 0)
+        }
+        unless (S2_LEFT_SHOULDER_BROKEN) {
+            spawn(NGinC, S_NGIN_ROBOT, 1, 0, -16, ROCKET_LAUNCHER_0, 0, 0, 0, 0, getins(VulnerablePartFlashRed))
+        }
+        unless (S2_RIGHT_SHOULDER_BROKEN) {
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_RIGHT_2, 16, 0, getins(RegisterDamage_Right_S2), 0, 0)
+        }
+        RightShoulderOBJ = objectspawned
+        unless (S2_RIGHT_SHOULDER_BROKEN) {
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_BROKEN_RIGHT_1, 8, 0, 0, 0, 0)
+        }
+        unless (S2_RIGHT_SHOULDER_BROKEN) {
+            spawn(NGinC, S_NGIN_ROBOT, 1, 0, -16, ROCKET_LAUNCHER_1, 0, 0, 0, 0, getins(VulnerablePartFlashRed))
+        }
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_PAD_RIGHT_2, 0, 0, 0, 0, 0)
+        pathprog = startpoint
+        DebugPhaseID = 13.0
+        setanim(ROBOT_MAIN_2)
+        FaceForward = false
+        trotx = 90deg
+        PartsVulnerable = false
+        animframe = 29.0
+        ShoulderMotion = 2
+        do {
+            UpdateBossPathPosition()
+            if (pathprog == 600.0) {
+                AttackCycle += 1
+                if (AttackCycle > 2) {
+                    AttackCycle = 0
+                }
+            }
+            else if (pathprog == 614.0 || pathprog == 674.0) {
+                ShoulderMotion = 1
+            }
+            else if (pathprog == 644.0 || pathprog == 704.0) {
+                ShoulderMotion = 2
+            }
+            playframe()
+            CheckRobotDamage_S2()
+            if ((S2_LEFT_SHOULDER_BROKEN) || (S2_RIGHT_SHOULDER_BROKEN)) {
+                changestateif(S2_Rocket_Right, AttackCycle == 1 && pathprog == 629.0)
+                if (AttackCycle == 2 && pathprog == 689.0) {
+                    AttackCycle += 1
+                    changestate(S2_Rocket_Left)
+                }
+            }
+            else {
+                changestateif(S2_Rocket_Barrage_Left, AttackCycle == 1 && pathprog == 629.0)
+                if (AttackCycle == 2 && pathprog == 689.0) {
+                    AttackCycle += 1
+                    changestate(S2_Rocket_Barrage_Right)
+                }
+            }
+            if (animframe == 43.0) {
+                soundpitch(0x6AC)
+                soundplay([sv16A], 1V)
+            }
+            else if (animframe == 71.0) {
+                soundpitch(0x6AC)
+                soundplay([sv16A], 1V)
+            }
+            if (animframe >= 29.0 && animframe <= 43.0 && ShoulderMotion == 1) {
+                animframe += 1.0
+            }
+            else if (animframe >= 30.0 && animframe <= 44.0 && ShoulderMotion == 2) {
+                animframe -= 1.0
+            }
+            if (animframe >= 41.0 && animframe <= 73.0) {
+                PartsVulnerable = true
+            }
+            else {
+                PartsVulnerable = false
+            }
+            pathprog += 1.0
+            if (pathprog > 719.0) {
+                pathprog = 600.0
+            }
+        } while (1)
+    }
+}
+
+sub RegisterDamage_Right_S2() {
+    if (!Initializing) {
+        RobotDamageFlash()
+        parent -> RightDamage += 1
+    }
+    if (!SparksSpawned && parent -> RightDamage >= 5) {
+        SparksSpawned = true
+        spawn(NGinC, S_SPARKS, 1, 53.0, 0)
+        spawn(NGinC, S_SPARKS, 1, 54.0, 1)
+        spawn(NGinC, S_SPARKS, 1, 55.0, 2)
+        spawn(NGinC, S_SPARKS, 1, 56.0, 3)
+        spawn(NGinC, S_SPARKS, 1, 57.0, 0)
+    }
+}
+
+sub RegisterDamage_Left_S2() {
+    if (!Initializing) {
+        RobotDamageFlash()
+        parent -> LeftDamage += 1
+    }
+    if (!SparksSpawned && parent -> LeftDamage >= 5) {
+        SparksSpawned = true
+        spawn(NGinC, S_SPARKS, 1, 48.0, 0)
+        spawn(NGinC, S_SPARKS, 1, 49.0, 1)
+        spawn(NGinC, S_SPARKS, 1, 50.0, 2)
+        spawn(NGinC, S_SPARKS, 1, 51.0, 3)
+        spawn(NGinC, S_SPARKS, 1, 52.0, 0)
+    }
+}
+
+state S2_Rocket_Barrage_Left { // 17
+    statusc 0x20
+    trans => state S1_Setup
+    code() {
+        DebugPhaseID = 14.0
+        setanim(ROBOT_MAIN_2)
+        FaceForward = 1
+        trotx = 90deg
+        PartsVulnerable = false
+        animframe = 45.0
+        pathprog = 720.0
+        do {
+            UpdateBossPathPosition()
+            if ((animframe >= 29.0 && animframe <= 58.0) || (animframe >= 71.0 && animframe <= 83.0)) {
+                animframe += 1.0
+            }
+            if (pathprog == 735.0) {
+                animframe = 65.0
+                interrupter = objectget(300.0)
+                sendevent(EventTriggerRocket, interrupter, -1, 1.0)
+            }
+            else if (pathprog == 741.0) {
+                animframe = 66.0
+                interrupter = objectget(301.0)
+                sendevent(EventTriggerRocket, interrupter, -1, 1.0)
+            }
+            else if (pathprog == 747.0) {
+                animframe = 67.0
+                interrupter = objectget(302.0)
+                sendevent(EventTriggerRocket, interrupter, -1, 1.0)
+            }
+            else if (pathprog == 753.0) {
+                animframe = 68.0
+                interrupter = objectget(303.0)
+                sendevent(EventTriggerRocket, interrupter, -1, 1.0)
+            }
+            else if (pathprog == 759.0) {
+                animframe = 69.0
+                interrupter = objectget(304.0)
+                sendevent(EventTriggerRocket, interrupter, 35.0, 0)
+            }
+            else if (pathprog == 765.0) {
+                animframe = 70.0
+                interrupter = objectget(306.0)
+                sendevent(EventTriggerRocket, interrupter, 35.0, 0)
+            }
+            else if (pathprog == 779.0) {
+                animframe = 71.0
+            }
+            playframe()
+            if (animframe == 43.0) {
+                soundpitch(0x6AC)
+                soundplay([sv16A], 1V)
+            }
+            else if (animframe == 71.0) {
+                soundpitch(0x6AC)
+                soundplay([sv16A], 1V)
+            }
+            CheckRobotDamage_S2()
+            if (animframe >= 41.0 && animframe <= 73.0) {
+                PartsVulnerable = true
+            }
+            else {
+                PartsVulnerable = false
+            }
+            pathprog += 1.0
+        } while (pathprog <= 839.0)
+        changestate(S2_Loop, 630.0)
+    }
+}
+
+state S2_Rocket_Barrage_Right { // 18
+    statusc 0x20
+    trans => state S1_Setup
+    code() {
+        DebugPhaseID = 15.0
+        setanim(ROBOT_MAIN_2)
+        FaceForward = 1
+        trotx = 90deg
+        PartsVulnerable = false
+        animframe = 45.0
+        pathprog = 840.0
+        do {
+            UpdateBossPathPosition()
+            if ((animframe >= 29.0 && animframe <= 58.0) || (animframe >= 71.0 && animframe <= 83.0)) {
+                animframe += 1.0
+            }
+            if (pathprog == 855.0) {
+                animframe = 60.0
+                interrupter = objectget(305.0)
+                sendevent(EventTriggerRocket, interrupter, -1, 1.0)
+            }
+            else if (pathprog == 861.0) {
+                animframe = 61.0
+                interrupter = objectget(304.0)
+                sendevent(EventTriggerRocket, interrupter, -1, 1.0)
+            }
+            else if (pathprog == 867.0) {
+                animframe = 62.0
+                interrupter = objectget(303.0)
+                sendevent(EventTriggerRocket, interrupter, -1, 1.0)
+            }
+            else if (pathprog == 873.0) {
+                animframe = 63.0
+                interrupter = objectget(302.0)
+                sendevent(EventTriggerRocket, interrupter, -1, 1.0)
+            }
+            else if (pathprog == 879.0) {
+                animframe = 64.0
+                interrupter = objectget(301.0)
+                sendevent(EventTriggerRocket, interrupter, 35.0, 0)
+            }
+            else if (pathprog == 885.0) {
+                animframe = 70.0
+                interrupter = objectget(307.0)
+                sendevent(EventTriggerRocket, interrupter, 35.0, 0)
+            }
+            else if (pathprog == 899.0) {
+                animframe = 71.0
+            }
+            playframe()
+            if (animframe == 43.0) {
+                soundpitch(0x6AC)
+                soundplay([sv16A], 1V)
+            }
+            else if (animframe == 71.0) {
+                soundpitch(0x6AC)
+                soundplay([sv16A], 1V)
+            }
+            CheckRobotDamage_S2()
+            if (animframe >= 41.0 && animframe <= 73.0) {
+                PartsVulnerable = true
+            }
+            else {
+                PartsVulnerable = false
+            }
+            pathprog += 1.0
+        } while (pathprog <= 959.0)
+        changestate(S2_Loop, 690.0)
+    }
+}
+
+state S2_Rocket_Left { // 19
+    statusc 0x20
+    trans => state S1_Setup
+    code() {
+        DebugPhaseID = 16.0
+        setanim(ROBOT_MAIN_2)
+        FaceForward = 1
+        trotx = 90deg
+        PartsVulnerable = false
+        animframe = 44.0
+        pathprog = 960.0
+        do {
+            UpdateBossPathPosition()
+            if ((animframe >= 29.0 && animframe <= 58.0) || (animframe >= 71.0 && animframe <= 83.0)) {
+                animframe += 1.0
+            }
+            if (pathprog == 1004.0) {
+                animframe = 59.0
+                if (S2_RIGHT_SHOULDER_BROKEN) {
+                    interrupter = objectget(311.0)
+                    sendevent(EventTriggerRocket, interrupter, -1, 0)
+                }
+                else {
+                    interrupter = objectget(314.0)
+                    sendevent(EventTriggerRocket, interrupter, -1, 0)
+                }
+            }
+            playframe()
+            if (animframe == 43.0) {
+                soundpitch(0x6AC)
+                soundplay([sv16A], 1V)
+            }
+            else if (animframe == 71.0) {
+                soundpitch(0x6AC)
+                soundplay([sv16A], 1V)
+            }
+            CheckRobotDamage_S2()
+            if (animframe >= 41.0 && animframe <= 73.0) {
+                PartsVulnerable = true
+            }
+            else {
+                PartsVulnerable = false
+            }
+            pathprog += 1.0
+        } while (pathprog <= 1079.0)
+        changestate(S2_Loop, 630.0)
+    }
+}
+
+state S2_Rocket_Right { // 20
+    statusc 0x20
+    trans => state S1_Setup
+    code() {
+        DebugPhaseID = 17.0
+        setanim(ROBOT_MAIN_2)
+        FaceForward = 1
+        trotx = 90deg
+        PartsVulnerable = false
+        animframe = 44.0
+        pathprog = 1080.0
+        do {
+            UpdateBossPathPosition()
+            if ((animframe >= 29.0 && animframe <= 58.0) || (animframe >= 71.0 && animframe <= 83.0)) {
+                animframe += 1.0
+            }
+            if (pathprog == 1139.0) {
+                animframe = 59.0
+                if (S2_RIGHT_SHOULDER_BROKEN) {
+                    interrupter = objectget(318.0)
+                    sendevent(EventTriggerRocket, interrupter, -1, 0)
+                }
+                else {
+                    interrupter = objectget(309.0)
+                    sendevent(EventTriggerRocket, interrupter, -1, 0)
+                }
+            }
+            playframe()
+            if (animframe == 43.0) {
+                soundpitch(0x6AC)
+                soundplay([sv16A], 1V)
+            }
+            else if (animframe == 71.0) {
+                soundpitch(0x6AC)
+                soundplay([sv16A], 1V)
+            }
+            CheckRobotDamage_S2()
+            if (animframe >= 41.0 && animframe <= 73.0) {
+                PartsVulnerable = true
+            }
+            else {
+                PartsVulnerable = false
+            }
+            pathprog += 1.0
+        } while (pathprog <= 1199.0)
+        changestate(S2_Loop, 690.0)
+    }
+}
+
+state S2_Break_Left { // 21
+    statusc 0x20
+    trans => state S1_Setup
+    code(otherbroken) {
+        cascadeevent(Event12, self, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 0, 0, NGIN_BOSS_6, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_MAIN_5, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_LEFT_BREAK_0, 4, 0, 0, 0, getins(SyncParentFrameT2))
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_LEFT_BREAK_1, 4, 0, 0, getins(SyncShoulderParent), getins(SyncParentFrameT1))
+        DetachedShoulderOBJ = objectspawned
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_BROKEN_LEFT_4, 8, 0, 0, getins(SyncShoulderParent), 0)
+        DetachedArmOBJ = objectspawned
+        if (!(S2_RIGHT_SHOULDER_BROKEN)) {
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_RIGHT_5, 16, 0, getins(SUB_6947), 0, 0)
+        }
+        if (!(S2_RIGHT_SHOULDER_BROKEN)) {
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_BROKEN_RIGHT_4, 8, 0, 0, 0, 0)
+        }
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_PAD_RIGHT_5, 0, 0, 0, 0, 0)
+        SoundRobotBreak()
+        DetachRobotPart(DetachedShoulderOBJ, 8m, 8m, 2m)
+        DetachRobotPart(DetachedArmOBJ, 8m, -8m, 0m)
+        DebugPhaseID = 18.0
+        setanim(ROBOT_MAIN_5, 0)
+        FaceForward = 1
+        trotx = 90deg
+        if (otherbroken) {
+            pathprog = 2840.0
+            do (var start = frametime) {
+                UpdateBossPathPosition()
+                playframe()
+                animframe += 1.0
+            } while (frametime - start < 0.5s)
+        }
+        else {
+            pathprog = 1200.0
+        }
+        do {
+            UpdateBossPathPosition()
+            playframe()
+            if (animseq == getanim(ROBOT_MAIN_5) && animframe == 33.0) {
+                health += 1
+                animframe = 69.0
+                interrupter = DetachedArmOBJ
+                sendevent(EventTriggered, interrupter)
+            }
+            else if (animseq == getanim(ROBOT_MAIN_5) && animframe >= 0 && animframe <= 127.0) {
+                animframe += 1.0
+            }
+            pathprog += 1.0
+        } while ((!otherbroken && pathprog <= 1292.0) || (otherbroken && pathprog <= 2899.0))
+        DestroyedParts |= 4
+        if (otherbroken) {
+            changestate(S4_Setup)
+        }
+        else {
+            changestate(S2_Loop, 600.0)
+        }
+    }
+}
+
+sub SUB_6947() {
+    if (!Initializing) {
+        RobotDamageFlash()
+        parent -> LeftDamage += 1
+    }
+}
+
+sub SyncParentFrameT1() {
+    animframe = parent -> animframe
+    unless (animframe <= 33.0) {
+        animframe = 33.0
+    }
+}
+
+sub SyncShoulderParent() {
+    FollowParentUnlessDetached()
+}
+
+sub SyncParentFrameT2() {
+    animframe = parent -> animframe
+    unless (animframe <= 14.0) {
+        animframe = 14.0
+    }
+}
+
+state S2_Break_Right { // 22
+    statusc 0x20
+    trans => state S1_Setup
+    code(otherbroken) {
+        cascadeevent(Event12, self, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 0, 0, NGIN_BOSS_6, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_MAIN_5, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_RIGHT_BREAK_0, 16, 0, 0, 0, getins(SyncParentFrameT4))
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_RIGHT_BREAK_1, 16, 0, 0, getins(SyncShoulderParent), getins(SyncParentFrameT3))
+        DetachedShoulderOBJ = objectspawned
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_BROKEN_RIGHT_4, 8, 0, 0, getins(SyncShoulderParent), 0)
+        DetachedArmOBJ = objectspawned
+        if (!(S2_LEFT_SHOULDER_BROKEN)) {
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_LEFT_5, 4, 0, getins(SUB_6947), 0, 0)
+        }
+        if (!(S2_LEFT_SHOULDER_BROKEN)) {
+            spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_BROKEN_LEFT_4, 8, 0, 0, 0, 0)
+        }
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_PAD_RIGHT_5, 0, 0, 0, 0, 0)
+        SoundRobotBreak()
+        DetachRobotPart(DetachedShoulderOBJ, -8m, 8m, 2m)
+        DetachRobotPart(DetachedArmOBJ, -8m, -8m, 0m)
+        DebugPhaseID = 19.0
+        setanim(ROBOT_MAIN_5)
+        animframe = 34.0
+        FaceForward = 1
+        trotx = 90deg
+        if (otherbroken) {
+            pathprog = 2840.0
+            do (var start = frametime) {
+                UpdateBossPathPosition()
+                playframe()
+                animframe += 1.0
+            } while (frametime - start < 12)
+        }
+        else {
+            pathprog = 1200.0
+        }
+        do {
+            UpdateBossPathPosition()
+            playframe()
+            if (animseq == getanim(ROBOT_MAIN_5) && animframe == 68.0) {
+                health += 1
+                animframe = 69.0
+                interrupter = DetachedArmOBJ
+                sendevent(EventTriggered, interrupter)
+            }
+            else if (animseq == getanim(ROBOT_MAIN_5) && animframe >= 0 && animframe <= 127.0) {
+                animframe += 1.0
+            }
+            pathprog += 1.0
+        } while ((!otherbroken && pathprog <= 1292.0) || (otherbroken && pathprog <= 2899.0))
+        DestroyedParts |= 8
+        if (otherbroken) {
+            changestate(S4_Setup)
+        }
+        else {
+            changestate(S2_Loop, 600.0)
+        }
+    }
+}
+
+sub SyncParentFrameT3() {
+    animframe = parent -> animframe - 34.0
+    unless (animframe <= 33.0) {
+        animframe = 33.0
+    }
+}
+
+sub SyncParentFrameT4() {
+    animframe = parent -> animframe - 34.0
+    unless (animframe <= 14.0) {
+        animframe = 14.0
+    }
+}
+
+state S2_Break_Both { // 23
+    statusc 0x20
+    trans => state S1_Setup
+    code() {
+        cascadeevent(Event12, self, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 0, 0, NGIN_BOSS_6, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_MAIN_5, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_RIGHT_BREAK_0, 16, 0, 0, 0, getins(SyncParentFrameT2))
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_RIGHT_BREAK_1, 16, 0, 0, getins(SyncShoulderParent), getins(SyncParentFrameT1))
+        DetachedShoulderOBJ = objectspawned
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_BROKEN_RIGHT_4, 8, 0, 0, getins(SyncShoulderParent), 0)
+        DetachedArmOBJ = objectspawned
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_LEFT_BREAK_0, 4, 0, 0, 0, getins(SyncParentFrameT2))
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_LEFT_BREAK_1, 4, 0, 0, getins(SyncBothShoulderParent), getins(SyncParentFrameT1))
+        SecondaryShoulderOBJ = objectspawned
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_ARM_BROKEN_LEFT_4, 8, 0, 0, getins(SyncShoulderParent), 0)
+        SecondaryArmOBJ = objectspawned
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_SHOULDER_PAD_RIGHT_5, 0, 0, 0, 0, 0)
+        SoundRobotBreak()
+        DetachRobotPart(DetachedShoulderOBJ, 8m, 8m, 2m)
+        DetachRobotPart(DetachedArmOBJ, 8m, -8m, 0m)
+        DetachRobotPart(SecondaryShoulderOBJ, -8m, 8m, 2m)
+        DetachRobotPart(SecondaryArmOBJ, -8m, -8m, 0m)
+        DebugPhaseID = 20.0
+        setanim(ROBOT_MAIN_5, 0)
+        FaceForward = 1
+        trotx = 90deg
+        pathprog = 2840.0
+        do (var start = frametime) {
+            UpdateBossPathPosition()
+            playframe()
+            animframe += 1.0
+        } while (frametime - start < 0.5s)
+        do {
+            UpdateBossPathPosition()
+            playframe()
+            if (animseq == getanim(ROBOT_MAIN_5) && animframe == 33.0) {
+                health += 2
+                animframe = 69.0
+                interrupter = DetachedArmOBJ
+                sendevent(EventTriggered, interrupter)
+                interrupter = SecondaryArmOBJ
+                sendevent(EventTriggered, interrupter)
+            }
+            else if (animseq == getanim(ROBOT_MAIN_5) && animframe >= 0 && animframe <= 127.0) {
+                animframe += 1.0
+            }
+            pathprog += 1.0
+        } while (pathprog <= 2899.0)
+        DestroyedParts |= 4
+        changestate(S4_Setup)
+    }
+}
+
+sub SyncBothShoulderParent() {
+    FollowParentUnlessDetached()
+}
+
+state S4_Setup { // 24
+    statusc 0x22
+    code() {
+        CoreDamage = 0
+        calcpath(2340.0, vvec)
+        BossBaseY = vecy
+        changestate(S4_Build)
+    }
+}
+
+state S4_Build { // 25
+    statusc 0x22
+    code() {
+        GLOBAL_3 = -1
+        AttackCycle = 0
+        cascadeevent(Event12, self, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 0, 0, NGIN_BOSS_3, 0, 0, 0, 0, getins(SyncParentFrameT5))
+        NGinModelOBJ = objectspawned
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_MAIN_FIRE, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_PART_U1, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_PART_U3, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 0, 0, NGIN_BOSS_8, 0, 0, getins(RegisterDamage_Core_S4), 0, 0)
+        changestate(S4_Hide)
+    }
+}
+
+sub RegisterDamage_Core_S4() {
+    if (!Initializing) {
+        RobotDamageFlash()
+        parent -> CoreDamage += 1
+    }
+    if (!SparksSpawned && parent -> CoreDamage >= 5) {
+        SparksSpawned = true
+        spawn(NGinC, S_SPARKS, 1, 58.0, 0)
+        spawn(NGinC, S_SPARKS, 1, 59.0, 1)
+        spawn(NGinC, S_SPARKS, 1, 60.0, 2)
+        spawn(NGinC, S_SPARKS, 1, 61.0, 3)
+        spawn(NGinC, S_SPARKS, 1, 62.0, 0)
+        spawn(NGinC, S_SPARKS, 1, 63.0, 1)
+        spawn(NGinC, S_SPARKS, 1, 64.0, 2)
+        spawn(NGinC, S_SPARKS, 1, 65.0, 3)
+        spawn(NGinC, S_SPARKS, 1, 66.0, 0)
+        spawn(NGinC, S_SPARKS, 1, 67.0, 1)
+    }
+}
+
+sub SyncParentFrameT5() {
+    if (animseq == getanim(NGIN_BOSS_10)) {
+        animframe = parent -> animframe - 60.0
+    }
+    else {
+        animframe = parent -> animframe
+    }
+}
+
+state S4_Hide { // 26
+    statusc 0x20
+    trans => state S1_Setup
+    code() {
+        PartsVulnerable = true
+        PlatformSequence += 1
+        if (PlatformSequence > 9) {
+            PlatformSequence = 1
+        }
+        if (PlatformSequence == 1 || PlatformSequence == 4 || PlatformSequence == 7) {
+            playframe(animframe, 0.85s)
+            playframe(animframe, 0.85s)
+            RestorePlatforms()
+            playframe(animframe, 1.25s)
+        }
+        if (PlatformSequence == 1) {
+            changestate(S4_Middle)
+        }
+        else if (PlatformSequence == 2) {
+            changestate(S4_Right)
+        }
+        else if (PlatformSequence == 3) {
+            changestate(S4_Left)
+        }
+        else if (PlatformSequence == 4) {
+            changestate(S4_Left)
+        }
+        else if (PlatformSequence == 5) {
+            changestate(S4_Middle)
+        }
+        else if (PlatformSequence == 6) {
+            changestate(S4_Right)
+        }
+        else if (PlatformSequence == 7) {
+            changestate(S4_Right)
+        }
+        else if (PlatformSequence == 8) {
+            changestate(S4_Left)
+        }
+        changestateif(S4_Middle, PlatformSequence == 9)
+    }
+}
+
+state S4_Left { // 27
+    statusc 0
+    code() {
+        DebugPhaseID = 21.0
+        changestate(S4_Fire, 2340.0, 2398.0, objectget(OBJ_PLAT_L))
+    }
+}
+
+state S4_Middle { // 28
+    statusc 0
+    code() {
+        DebugPhaseID = 22.0
+        changestate(S4_Fire, 2220.0, 2278.0, objectget(OBJ_PLAT_M))
+    }
+}
+
+state S4_Right { // 29
+    statusc 0
+    code() {
+        DebugPhaseID = 23.0
+        changestate(S4_Fire, 2280.0, 2338.0, objectget(OBJ_PLAT_R))
+    }
+}
+
+state S4_Fire { // 30
+    statusc 0x20
+    trans => state S1_Setup
+    code(startpoint, endpoint, platform_id) {
+        setanim(ROBOT_MAIN_FIRE)
+        FaceForward = 1
+        trotx = 90deg
+        pathprog = startpoint
+        animframe = 0
+        spawn(NGinC, S_LAZER_GREEN, 1, platform_id, 0)
+        child = objectspawned
+        do {
+            UpdateBossPathPosition()
+            playframe()
+            if (CoreDamage >= 5 && animframe < 59.0) {
+                sendevent(Event12, child, 0)
+                changestate(Boss_Death)
+            }
+            if (animframe == 60.0) {
+                interrupter = NGinModelOBJ
+                sendevent(EventExplode, interrupter, -40.0)
+            }
+            if (animframe == 55.0) {
+                cascadeevent(Event53, self)
+            }
+            animframe += 1.0
+            pathprog += 1.0
+        } while (pathprog <= endpoint)
+        do {
+            UpdateBossPathPosition()
+            playframe()
+            animframe += 1.0
+        } while (animframe != 99.0)
+        interrupter = NGinModelOBJ
+        sendevent(EventExplode, interrupter, 9.0)
+        cascadeevent(Event51, self)
+        do {
+            UpdateBossPathPosition()
+            playframe()
+            if (pathprog == startpoint + 24.0) {
+                soundpitch((4.8 + rand(3.2)) * 0.203 >> 8)
+                sounddecay(7.7s)
+                soundplay([jmp0A], 3V)
+            }
+            if (animframe != 129.0) {
+                animframe += 1.0
+            }
+            pathprog -= 1.0
+        } while (pathprog >= startpoint)
+        changestate(S4_Hide)
+    }
+}
+
+state Boss_Death { // 31
+    statusc 0x20
+    code() {
+        spawn(NGinC, S_OUTRO_VOICE, 1)
+        DebugPhaseID = 24.0
+        cascadeevent(Event12, self, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 0, 0, NGIN_BOSS_7, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_MAIN_BREAKING, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_PART_U2, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_PART_U4, 0, 0, 0, 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 0, 0, NGIN_BOSS_9, 0, 0, 0, 0, 0)
+        calcpath(0, vvec)
+        save (vfx) {
+            vfx = (vfx & 0xFFFFFF00) | 0x6
+            soundpitch(0x343)
+            sounddecay(7.7s)
+            soundplay([NRE9A], 10V)
+        }
+        setanim(NGIN_BOSS_7)
+        do (var s_x = x, s_y = y, s_z = z, t_x = vecx, t_y = vecy, t_z = vecz, f = 1.0) {
+            x = s_x + ((t_x - s_x) * (f >> 8)) / 30
+            y = s_y + ((t_y - s_y) * (f >> 8)) / 30
+            z = s_z + ((t_z - s_z) * (f >> 8)) / 30
+            playframe(f - 1.0)
+            f += 1.0
+        } while (f < 30.0)
+        DebugPhaseID = 25.0
+        cascadeevent(Event12, self, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 0, 1.0, NGIN_BOSS_11, 0, 0, getins(SpawnExplosionT2), getins(SyncNGinBoss), getins(ShrinkNGinBoss))
+        NGinModelOBJ = objectspawned
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_MAIN_BREAK_0, 0, 0, getins(SpawnExplosionT1), 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_MAIN_BREAK_1, 4, 0, getins(SpawnExplosionT2), 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_MAIN_BREAK_2, 8, 0, getins(SpawnExplosionT1), 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_MAIN_BREAK_3, 12, 0, getins(SpawnExplosionT2), 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_MAIN_BREAK_4, 16, 0, getins(SpawnExplosionT1), 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_MAIN_BREAK_5, 20, 0, getins(SpawnExplosionT2), 0, 0)
+        spawn(NGinC, S_NGIN_ROBOT, 1, 1.0, 0, ROBOT_MAIN_BREAK_6, 24, 0, getins(SpawnExplosionT1), 0, 0)
+        DetachRobotPart(NGinModelOBJ, 0m, 0m, -1m)
+        playframes(ROBOT_MAIN_BREAK_0, 0.0, 29.0)
+        cascadeevent(Event12, self, 0)
+        health += 1
+        sendevent(EventWarp, player, 0)
+        DeloadCurrentAnimGroup()
+        AnimGroup = -1
+        sleepnull()
+    }
+}
+
+sub SpawnExplosionT1() {
+    if (Initializing) {
+        save (x, y, z) {
+            x += randi(-6m, 6m)
+            y += randi(-6m, 6m)
+            z += randi(-6m, 6m)
+            spawn(9, 4, 1, 0, 4)
+            child = objectspawned
+        }
+    }
+}
+
+sub ShrinkNGinBoss() {
+    if (scalex > 0S) {
+        scalex -= 5
+        scaley -= 5
+        scalez -= 5
+    }
+    animframe = (animframe + 1.0) % 20.0
+}
+
+sub SyncNGinBoss() {
+    x = parent -> x
+    y = parent -> y + 2.5m
+}
+
+sub SpawnExplosionT2() {
+    if (Initializing) {
+        save (x, y, z) {
+            x += randi(-6m, 6m)
+            y += randi(-6m, 6m)
+            z += randi(-6m, 6m)
+            spawn(9, 40, 1, 0, 4)
+            child = objectspawned
+        }
+    }
+}
+
+sub SetPlatformAnim() {
+    if (spawn == S_PLATFORM_L) {
+        setanim(PLATFORM_RIGHT)
+    }
+    else if (spawn == S_PLATFORM_M) {
+        setanim(PLATFORM_MIDDLE)
+    }
+    else if (spawn == S_PLATFORM_R) {
+        setanim(PLATFORM_LEFT)
+    }
+    else if (spawn == S_PLATFORM_INTRO) {
+        setanim(PLATFORM_INTRO)
+    }
+    animframe = 0
+}
+
+sub RestorePlatforms() {
+    interrupter = objectget(OBJ_PLAT_L)
+    sendevent(Event14, interrupter, 0)
+    interrupter = objectget(OBJ_PLAT_M)
+    sendevent(Event14, interrupter, 0)
+    interrupter = objectget(OBJ_PLAT_R)
+    sendevent(Event14, interrupter, 0)
+}
+
+state Platform { // 32
+    statusc 0x20
+    code() {
+        vfx = (vfx & 0xFF00FFFF) | 0x30000
+        SetPlatformAnim()
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_TOP | FLAG_NO_CAMERA_CLIP
+        sleep()
+    }
+    event(e, a) {
+        accevif (e == EventTriggered) {
+            statusb |= FLAG_INVISIBLE
+        }
+        if (e == Event53) {
+            statusb &= ~FLAG_INVISIBLE
+        }
+        accevcstate(Platform_Break, e == Event30)
+    }
+}
+
+state Platform_Break { // 33
+    statusc 0
+    code() {
+        vecx = false
+        playframes(PLATFORM_BREAK, 0.0, 39.0)
+        statusb |= FLAG_INVISIBLE
+        var0 = frametime
+        do {
+            playframe()
+        } until (vecx || frametime - var0 >= 7.1s)
+        statusb &= ~FLAG_INVISIBLE
+        SetPlatformAnim()
+        vecy = y
+        y -= 15m
+        do {
+            playframe()
+            y += 0.5m
+        } until (vecy == y)
+        changestate(Platform)
+    }
+    event(e, a) {
+        accevif (e == Event14) {
+            vecx = true
+        }
+    }
+}
+
+state Fruit_Projectile { // 34
+    code(vertex) {
+        creator = objectget(OBJ_NGIN)
+        SetRot(0deg)
+        statusb = FLAG_PHYSICS_ENGINE
+        getvert(vtrans, player, vertex)
+        if (GLOBAL_3 == -1) {
+            var0 = 0
+        }
+        else {
+            var0 = (creator -> y - creator -> BossBaseY) >> 2
+        }
+        y = player -> y + 1.5m + var0
+        SetRot(0deg, 0deg, rand(360deg))
+        velx = 0
+        if (GLOBAL_3 == -1) {
+            vely = 0m
+        }
+        else {
+            vely = GLOBAL_3
+        }
+        velz = -45m
+        setanim(FRUIT_PROJECTILE, rand(32.0))
+        do {
+            if (z < creator -> z + 5m && z > creator -> z - 2m) {
+                broadcastevent(EventHit, 4, 1)
+            }
+            animframe = (animframe + 1.0) & 0x1FFF
+            playframe()
+        } while (frametime - statetime < 3s)
+    }
+    event(e, a) {
+        accevcstate(Fruit_Projectile_Hit, e == EventTriggered)
+        accevcstate(Fruit_Projectile_Miss, e == Event53)
+    }
+}
+
+state Fruit_Projectile_Miss { // 35
+    code() {
+        soundpitch(2.903)
+        soundplay([NBB9A], 2.5V)
+        zindex = 64
+        statusb = FLAG_SOLID_GROUND | FLAG_PHYSICS_ENGINE | FLAG_GRAVITY
+        SetVel(randi(-0.5m, 0.5m), 0m, 0.2m + rand(0.2m))
+        groundy = player -> y - 10m
+        do {
+            animframe = (animframe + 1.0) % 32.0
+            playframe()
+        } until (STATUS_GROUNDLAND)
+    }
+}
+
+state Fruit_Projectile_Hit { // 36
+    code() {
+        soundpitch(2.903)
+        soundplay([NBH9A], 2.5V)
+        SetScale(4S)
+        zindex = 84
+        statusb &= ~FLAG_PHYSICS_ENGINE
+        playanim(0, FRUIT_PROJECTILE_HIT_0)
+        playanim(1, FRUIT_PROJECTILE_HIT_0)
+        playanim(2, FRUIT_PROJECTILE_HIT_0)
+        playanim(3, FRUIT_PROJECTILE_HIT_0)
+        playanim(4, FRUIT_PROJECTILE_HIT_0)
+        playanim(5, FRUIT_PROJECTILE_HIT_0)
+        playanim(6, FRUIT_PROJECTILE_HIT_0)
+        playanim(7, FRUIT_PROJECTILE_HIT_0)
+        playanim(0, FRUIT_PROJECTILE_HIT_1)
+        playanim(1, FRUIT_PROJECTILE_HIT_1)
+        playanim(2, FRUIT_PROJECTILE_HIT_1)
+        playanim(3, FRUIT_PROJECTILE_HIT_1)
+        playanim(4, FRUIT_PROJECTILE_HIT_1)
+        playanim(5, FRUIT_PROJECTILE_HIT_1)
+        playanim(6, FRUIT_PROJECTILE_HIT_1)
+        playanim(7, FRUIT_PROJECTILE_HIT_1)
+    }
+}
+
+state None { // 37
+    code() {}
+}
+
+state Lazer_Spawner { // 38
+    __transargs
+    code(vertex) {
+        SetRot(0deg)
+        var0 = false
+        vfx = (vfx & 0xFF00FFFF) | 0x10000
+        vecx = x
+        velx = x
+        vecy = y
+        vely = y
+        vecz = z
+        velz = z
+        spawn(NGinC, S_LAZER_RED, 1, LAZER_RED_0, 24, 1.0, getins(SyncLazerAnimT4))
+        spawn(NGinC, S_LAZER_RED, 1, LAZER_RED_1, 0, 0, getins(SyncLazerAnimT3))
+        spawn(NGinC, S_LAZER_RED, 1, LAZER_RED_1, 0, 0, getins(SyncLazerAnimT2))
+        spawn(NGinC, S_LAZER_RED, 1, LAZER_RED_2, 0, 0, getins(SyncLazerAnimT1))
+        spawn(NGinC, S_LAZER_RED, 1, LAZER_RED_2, 0, 0, getins(SyncLazerAnimT0))
+        child = objectspawned
+        WaitChildNull()
+    }
+    event(e, a) {
+        accevif (e == Event12) {
+            var0 = true
+        }
+    }
+    trans {
+        velx = vecx
+        vecx = x
+        vely = vecy
+        vecy = y
+        velz = vecz
+        vecz = z
+        getvert(vtrans, parent, vertex)
+    }
+}
+
+sub SyncLazerAnimT0() {
+    x = parent -> velx
+    y = parent -> vely
+    z = parent -> velz
+}
+
+sub SyncLazerAnimT1() {
+    x = parent -> vecx + parent -> velx >> 1
+    y = parent -> vecy + parent -> vely >> 1
+    z = parent -> vecz + parent -> velz >> 1
+}
+
+sub SyncLazerAnimT2() {
+    x = parent -> vecx
+    y = parent -> vecy
+    z = parent -> vecz
+}
+
+sub SyncLazerAnimT3() {
+    x = parent -> x + parent -> vecx >> 1
+    y = parent -> y + parent -> vecy >> 1
+    z = parent -> z + parent -> vecz >> 1
+}
+
+sub SyncLazerAnimT4() {
+    x = parent -> x
+    y = parent -> y
+    z = parent -> z
+}
+
+state Lazer_Red { // 39
+    statusc 0
+    trans => sub LazerRedTrans
+    __transargs
+    code(anim, depth, burn, posfn) {
+        if (burn) {
+            soundpitch(4.353)
+            sounddecay(7.7s)
+            soundplay([RRSEA], 2.5V)
+            settrans(LazerGreenTrans)
+        }
+        else {
+            settrans(LazerRedTrans)
+        }
+        zindex = depth
+        vfx = (vfx & 0xFF00FFFF) | 0x10000
+        playframes(anim, 0.0, 4.0)
+        do {
+            playframes(5.0, 8.0)
+        } until (var0)
+        if (burn) {
+            soundfadet(0.18s, voice)
+            soundfadev(0V, voice, 3)
+        }
+        playframes(9.0, 13.0)
+    }
+}
+
+sub LazerRedTrans(anim, depth, burn, posfn) __trans {
+    var0 = parent -> var0
+    call(posfn)
+}
+
+sub LazerGreenTrans(anim, depth, burn, posfn) __trans {
+    var0 = parent -> var0
+    call(posfn)
+    sendeventif(EventBurn, player, player -> x >= x - 0.5m && player -> x <= x + 0.5m && y <= player -> y + 1.5m && y >= player -> y, 100.0)
+}
+
+state Rocket_Spawner { // 40
+    statusc 0
+    code() {
+        SetRot(0deg)
+        trotx = 360deg
+        yzapproach = 180deg
+        statusb = FLAG_INVISIBLE
+        sleepnull()
+    }
+    event(e, a) {
+        if (e == EventTriggerRocket) {
+            vecx = a[0]
+            vecy = a[1.0]
+            accevcstate(Rocket)
+        }
+    }
+}
+
+state Rocket { // 41
+    statusc 0
+    code() {
+        statusb = FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | 0x800 | 0x2000
+        setanim(ROCKET, 0)
+        child = 0
+        soundpitch(0x343)
+        soundplay([JstTA], 0V)
+        soundfadet(0.1s, voice)
+        soundfadev(2V, voice, 2)
+        pathprog = 0
+        do {
+            calcpath(pathprog)
+            if (vecx >= 0 && pathprog >= vecx) {
+                soundsetup(0, voice, 0, 15)
+                changestate(Rocket_Spawner)
+            }
+            if (vecy && pathprog >= 40.0) {
+                vecy = 0
+                spawn(NGinC, S_ROCKET_SHADOW, 1, x, 0, z)
+                child = objectspawned
+            }
+            animframe = (animframe + 1.0) % 9.0
+            playframe()
+            pathprog += 0.5
+        } while (pathprog <= pathlen - 1.0)
+        soundsetup(0, voice, 0, 15)
+        sendevent(Event12, child, 0)
+        spawn(NGinC, S_ROCKET_EXPLOSION, 1)
+        child = objectspawned
+        WaitChildNull()
+        changestate(Rocket_Spawner)
+    }
+    trans {
+        sendevent(EventBurn, collider, 100.0)
+    }
+}
+
+state Rocket_Explosion { // 42
+    statusc 0
+    code() {
+        soundpitch(0x3A0)
+        soundplay([tnt0A], 1.28V)
+        soundsetup(0, voice, 5)
+        SetScale(2S)
+        if (!rand(2)) {
+            scalex = -scalex
+        }
+        setanim(EXPLOSION_SMOKE)
+        zindex = 50
+        SetRot(0deg, 0deg, rand(360deg))
+        animframe = rand(3)
+        do {
+            playframe()
+            animframe += 1.0
+            sendeventif(EventBurn, player, player -> x > x - 1.35m && player -> x < x + 1.35m, 100.0)
+        } while (animframe < 15.0)
+    }
+}
+
+state Rocket_Shadow { // 43
+    statusc 0
+    __transargs
+    code(px, py, pz) {
+        SetTrans(px, py, pz)
+        SetRot(0deg)
+        zindex = 32
+        sleepanim(0, ROCKET_SHADOW)
+    }
+    trans {
+        var0 = 2S - (3.75S - parent -> pathprog)
+        SetScale(var0)
+    }
+}
+
+state Lazer_Green { // 44
+    code(platform_id, frame) {
+        SetRot(0deg)
+        zindex = 128
+        setanim(LAZER_GREEN, frame - 1.0)
+        do {
+            animframe += 1.0
+            x = parent -> x
+            y = parent -> y
+            z = parent -> z
+            if (animframe == 24.0) {
+                soundpitch((4.8 + rand(3.2)) * 0.205 >> 8)
+                sounddecay(7.7s)
+                soundplay([jmp0A], 3V)
+            }
+            if (animframe == 39.0) {
+                soundpitch(2.903)
+                sounddecay(7.7s)
+                soundplay([NLS9A], 3V)
+            }
+            sendeventif(EventBurn, player, (animframe >= 60.0 && animframe <= 99.0) && player -> x > x - 1.75m && player -> x < x + 1.75m, 100.0)
+            if (animframe == 60.0) {
+                interrupter = platform_id
+                sendevent(EventExplode, interrupter, 100.0)
+            }
+            playframe()
+        } while (animframe + 1.0 <= 99.0)
+    }
+}
+
+state Electricity_Sparks { // 45
+    statusc 0
+    __transargs
+    code(vertex, t) {
+        getvert(vtrans, creator, vertex)
+        vecx = false
+        SetScale(1.5S, 0.75S, 0.75S)
+        zindex = 0x100
+        do {
+            if (!rand(5)) {
+                statusb = FLAG_INVISIBLE
+                playanim(0, ELECTRICITY_SPARKS, 2)
+                sounddecay(7.7s)
+                soundpitch((12.8 + rand(6.4)) * 0.43 >> 8)
+                if (!rand(2)) {
+                    soundplay([sp23A], 2.5V + rand(0.4V))
+                }
+                else {
+                    soundplay([sp13A], 2.5V + rand(0.4V))
+                }
+            }
+            statusb = 0
+            rotz = rand(360deg)
+            playframes(ELECTRICITY_SPARKS, 0.0, 8.0)
+        } while (!vecx)
+    }
+    event(e, a) {
+        accevif (e == EventTriggered) {
+            vecx = true
+        }
+    }
+    trans {
+        if (t == ((frametime - statetime) & 3)) {
+            getvert(vtrans, creator, vertex)
+            SparkOffsetX = parent -> x - x
+            SparkOffsetY = parent -> y - y
+            SparkOffsetZ = parent -> z - z
+        }
+        else {
+            x = parent -> x - SparkOffsetX
+            y = parent -> y - SparkOffsetY
+            z = parent -> z - SparkOffsetZ
+        }
+    }
+}
+
+state Kill { // 46
+    stateflag 0x20
+    statusc 0
+    code() {}
+}
+
+state Outro_Voice { // 47
+    statusc 0x20
+    code() {
+        movetolist(3.0)
+        if (var lang = GLOBAL_151; lang == LANG_FR) {
+            spawn(9, 44, 1, [NI0FO], [NI1FO], 2.0, 4s, 4.0)
+        }
+        else if (lang == LANG_DE) {
+            spawn(9, 44, 1, [NI0GO], [NI1GO], 2.0, 4s, 4.0)
+        }
+        else if (lang == LANG_ES) {
+            spawn(9, 44, 1, [NI0SO], [NI1SO], 2.0, 4s, 4.0)
+        }
+        else if (lang == LANG_IT) {
+            spawn(9, 44, 1, [NI0IO], [NI1IO], 2.0, 4s, 4.0)
+        }
+        else {
+            spawn(9, 44, 1, [NI0EO], [NI1EO], 2.0, 4s, 4.0)
+        }
+        sleepnull()
+    }
+}

@@ -1,0 +1,1046 @@
+#gool WinOC 61 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C2_FruiC.gooh"
+//gooc -c 2 -r pal "C2\C2_WinOC.gooc" "C2\Out\C2_WinOC.nsentry"
+
+#anim CRAB         [Cr1FV] 19 1
+#anim SHIP_PART_1  [Sh1EV] 168 1
+#anim SHIP_PART_2  [ShdEV] 63 1
+#anim SHIP_PART_3  [SheEV] 54 1
+#anim SHIP_PART_4  [ShfEV] 50 1
+#anim SHIP_PART_5  [Sh2EV] 168 1
+#anim SHIP_PART_6  [Sh3EV] 168 1
+#anim SHIP_PART_7  [Sh4EV] 168 1
+#anim SHIP_PART_8  [Sh5EV] 168 1
+#anim SHIP_PART_9  [Sh6EV] 168 1
+#anim SHIP_PART_10 [Sh7EV] 288 1
+#anim SHIP_PART_11 [ShhEV] 67 1
+#anim SHIP_PART_12 [Sh8EV] 168 1
+#anim SHIP_PART_13 [Sh9EV] 168 1
+#anim SHIP_PART_14 [ShaEV] 288 1
+#anim SHIP_PART_15 [ShaiV] 67 1
+#anim SHIP_PART_16 [ShbEV] 288 1
+#anim SHIP_PART_17 [ShgEV] 67 1
+#anim SHIP_PART_18 [ShcEV] 113 1
+#anim WILLY        [CW1EV] 1 1
+#anim BRIO_1       [BW1EV] 166 1
+#anim BRIO_2       [BW2EV] 50 1
+#anim SIS_STAND    [SW1EV] 18 1
+#anim WILLY_STAND  [Cr1EV] 18 1
+#anim WILLY_JUMP   [Cr2EV] 41 1
+#anim WILLY_LOOK   [Cr3EV] 7 1
+#anim LAZER_1      [La1EV] 19 0
+#anim LAZER_2      [La2EV] 23 1
+#anim EXPLOSION    [FB1EV] 54 1
+#anim BEAM         [Be1EV] 25 1
+#anim WILLY_SLEEP  [CI1sV] 50 1
+#anim WILLY_WAKE   [CI2sV] 17 1
+#anim WAVES        [Wa1FV] 128 1
+#anim SIS_LAPTOP_1 [Si1FV] 133 1
+#anim SIS_LAPTOP_2 [Si2FV] 153 1
+#anim SHIP_LIGHT   [Li1sV] 9 1
+
+#include "..\\Includes\\Fonts\\C2_FONT_SMALL.gooc"
+
+#text TEXT           FONT_SMALL[Cr20T]
+"CRASH BANDICOOT 2"             // 0.0
+"CORTEX STRIKES BACK"           // 1.0
+"CREATED AND DEVELOPED"         // 2.0
+"BY"                            // 3.0
+"NAUGHTY DOG"                   // 4.0
+"ANDY GAVIN    JASON RUBIN"     // 5.0
+"DAVE BAGGETT"                  // 6.0
+"BOB RAFEI"                     // 7.0
+"JUSTIN MONAST"                 // 8.0
+"CHARLOTTE FRANCIS"             // 9.0
+"STEPHEN WHITE"                 // 10.0
+"GREG OMI"                      // 11.0
+"ERIC IWASAKI"                  // 12.0
+"ERICK PANGILINAN"              // 13.0
+"ROB TITUS"                     // 14.0
+"JOE LABBE II"                  // 15.0
+"DAN AREY"                      // 16.0
+"MORGAN"                        // 17.0
+"SPECIAL THANKS:"               // 18.0
+"TAYLOR KUROSAKI"               // 19.0
+"DAN KOLLMORGEN"                // 20.0
+"JOHN CUTRY"                    // 21.0
+"JOE PEARSON"                   // 22.0
+"REINER"                        // 23.0
+"IN ASSOCIATION WITH"           // 24.0
+"UNIVERSAL INTERACTIVE STUDIOS" // 25.0
+"PRODUCER:"                     // 26.0
+"MARK CERNY"                    // 27.0
+"JACKIE EVANOCHICK"             // 28.0
+"DIANE FORNASIER"               // 29.0
+"SUSAN MCCREADY"                // 30.0
+"PAUL RIOUX"                    // 31.0
+"DAVID SILLER"                  // 32.0
+"TERRY SMITH"                   // 33.0
+"PUBLISHED BY"                  // 34.0
+"SONY COMPUTER ENTERTAINMENT"   // 35.0
+"EUROPE"                        // 36.0
+"SENIOR PRODUCER:"              // 37.0
+"JOHN ROBERTS"                  // 38.0
+"ASSOCIATE PRODUCER:"           // 39.0
+"DAVID BOWRY"                   // 40.0
+"PRODUCT MANAGERS:"             // 41.0
+"CAROLINE STOKES"               // 42.0
+"KENNY MATHERS"                 // 43.0
+"PR MANAGER:"                   // 44.0
+"LIZ ASHFORD"                   // 45.0
+"DAVID PATTON"                  // 46.0
+"CHRIS DEERING"                 // 47.0
+"HEAD OF INTERNAL TESTING:"     // 48.0
+"STEVE ARCHER"                  // 49.0
+"LEAD TESTER:"                  // 50.0
+"BRAD DAVEY"                    // 51.0
+"TESTERS:"                      // 52.0
+"PHIL GREEN"                    // 53.0
+"CRAIG DUDDLE"                  // 54.0
+"KEV MASON"                     // 55.0
+"NEIL JAMES"                    // 56.0
+"PAUL JONES"                    // 57.0
+"JOHN CASSIDY"                  // 58.0
+"AMERICA"                       // 59.0
+"EXECUTIVE PRODUCER:"           // 60.0
+"CONNIE BOOTH"                  // 61.0
+"DAVID GRACIA"                  // 62.0
+"SENIOR PRODUCT MANAGER:"       // 63.0
+"AMI MATSUMURA-BLAIRE"          // 64.0
+"SENIOR COMMUNICATIONS MANAGER:"// 65.0
+"MOLLY SMITH"                   // 66.0
+"MARKETING SPECIALIST:"         // 67.0
+"NEMER VELASQUEZ"               // 68.0
+"QA MANAGER:"                   // 69.0
+"MARK PENTEK"                   // 70.0
+"LEAD ANALYST:"                 // 71.0
+"DONOVAN SOTO"                  // 72.0
+"ASSISTANT LEAD ANALYSTS:"      // 73.0
+"PETE MAYBERRY"                 // 74.0
+"ANTHONY GOMEZ"                 // 75.0
+"ANALYSTS:"                     // 76.0
+"IAN MCGUINNESS"                // 77.0
+"ANDREW WOODWORTH"              // 78.0
+"ANDREW BYRNE"                  // 79.0
+"JACK AMATO"                    // 80.0
+"CHRIS JOHNSON"                 // 81.0
+"CONNER MORLANG"                // 82.0
+"IVAN KOUGAENKO"                // 83.0
+"KEN CHAN"                      // 84.0
+"STEVE DREO"                    // 85.0
+"SEAN BURKE"                    // 86.0
+"TIM DUZMAL"                    // 87.0
+"WELDON CHEN"                   // 88.0
+"RYAN JOSEPH"                   // 89.0
+"ANNETTE DANCEL"                // 90.0
+"BRUCE COCHRANE"                // 91.0
+"CHRISTIAN DAVIS"               // 92.0
+"SAMUEL THOMPSON"               // 93.0
+"LEIGHTON CHIN"                 // 94.0
+"'UNCLE' DAVE KINEL"            // 95.0
+"RAMON CONCEPCION"              // 96.0
+"KELLY FLOCK"                   // 97.0
+"ALLAN BECKER"                  // 98.0
+"ANDREW HOUSE"                  // 99.0
+"JEFF FOX"                      // 100.0
+"PETER DILLE"                   // 101.0
+"JACK TRETTON"                  // 102.0
+"HOWARD LIEBESKIND"             // 103.0
+"AXIOM DESIGN"                  // 104.0
+"BEELINE GROUP"                 // 105.0
+"INC."                          // 106.0
+"PRODUCERS:"                    // 107.0
+"SHUHEI YOSHIDA"                // 108.0
+"TSURUMI-0600"                  // 109.0
+"PRODUCT MANAGER:"              // 110.0
+"MEGUMI HOSOYA"                 // 111.0
+"MASAYUKI MIZUNO"               // 112.0
+"JUNICHI B KOBAYASHI"           // 113.0
+"CHARACTER DESIGN"              // 114.0
+"AND ART DIRECTION"             // 115.0
+"AMERICAN EXITUS:"              // 116.0
+"CHARLES ZEMBILLAS"             // 117.0
+"SOUNDTRACK"                    // 118.0
+"MUTATO MUZIKA:"                // 119.0
+"MARK MOTHERSBAUGH"             // 120.0
+"JOSH MANCELL"                  // 121.0
+"SOUND DESIGN"                  // 122.0
+"UNIVERSAL STUDIOS"             // 123.0
+"SOUND FACILITIES:"             // 124.0
+"MICHAEL GOLLOM"                // 125.0
+"RON HORWITZ"                   // 126.0
+"KEVIN SPEARS"                  // 127.0
+"VOICE OF DR. NEO CORTEX:"      // 128.0
+"CLANCY BROWN"                  // 129.0
+"DR. N. BRIO, N. GIN:"          // 130.0
+"BRENDAN OBRIEN"                // 131.0
+"COCO BANDICOOT:"               // 132.0
+"VICKI WINTERS"                 // 133.0
+"ANIMATION REFERENCE:"          // 134.0
+"JEFF ETTER"                    // 135.0
+"SKIP PAUL"                     // 136.0
+"ALIAS/WAVEFRONT"               // 137.0
+"SILICON GRAPHICS"              // 138.0
+"ANGUS GUSCHWAN"                // 139.0
+"COPYRIGHT 1997 UNIVERSAL"      // 140.0
+"INTERACTIVE STUDIOS, INC."     // 141.0
+"SOURCE CODE COPYRIGHT 1997"    // 142.0
+"NAUGHTY DOG, INC."             // 143.0
+"TM UNIVERSAL INTERACTIVE"      // 144.0
+"STUDIOS, INC."                 // 145.0
+
+#spawn S_SIS_END       Sis_GameEnd
+#spawn S_BEACH         Beach_Master
+#spawn S_WAVES         Waves
+#spawn S_SEAGULL       SeaGull_Sound
+#spawn S_CREDIT_TEXT   Credit_Line_Init
+#spawn S_CREDIT        Credit_Line
+#spawn S_WIN           Win_Master
+#spawn S_SIS_END       Sis_Ending
+#spawn S_WILLY_END     Willy_Ending
+#spawn S_GEM           Title_Gem
+#spawn S_LAZER         Lazer_Fired
+#spawn S_SHIPLIGHT     Ship_Light
+#spawn S_BRIO_END      Brio_Ending
+#spawn S_SIS_END_ALT   Sis_Ending
+#spawn S_FIREBALL      FireBall
+#spawn S_BEAM          Beam
+#spawn S_LAZER_EARTH   Lazer_Earth
+#spawn S_DEBRIS        Debris_Spawner
+#spawn S_DEBRIS_1      Ship_Debris
+#spawn S_DEBRIS_2      Ship_Debris
+#spawn S_DEBRIS_3      Ship_Debris
+#spawn S_DEBRIS_4      Ship_Debris
+#spawn S_DEBRIS_5      Ship_Debris
+#spawn S_DEBRIS_6      Ship_Debris
+#spawn S_DEBRIS_7      Ship_Debris
+#spawn S_DEBRIS_8      Ship_Debris
+#spawn S_DEBRIS_9      Ship_Debris
+#spawn S_DEBRIS_10     Ship_Debris
+#spawn S_DEBRIS_11     Ship_Debris
+#spawn S_DEBRIS_12     Ship_Debris
+#spawn S_DEBRIS_13     Ship_Debris
+#spawn S_CRAB          Crab
+
+event Event12 => state Kill
+
+var SeagullCall, SeagullCallDelay, SeagullOrbitRadius, SeagullOrbitSpeed
+
+expr WillyEndingOBJ = 100.0
+expr SisEndingOBJ = 101.0
+
+expr CreditPhase = var0
+expr CreditOffset = vely
+expr ExplosionDelay = var0
+expr EndingTriggered = var0
+
+state Credit_Line_Init { // 0
+    stateflag 0x1
+    statusc 0x0
+    code(frame, offset, mode) {
+        SetVFX2D()
+        statusb = FLAG_INVISIBLE | FLAG_STRING_CENTER
+        zindex = 8000
+        if (mode == 1) {
+            SetScale(0xA3, 0x81, 0x1000)
+            SetTextColor(0x1FF, 0x1FF, 0x1FF, 0x1FF, 0x1FF, 0x1FF)
+        }
+        else if (mode == 2) {
+            TextDefaultScale()
+            SetTextColor(0x1FF, 0x1FF, 0x1FF, 0x1FF, 0x1FF, 0x1FF)
+        }
+        else {
+            SetTextColor(0x1FF, 0x1FF, 0x1FF, 0xC8, 0xC8, 0xC8)
+            TextDefaultScale()
+        }
+        setanim(TEXT)
+        CreditOffset = offset
+        y = parent -> y - CreditOffset
+        sleepframe(frame)
+    }
+    trans {
+        nofirst {
+            y = parent -> y - CreditOffset
+            if (y > -140.0) {
+                statusb &= ~FLAG_INVISIBLE
+                changestateif(Kill, y > 140.0)
+            }
+        }
+    }
+}
+
+state Credit_Line { // 1
+    stateflag 0x1
+    statusc 0x0
+    code(skip) {
+        CreditPhase = true
+        SetVFX2D()
+        statusb = FLAG_INVISIBLE
+        SetTrans(0, -200.0, 0)
+        SetRot(0deg)
+        tpc = 0
+        if (!skip) {
+            settrans(__Credit_Line_TRANS)
+            MakeCreditLines()
+            CreditPhase = false
+        }
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event12)
+    }
+    trans {
+        nofirst {
+            y = spd(y, 50.0)
+            unless (child || CreditPhase) {
+                CreditPhase = 2
+                FADEAMOUNT = 16
+                FadeToBlack()
+                statetime = frametime
+            }
+            if (CreditPhase == 2 && frametime - statetime >= 1s) {
+                GLOBAL_17 = 3.0
+                GLOBAL_131 = 0
+                if (LEVEL == LEVEL_GameEnd) {
+                    loadlevel(LEVEL_WarpRoom)
+                }
+                else {
+                    loadlevel(LEVEL_Title)
+                }
+                CreditPhase = true
+            }
+        }
+    }
+}
+
+inline sub SpawnCreditLine(frame, offset, mode) {
+    spawn(WinOC, S_CREDIT_TEXT, 1, frame, offset, mode)
+    playnull(10)
+}
+
+sub MakeCreditLines() {
+    SpawnCreditLine(0.0, 0.0, 0)
+    SpawnCreditLine(1.0, 24.0, 0)
+    SpawnCreditLine(2.0, 120.0, 0)
+    SpawnCreditLine(3.0, 144.0, 0)
+    SpawnCreditLine(4.0, 168.0, 0)
+    SpawnCreditLine(5.0, 264.0, 0)
+    SpawnCreditLine(6.0, 288.0, 0)
+    SpawnCreditLine(7.0, 312.0, 0)
+    SpawnCreditLine(8.0, 336.0, 0)
+    SpawnCreditLine(9.0, 360.0, 0)
+    SpawnCreditLine(10.0, 384.0, 0)
+    SpawnCreditLine(11.0, 408.0, 0)
+    SpawnCreditLine(12.0, 432.0, 0)
+    SpawnCreditLine(13.0, 456.0, 0)
+    SpawnCreditLine(14.0, 480.0, 0)
+    SpawnCreditLine(15.0, 504.0, 0)
+    SpawnCreditLine(16.0, 528.0, 0)
+    SpawnCreditLine(17.0, 552.0, 0)
+    SpawnCreditLine(18.0, 600.0, 0)
+    SpawnCreditLine(19.0, 624.0, 0)
+    SpawnCreditLine(20.0, 648.0, 0)
+    SpawnCreditLine(21.0, 672.0, 0)
+    SpawnCreditLine(22.0, 696.0, 0)
+    SpawnCreditLine(23.0, 720.0, 0)
+    SpawnCreditLine(24.0, 816.0, 0)
+    SpawnCreditLine(25.0, 840.0, 0)
+    SpawnCreditLine(26.0, 888.0, 0)
+    SpawnCreditLine(27.0, 912.0, 0)
+    SpawnCreditLine(18.0, 960.0, 0)
+    SpawnCreditLine(28.0, 984.0, 0)
+    SpawnCreditLine(29.0, 1008.0, 0)
+    SpawnCreditLine(30.0, 1032.0, 0)
+    SpawnCreditLine(31.0, 1056.0, 0)
+    SpawnCreditLine(32.0, 1080.0, 0)
+    SpawnCreditLine(33.0, 1104.0, 0)
+    SpawnCreditLine(34.0, 1200.0, 0)
+    SpawnCreditLine(35.0, 1224.0, 0)
+    SpawnCreditLine(36.0, 1248.0, 0)
+    SpawnCreditLine(37.0, 1296.0, 0)
+    SpawnCreditLine(38.0, 1320.0, 0)
+    SpawnCreditLine(39.0, 1368.0, 0)
+    SpawnCreditLine(40.0, 1392.0, 0)
+    SpawnCreditLine(41.0, 1440.0, 0)
+    SpawnCreditLine(42.0, 1464.0, 0)
+    SpawnCreditLine(43.0, 1488.0, 0)
+    SpawnCreditLine(44.0, 1536.0, 0)
+    SpawnCreditLine(45.0, 1560.0, 0)
+    SpawnCreditLine(18.0, 1608.0, 0)
+    SpawnCreditLine(46.0, 1632.0, 0)
+    SpawnCreditLine(47.0, 1656.0, 0)
+    SpawnCreditLine(48.0, 1704.0, 0)
+    SpawnCreditLine(49.0, 1728.0, 0)
+    SpawnCreditLine(50.0, 1776.0, 0)
+    SpawnCreditLine(51.0, 1800.0, 0)
+    SpawnCreditLine(52.0, 1848.0, 0)
+    SpawnCreditLine(53.0, 1872.0, 0)
+    SpawnCreditLine(54.0, 1896.0, 0)
+    SpawnCreditLine(55.0, 1920.0, 0)
+    SpawnCreditLine(56.0, 1944.0, 0)
+    SpawnCreditLine(57.0, 1968.0, 0)
+    SpawnCreditLine(58.0, 1992.0, 0)
+    SpawnCreditLine(35.0, 2088.0, 0)
+    SpawnCreditLine(59.0, 2112.0, 0)
+    SpawnCreditLine(60.0, 2160.0, 0)
+    SpawnCreditLine(61.0, 2184.0, 0)
+    SpawnCreditLine(39.0, 2232.0, 0)
+    SpawnCreditLine(62.0, 2256.0, 0)
+    SpawnCreditLine(63.0, 2304.0, 0)
+    SpawnCreditLine(64.0, 2328.0, 0)
+    SpawnCreditLine(65.0, 2376.0, 0)
+    SpawnCreditLine(66.0, 2400.0, 0)
+    SpawnCreditLine(67.0, 2448.0, 0)
+    SpawnCreditLine(68.0, 2472.0, 0)
+    SpawnCreditLine(69.0, 2520.0, 0)
+    SpawnCreditLine(70.0, 2544.0, 0)
+    SpawnCreditLine(71.0, 2592.0, 0)
+    SpawnCreditLine(72.0, 2616.0, 0)
+    SpawnCreditLine(73.0, 2664.0, 0)
+    SpawnCreditLine(74.0, 2688.0, 0)
+    SpawnCreditLine(75.0, 2712.0, 0)
+    SpawnCreditLine(76.0, 2760.0, 0)
+    SpawnCreditLine(77.0, 2784.0, 0)
+    SpawnCreditLine(78.0, 2808.0, 0)
+    SpawnCreditLine(79.0, 2832.0, 0)
+    SpawnCreditLine(80.0, 2856.0, 0)
+    SpawnCreditLine(81.0, 2880.0, 0)
+    SpawnCreditLine(82.0, 2904.0, 0)
+    SpawnCreditLine(83.0, 2928.0, 0)
+    SpawnCreditLine(84.0, 2952.0, 0)
+    SpawnCreditLine(85.0, 2976.0, 0)
+    SpawnCreditLine(86.0, 3000.0, 0)
+    SpawnCreditLine(87.0, 3024.0, 0)
+    SpawnCreditLine(88.0, 3048.0, 0)
+    SpawnCreditLine(89.0, 3072.0, 0)
+    SpawnCreditLine(90.0, 3096.0, 0)
+    SpawnCreditLine(91.0, 3120.0, 0)
+    SpawnCreditLine(92.0, 3144.0, 0)
+    SpawnCreditLine(93.0, 3168.0, 0)
+    SpawnCreditLine(94.0, 3192.0, 0)
+    SpawnCreditLine(95.0, 3216.0, 0)
+    SpawnCreditLine(96.0, 3240.0, 0)
+    SpawnCreditLine(18.0, 3288.0, 0)
+    SpawnCreditLine(97.0, 3312.0, 0)
+    SpawnCreditLine(98.0, 3336.0, 0)
+    SpawnCreditLine(99.0, 3360.0, 0)
+    SpawnCreditLine(100.0, 3384.0, 0)
+    SpawnCreditLine(101.0, 3408.0, 0)
+    SpawnCreditLine(102.0, 3432.0, 0)
+    SpawnCreditLine(103.0, 3456.0, 0)
+    SpawnCreditLine(104.0, 3480.0, 0)
+    SpawnCreditLine(105.0, 3504.0, 0)
+    SpawnCreditLine(35.0, 3600.0, 0)
+    SpawnCreditLine(106.0, 3624.0, 0)
+    SpawnCreditLine(107.0, 3672.0, 0)
+    SpawnCreditLine(108.0, 3696.0, 0)
+    SpawnCreditLine(109.0, 3720.0, 0)
+    SpawnCreditLine(110.0, 3768.0, 0)
+    SpawnCreditLine(111.0, 3792.0, 0)
+    SpawnCreditLine(71.0, 3840.0, 0)
+    SpawnCreditLine(112.0, 3864.0, 0)
+    SpawnCreditLine(18.0, 3912.0, 0)
+    SpawnCreditLine(113.0, 3936.0, 0)
+    SpawnCreditLine(114.0, 4032.0, 0)
+    SpawnCreditLine(115.0, 4056.0, 0)
+    SpawnCreditLine(3.0, 4080.0, 0)
+    SpawnCreditLine(116.0, 4104.0, 0)
+    SpawnCreditLine(117.0, 4152.0, 0)
+    SpawnCreditLine(118.0, 4248.0, 0)
+    SpawnCreditLine(3.0, 4272.0, 0)
+    SpawnCreditLine(119.0, 4296.0, 0)
+    SpawnCreditLine(120.0, 4344.0, 0)
+    SpawnCreditLine(121.0, 4368.0, 0)
+    SpawnCreditLine(122.0, 4464.0, 0)
+    SpawnCreditLine(3.0, 4488.0, 0)
+    SpawnCreditLine(123.0, 4512.0, 0)
+    SpawnCreditLine(124.0, 4536.0, 0)
+    SpawnCreditLine(125.0, 4584.0, 0)
+    SpawnCreditLine(126.0, 4608.0, 0)
+    SpawnCreditLine(127.0, 4632.0, 0)
+    SpawnCreditLine(128.0, 4728.0, 0)
+    SpawnCreditLine(129.0, 4752.0, 0)
+    SpawnCreditLine(130.0, 4800.0, 0)
+    SpawnCreditLine(131.0, 4824.0, 0)
+    SpawnCreditLine(132.0, 4872.0, 0)
+    SpawnCreditLine(133.0, 4896.0, 0)
+    SpawnCreditLine(134.0, 4992.0, 0)
+    SpawnCreditLine(135.0, 5016.0, 0)
+    SpawnCreditLine(18.0, 5112.0, 0)
+    SpawnCreditLine(136.0, 5160.0, 0)
+    SpawnCreditLine(137.0, 5184.0, 0)
+    SpawnCreditLine(138.0, 5208.0, 0)
+    SpawnCreditLine(139.0, 5232.0, 0)
+    SpawnCreditLine(140.0, 5328.0, 0)
+    SpawnCreditLine(141.0, 5352.0, 0)
+    SpawnCreditLine(142.0, 5376.0, 0)
+    SpawnCreditLine(143.0, 5400.0, 0)
+    SpawnCreditLine(144.0, 5424.0, 0)
+    SpawnCreditLine(145.0, 5448.0, 0)
+
+    if (LEVEL == LEVEL_GameWin) {
+        if (var lang = GLOBAL_151; lang == LANG_FR) {
+            spawn2(9, 44, 1, [CL0FO], [CL1FO], 2.0, 26s, 8.0)
+            creator = objectspawned
+        }
+        else if (lang == LANG_DE) {
+            spawn2(9, 44, 1, [CL0GO], [CL1GO], 2.0, 26s, 8.0)
+            creator = objectspawned
+        }
+        else if (lang == LANG_ES) {
+            spawn2(9, 44, 1, [CL0SO], [CL1SO], 2.0, 26s, 8.0)
+            creator = objectspawned
+        }
+        else if (lang == LANG_IT) {
+            spawn2(9, 44, 1, [CL0IO], [CL1IO], 2.0, 26s, 8.0)
+            creator = objectspawned
+        }
+        else {
+            spawn2(9, 44, 1, [CL0EO], [CL1EO], 2.0, 26s, 8.0)
+            creator = objectspawned
+        }
+    }
+}
+
+state Beach_Master { // 2
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        spawn(WinOC, S_WAVES, 1, 6.0)
+        spawn(WinOC, S_SEAGULL, 1, 1)
+        spawn(WinOC, S_SEAGULL, 1, 2)
+        spawn(WinOC, S_SEAGULL, 1, 1 + rand(2))
+        zindex = 400
+        statusb = FLAG_NO_CAMERA_CLIP
+        do {
+            soundpitch(3.6 + rand(0.8))
+            soundplay([Su1FA], 0.3V + rand(0.4V))
+            playframes(WAVES, 0.0, 127.0)
+        } while (1)
+    }
+    trans {
+        unless (STATUS_FIRSTFRAME) {
+            calcpath(loopseek(pathprog, pathlen, 1.0))
+            y += 40.0
+        }
+    }
+}
+
+state Waves { // 3
+    stateflag 0x1
+    statusc 0x2
+    code(prog) {
+        zindex = 300
+        entity = parent -> entity
+        pathlen = parent -> pathlen
+        pathprog = prog
+        statusb = FLAG_NO_CAMERA_CLIP
+        playframes(WAVES, 124.0, 127.0)
+        sleepframes(WAVES, 0.0, 127.0)
+    }
+    trans {
+        unless (STATUS_FIRSTFRAME) {
+            calcpath(loopseek(pathprog, pathlen, 1.0))
+            y += 40.0
+            x += 1m
+        }
+    }
+}
+
+state SeaGull_Sound { // 4
+    stateflag 0x1
+    statusc 0x2
+    code(call) {
+        SeagullCall = call
+        vecx = parent -> x + randi(-10m, 10m)
+        vecz = parent -> z + randi(-6m, 6m)
+        vecy = parent -> y + 7m
+        troty = rand(360deg)
+        SeagullOrbitRadius = 10m + rand(6m)
+        SeagullOrbitSpeed = 2deg + rand(5deg)
+        if (!rand(2)) {
+            SeagullOrbitSpeed = -SeagullOrbitSpeed
+        }
+        statusb = FLAG_INVISIBLE
+        do {
+            SeagullCallDelay = 3s + rand(6s)
+            WaitNull(SeagullCallDelay)
+            if (var kind = SeagullCall; kind == 1) {
+                soundpitch(3.6 + rand(0.8))
+                soundplay([SG2FA], 0.1V + rand(0.3V))
+            }
+            else if (kind == 2) {
+                soundpitch(3.6 + rand(0.8))
+                soundplay([SG4FA], 0.1V + rand(0.3V))
+            }
+        } while (1)
+    }
+    trans {
+        nofirst {
+            troty += SeagullOrbitSpeed
+            vectransf2(vvec, vtrans, 0, SeagullOrbitRadius, 0)
+        }
+    }
+}
+
+state Sis_GameEnd { // 5
+    stateflag 0x40001
+    statusc 0x2
+    code() {
+        GLOBAL_74 = 0
+        SetVFX2D()
+        playnull(42)
+        playnull(42)
+        if (var lang = GLOBAL_151; lang == LANG_FR) {
+            spawn(9, 44, 1, [W00FO], [W01FO], 2.0, 0x64, 8.0)
+        }
+        else if (lang == LANG_DE) {
+            spawn(9, 44, 1, [W00GO], [W01GO], 2.0, 0x64, 8.0)
+        }
+        else if (lang == LANG_ES) {
+            spawn(9, 44, 1, [W00SO], [W01SO], 2.0, 0x64, 8.0)
+        }
+        else if (lang == LANG_IT) {
+            spawn(9, 44, 1, [W00IO], [W01IO], 2.0, 0x64, 8.0)
+        }
+        else {
+            spawn(9, 44, 1, [W00EO], [W01EO], 2.0, 0x64, 8.0)
+        }
+        soundpitch(3.263)
+        sounddelay(15s)
+        soundplay([SBLFA], 1V)
+        WaitNull(27s)
+        soundfadet(1s, voice)
+        soundfadev(0V, voice, 3)
+        spawn(WinOC, S_CREDIT, 1, 0)
+        WaitNull(13s)
+        FADEAMOUNT = 8
+        FadeToBlack()
+        WaitFadeNull()
+        GAMEFLAGS &= ~0x1
+        sleepnull()
+    }
+}
+
+state Win_Master { // 6
+    stateflag 0x40001
+    statusc 0x2
+    code() {
+        SetVFX2D()
+        GLOBAL_74 = 0
+        playnull(42)
+        playnull(42)
+        WaitNull(10s)
+        WaitNull(32s)
+        spawn2(WinOC, S_CREDIT, 1, 0)
+        sleepnull()
+    }
+    event(e, a) {
+        accevif (e == EventTriggered) {
+            soundpitch(4.353)
+            sounddelay(0.8s)
+            sounddecay(10.2s)
+            soundplay([RRSEA], 1V)
+        }
+        accevif (e == Event14) {
+            soundfadet(0.5s, voice)
+            soundfadev(0V, voice, 3)
+        }
+    }
+}
+
+state Kill { // 7
+    stateflag 0x22
+    statusc 0x0
+    code() {}
+}
+
+state Sis_Ending { // 8
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        changestateif(Coco_FireLazer, LEVEL == LEVEL_GameWin)
+        roty = -20deg
+        zindex = 40
+        playframes(SIS_LAPTOP_1, 0.0, 132.0)
+        playframes(SIS_LAPTOP_2, 0.0, 152.0)
+        sleep()
+    }
+}
+
+state Willy_Ending { // 9
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        changestateif(Willy_FireLazer, LEVEL == LEVEL_GameWin)
+        zindex = 40
+        sleepframes(WILLY_SLEEP, 0.0, 49.0)
+    }
+}
+
+state Ship_Light { // 10
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        changestateif(Ship_Explosions, LEVEL == LEVEL_GameWin)
+        SetScale(0.5S)
+        vfx = (vfx & 0xFFFFFF00) | 0x2
+        zindex = 20
+        do {
+            playframes(SHIP_LIGHT, 0.0, 8.0)
+            playframe(animframe, 23)
+        } while (1)
+    }
+}
+
+state Title_Gem { // 11
+    stateflag 0x1
+    statusc 0x2
+    code(id) {
+        spawn(FruiC, FruiC_S_GEM, 1, id, -0xCCC, -8.0, 0)
+        creator = objectspawned
+        sleepnull()
+    }
+    event(e, a) {
+        accevif (e == EventDespawn) {
+            KillEntity()
+            sendevent(Event12, creator)
+        }
+    }
+}
+
+state Beam { // 12
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        statusb = FLAG_NO_CAMERA_CLIP
+        zindex = 40
+        soundpitch(4.353)
+        sounddelay(10)
+        soundplay([CRSEA], 1V)
+        playframes(BEAM, 0.0, 24.0)
+        broadcastevent(Event1, 0)
+        sleep()
+    }
+}
+
+state Lazer_Fired { // 13
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        statusb = FLAG_NO_CAMERA_CLIP
+        zindex = 40
+        playframes(LAZER_1, 0.0, 3.0)
+        sleepframes(LAZER_1, 4.0, 18.0)
+    }
+}
+
+state Lazer_Earth { // 14
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        statusb = FLAG_NO_CAMERA_CLIP
+        playframes(LAZER_2, 0.0, 3.0)
+        playanim(4, LAZER_2, 7)
+        playframes(LAZER_2, 4.0, 13.0)
+        playanim(14, LAZER_2, 7)
+        playframes(LAZER_2, 15.0, 22.0)
+        sendevent(Event14, player, 0)
+        KillEntity()
+    }
+    event(e, a) {
+        sendevent(Event14, player, 0)
+    }
+}
+
+state FireBall { // 15
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        statusb = FLAG_NO_CAMERA_CLIP
+        zindex = 40
+        vfx = (vfx & 0xFFFFFF00) | 0x2
+        do (var i = 0) {
+            SetVFX2D()
+            soundpitch(4.353)
+            sounddelay(3)
+            sounddecay(10.2s)
+            soundplay([SWaEA], 1V)
+            vfx &= 0xFFFFFF00
+            playframes(EXPLOSION, 0.0, 53.0)
+            playframe(animframe, 10)
+            settrans(__FireBall_TRANS)
+            moda = 0
+        } while ({ i += 1.0 }; i < 2.0)
+        KillEntity()
+    }
+    trans {
+        once {
+            SetScale(0S)
+        }
+        scalex = seek(scalex, 1S, 0xF5)
+        scaley = seek(scaley, 1S, 0xF5)
+        scalez = seek(scalez, 1S, 0xF5)
+        if (frametime - statetime >= 2s) {
+            moda = seek(moda, 16.0, 0xF5)
+        }
+    }
+}
+
+state Ship_Explosions { // 16
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        SetVec(x, y, z)
+        playnull()
+        do {
+            x = vecx + randi(-2m, 2m)
+            y = vecy + randi(-2m, 2m)
+            z = vecz + randi(-2m, 2m)
+            ExplosionDelay = 0.5s + rand(2s)
+            if (!rand(3)) {
+                spawn(9, 40, 1, 0, 0)
+            }
+            else {
+                spawn(9, 4, 1, 0, 0)
+            }
+            WaitNull(ExplosionDelay)
+        } while (1)
+    }
+}
+
+state Willy_FireLazer { // 17
+    stateflag 0x1
+    statusc 0x2
+    event => state Coco_FireLazer
+    code() {
+        zindex = 40
+        roty = -80deg
+        statusb = FLAG_ROT_Y | FLAG_NO_CAMERA_CLIP
+        troty = roty
+        trotx = 180deg
+        do (EndingTriggered = false) {
+            playframes(WILLY_STAND, 0.0, 17.0)
+        } while (!EndingTriggered)
+        troty = -250deg
+        interrupter = objectget(SisEndingOBJ)
+        sendevent(EventTriggered, interrupter)
+        sendevent(EventTriggered, player)
+        playframes(WILLY_JUMP, 0.0, 40.0)
+        troty = -250deg
+        playanim(0, WILLY_LOOK)
+        playanim(1, WILLY_LOOK)
+        playanim(2, WILLY_LOOK)
+        playanim(3, WILLY_LOOK)
+        playanim(4, WILLY_LOOK)
+        playanim(4, WILLY_LOOK)
+        playanim(5, WILLY_LOOK)
+        sleep()
+    }
+}
+
+state Coco_FireLazer { // 18
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        roty = -50deg
+        zindex = 40
+        statusb = FLAG_NO_CAMERA_CLIP
+        do (EndingTriggered = false) { 
+            playanim(0, SIS_STAND) 
+        } while (!EndingTriggered)
+        playframes(SIS_STAND, 0.0, 17.0)
+        sleep()
+    }
+    event(e,a) {
+        accevif (e == EventTriggered) {
+            EndingTriggered = true
+        }
+    }
+}
+
+state Brio_Ending { // 19
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        SetVFX2D()
+        soundpitch(3.263)
+        sounddecay(10.2s)
+        soundplay([EHBEA], 1V)
+        vfx &= 0xFFFFFF00
+        roty = 60deg
+        statusb = FLAG_NO_CAMERA_CLIP
+        do (var i = 0) {
+            playanim(0, BRIO_1, 25)
+        } while ({ i += 1.0 }; i < 16.0)
+
+        if (var lang = GLOBAL_151; lang == LANG_FR) {
+            spawn2(9, 44, 1, [W10FO], [W11FO], 2.0, 1000s, 8.0)
+        }
+        else if (lang == LANG_DE) {
+            spawn2(9, 44, 1, [W10GO], [W11GO], 2.0, 1000s, 8.0)
+        }
+        else if (lang == LANG_ES) {
+            spawn2(9, 44, 1, [W10SO], [W11SO], 2.0, 1000s, 8.0)
+        }
+        else if (lang == LANG_IT) {
+            spawn2(9, 44, 1, [W10IO], [W11IO], 2.0, 1000s, 8.0)
+        }
+        else {
+            spawn2(9, 44, 1, [W10EO], [W11EO], 2.0, 1000s, 8.0)
+        }
+        playanim(0, BRIO_1, 50)
+        playanim(0, BRIO_1, 50)
+        sendevent(EventTriggered, child)
+        playframes(BRIO_1, 0.0, 165.0)
+        interrupter = objectget(WillyEndingOBJ)
+        sendevent(EventTriggered, interrupter)
+        playframes(BRIO_2, 0.0, 49.0)
+        sleep()
+    }
+}
+
+state Debris_Spawner { // 20
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        spawn(WinOC, S_DEBRIS_1)
+        spawn(WinOC, S_DEBRIS_2)
+        spawn(WinOC, S_DEBRIS_3)
+        spawn(WinOC, S_DEBRIS_4)
+        spawn(WinOC, S_DEBRIS_5)
+        spawn(WinOC, S_DEBRIS_7)
+        spawn(WinOC, S_DEBRIS_8)
+        spawn(WinOC, S_DEBRIS_9)
+        spawn(WinOC, S_DEBRIS_10)
+        spawn(WinOC, S_DEBRIS_11)
+        spawn(WinOC, S_DEBRIS_6)
+        spawn(WinOC, S_DEBRIS_12)
+        spawn(WinOC, S_DEBRIS_13)
+        WaitChildNull()
+        KillEntity()
+    }
+}
+
+state Ship_Debris { // 21
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        if (spawn == S_DEBRIS_1) {
+            setanim(SHIP_PART_1)
+            HoldDebrisFirstFrame()
+            playframes(SHIP_PART_1, 0.0, 167.0)
+        }
+        else if (spawn == S_DEBRIS_2) {
+            setanim(SHIP_PART_2)
+            HoldDebrisFirstFrame()
+            playframes(SHIP_PART_2, 0.0, 62.0)
+            playframes(SHIP_PART_3, 0.0, 53.0)
+            playframes(SHIP_PART_4, 0.0, 49.0)
+        }
+        else if (spawn == S_DEBRIS_3) {
+            setanim(SHIP_PART_5)
+            HoldDebrisFirstFrame()
+            playframes(SHIP_PART_5, 0.0, 167.0)
+        }
+        else if (spawn == S_DEBRIS_4) {
+            setanim(SHIP_PART_6)
+            HoldDebrisFirstFrame()
+            playframes(SHIP_PART_6, 0.0, 167.0)
+        }
+        else if (spawn == S_DEBRIS_5) {
+            setanim(SHIP_PART_7)
+            HoldDebrisFirstFrame()
+            playframes(SHIP_PART_7, 0.0, 167.0)
+        }
+        else if (spawn == S_DEBRIS_5) {
+            setanim(SHIP_PART_8)
+            HoldDebrisFirstFrame()
+            playframes(SHIP_PART_8, 0.0, 167.0)
+        }
+        else if (spawn == S_DEBRIS_6) {
+            setanim(SHIP_PART_9)
+            HoldDebrisFirstFrame()
+            playframes(SHIP_PART_9, 0.0, 167.0)
+        }
+        else if (spawn == S_DEBRIS_7) {
+            setanim(SHIP_PART_10)
+            HoldDebrisFirstFrame()
+            playframes(SHIP_PART_10, 0.0, 287.0)
+            sleepframes(SHIP_PART_11, 0.0, 66.0)
+        }
+        else if (spawn == S_DEBRIS_8) {
+            setanim(SHIP_PART_12)
+            HoldDebrisFirstFrame()
+            playframes(SHIP_PART_12, 0.0, 167.0)
+        }
+        else if (spawn == S_DEBRIS_9) {
+            setanim(SHIP_PART_13)
+            HoldDebrisFirstFrame()
+            playframes(SHIP_PART_13, 0.0, 167.0)
+        }
+        else if (spawn == S_DEBRIS_10) {
+            setanim(SHIP_PART_14)
+            HoldDebrisFirstFrame()
+            playframes(SHIP_PART_14, 0.0, 287.0)
+            sleepframes(SHIP_PART_15, 0.0, 66.0)
+        }
+        else if (spawn == S_DEBRIS_11) {
+            setanim(SHIP_PART_16)
+            HoldDebrisFirstFrame()
+            playframes(SHIP_PART_16, 0.0, 287.0)
+            sleepframes(SHIP_PART_17, 0.0, 66.0)
+        }
+        else if (spawn == S_DEBRIS_12) {
+            setanim(SHIP_PART_18)
+            HoldDebrisFirstFrame()
+            playframes(SHIP_PART_18, 0.0, 112.0)
+        }
+    }
+}
+
+sub HoldDebrisFirstFrame() { // S-1770
+    playframe(0, 42)
+    playframe(0, 42)
+}
+
+state Crab { // 22
+    stateflag 0x5
+    statusc 0x0
+    code() {
+        statusb = FLAG_TRACK_PATH_SIGN | 0x800 | 0x2000
+        yzapproach = 90deg
+        zindex = 14
+        do {
+            playanim(0, CRAB)
+            playanim(1, CRAB)
+            playanim(2, CRAB)
+            playanim(3, CRAB)
+            playanim(4, CRAB)
+            playanim(5, CRAB)
+            soundpitch(3.6 + rand(0.8))
+            soundplay([CC1FA], 0.3V)
+            playanim(6, CRAB)
+            playanim(7, CRAB)
+            playanim(8, CRAB)
+            playanim(9, CRAB)
+            playanim(10, CRAB)
+            playanim(11, CRAB)
+            playanim(12, CRAB)
+            playanim(13, CRAB)
+            playanim(14, CRAB)
+            playanim(15, CRAB)
+            soundpitch(3.6 + rand(0.8))
+            soundplay([CC2FA], 0.3V)
+            playanim(16, CRAB)
+            playanim(17, CRAB)
+            playanim(18, CRAB)
+        } while (1)
+    }
+    trans {
+        SinePathProg(spd(30.0))
+    }
+}
+

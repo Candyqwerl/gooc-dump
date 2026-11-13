@@ -1,0 +1,887 @@
+#gool HRdOC 50 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_HRdOC.gooc" "C3\Out\C3_HRdOC.nsentry"
+
+#anim HOTROD_HIGH_1 [HR1lV] [HR1lG] 1 1 2
+#anim HOTROD_SHADOW [HR2lV] [HR2lG] 1 1 2
+#anim HOTROD_HIGH_2 [HR3lV] [HR3lG] 1 1 2
+#anim HOTROD_LOW    [HR4lV] [HR4lG] 1 1 2
+
+#sprite HOTROD_WHEEL[Hi2lT]
+#tex 0x808080 0 0 10 7 736 96 32 32
+#tex 0x808080 0 0 11 7 736 64 32 32
+#tex 0x808080 0 0 12 7 736 32 32 32
+#tex 0x808080 0 0 13 7 768 96 32 32
+#tex 0x808080 0 0 14 7 768 64 32 32
+#tex 0x808080 0 0 15 7 768 32 32 32
+#tex 0x808080 0 0 0 8 800 96 32 32
+#tex 0x808080 0 0 1 8 800 64 32 32
+#tex 0x808080 0 0 2 8 800 32 32 32
+#tex 0x808080 0 0 3 8 832 96 32 32
+#tex 0x808080 0 0 4 8 832 64 32 32
+#tex 0x808080 0 0 5 8 832 32 32 32
+#tex 0x808080 0 0 6 8 864 96 32 32
+#tex 0x808080 0 0 7 8 864 64 32 32
+#tex 0x808080 0 0 8 8 864 32 32 32
+#tex 0x808080 0 0 9 8 896 96 32 32
+
+#anim CHECKERED_FLAG_1 [Fl1kV] [Fl0kG] 8 0 2
+#anim CHECKERED_FLAG_2 [Fl1kV] [Fl1kG] 8 0 2
+#anim CHECKERED_FLAG_3 [Fl1kV] [Fl2kG] 8 0 2
+#anim CHECKERED_FLAG_4 [Fl1kV] [Fl3kG] 8 0 2
+#anim CHECKERED_FLAG_5 [Fl1kV] [Fl4kG] 8 0 2
+#anim CHECKERED_FLAG_6 [Fl1kV] [Fl5kG] 8 0 2
+#anim CHECKERED_FLAG_7 [Fl1kV] [Fl6kG] 8 0 2
+#anim CHECKERED_FLAG_8 [Fl1kV] [Fl7kG] 8 0 2
+
+#include "..\\Includes\\Fonts\\C3_FONT_BIG.gooc"
+
+#text TEXT FONT_BIG[Cr20T]
+"%d~sx200~~sy200~~y+200~."   // 0.0
+"%d~sx200~~sy200~~y+200~O"   // 1.0
+"1~sx200~~sy200~~y+200~ER"   // 2.0
+"%d~sx200~~sy200~~y+200~E"   // 3.0
+"1~sx200~~sy200~~y+200~ST"   // 4.0
+"2~sx200~~sy200~~y+200~ND"   // 5.0
+"3~sx200~~sy200~~y+200~RD"   // 6.0
+"%d~sx200~~sy200~~y+200~TH"  // 7.0
+
+array OrangeAsphaltRoadEvents = {
+    0x6B00,  1,
+    0x8100,  2,
+    0x12100, 1,
+    0x13F00, 3,
+    0x15D00, 2,
+    0x20A00, 1,
+    0x21E00, 3,
+    0x23200, 2,
+    0x49C00, 1,
+    0x4C600, 2,
+    0x4F500, 1,
+    0x51000, 2,
+    0x63D00, 1,
+    0x65B00, 2,
+    0x77D00, 1,
+    0x7A200, 2,
+    0x7CE00, 1,
+    0x7F100, 2,
+    0x92300, 1,
+    0x93B00, 3,
+    0x95400, 2,
+    0xA8300, 1,
+    0xAA600, 2,
+    0xF423F00
+}
+
+event Event19 => sub RetireRaceObject
+event Event80 => sub RetireHotRod
+
+#spawn S_HOT_ROD              HotRod_Init
+#spawn S_HOT_ROD_WHEEL        HotRod_Wheel
+#spawn S_HOT_RAIL             HotRail_Init
+#spawn S_POSITION_TEXT        Race_Position_Text
+#spawn S_HOT_ROD_SHADOW       HotRod_Shadow_Init
+#spawn S_FLAG                 Checkered_Flag
+
+var PlayerBehind, OpponentOrder, TrackProgress, TrackSpeed, TargetTrackSpeed, WheelsVisible, SteeringYaw, StartDelay,
+    TrackStart, TrackLength, TrackEntity, FinishProgress, PlayerDistance, UseApproachPath, JumpHeight, NextRoadEvent, RoadEventIndex
+
+expr RacePosition        = PlayerBehind
+expr PositionDisplay     = UseApproachPath
+expr PositionTextScaleX  = UseApproachPath
+expr PositionTextScaleY  = OpponentOrder
+expr WheelBaseZindex     = UseApproachPath
+expr RaceFlags           = stalltime
+expr PreviousPathY       = stalltime
+expr WheelGroundY        = groundy
+expr JumpPhase           = field_63
+expr RockVelocity        = field_62
+expr JumpPitch           = troty
+expr RockAngle           = trotz
+expr EngineVoice         = groundvel
+
+inline sub SoundHotRodHit(vol) {
+    soundpitch(4.715)
+    soundplay([HR2kA], vol)
+}
+
+inline sub SoundHotRodLand() {
+    soundpitch(4.715)
+    soundplay([HR3kA], 1V)
+}
+
+inline sub SoundHotRodRev() {
+    soundpitch(5.442)
+    soundplay([HR1kA], 1V)
+}
+
+inline sub SoundInitHotRodEngine() {
+    soundpitch(13.788)
+    sounddecay(10s)
+    soundsetup(7, self, 0, 8)
+    soundcount(0xFFFF)
+    soundsetup(3s, self, 6)
+    soundsetup(0.7V, self, 2, 0)
+    soundplay([HR6kA], 0.01V)
+}
+
+state HotRail_Init { // 1
+    statusc 0
+    code(opponent_count) {
+        RaceFlags = 0
+        RacePosition = opponent_count + 1
+        spawn(HRdOC, S_POSITION_TEXT, 1)
+        PositionDisplay = objectspawned
+        GLOBAL_120 = 0
+        changestate(HotRail_Control)
+    }
+}
+
+state HotRail_Control { // 1
+    statusc 0
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        accevif (e == Event14 && !(RaceFlags & 0x100)) {
+            RacePosition = a[0]
+            creator = PositionDisplay
+            sendevent(EventTriggered, creator)
+        }
+        accevif (e == Event22) {
+            if (RacePosition <= 1) {
+                RaceFlags = 0x102
+            }
+            else {
+                RaceFlags = 0x101
+            }
+        }
+        accevif (e == EventTriggered && !RaceFlags) {
+            RaceFlags = 1
+        }
+    }
+}
+
+state HotRod_Init { // 2
+    statusc 0
+    code(approach, rail_id, unused, order, speed, delay, start, finish, retries, retry_speed) {
+        OpponentOrder = order
+        TargetTrackSpeed = speed
+        TrackSpeed = 0
+        StartDelay = delay * 1s / 1.2s
+        TrackStart = start
+        UseApproachPath = approach
+        FinishProgress = finish
+        JumpPhase = 0
+        JumpPitch = 0
+        RockAngle = 0
+        RockVelocity = 0
+        EngineVoice = 0
+        PlayerBehind = 1
+        WheelsVisible = false
+        playnull()
+        playnull()
+        var0 = SECTIONDEATHCOUNT >> 8
+        if (!GLOBAL_105) {
+            if (var item_offs = LEVEL >> 8; item_offs < 32) {
+                misc = SAVEDCRYSTALPOOL1 & (1 << item_offs)
+            }
+            else {
+                misc = SAVEDCRYSTALPOOL2 & (1 << (item_offs - 32))
+            }
+        }
+        if (misc) {
+            var0 = 0
+        }
+        if (LEVEL == LEVEL_OrangeAsphalt && var0 < 2) {
+            var0 = 2
+        }
+        if (var0 > 0) {
+            if (var0 > retries) {
+                var0 = retries
+            }
+            TargetTrackSpeed += (retry_speed - TargetTrackSpeed) * var0 / retries
+        }
+        creator = 0
+        if (rail_id) {
+            creator = objectget(rail_id)
+        }
+        if (UseApproachPath || !creator) {
+            TrackProgress = 0
+            pathprog = 4.0
+            calcpath(pathprog, vvec)
+            calcpath(TrackProgress)
+        }
+        else {
+            save (pathlen, entity) {
+                CopyCreatorPath()
+                TrackProgress = TrackStart
+                pathprog = TrackProgress + 4.0
+                calcpath(pathprog, vvec)
+                calcpath(TrackProgress)
+            }
+        }
+        roty = atan(vecx - x, vecz - z)
+        SteeringYaw = roty
+        zindex = 30
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        changestate(HotRod_WaitStart)
+    }
+}
+
+sub SelectRoadEvents() { // S-127
+    if (LEVEL == LEVEL_OrangeAsphalt) {
+        vecx = OrangeAsphaltRoadEvents
+    }
+    else {
+        NextRoadEvent = 0xF423F00
+        return
+    }
+    RoadEventIndex = 0
+    do {
+        NextRoadEvent = vecx[RoadEventIndex]
+        if (NextRoadEvent >= TrackProgress) {
+            break
+        }
+        RoadEventIndex += 2.0
+    } while (1)
+}
+
+sub ProcessRoadEvents() { // S-150
+    vecx = OrangeAsphaltRoadEvents
+    do {
+        NextRoadEvent = vecx[RoadEventIndex]
+        if (NextRoadEvent > TrackProgress) {
+            return
+        }
+        RoadEventIndex += 1.0
+        vecy = vecx[RoadEventIndex]
+        RoadEventIndex += 1.0
+        if (vecy == 1) {
+            if (PlayerDistance <= 32m) {
+                spawn(9, 21, 1, 2.0, 0, 2.5m, 0, 2S, 0, 24, 2)
+                spawn(9, 21, 1, 3.0, 0, 2.5m, 0, 2S, 0, 24, 2)
+                vecy = rand(18) + 31
+                if (rand(2)) {
+                    vecy = -vecy
+                }
+                RockVelocity += vecy
+                SoundHotRodHit(0.7V)
+            }
+        }
+        else if (vecy == 2) {
+            if (PlayerDistance <= 32m) {
+                vecy = rand(11) + 20
+                if (rand(2)) {
+                    vecy = -vecy
+                }
+                RockVelocity += vecy
+                SoundHotRodHit(0.5V)
+            }
+        }
+        else if (vecy == 3) {
+            if (PlayerDistance <= 32m) {
+                if (rand(2)) {
+                    spawn(9, 21, 1, 2.0, 0, 2.5m, 0, 1S, 0, 24, 2)
+                }
+                else {
+                    spawn(9, 21, 1, 3.0, 0, 2.5m, 0, 1S, 0, 24, 2)
+                }
+                vecy = rand(18) + 15
+                if (rand(2)) {
+                    vecy = -vecy
+                }
+                RockVelocity += vecy
+            }
+        }
+    } while (1)   
+}
+
+inline sub UpdateHotRodDisplay() {
+    do {
+        if (PlayerDistance < 110m) {
+            if (PlayerDistance < 32m) {
+                if (!WheelsVisible) {
+                    WheelsVisible = 1
+                    spawn(HRdOC, S_HOT_ROD_WHEEL, 1, 0.0)
+                    spawn(HRdOC, S_HOT_ROD_WHEEL, 1, 1.0)
+                    spawn(HRdOC, S_HOT_ROD_WHEEL, 1, 2.0)
+                    spawn(HRdOC, S_HOT_ROD_WHEEL, 1, 3.0)
+                }
+                if (JumpPhase == 2) {
+                    playanim(0, HOTROD_HIGH_2)
+                }
+                else {
+                    playanim(0, HOTROD_HIGH_1)
+                }
+            }
+            else {
+                if (WheelsVisible) {
+                    WheelsVisible = false
+                    cascadeevent(Event14, self, 0)
+                }
+                playanim(0, HOTROD_LOW)
+            }
+        }
+        else {
+            if (FinishProgress == 99999.0) {
+                KillEntity()
+                changestate(Kill)
+            }
+            if (WheelsVisible) {
+                WheelsVisible = false
+                cascadeevent(Event14, self, 0)
+            }
+            playnull()
+        }
+    } while (1)
+}
+
+inline sub UpdateHotRodJump() {
+    if (y > 0.1m && !JumpPhase) {
+        JumpPhase = 1
+    }
+    if (JumpPhase) {
+        if (JumpPhase == 1) {
+            if (y < 2.5m) {
+                JumpPitch = degseek(JumpPitch, -30deg, 180deg)
+                PreviousPathY = y
+            }
+            else {
+                JumpHeight = y
+                JumpPhase = 2
+                vely = y - PreviousPathY
+                spawn(HRdOC, S_HOT_ROD_SHADOW, 1)
+            }
+        }
+        if (JumpPhase == 2) {
+            vely -= 10.24
+            JumpHeight += vely
+            if (JumpHeight > 0) {
+                y = JumpHeight
+                JumpPitch += 19
+            }
+            else {
+                JumpPhase = 3
+                SoundHotRodLand()
+                spawn(9, 21, 1, 2.0, 0, 2.5m, 0, 2S, 0, 24, 2)
+                spawn(9, 21, 1, 3.0, 0, 2.5m, 0, 2S, 0, 24, 2)
+                RockVelocity -= 54
+            }
+        }
+        if (JumpPhase == 3) {
+            JumpPitch = degseek(JumpPitch, 0deg, 720deg)
+            if (JumpPitch || y > 0) {
+                y = 0
+                JumpPitch = 0
+            }
+            else {
+                JumpPhase = 0
+                cascadeevent(Event81, self)
+            }
+        }
+    }
+}
+
+inline sub UpdateHotRodRock() {
+    if (RockVelocity || RockAngle) {
+        var old_angle = RockAngle
+        if (RockAngle >= 0) {
+            RockVelocity -= 6
+            RockAngle += RockVelocity
+            if (RockAngle <= 0) {
+                RockVelocity += -(RockVelocity >> 2)
+                if (abs(RockVelocity) < 3) {
+                    RockVelocity = 0
+                    RockAngle = 0
+                }
+            }
+        }
+        else {
+            RockVelocity += 6
+            RockAngle += RockVelocity
+            if (RockAngle >= 0) {
+                RockVelocity += -(RockVelocity >> 2)
+                if (abs(RockVelocity) < 3) {
+                    RockVelocity = 0
+                    RockAngle = 0
+                }
+            }
+        }
+    }
+    rotx = JumpPitch + RockAngle
+}
+
+inline sub UpdateHotRodPosition() {
+    var yc, ys, offset
+    offset = -roty
+    yc = cos(offset)
+    ys = sin(offset)
+    offset = ((((player -> z - z) >> 8) * ys) + (((player -> x - x) >> 8) * yc)) >> 4
+    if (abs(offset) <= 20m) {
+        offset = ((((player -> z - z) >> 8) * yc) - (((player -> x - x) >> 8) * ys)) >> 4
+        if (abs(offset) <= 8m) {
+            if (offset >= 0) {
+                if (PlayerBehind) {
+                    PlayerBehind = 0
+                    sendeventif(Event14, creator, creator && FinishProgress != 99999.0, OpponentOrder + 1)
+                }
+            }
+            else {
+                if (!PlayerBehind) {
+                    PlayerBehind = 1
+                    sendeventif(Event14, creator, creator && FinishProgress != 99999.0, OpponentOrder + 2)
+                }
+            }
+        }
+    }
+}
+
+inline sub CheckHotRodCollision() {
+    if (PlayerDistance <= 3m) {
+        if (distance(x, player, DIST_EXACT | DIST_NO_Y) < 1.8m, player -> y < y + 2m, y - 2m < player -> y) {
+            sendevent(Event27, player, 1.8m, 0.5)
+            if (eventaccepted) {
+                if (frametime - statetime >= 1s) {
+                    if (player -> speed > 2m) {
+                        SoundHotRodHit(1V)
+                    }
+                    statetime = frametime
+                    var impulse
+                    impulse = rand(31) + 18
+                    if (rand(2)) {
+                        impulse = -impulse
+                    }
+                    RockVelocity += impulse
+                }
+            }
+        }
+        else {
+            misc = 0
+        }
+    }
+}
+
+state HotRod_WaitStart { // 3
+    statusc 0
+    code() {
+        UpdateHotRodDisplay()
+    }
+    trans {
+        PlayerDistance = distance(player, DIST_NO_Y)
+        if (player -> stateflag & 0x2000) {
+            statetime = frametime
+        }
+        else if (frametime - statetime >= StartDelay) {
+            if (UseApproachPath) {
+                changestate(HotRod_Approach)
+            }
+            else {
+                changestate(HotRod_JoinTrack)
+            }
+        }
+        if (!rand(20)) {
+            SoundHotRodRev()
+        }
+        if (distance(x, player, DIST_EXACT | DIST_NO_Y) < 1.8m, player -> y < y + 2m, y - 2m < player -> y) {
+            sendevent(Event27, player, 1.8m, 0.5)
+            if (eventaccepted) {
+                if (frametime - statetime >= 1s) {
+                    if (player -> speed > 2m) {
+                        SoundHotRodHit(1V)
+                    }
+                    statetime = frametime
+                }
+            }
+        }
+        else {
+            misc = 0
+        }
+    }
+}
+
+state HotRod_Approach { // 4
+    statusc 0
+    code() {
+        UpdateHotRodDisplay()
+    }
+    trans {
+        PlayerDistance = distance(player, DIST_NO_Y)
+        TrackSpeed = seek(TrackSpeed, TargetTrackSpeed, 2.5)
+        TrackProgress = spd(TrackProgress, TrackSpeed)
+        if (TrackProgress >= pathlen) {
+            TrackStart += pathlen - TrackProgress
+            changestate(HotRod_JoinTrack)
+        }
+        {
+            var lookahead, path_yaw
+            lookahead = TrackProgress + ((TrackSpeed * 1.5) >> 8)
+            if (lookahead >= pathlen) {
+                lookahead = pathlen - 1
+            }
+            calcpath(lookahead, vvec)
+            calcpath(TrackProgress)
+            SteeringYaw = atan(vecx - x, vecz - z)
+            lookahead = TrackProgress + TrackSpeed
+            if (lookahead >= pathlen) {
+                lookahead = pathlen - 1
+            }
+            calcpath(lookahead, vvec)
+            path_yaw = atan(vecx - x, vecz - z)
+            roty = degseek(roty, path_yaw, 360deg)
+        }
+        if (PlayerDistance <= 110m) {
+            CheckHotRodCollision()
+            UpdateHotRodPosition()
+        }
+        UpdateHotRodJump()
+        UpdateHotRodRock()
+    }
+}
+
+state HotRod_JoinTrack { // 5
+    statusc 0
+    code() {
+        changestateifn(HotRod_Idle, creator)
+        save (pathlen, entity) {
+            CopyCreatorPath()
+            TrackLength = pathlen
+            TrackEntity = entity
+            if (FinishProgress < 0) {
+                FinishProgress = TrackLength - 1
+            }
+        }
+        TrackProgress = TrackStart
+        RoadEventIndex = 0
+        SelectRoadEvents()
+        changestate(HotRod_Race)
+    }
+}
+
+state HotRod_Race { // 6
+    stateflag 0x10001
+    statusc 0
+    code() {
+        UpdateHotRodDisplay()
+    }
+    trans {
+        TrackSpeed = seek(TrackSpeed, TargetTrackSpeed, 2.5)
+        {
+            var lookahead, engine_sound_needed
+            PlayerDistance = distance(player, DIST_NO_Y)
+            TrackProgress = spd(TrackProgress, TrackSpeed)
+            if (TrackProgress >= FinishProgress) {
+                FinishProgress = 99999.0
+                sendevent(EventTriggered, creator)
+            }
+            if (TrackProgress >= TrackLength) {
+                TrackProgress -= TrackLength
+            }
+            save (pathlen, entity) {
+                pathlen = TrackLength
+                entity = TrackEntity
+                calcpath(TrackProgress)
+                if (PlayerDistance <= 110m) {
+                    UpdateHotRodPosition()
+                    if (PlayerDistance >= 5m) {
+                        vecx = CAMTRANSX
+                        vecz = CAMTRANSZ
+                        vecy = atan2(self, vecx) + 180deg
+                        if (abs(degdist(vecy, CAMROTY + 180deg)) > 55deg) {
+                            PlayerDistance = 110m
+                        }
+                    }
+                    if (PlayerDistance <= 20m) {
+                        lookahead = TrackProgress + ((TrackSpeed * 1.5) >> 8)
+                        if (lookahead >= TrackLength) {
+                            lookahead = TrackLength - 1
+                        }
+                        calcpath(lookahead, vvec)
+                        SteeringYaw = atan(vecx - x, vecz - z)
+                        CheckHotRodCollision()
+                        misc = -1
+                        if (EngineVoice) {
+                            soundcheck(EngineVoice)
+                        }
+                        if (misc == -1) {
+                            SoundInitHotRodEngine()
+                            EngineVoice = voice
+                        }
+                        engine_sound_needed = true
+                    }
+                    lookahead = TrackProgress + TrackSpeed
+                    if (lookahead >= pathlen) {
+                        lookahead = pathlen - 1
+                    }
+                    calcpath(lookahead, vvec)
+                    vecy = atan(vecx - x, vecz - z)
+                    rotz = degseek(roty, vecy, 360deg)
+                    roty = rotz
+                }
+            }
+            if (!engine_sound_needed && EngineVoice) {
+                soundsetup(2s, EngineVoice, 6)
+                soundfadev(0V, EngineVoice, 3)
+                EngineVoice = 0
+            }
+        }
+        UpdateHotRodJump()
+        if (TrackProgress >= NextRoadEvent) {
+            ProcessRoadEvents()
+        }
+        UpdateHotRodRock()
+    }
+}
+
+state HotRod_Idle { // 7
+    statusc 0
+    code() {
+        do {
+            PlayerDistance = distance(player, DIST_NO_Y)
+            if (PlayerDistance < 110m) {
+                playanim(0, HOTROD_HIGH_1)
+            }
+            else {
+                playnull()
+            }
+        } while (1)
+    }
+}
+
+state HotRod_Wheel { // 8
+    stateflag 0x10001
+    statusc 0
+    code(wheel_index) {
+        SetRot(0deg)
+        setanim(HOTROD_WHEEL)
+        if (wheel_index == 2.0 || wheel_index == 3.0) {
+            SetScale(0.75S)
+            if (var level = LEVEL; level == LEVEL_OrangeAsphalt) {
+                WheelGroundY = 0.194m
+            }
+            else {
+                WheelGroundY = 0.319m
+            }
+        }
+        else {
+            if (var level = LEVEL; level == LEVEL_OrangeAsphalt) {
+                WheelGroundY = 0.319m
+            }
+            else {
+                WheelGroundY = 0.444m
+            }
+        }
+        WheelBaseZindex = parent -> zindex
+        do (var view_angle, cam_angle) {
+            JumpPhase = creator -> JumpPhase
+            getvert(vtrans, parent, wheel_index)
+            if (!JumpPhase) {
+                y = WheelGroundY
+            }
+            SetVec(CAMTRANSX, CAMTRANSY, CAMTRANSZ)
+            cam_angle = atan2(self, vecx)
+            cam_angle = ((CAMROTY << 20) - (cam_angle << 20)) >> 20
+            if (abs(cam_angle) > 45deg) {
+                if (cam_angle >= 0deg) {
+                    cam_angle = 45deg
+                }
+                else {
+                    cam_angle = -45deg
+                }
+            }
+            cam_angle = (0.5 * cam_angle) >> 8
+            if (wheel_index == 0 || wheel_index == 1.0) {
+                view_angle = parent -> roty
+            }
+            else {
+                view_angle = creator -> SteeringYaw
+                SteeringYaw = view_angle
+            }
+            view_angle = (view_angle + -(CAMROTY + 180deg) + cam_angle) & 0xFFF
+            if (view_angle <= 90deg) {
+                zindex = 5
+                scalex = abs(scalex)
+            }
+            else if (view_angle <= 180deg) {
+                zindex = 5
+                view_angle = 180deg - view_angle
+                scalex = -abs(scalex)
+            }
+            else if (view_angle <= 270deg) {
+                zindex = -5
+                view_angle -= 180deg
+                scalex = abs(scalex)
+            }
+            else {
+                view_angle = 360deg - view_angle
+                scalex = -abs(scalex)
+                zindex = -5
+            }
+            if (wheel_index == 1.0 || wheel_index == 2.0) {
+                zindex = -zindex
+            }
+            zindex += WheelBaseZindex
+            animframe = view_angle >> 6
+            if (animframe > 15) {
+                animframe = 15
+            }
+            playframe(animframe << 8)
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event14)
+    }
+}
+
+state Race_Position_Text { // 9
+    stateflag 0x10001
+    code() {
+        SetVFX2D()
+        statusb = FLAG_STRING_CENTER
+        TextDefaultColor()
+        zindex = 165
+        SetRot(0deg)
+        SetScale(0x146, 0x207, 0x1000)
+        spawn(HRdOC, S_FLAG, 1)
+        SetTrans(-192.0, -77.0, 0.0)
+        changestate(RacePosition_Display, creator -> RacePosition)
+    }
+}
+
+state RacePosition_Display { // 10
+    stateflag 0x10001
+    trans => sub UpdateRacePositionText
+    code(position) {
+        do {
+            if (var lang = GLOBAL_151; lang == 3.0) {
+                var pos = position
+                playanim(0, TEXT)
+            }
+            else if (lang == 4.0 || lang == 1.0) {
+                var pos = position
+                playanim(1, TEXT)
+            }
+            else if (lang == 2.0) {
+                if (position == 1) {
+                    playanim(2, TEXT)
+                }
+                else {
+                    var pos = position
+                    playanim(3, TEXT)
+                }
+            }
+            else if (position == 1) {
+                playanim(4, TEXT)
+            }
+            else if (position == 2) {
+                playanim(5, TEXT)
+            }
+            else if (position == 3) {
+                playanim(6, TEXT)
+            }
+            else {
+                var pos = position
+                playanim(7, TEXT)
+            }
+        } while (1)
+    }
+    event(e, a) {
+        accevif (e == EventTriggered) {
+            settrans(UpdateRacePositionText)
+        }
+    }
+}
+
+sub UpdateRacePositionText(position) __trans {
+    once {
+        PositionTextScaleX = 0xA3
+        PositionTextScaleY = 0x104
+    }
+    scalex = seek(scalex, PositionTextScaleX, 43)
+    scaley = seek(scaley, PositionTextScaleY, 0x45)
+    if (scalex == PositionTextScaleX) {
+        scaley = PositionTextScaleY
+        if (scalex == 0x146) {
+            tpc = 0
+        }
+        else {
+            position = creator -> RacePosition
+            PositionTextScaleX = 0x146
+            PositionTextScaleY = 0x207
+        }
+    }
+}
+
+state HotRod_Shadow_Init { // 11
+    statusc 0
+    code() {
+        zindex = creator -> zindex
+        y = 0
+        rotx = 0
+        rotz = 0
+        changestate(HotRod_Shadow)
+    }
+}
+
+state HotRod_Shadow { // 12
+    statusc 0
+    code() {
+        sleepanim(0, HOTROD_SHADOW)
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event81)
+    }
+    trans {
+        roty = creator -> roty
+        x = creator -> x
+        z = creator -> z
+    }
+}
+
+state Checkered_Flag { // 13
+    stateflag 0x10001
+    statusc 0
+    code() {
+        SetVFX2D()
+        vfx = (vfx & 0xFFFF00FF) | 0x600
+        zindex = 160
+        SetRot(0deg)
+        SetScale(1.2S, 1S, 0.875S)
+        SetTrans(-192.0, -94.0, 0.0)
+        do {
+            playanim(0, CHECKERED_FLAG_1)
+            playanim(1, CHECKERED_FLAG_2)
+            playanim(2, CHECKERED_FLAG_3)
+            playanim(3, CHECKERED_FLAG_4)
+            playanim(4, CHECKERED_FLAG_5)
+            playanim(5, CHECKERED_FLAG_6)
+            playanim(6, CHECKERED_FLAG_7)
+            playanim(7, CHECKERED_FLAG_8)
+        } while (1)
+    }
+}
+
+sub RetireHotRod() { // S-2709
+    if (spawn != S_HOT_RAIL) {
+        miscfunc(x, player, 0, 9)
+        stateflag &= ~0x10000
+        id = 0
+        changestate(Kill)
+    }
+}
+
+sub RetireRaceObject() { // S-2717
+    if (spawn != S_HOT_RAIL) {
+        miscfunc(x, player, 0, 9)
+        stateflag &= ~0x10000
+        id = 0
+    }
+    changestate(Kill)
+}
+
+state Kill { // 14
+    stateflag 0
+    statusc 0
+    code() {}
+}

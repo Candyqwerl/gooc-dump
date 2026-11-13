@@ -1,0 +1,246 @@
+#gool MonkC 10 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C2_ShadC.gooh"
+//gooc -c 2 -r pal "C2\C2_MonkC.gooc" "C2\Out\C2_MonkC.nsentry"
+
+#anim MONKEY_JUMP    [Mo1fV] 22 1
+#anim MONKEY_LAND    [Mo2fV] 20 1
+#anim MONKEY_TURN    [Mo3fV] 20 1
+#anim MONKEY_WAIT    [Mo4fV] 10 1
+#anim MONKEY_FLING   [Mo5fV] 1 1
+
+#spawn S_MONKEY      Monkey_Init
+#spawn S_1           __s_1
+
+event EventJumpedOn      => state Monkey_Squash
+event EventHit           => state Monkey_Squash
+event EventSpinHit       => state Monkey_Fling
+event EventHitInvincible => state Monkey_Squash
+event EventFling         => state Monkey_Squash
+event EventSlideHit      => state Monkey_Fling
+event EventSlamHit       => state Monkey_Squash
+
+var MonkeyVar1, MonkeyStartX, MonkeyStartY, MonkeyStartZ,
+    MonkeyJumpHeight, MonkeyVar6, MonkeyStartDistance, MonkeyWaitZ, MonkeyVar9, MonkeyMaxDistance, MonkeyPathprog
+
+sub MonkeyDoJump(pathpoint) {
+    setanim(MONKEY_JUMP, 0.0)
+    calcpath(pathpoint, vvec)
+    sounddecay(1.3s)
+    SoundPitchDefault()
+    soundplay([jmp0A], 0.1V)
+    vely = (-MonkeyJumpHeight * 29 / 50 << 8) * (1m / 256)
+    statusb |= FLAG_PHYSICS_ENGINE
+    {
+        var s_x = x, s_y = y, s_z = z, t_x = vecx, t_y = vecy, t_z = vecz
+        troty = atan2(t_x)
+        setanim(MONKEY_JUMP)
+        do (var i = 1.0) {
+            x = s_x + ((t_x - s_x) * (i >> 8)) / 27
+            z = s_z + ((t_z - s_z) * (i >> 8)) / 27
+            roty = troty
+            vely = spd(vely, (MonkeyJumpHeight << 8) * (1m / 256))
+            playframe((i - 1.0) * 22 / 27)
+            i += 1.0
+        } while (i <= 27.0)
+    }
+    y = groundy
+    statusb &= ~FLAG_PHYSICS_ENGINE
+    sounddecay(1.3s)
+    SoundPitchDefault(0.23)
+    soundplay([ld10A], 0.2V)
+}
+
+state Monkey_Init {
+    statusc 0x12
+    code(height, maxdist, startdist, inverse) {
+        MonkeyJumpHeight = height
+        MonkeyMaxDistance = maxdist
+        MonkeyStartDistance = startdist
+        roty = 90deg
+        density = 0.02m
+        zindex = 24
+        MonkeyVar9 = 0
+        spawn(ShadC, ShadC_S_SHADOW_GROUND, 1, y + 0.05m, 1.2S, 0)
+        if (inverse) {
+            save (vecx, vecy, vecz, trotx, troty, trotz) {
+                calcpath(0, vvec)
+                calcpath(pathlen - 1.0, vtrot)
+                if (distance(vecx, player, 0) < distance(trotx, player, 0)) {
+                    misc = 0
+                }
+                else {
+                    misc = -(pathlen - 1.0)
+                }
+            }
+            pathprog = misc
+        }
+        else {
+            save (vecx, vecy, vecz, trotx, troty, trotz) {
+                calcpath(0, vvec)
+                calcpath(pathlen - 1.0, vtrot)
+                if (distance(vecx, player, 0) > distance(trotx, player, 0)) {
+                    misc = 0
+                }
+                else {
+                    misc = -(pathlen - 1.0)
+                }
+            }
+            pathprog = misc
+        }
+        save (statusb) {
+            statusb |= FLAG_TRACK_PATH_SIGN | FLAG_TRACK_PATH_ROT
+            calcpath(pathprog)
+            MonkeyPathprog = pathprog
+            roty = troty + 180deg
+        }
+        MonkeyStartX = x
+        MonkeyStartY = y
+        MonkeyStartZ = z
+        MonkeyWaitZ = z
+        groundy = y
+        changestate(Monkey)
+    }
+}
+
+inline sub SoundMonkeyScream() {
+    unless (time(1s)) {
+        unless (rand(4)) {
+            if (var r = rand(3); r == 0) {
+                sounddecay(6.4s)
+                SoundPitchDefault(0.18)
+                soundplay([Mk1rA], 0.4V)
+            }
+            else if (r == 1) {
+                sounddecay(6.4s)
+                SoundPitchDefault(0.18)
+                soundplay([Mk2rA], 0.4V)
+            }
+            else if (r == 2) {
+                sounddecay(6.4s)
+                SoundPitchDefault(0.18)
+                soundplay([Mk3rA], 0.4V)
+            }
+        }
+    }
+}
+
+state Monkey {
+    stateflag 0x5
+    statusc 0
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_GROUND | FLAG_SOLID_SIDES
+        SetVel(0, 0, 0)
+        trotx = 270deg
+        do {
+            playanim(3, MONKEY_TURN, 0.4s)
+            playframesback(MONKEY_WAIT, 9.0, 2.0)
+            v0 = 5.0 + rand(5.0)
+            do (var i = 0) {
+                playanim(2, MONKEY_WAIT)
+                playanim(1, MONKEY_WAIT)
+                playanim(0, MONKEY_WAIT)
+                playanim(1, MONKEY_WAIT)
+                i += 1.0
+            } while (i < v0)
+            playframes(MONKEY_WAIT, 2.0, 9.0)
+        } while (1)
+    }
+    trans {
+        nofirst {
+            changestateif(Monkey_Jump_Cycle, distance(player) < MonkeyStartDistance)
+            sendevent(EventHit, collider, 100.0)
+        }
+        SoundMonkeyScream()
+    }
+}
+
+state Monkey_Jump_Cycle {
+    stateflag 0x5
+    statusc 0
+    code() {
+        playframes(MONKEY_TURN, 3.0, 19.0)
+        do {
+            if (spawn == S_MONKEY) {
+                MonkeyDoJump(loopseek(MonkeyPathprog, pathlen, 1.0))
+            }
+            else {
+                var range = 999m
+                var pathpoint = -1.0
+                var dist_to_player = 0
+                do (var prog = 0) {
+                    calcpath(prog, vvec)
+                    dist_to_player = distance(vec, player, DIST_NO_Y)
+                    unless (distance(vec, self, DIST_NO_Y) > MonkeyMaxDistance) {
+                        if (pathpoint == -1.0 || dist_to_player < range) {
+                            range = dist_to_player
+                            pathpoint = prog
+                        }
+                    }
+                    prog += 1.0
+                } while (prog < pathlen)
+                if (pathpoint != -1.0) {
+                    misc = pathpoint
+                }
+                else {
+                    misc = pathprog
+                }
+                MonkeyDoJump(misc)
+            }
+            if (MonkeyPathprog == 0 || abs(MonkeyPathprog) == pathlen - 1.0) {
+                playframes(MONKEY_TURN, 0.0, 19.0)
+            }
+            else {
+                playframes(MONKEY_LAND, 0.0, 19.0)
+            }
+        } while (1)
+    }
+    trans {
+        sendevent(EventHit, collider, 100.0)
+        SoundMonkeyScream()
+    }
+}
+
+state Monkey_Squash {
+    stateflag 0x21
+    statusc 0x32
+    code(h) {
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        playframe()
+    }
+}
+
+sub SetParticleColor() {
+    if (var r = rand(3); r == 0) {
+        SetColor1(0xB2, 0x7C, 0x23)
+    }
+    else if (r == 1) {
+        SetColor1(0x7F, 0x28, 0x00)
+    }
+    else if (r == 2) {
+        SetColor1(0x40, 0x40, 0x80)
+    }
+}
+
+
+state Monkey_Fling {
+    stateflag 0x30
+    statusc 0x12
+    code(h) {
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir()
+        if (LEVEL == LEVEL_Ruination || LEVEL == LEVEL_RoadToRuin) {
+            troty += 22deg
+        }
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale(0, MONKEY_FLING)
+    } 
+    trans {
+        EnemyFlingTrans(2m, EventFling)
+        roty += 20deg
+    }
+}

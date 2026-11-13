@@ -1,0 +1,416 @@
+#gool SwarC 8 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C2_ShadC.gooh"
+//gooc -c 2 -r pal "C2\C2_SwarC.gooc" "C2\Out\C2_SwarC.nsentry"
+
+#iflev uv
+#anim SWARMER_DIG     [Sw1bV] 20 1
+#anim SWARMER_CHASE   [Sw2bV] 12 1
+#sprite DIRT_CRACK    [Ju5bT]
+#tex 0x505050 0 3 1 9 704 64 64 64
+#sprite DIRT          [Ju5bT]
+#tex 0x013F8F 0 0 2 9 656 24 8 8
+#tex 0x2E85BF 0 0 2 9 656 24 8 8
+#tex 0x0A4269 0 0 2 9 656 24 8 8
+#tex 0x013F8F 0 0 2 9 656 16 8 8
+#tex 0x2E85BF 0 0 2 9 656 16 8 8
+#tex 0x0A4269 0 0 2 9 656 16 8 8
+#anim MUSHROOM_GROW   [Ss1bV] 30 1
+#anim MUSHROOM_BOUNCE [Ss2bV] 10 1
+#else
+#anim SWARMER_DIG     [Sw1lV] 20 1
+#anim SWARMER_CHASE   [Sw2lV] 12 1
+#sprite DIRT_CRACK    [Cl6lT]
+#tex 0x505050 0 3 1 9 704 64 64 64
+#sprite DIRT          [Cl6lT]
+#tex 0x013F8F 0 0 6 5 120 8 8 8
+#tex 0x2E85BF 0 0 6 5 120 8 8 8
+#tex 0x0A4269 0 0 6 5 120 8 8 8
+#tex 0x013F8F 0 0 7 5 128 8 8 8
+#tex 0x2E85BF 0 0 7 5 128 8 8 8
+#tex 0x0A4269 0 0 7 5 128 8 8 8
+#anim MUSHROOM_GROW   [Ss1lV] 30 1
+#anim MUSHROOM_BOUNCE [Ss2lV] 10 1
+#endif
+
+event EventJumpedOn      => state Swarmer_Squash
+event EventHit           => state Swarmer_Squash
+event EventSpinHit       => state Swarmer_Die
+event EventHitInvincible => state Swarmer_Squash
+event EventFling         => state Swarmer_Squash
+event EventSlamHit       => state Swarmer_Squash
+
+#spawn S_SWARM_SPAWNER   Swarmer_Spawner
+#spawn S_SWARMER         Swarmer_Spawn
+#spawn S_DIRT_CRACK      Dirt_Crack
+#spawn S_DIRT_CHUNK      Dirt_Particle
+#spawn S_MUSHROOM        Mushroom_Grow
+
+array SpawnConfig_0 = { -0x25800, 0x25800, 0x25800, 0x4B000 }
+array SpawnConfig_1 = { 0, 0x25800, 0x25800, 0, -0x25800, 0x4B000, 0x25800, 0x25800 }
+array SpawnConfig_2 = { 0, 0x25800, -0x25800, 0x25800, 0x25800, 0x4B000, 0, 0 }
+array SpawnConfig_3 = { 0, 0, 0x25800, 0x25800, -0x4B000, 0x25800, 0, 0x4B000, -0x25800, 0x25800 }
+array SpawnConfig_4 = { 0, 0x25800, -0x25800, 0x4B000, 0x25800, 0x4B000, -0x4B000, 0x4B000, 0x4B000, 0x25800 }
+array SpawnConfig_5 = { 0, 0x25800, -0x25800, 0x4B000, 0x25800, 0x25800, -0x4B000, 0x25800, 0, 0x4B000 }
+array SpawnConfig_6 = { -0x19000, 0x3E800, 0x19000, 0x4B000 }
+
+var SwarmerCount, SwarmerSpawnOffsets, FlingPathY
+
+state Swarmer_Spawner { // 0
+    code(config, limit, base_trotz, mushroom_offs) {
+        if (config == 0) {
+            SwarmerCount = 2.0
+            SwarmerSpawnOffsets = SpawnConfig_0
+        }
+        else if (config == 1) {
+            SwarmerCount = 4.0
+            SwarmerSpawnOffsets = SpawnConfig_1
+        }
+        else if (config == 2) {
+            SwarmerCount = 4.0
+            SwarmerSpawnOffsets = SpawnConfig_2
+        }
+        else if (config == 3) {
+            SwarmerCount = 5.0
+            SwarmerSpawnOffsets = SpawnConfig_3
+        }
+        else if (config == 4) {
+            SwarmerCount = 5.0
+            SwarmerSpawnOffsets = SpawnConfig_4
+        }
+        else if (config == 5) {
+            SwarmerCount = 5.0
+            SwarmerSpawnOffsets = SpawnConfig_5
+        }
+        else if (config == 6) {
+            SwarmerCount = 2.0
+            SwarmerSpawnOffsets = SpawnConfig_6
+        }
+
+        if (ZONEFLAGS & 0x800) {
+            epc = 0
+        }
+        calcpath(pathlen >> 1)
+        var0 = 0
+        unless (entitygetstate(2)) {
+            if (ZONEFLAGS & 0x800) {
+                do { playnull() } until (abs(player -> y - y) < 1.5m && distance(player, DIST_NO_Y) < 15m)
+            }
+            else {
+                do { playnull() } until (var0)
+            }
+            if (!(ZONEFLAGS & 0x800)) {
+                ins72(0x100, 0x200)
+            }
+            do (var swarmers = 0) {
+                playnull(0.85s)
+                var0 = swarmers << 1
+                if (!(ZONEFLAGS & 0x800)) {
+                    vecx = SwarmerSpawnOffsets[var0]
+                    vecz = -SwarmerSpawnOffsets[var0 + 1.0]
+                }
+                else {
+                    vecx = SwarmerSpawnOffsets[var0 + 1.0]
+                    vecz = SwarmerSpawnOffsets[var0]
+                }
+                spawn(SwarC, S_SWARMER, 1, limit, base_trotz + (1m * swarmers >> 8), x + vecx, y, z + vecz)
+                swarmers += 1.0
+            } while (swarmers < SwarmerCount)
+            changestate(Swarmer_Wait_For_Clear, mushroom_offs)
+        }
+        changestate(Spawn_Mushroom, mushroom_offs)
+    }
+    event(e, a) {
+        accevif (e == Event49 && distance(player, DIST_NO_Y) < 15m) {
+            var0 = 1.0
+            epc = 0
+        }
+    }
+}
+
+state Swarmer_Wait_For_Clear { // 1
+    code(mushroom_offs) {
+        WaitChildNull()
+        if (!(ZONEFLAGS & 0x800)) {
+            ins72(0x100, 0x100)
+        }
+        changestate(Spawn_Mushroom, mushroom_offs)
+    }
+}
+
+state Spawn_Mushroom { // 2
+    code(mushroom_offs) {
+        pathprog = (pathlen >> 1) + mushroom_offs
+        if (pathprog < 0) {
+            pathprog = 0
+        }
+        if (pathprog >= pathlen) {
+            pathprog = pathlen - 1
+        }
+        calcpath(pathprog)
+        spawn(SwarC, S_MUSHROOM, 1, !entitygetstate(2))
+        entitysetstate(1)
+        sleepnull()
+    }
+}
+
+state Swarmer_Spawn { // 3
+    code(limit, base_trotz, px, py, pz) {
+        CopyCreatorPath()
+        zindex = 40
+        density = 0.15m
+        trotz = base_trotz
+        pathdist = limit
+        SetTrans(px, py, pz)
+        trotx = 360deg
+        SetScale(1.2S)
+        SetVel(0m, 0m, 0m)
+        changestate(Swarmer_Dig_Up)
+    }
+}
+
+state Swarmer_Dig_Up { // 4
+    statusc 0x0
+    code() {
+        statusb = FLAG_ROT_Y | FLAG_COLLIDABLE | FLAG_SOLID_TOP
+        if (!(ZONEFLAGS & 0x800)) {
+            spawn(SwarC, S_DIRT_CRACK, 1)
+        }
+        soundpitch(3.263)
+        soundplay([SwDJA], 0.8V)
+        playnull(0.7s)
+        roty = rand(360deg)
+        setevent(SwarmerEvents)
+        playanim(1, SWARMER_DIG, 0.35s)
+        troty += 20deg
+        playanim(1, SWARMER_DIG, 0.35s)
+        troty -= 20deg
+        playanim(1, SWARMER_DIG, 0.2s)
+        troty = atan2(player -> trans)
+        playframes(SWARMER_DIG, 0.0, 19.0)
+        soundpitch(3.263)
+        soundplay([SwGJA], 1V)
+        changestate(Swarmer_Chase)
+    }
+}
+
+state Swarmer_Chase { // 5
+    statusc 0x0
+    event => sub SwarmerEvents
+    trans => sub SwarmerChasePlayer
+    code() {
+        statusb |= (FLAG_ROT_Y | FLAG_GRAVITY | FLAG_PHYSICS_ENGINE | 0xD000)
+        sleepframes(SWARMER_CHASE, 0.0, 11.0)
+    }
+}
+
+sub SwarmerEvents(e, a) {
+    accevcstate(Swarmer_Fling, e == EventSpinHit || e == EventSlideHit)
+    if (e == Event14) {
+        cascadeevent(EventTriggered, self)
+        accevcstate(Kill)
+    }
+}
+
+sub SwarmerChasePlayer() {
+    troty = atan2(player -> trans)
+    setvel(15m, vvec)
+    velx = spd(velx, vecx)
+    vely = spd(vely, vecy)
+    velz = spd(velz, vecz)
+    sendeventif(EventHit, collider, player -> statusa \ FLAG_GROUNDLAND, 100.0)
+}
+
+state Swarmer_Fling { // 6
+    stateflag 0x12
+    statusc 0x12
+    code(h) {
+        save (statusb, trotz) {
+            statusb &= ~(FLAG_ROT_Y | FLAG_ROT_INWARDS | 0x800 | 0x2000)
+            save (statusb, troty, speed) {
+                trotz = 900deg
+                EnemyFlingSetDir()
+                vely = -1.8m
+                speed = 10m
+                setvel(speed)
+                statusb |= (FLAG_GRAVITY | FLAG_PHYSICS_ENGINE | 0xC000)
+                do {
+                    playframe()
+                    pathprog = misc
+                } until (STATUS_INVALID_PATH)
+                y = groundy
+            }
+            FlingPathY = vecy
+        }
+        statusc &= ~0x2
+        changestate(Swarmer_Die, h)
+    }
+    trans {
+        unless (STATUS_FIRSTFRAME) {
+            speed += 3m
+            if (speed < 40m) {
+                speed += 3m
+                setvel(speed)
+            }
+            else {
+                setvel(40m)
+            }
+            roty = spd(roty, trotz)
+            if (trotz > 0deg) {
+                trotz -= 1deg
+            }
+        }
+    }
+}
+
+sub SwarmerKill(h) {
+    cascadeevent(EventTriggered, self)
+    spawn(9, 4, 1, getins(SetParticleColor), 1)
+    KillEntity()
+    sendevent(EventCombo, player, h)
+}
+
+sub SetParticleColor() {
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x46, 0x46, 0x96)
+    }
+    else if (r == 1) {
+        SetColor1(0x70, 0x89, 0xB8)
+    }
+    else if (r == 2) {
+        SetColor1(0x96, 0x1E, 0x64)
+    }
+}
+
+state Swarmer_Die { // 7
+    stateflag 0x3
+    code(h) {
+        SwarmerKill(h)
+        statusb &= ~(FLAG_GRAVITY | FLAG_PHYSICS_ENGINE | FLAG_COLLIDABLE | FLAG_PATH_CALCS)
+        soundpitch(3.263)
+        soundplay([SwDJA], 0.5V)
+        playframesback(SWARMER_DIG, 19.0, 0.0)
+    }
+}
+
+state Swarmer_Squash { // 8
+    stateflag 0x23
+    statusc 0x12
+    code(h) {
+        SwarmerKill(h)
+        EnemyDieClearFlags()
+        while (scalex > 0.04S) {
+            playframe()
+        }
+    }
+    trans {
+        EnemyDieTrans()
+    }
+}
+
+state Dirt_Crack { // 9
+    code() {
+        vfx = (vfx & 0xFFFFFF00) | 0x3
+        SetRot(90deg, rand(360deg), roty)
+        zindex = 48
+        SetScale(0S)
+        moda = 16.0
+        playanim(0, DIRT_CRACK, 1.7s)
+        playanim(0, DIRT_CRACK, 0.4s)
+        sleepanim(0, DIRT_CRACK)
+    }
+    event(e, a) {
+        accevif (e == EventTriggered) {
+            movetolist(3.0)
+            settrans(DirtCrackFade)
+        }
+    }
+    trans {
+        if (!STATUS_FIRSTFRAME) {
+            moda = seek(moda, 0.0, 2.6s)
+            SetScale(seek(scalex, 1.5S, 0.06S), scalex, scalex)
+            if (!rand(3)) {
+                spawn(SwarC, S_DIRT_CHUNK, 1, 0.1S + (scalex >> 3))
+            }
+            if (frametime - statetime >= 2.5s) {
+                tpc = 0
+            }
+        }
+    }
+}
+
+sub DirtCrackFade() {
+    moda = seek(moda, 16.0, 0.32)
+    SetScale(seek(scalex, 0S, 0.06S), scalex, scalex)
+    changestateif(Kill, scalex < 1)
+}
+
+state Dirt_Particle { // 10
+    code(scale) {
+        zindex = 58
+        SetScale(scale)
+        SetRot(0deg)
+        groundy = y
+        velx = !rand(2) ? 0.5m + rand(3m) : -(0.5m + rand(3m))
+        vely = rand(10m)
+        velz = !rand(2) ? 0.5m + rand(3m) : -(0.5m + rand(3m))
+        statusb = FLAG_GRAVITY | FLAG_PHYSICS_ENGINE | FLAG_SOLID_GROUND
+        setanim(DIRT)
+        playframe(rand(6.0), 1s)
+    }
+    trans {
+        rotz += 8deg
+        if (STATUS_GROUNDLAND && vely < 0m) {
+            var old_velx = velx
+            velz = old_velx >> 2
+            velx = old_velx >> 1
+            vely = -(vely >> 1)
+        }
+    }
+}
+
+state Mushroom_Grow { // 11
+    statusc 0x200012
+    code(grow) {
+        if (ZONEFLAGS & 0x800) {
+            z -= 1m
+        }
+        zindex = 48
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        if (grow) {
+            playframes(MUSHROOM_GROW, 0.0, 29.0)
+        }
+        changestate(Mushroom)
+    }
+}
+
+state Mushroom { // 12
+    statusc 0x200012
+    code() {
+        sleepanim(0, MUSHROOM_BOUNCE)
+    }
+    event(e, a) {
+        if (player -> y > y + 0.5m && interrupter == player && (e == EventJumpedOn || e == EventSlamHit)) {
+            sendevent(EventBounce, interrupter, 17.88854m)
+            rejevcstate(Mushroom_Bounce)
+        }
+    }
+}
+
+state Mushroom_Bounce { // 13
+    statusc 0x200012
+    code() {
+        SoundPitchDefault(0.23)
+        sounddecay(6.4s)
+        soundplay([bnc0A], 0.4V)
+        playframes(MUSHROOM_BOUNCE, 0.0, 9.0)
+        changestate(Mushroom)
+    }
+}
+
+state Kill { // 14
+    stateflag 0x0
+    statusc 0x0
+    code() {}
+}

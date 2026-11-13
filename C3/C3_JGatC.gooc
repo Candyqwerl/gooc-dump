@@ -1,0 +1,206 @@
+#gool JGatC 76 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_JGatC.gooc" "C3\Out\C3_JGatC.nsentry"
+
+#iflev A
+#anim JUMP_GATOR[Ga1AV] [Ga1AG] 24 1 2
+#else
+#anim JUMP_GATOR[Ga1oV] [Ga1oG] 24 1 2
+
+#spawn S_JUMP_GATOR Jump_Gator_Init
+
+event EventJumpedOn      => state Jump_Gator_Squash
+event EventHit           => state Jump_Gator_Squash
+event EventHitInvincible => state Jump_Gator_Squash
+event Event19            => sub KillVoice
+event Event26            => sub KillVoice
+event EventFling         => state Jump_Gator_Fling
+
+var CycleOffset, CycleLength, TurnDuration, GatorVar4, GatorTrackOffset, TravelDuration, BackZindex, FrontZindex, ZindexThresh
+
+state Jump_Gator_Init {
+    code(limit, cyclelen, cycleoffs, turndur, zdxb, zdxf, zthresh) {
+        pathdist = limit
+        CycleLength = cyclelen * 1s / 1.2s
+        CycleOffset = cycleoffs * 1s / 1.2s
+        TurnDuration = turndur * 1s / 1.2s
+        GatorTrackOffset = 0m
+        density = 0.15m
+        zindex = 25
+        GatorVar4 = 0
+        groundy = y
+        trotx = 360deg
+        BackZindex = zdxb
+        FrontZindex = zdxf
+        ZindexThresh = zthresh
+        statusb = FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | FLAG_SOLID_SIDES | 0x20000000
+        TravelDuration = CycleLength - (TurnDuration << 1) >> 1
+        changestate(Jump_Gator)
+    }
+}
+
+state Jump_Gator {
+    stateflag 0x5
+    statusc 0
+    code() {
+        do {
+            SoundGatorGrowl(12.8)
+            playframes(JUMP_GATOR, 0.0, 12.0)
+            SoundGatorGrowl(16.0)
+            playframes(JUMP_GATOR, 12.0, 23.0)
+            if (!rand(4)) {
+                soundpitch(5.08)
+                soundplay([TS3cA], 1V)
+            }
+        } while (1)
+    }
+    event(e, a) {
+        if (e == EventJumpedOn && player -> y < y + 1.5m) {
+            rejev()
+            sendevent(Event24, player, 100.0)
+        }
+        accevcstate(Jump_Gator_Squash, e == EventSpinHit && player -> vely < 0 && player -> y > y + 2.5m)
+        if (e == EventSpinHit || e == EventSlideHit) {
+            rejev()
+            sendevent(Event24, player, 100.0)
+        }
+    }
+    trans {
+        unless(STATUS_FIRSTFRAME) {
+            var cycletime = time(CycleLength, CycleOffset)
+            var phase = 0
+            if (cycletime >= 0 && cycletime <= TurnDuration) {
+                phase = cycletime
+                roty = troty + ((phase * -180deg) / TurnDuration)
+                statusb &= ~(FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN)
+                calcpath(0)
+            }
+            else if (cycletime >= TurnDuration && cycletime <= TurnDuration + TravelDuration) {
+                phase = cycletime - TurnDuration
+                var prog = (phase * (pathlen - 1.0)) / TravelDuration
+                statusb |= FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN
+                calcpath(prog)
+            }
+            else if (cycletime >= TurnDuration + TravelDuration && cycletime <= (TurnDuration << 1) + TravelDuration) {
+                phase = cycletime - (TurnDuration + TravelDuration)
+                roty = troty + ((phase * -180deg) / TurnDuration)
+                statusb &= ~(FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN)
+                calcpath(pathlen - 1.0)
+            }
+            else if (cycletime >= (TurnDuration << 1) + TravelDuration && cycletime <= CycleLength) {
+                phase = cycletime - ((TurnDuration << 1) + TravelDuration)
+                var prog = (pathlen - 1.0) + ((phase * -(pathlen - 1.0)) / (CycleLength - ((TurnDuration << 1) + TravelDuration)))
+                statusb |= FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN
+                calcpath(prog)
+                troty += 180deg
+            }
+        }
+        if (pathdist) {
+            var v1 = 0
+            var deg_to_player = 0deg
+            var pathrot = troty
+            save(troty, statusa, statusb, x, y, z, pathprog) {
+                statusb = FLAG_PATH_CALCS | FLAG_TRACK_PATH_SIGN
+                x = player -> x
+                y = player -> y
+                z = player -> z
+                calcpath(0)
+                v1 = troty
+                troty += 90deg
+                setvel(GatorTrackOffset, vvel)
+            }
+            x += velx
+            z += velz
+            if (abs(GatorTrackOffset - vecy) > 2.5m) {
+                deg_to_player = degdist(troty, atan2(player -> trans))
+                if (abs(deg_to_player) < 60deg) {
+                    if (deg_to_player < -45deg) {
+                        deg_to_player = -45deg
+                    }
+                    else if (deg_to_player > 45deg) {
+                        deg_to_player = 45deg
+                    }
+                    troty += deg_to_player
+                }
+            }
+            GatorTrackOffset = seek(GatorTrackOffset, vecy, spd(1.2m))
+            if (GatorTrackOffset < -pathdist) {
+                troty = pathrot
+                GatorTrackOffset = -pathdist
+            }
+            else if (GatorTrackOffset > pathdist) {
+                GatorTrackOffset = pathdist
+                troty = pathrot
+            }
+        }
+        sendevent(EventHit, collider, 100.0)
+        if (player -> z - z >= ZindexThresh) {
+            zindex = FrontZindex
+        }
+        else {
+            zindex = BackZindex
+        }
+    }
+}
+
+sub SoundGatorGrowl(p) {
+    if (GLOBAL_118 > y) {
+        soundpitch(p * 52 >> 8)
+        soundsetup(6, self, 8)
+        soundplay([TS2cA], 1V)
+    }
+    else {
+        soundpitch(p << 6 >> 8)
+        soundsetup(6, self, 8)
+        soundplay([TS9cA], 1V)
+    }
+}
+
+state Jump_Gator_Fling {
+    stateflag 0x30
+    statusc 0x32
+    code(h) {
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir(0x80000)
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    } 
+    trans {
+        EnemyFlingTrans(2m, EventFling)
+    }
+}
+
+state Jump_Gator_Squash {
+    stateflag 0x23
+    statusc 0x32
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        playframe()
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        playframe()
+    }
+}
+
+sub SetParticleColor() {
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    if (var r = rand(3); !r) {
+        SetColor1(0x05, 0xBD, 0xBE)
+    }
+    else if (r == 1) {
+        SetColor1(0x0D, 0x4C, 0x4C)
+    }
+    else if (r == 2) {
+        SetColor1(0xE7, 0x85, 0x81)
+    }
+}
+
+sub KillVoice() {
+    voice = -1
+    soundfadet(1s, voice)
+    soundfadev(0V, voice, 3)
+    voice = -1
+    soundsetup(0, voice, 5)
+}

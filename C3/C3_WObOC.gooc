@@ -1,0 +1,368 @@
+#gool WObOC 26 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_WObOC.gooc" "C3\Out\C3_WObOC.nsentry"
+
+#anim SKYBOX  [Sk12V] [Sk12G] 01 1 2
+#anim SCREEN  [Sc12V] [Sc12G] 01 1 2
+#anim BARRIER [Bar2V] [Bar2G] 30 1 2
+#anim FLASH   [Bar3V] [Bar3G] 01 1 2
+
+#spawn S_MONTY    Monty_Init
+#spawn S_SKYBOX   Skybox
+#spawn S_BARRIER  Barrier_Init
+#spawn S_FLASH    Barrier_Flash
+#spawn S_SCREEN   Screen_Init
+
+var WarpVar1, WarpVar2, WarpVar3, WarpVar4, WarpVar5, WarpVar6, ScreenOBJ
+
+expr PlayerBearing = WarpVar1
+expr LastPlayerX = WarpVar2
+expr LastPlayerY = WarpVar3
+expr LastPlayerZ = WarpVar4
+expr CardMenuOBJ = WarpVar5
+expr PendingMenuMode = WarpVar6
+expr BarrierRoom = WarpVar1
+expr RequiredCrystals = WarpVar2
+expr BossDefeated = WarpVar3
+expr FlashTargetScale = WarpVar1
+expr FlashBrightness = WarpVar2
+expr ScreenAlpha = WarpVar1
+
+state Monty_Init { // 0
+    stateflag 0x1
+    statusc 0x0
+    code(screen) {
+        ScreenOBJ = screen
+        statusb = 0
+        CardMenuOBJ = 0
+        PendingMenuMode = 0
+        if (GLOBAL_90 & 0x1) {
+            GLOBAL_90 ^= 1
+            PendingMenuMode = 1
+        }
+        changestate(Monty)
+    }
+}
+
+state Monty { // 1
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepnull()
+    }
+    trans {
+        once {
+            LastPlayerX = player -> x
+            LastPlayerY = player -> y
+            LastPlayerZ = player -> z
+        }
+        if (LastPlayerX != player -> x || LastPlayerY != player -> y || LastPlayerZ != player -> z) {
+            statetime = frametime
+        }
+        LastPlayerX = player -> x
+        LastPlayerY = player -> y
+        LastPlayerZ = player -> z
+        PlayerBearing = atan(-player -> x, -player -> z) % 360deg
+        if (PlayerBearing < 40deg || PlayerBearing > 80deg || distance(player, DIST_NO_Y) < 3.5m || player -> stateflag & 0x800) {
+            statetime = frametime
+        }
+        changestateif(Monty_Trigger_LoadSave, frametime - statetime >= 12 && !GLOBAL_109)
+    }
+}
+
+state Monty_Trigger_LoadSave { // 2
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        {
+            var s3 = 0, s4 = 1, zoom = -1
+            var s6 = 0, s7 = 22, angle = 0
+            s7 = -31
+            angle = 60deg
+            zoom = 13.5m
+            ins72(0x500, s6)
+            ins72(0x600, s3)
+        }
+        sendevent(Event34, player, 0)
+        interrupter = objectget(ScreenOBJ)
+        sendevent(EventTriggered, interrupter)
+        var0 = 0
+        if (PendingMenuMode) {
+            PendingMenuMode = 0
+            var0 = 1
+        }
+        spawn(33, 1, 1, var0) // CardC-1
+        CardMenuOBJ = objectspawned
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Monty_Wait_Movement, e == Event14)
+    }
+}
+
+state Monty_Wait_Movement { // 3
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepnull()
+    }
+    trans {
+        once {
+            {
+                var s3 = 0, s4 = 0, s5 = -1
+                ins72(0x600, s3)
+            }
+            sendevent(Event21, player, 0)
+            interrupter = objectget(ScreenOBJ)
+            sendevent(Event14, interrupter, 0)
+            LastPlayerX = player -> x
+            LastPlayerY = player -> y
+            LastPlayerZ = player -> z
+        }
+        changestateif(Monty, LastPlayerX != player -> x || LastPlayerY != player -> y || LastPlayerZ != player -> z)
+    }
+}
+
+state Barrier_Init { // 4
+    stateflag 0x1
+    statusc 0x0
+    code(yaw, room) {
+        roty = yaw
+        BarrierRoom = room
+        if (BarrierRoom >= 2) {
+            RequiredCrystals = 5 * (BarrierRoom - 1)
+            if (GLOBAL_109) {
+                RequiredCrystals = 100
+            }
+        }
+        else {
+            RequiredCrystals = 0
+        }
+        BossDefeated = 1
+        if (var roomnum = BarrierRoom; roomnum == 2) {
+            unless (0x40 & GLOBAL_27) {
+                BossDefeated = 0
+            }
+        }
+        else if (roomnum == 3) {
+            unless (0x8 & GLOBAL_27) {
+                BossDefeated = 0
+            }
+        }
+        else if (roomnum == 4) {
+            unless (0x10 & GLOBAL_27) {
+                BossDefeated = 0
+            }
+        }
+        else if (roomnum == 5) {
+            unless (0x20 & GLOBAL_27) {
+                BossDefeated = 0
+            }
+        }
+        zindex = 26
+        y -= 0.9m
+        if (BossDefeated) {
+            misc = 0
+            CountPoolBits(SAVEDCRYSTALPOOL1)
+            CountPoolBits(SAVEDCRYSTALPOOL2)
+            if (misc >= RequiredCrystals) {
+                KillEntity()
+                changestate(Kill)
+            }
+        }
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_SIDES
+        setanim(BARRIER, 0.0)
+        changestate(Barrier_Active)
+    }
+}
+
+state Barrier_Active { // 5
+    stateflag 0x4081
+    statusc 0x0
+    code() {
+        playframes4(BARRIER, -1.0, 29.0)
+        sleepframes(BARRIER, 0.0, 29.0)
+    }
+    trans {
+        if (statusa & 0x20) {
+            moda = 4.8
+        }
+        if (BossDefeated && (frametime & 15) == BarrierRoom) {
+            misc = 0
+            CountPoolBits(SAVEDCRYSTALPOOL1)
+            CountPoolBits(SAVEDCRYSTALPOOL2)
+            if (misc >= RequiredCrystals) {
+                KillEntity()
+                changestate(Kill)
+            }
+        }
+        if ((DEBUG && buttonhold(PAD_TRIANGLE)) || (0x2000000 & GLOBAL_150)) {
+            KillEntity()
+            changestate(Kill)
+        }
+        if (collider && (player -> statusb & 0x80)) {
+            vecx = player -> x
+            vecz = player -> z
+            sendevent(Event32, player, (miscfunc(vecx, self, 1, 2) + 180deg) % 360deg, 12m)
+            changestateif(Barrier_Repel, eventaccepted)
+        }
+    }
+}
+
+state Barrier_Repel { // 6
+    stateflag 0x4081
+    statusc 0x0
+    code() {
+        spawn(WObOC, S_FLASH)
+        SoundPitchDefault(0.295)
+        sounddecay(8s)
+        soundplay([Bar2A], 1V)
+        GLOBAL_75 = 7
+        GLOBAL_65 = -1
+        if (animseq != getanim(BARRIER)) {
+            setanim(BARRIER, -1.0)
+        }
+        while (animframe < 29.0) {
+            playframe(animframe + 1.0)
+        }
+        sleepframes(BARRIER, 0.0, 29.0)
+    }
+    trans {
+        if (frametime - statetime < 2) {
+            GAMEFLAGS |= GFLAG_WHITE_FADE
+            FADECONTROL = rand(64) + 64
+        }
+        else {
+            FADECONTROL = 0
+        }
+        changestateif(Barrier_Active, frametime - statetime >= 17)
+        moda = rand(16.0)
+        if (collider && (player -> statusb & 0x80)) {
+            vecx = player -> x
+            vecz = player -> z
+            sendevent(Event32, player, (miscfunc(vecx, self, 1, 2) + 180deg) % 360deg, 12m)
+            changestateif(Barrier_Repel, eventaccepted)
+        }
+    }
+}
+
+state Barrier_Flash { // 7
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepanim(0, FLASH)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            zindex = 300
+            SetScale(0S)
+            FlashTargetScale = 4.5S
+            FlashBrightness = 0
+            x = player -> x
+            y = player -> y
+            z = player -> z
+        }
+        rotz = CAMROTY
+        roty = CAMROTY
+        rotx = -CAMROTX
+        scalez = seek(scalex, FlashTargetScale, 1S)
+        scaley = scalez
+        scalex = scalez
+        moda = seek(FlashBrightness, 16.0, 1.6)
+        FlashBrightness = moda
+        if (scalex == FlashTargetScale) {
+            changestateifn(Kill, scalex)
+            FlashTargetScale = 0
+        }
+    }
+}
+
+state Skybox { // 8
+    stateflag 0x10001
+    statusc 0x0
+    code() {
+        statusb = FLAG_NO_CAMERA_CLIP
+        SetScale(0xCC, 0x7A, 0xCC)
+        zindex = -4000
+        SetRot(0deg)
+        do {
+            if (GLOBAL_119 & 0x4000) {
+                playanim(0, SKYBOX)
+            }
+            else {
+                playnull()
+            }
+        } while (1)
+    }
+    trans {
+        x = CAMTRANSX
+        y = CAMTRANSY
+        z = CAMTRANSZ
+    }
+}
+
+state Screen_Init { // 9
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        if (GLOBAL_109) {
+            KillEntity()
+            return
+        }
+        ScreenAlpha = 16.0
+        y = 0.7m
+        changestate(Screen_Visible)
+    }
+}
+
+state Screen_Visible { // 10
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepanim(0, SCREEN)
+    }
+    event(e, a) {
+        accevcstate(Screen_FadeOut, e == EventTriggered)
+    }
+    trans {
+        ScreenAlpha = seek(ScreenAlpha, 16.0, 2.135)
+        moda = 16.0 - ScreenAlpha
+        if (ScreenAlpha == 16.0) {
+            tpc = 0
+        }
+    }
+}
+
+state Screen_FadeOut { // 11
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepanim(0, SCREEN)
+    }
+    event(e, a) {
+        accevcstate(Screen_Visible, e == Event14)
+    }
+    trans {
+        ScreenAlpha = seek(ScreenAlpha, 0, 2.135)
+        moda = 16.0 - ScreenAlpha
+        changestateifn(Screen_Hidden, ScreenAlpha)
+    }
+}
+
+state Screen_Hidden { // 12
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Screen_Visible, e == Event14)
+    }
+}
+
+state Kill { // 13
+    stateflag 0x20
+    statusc 0x0
+    code() {}
+}

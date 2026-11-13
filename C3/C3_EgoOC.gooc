@@ -1,0 +1,694 @@
+#gool EgoOC 37 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_EgoOC.gooc" "C3\Out\C3_EgoOC.nsentry"
+
+#anim CROCODILE             [CroAV] [CroAG] 24 1 2
+#anim SWITCH_PRESSED        [SwNiV] [SwNiG] 05 1 2
+#anim SWITCH_RELEASED       [SwFiV] [SwFiG] 12 1 2
+#anim COBRA                 [Cb1iV] [Cb1iG] 82 1 2
+#anim DART                  [DariV] [DariG] 01 1 2
+#anim SPEAR_TIP             [Sp1iV] [SpeiG] 05 0 2
+#anim SPEAR_HALF            [Sp2iV] [SpeiG] 08 0 2
+#anim SPEAR_FULL            [Sp3iV] [SpeiG] 12 0 2
+#anim SPEAR_RETRACT         [Sp4iV] [SpeiG] 17 0 2
+#anim PILLAR_2X2            [PTwAV] [PTwAG] 01 1 2
+#anim PILLAR_2X3            [PThAV] [PThAG] 01 1 2
+
+#sprite DART_SMOKE          [Cr10T]
+#tex 0x606060 0 3 14 7 672 64 32 32
+#tex 0x606060 0 3 15 7 672 32 32 32
+#tex 0x606060 0 3 0 8 704 96 32 32
+#tex 0x606060 0 3 1 8 704 64 32 32
+#tex 0x606060 0 3 2 8 704 32 32 32
+#tex 0x606060 0 3 3 8 736 96 32 32
+#tex 0x606060 0 3 4 8 736 64 32 32
+#tex 0x606060 0 3 5 8 736 32 32 32
+#tex 0x606060 0 3 6 8 768 96 32 32
+#tex 0x606060 0 3 7 8 768 64 32 32
+#tex 0x606060 0 3 14 7 768 32 32 32
+#tex 0x606060 0 3 8 8 800 96 32 32
+#tex 0x606060 0 3 9 8 800 64 32 32
+#tex 0x606060 0 3 10 8 640 16 32 16
+#tex 0x606060 0 3 11 8 672 16 32 16
+#tex 0x606060 0 3 11 8 672 16 32 16
+
+#spawn S_CROCODILE          Crocodile_Init
+#spawn S_SWITCH             Switch_Init
+#spawn S_COBRA              Cobra_Init
+#spawn S_DART               Dart_Init
+#spawn S_SPEAR              Spear_Init
+#spawn S_TRIGGER            Dart_Trigger
+#spawn S_SMOKE              Dart_Smoke
+#spawn S_DART_TOP           Dart_Init
+#spawn S_DART_BOTTOM        Dart_Init
+#spawn S_PILLAR_2X2         Pillar_2x2
+#spawn S_PILLAR_2X3         Pillar_2x3
+
+var EgyptVar1, EgyptVar2, EgyptVar3, EgyptVar4, EgyptVar5, EgyptVar6, EgyptVar7, CrocNearFX1, CrocNearFX2,
+    CrocFarFX1, CrocFarFX2, EnableDarknessFX, CrocBaseY, CrocVar7, CrocDefaultColor, CrocVar9, CrocVar10,
+    CrocActiveFX1, CrocActiveFX2
+
+expr CrocBaseYaw            = EgyptVar1
+expr CrocWaitDuration       = EgyptVar2
+expr CrocSpawnY             = EgyptVar3
+expr CrocReverseFacing      = EgyptVar4
+expr CrocFacingRepeatCount  = EgyptVar5
+expr CrocJumpBaseY          = EgyptVar6
+expr CrocFXDepthThreshold   = EgyptVar7
+
+expr SwitchTargetOBJ        = EgyptVar1
+
+expr CobraCycleOffset       = EgyptVar1
+expr CobraYaw               = EgyptVar2
+expr CobraVar3              = EgyptVar3
+
+expr DartTravelDistance     = EgyptVar1
+expr DartFlightDuration     = EgyptVar2
+expr DartOriginX            = EgyptVar3
+expr DartOriginY            = EgyptVar4
+expr DartOriginZ            = EgyptVar5
+expr DartStepDistance       = EgyptVar6
+expr DartSmokeCountdown     = EgyptVar7
+
+expr SpearTipHoldDuration   = EgyptVar1
+expr SpearHalfHoldDuration  = EgyptVar2
+expr SpearFullHoldDuration  = EgyptVar3
+expr SpearRetractedDuration = EgyptVar4
+expr SpearCycleLength       = EgyptVar5
+expr SpearCycleOffset       = EgyptVar6
+expr SpearHitYVelocity      = EgyptVar7
+
+state Crocodile_Init { // 0
+    statusc 0
+    code(yaw, wait, depth, neara, nearb, fara, farb, enable) {
+        CrocBaseYaw = yaw
+        CrocWaitDuration = wait * 1s / 1.2s
+        CrocFXDepthThreshold = depth
+        CrocNearFX1 = neara
+        CrocNearFX2 = nearb
+        CrocFarFX1 = fara
+        CrocFarFX2 = farb
+        EnableDarknessFX = enable
+        CrocSpawnY = y
+        roty = CrocBaseYaw
+        zindex = 0
+        field_61 = &CrocBaseY
+        statusb |= 0x80000000
+        vfx = (vfx & 0xFFFF00FF) | 0xA00
+        CrocBaseY = y
+        CrocVar7 = 1
+        CrocDefaultColor = 0x7F7F7F
+        CrocVar9 = 0
+        CrocVar10 = 0
+        changestate(Crocodile_Jump)
+    }
+}
+
+state Crocodile_Jump { // 1
+    statusc 0
+    code() {
+        sounddecay(7.7s)
+        SoundPitchDefault(0.23)
+        soundplay([Cr1iA], 0.6V)
+        playframes(CROCODILE, 0.0, 23.0)
+        changestate(Crocodile_Wait)
+    }
+    event(e, a) {
+        accevcstate(Egypt_Enemy_Fling, e == EventSpinHit || e == EventSlideHit || e == EventHitInvincible || e == EventHit || e == EventFling)
+    }
+    trans {
+        once {
+            if (CrocFacingRepeatCount >= 2) {
+                if (CrocReverseFacing) {
+                    CrocReverseFacing = 0
+                }
+                else {
+                    CrocReverseFacing = 1
+                }
+                CrocFacingRepeatCount = 1
+            }
+            else {
+                v0 = rand(2)
+                if (v0 == CrocReverseFacing) {
+                    CrocFacingRepeatCount += 1
+                }
+                else {
+                    CrocReverseFacing = v0
+                    CrocFacingRepeatCount = 1
+                }
+            }
+            if (CrocReverseFacing) {
+                roty = CrocBaseYaw + 180deg
+            }
+            else {
+                roty = CrocBaseYaw
+            }
+            CrocJumpBaseY = CrocSpawnY + rand(2m)
+            y = CrocJumpBaseY 
+            statusb = FLAG_COLLIDABLE | FLAG_NO_CAMERA_CLIP | 0x80000000
+        }
+        vecz = abs(z - CAMTRANSZ)
+        if (vecz < 2m) {
+            vecy = (-0x7D0 * vecz / 0x320) + CrocJumpBaseY 
+            y = seek(y, vecy, 0.2m)
+        }
+        else {
+            y = seek(y, CrocJumpBaseY, 0.2m)
+        }
+        vecz = CAMTRANSZ - z
+        if (vecz <= CrocFXDepthThreshold) {
+            CrocActiveFX1 = CrocNearFX1
+            CrocActiveFX2 = CrocNearFX2
+        }
+        else {
+            CrocActiveFX1 = CrocFarFX1
+            CrocActiveFX2 = CrocFarFX2
+        }
+        if (EnableDarknessFX) {
+            var nearest_light_distance, light_distance
+            save (interrupter) {
+                nearest_light_distance = -1
+                if (GLOBAL_54) {
+                    interrupter = GLOBAL_54
+                    light_distance = distance(interrupter, DIST_NO_Y)
+                    if (!(nearest_light_distance < 0) && light_distance < nearest_light_distance) {
+                        nearest_light_distance = light_distance
+                    }
+                }
+                if (GLOBAL_120) {
+                    interrupter = GLOBAL_120
+                    light_distance = distance(interrupter, DIST_NO_Y)
+                    if (!(nearest_light_distance < 0) && light_distance < nearest_light_distance) {
+                        nearest_light_distance = light_distance
+                    }
+                }
+                if (nearest_light_distance >= 0) {
+                    if (nearest_light_distance > 15m) {
+                        nearest_light_distance = 15m
+                    }
+                    moda = (16.0 * (nearest_light_distance >> 8)) / 0x1770
+                }
+                else {
+                    moda = 16.0
+                }
+            }
+        }
+        sendevent(EventHit, collider, 100.0)
+    }
+}
+
+state Crocodile_Wait { // 2
+    statusc 0
+    code() {
+        if (EnableDarknessFX) {
+            settrans(DarknessFX)
+        }
+        statusb = 0
+        do {
+            playnull()
+        } until (frametime - statetime >= CrocWaitDuration)
+        changestate(Crocodile_Jump)
+    }
+}
+
+sub DarknessFX() {
+    var nearest_light_distance, light_distance
+    save (interrupter) {
+        nearest_light_distance = -1
+        if (GLOBAL_54) {
+            interrupter = GLOBAL_54
+            light_distance = distance(interrupter, DIST_NO_Y)
+            if (!(nearest_light_distance < 0) && light_distance < nearest_light_distance) {
+                nearest_light_distance = light_distance
+            }
+        }
+        if (GLOBAL_120) {
+            interrupter = GLOBAL_120
+            light_distance = distance(interrupter, DIST_NO_Y)
+            if (!(nearest_light_distance < 0) && light_distance < nearest_light_distance) {
+                nearest_light_distance = light_distance
+            }
+        }
+        if (nearest_light_distance >= 0) {
+            if (nearest_light_distance > 15m) {
+                nearest_light_distance = 15m
+            }
+            moda = (16.0 * (nearest_light_distance >> 8)) / 0x1770
+        }
+        else {
+            moda = 16.0
+        }
+    }
+}
+
+state Switch_Init { // 3
+    stateflag 0x4000281
+    code(obj) {
+        SwitchTargetOBJ = obj
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_TOP | 0x400000
+        changestate(Switch)
+    }
+}
+
+sub CheckPlayerStep() {
+    v0 = abs(player -> x - x) <= 1m && abs(player -> z - z) <= 1m && player -> y > y - 0.5m && player -> y < y + 0.5m       
+}
+
+state Switch { // 4
+    stateflag 0x5000281
+    code() {
+        setanim(SWITCH_RELEASED)
+        sleepframe(11.0)
+    }
+    event(e, a) {
+        accevcstate(Switch_Pressed, e == EventHit)
+    }
+    trans {
+        CheckPlayerStep()
+        changestateif(Switch_Pressed, v0)
+    }
+}
+
+state Switch_Pressed { // 5
+    stateflag 0x4000281
+    code() {
+        if (SwitchTargetOBJ) {
+            interrupter = objectget(SwitchTargetOBJ)
+            sendevent(EventTriggered, interrupter)
+        }
+        soundpitch(4.8)
+        soundplay([Sw1iA], 0.7V)
+        playanim(0, SWITCH_PRESSED)
+        playanim(1, SWITCH_PRESSED)
+        playanim(2, SWITCH_PRESSED)
+        playanim(2, SWITCH_PRESSED)
+        playanim(3, SWITCH_PRESSED)
+        settrans(SwitchTrans)
+        playframe(animframe, 0.2s)
+        sleepanim(0, SWITCH_RELEASED)
+    }
+}
+
+sub SwitchTrans() {
+    CheckPlayerStep()
+    changestateifn(Switch_Released, v0)
+}
+
+state Switch_Released { // 6
+    stateflag 0x4000281
+    code() {
+        if (SwitchTargetOBJ) {
+            interrupter = objectget(SwitchTargetOBJ)
+            sendeventif(Event14, interrupter, interrupter, 0)
+        }
+        soundpitch(1.2)
+        sounddelay(0.1s)
+        soundplay([Sw1iA], 0.5V)
+        playframes(SWITCH_RELEASED, 0.0, 11.0)
+        changestate(Switch)
+    }
+}
+
+state Cobra_Init { // 7
+    statusc 0
+    code(cycleoffs, yaw, unused) {
+        CobraCycleOffset = cycleoffs * 3.3s >> 8
+        if (CobraCycleOffset >= 3.3s) {
+            CobraCycleOffset = 3.3s - 1
+        }
+        CobraYaw = yaw
+        roty = yaw
+        CobraVar3 = unused
+        statusb = FLAG_SOLID_SIDES | FLAG_COLLIDABLE
+        zindex = 24
+        changestate(Cobra)
+    }
+}
+
+state Cobra { // 8
+    statusc 0
+    code() {
+        setanim(COBRA)
+        do (var f) {
+            f = time(82, CobraCycleOffset)
+            if (f == 0) {
+                soundpitch(2.88)
+                soundplay([Cb1iA], 0.7V)
+            }
+            animframe = f << 8
+            playframe()
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Egypt_Enemy_Fling, e == EventSpinHit
+            || e == EventHitInvincible
+            || e == EventFling
+            || e == EventSlideHit
+        )
+        accevcstate(Egypt_Enemy_Squash, e == EventJumpedOn
+            || e == EventSlamHit
+            || e == EventHit)
+    }
+    trans {
+        sendevent(EventHit, collider, 100.0)
+        changestateif(Egypt_Enemy_Squash, eventaccepted, 0)
+    }
+}
+
+state Dart_Trigger { // 9
+    statusc 0x1000000
+    code(radius, start_id, count) {
+        do {
+            if (distance(player, DIST_EXACT | DIST_NO_Y) <= radius && !(player -> stateflag & 0x20) && !player -> invincible) {
+                until (var remaning = count, delay = 0, dart_id = start_id; remaning == 0) {
+                    interrupter = objectget(dart_id)
+                    sendeventif(EventTriggered, interrupter, interrupter)
+                    dart_id += 1.0
+                    remaning -= 1
+                    delay = rand(2)
+                    while (delay) {
+                        playnull()
+                        delay -= 1
+                    }
+                }
+                playnull(0.18s)
+            }
+            playnull()
+        } while (1)
+    }
+}
+
+state Dart_Init { // 10
+    statusc 0x1000000
+    code(pitch, yaw, travel, speed) {
+        rotx = pitch
+        roty = yaw
+        DartTravelDistance = travel
+        DartStepDistance = speed / 1s
+        DartFlightDuration = DartTravelDistance / DartStepDistance  
+        vectransf(vtrans, vvel, DartStepDistance, 0, 0)
+        velx -= x
+        vely -= y
+        velz -= z
+        statusb = 0
+        DartOriginX = x
+        DartOriginY = y
+        DartOriginZ = z
+        changestate(Dart_Wait)
+    }
+}
+
+state Dart_Wait { // 11
+    statusc 0x1000000
+    code() {
+        statusb = 0
+        SetTrans(DartOriginX, DartOriginY, DartOriginZ)
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Dart_Shoot, e == EventTriggered)
+    }
+}
+
+state Dart_Shoot { // 12
+    statusc 0x1000000
+    code() {
+        sleepanim(0, DART)
+    }
+    event(e, a) {
+        accevcstate(Dart_Hit, e == EventHitInvincible)
+    }
+    trans { 
+        once {
+            statusb = FLAG_COLLIDABLE
+            spawn(EgoOC, S_SMOKE, 1, 0)
+            SoundPitchDefault()
+            sounddecay(2s)
+            soundplay([Da2iA], 0.5V)
+            DartSmokeCountdown = 1
+        }
+        DartSmokeCountdown -= 1
+        if (DartSmokeCountdown <= 0) {
+            spawn(EgoOC, S_SMOKE, 1, CAMROTY)
+            DartSmokeCountdown = 1
+        }
+        changestateif(Dart_Hit, frametime - statetime >= DartFlightDuration)
+        sendevent(Event24, collider, 100.0)
+        changestateif(Dart_Hit, eventaccepted)
+        x += velx
+        y += vely
+        z += velz
+    }
+}
+
+state Dart_Hit { // 13
+    statusc 0x1000000
+    code() {
+        SoundPitchDefault(0.18)
+        sounddecay(2s)
+        soundplay([Da1iA], 1V)
+        spawn(EgoOC, S_SMOKE, 1, 0)
+        while (child || !(frametime - statetime >= 1s)) {
+            playnull()
+        }
+        x = DartOriginX 
+        y = DartOriginY
+        z = DartOriginZ 
+        changestate(Dart_Wait)
+    }
+}
+
+state Dart_Smoke { // 14
+    statusc 0
+    code() {
+        statusb = 0
+        roty = CAMROTY
+        y += 0.15m
+        zindex = 26
+        SetScale(0.75S)
+        playframes(DART_SMOKE, 2.0, 0.0, 15.0)
+    }
+}
+
+state Spear_Init { // 15
+    stateflag 0x4804081
+    statusc 0x80012
+    code(tip, half, full, retracted, cycleoffs, yvel) {
+        SpearTipHoldDuration = tip * 1s / 1.2s
+        SpearHalfHoldDuration = half * 1s / 1.2s
+        SpearFullHoldDuration = full * 1s / 1.2s
+        SpearRetractedDuration = retracted * 1s / 1.2s
+        SpearHitYVelocity = yvel * 1s / 1.2s
+        SpearCycleLength = 5 + (SpearTipHoldDuration + (8 + (SpearHalfHoldDuration + (12 + (SpearFullHoldDuration + (17 + SpearRetractedDuration))))))
+        SpearCycleOffset = cycleoffs * SpearCycleLength >> 8
+        if (SpearCycleOffset < 0) {
+            SpearCycleOffset = 0
+        }
+        if (SpearCycleOffset >= SpearCycleLength) {
+            SpearCycleOffset = SpearCycleLength 
+        }
+        statusb = FLAG_COLLIDABLE |  FLAG_SOLID_SIDES
+        SetZindexField(24)
+        FlipRand()
+        if (!(player -> stateflag & 0x20) && !player -> invincible) {
+            changestate(Spear)
+        }
+        else {
+            changestate(Spear_Wait)
+        }
+    }
+}
+
+inline sub ForceRetract() {
+    changestateifn(Spear_Force_Retract, !(player -> stateflag & 0x20) && !player -> invincible)
+}
+
+state Spear { // 16
+    stateflag 0x4804081
+    statusc 0x80012
+    code() {
+        do (var frame = 0) {
+            statusb = FLAG_COLLIDABLE | FLAG_SOLID_SIDES
+            frame = time(SpearCycleLength, SpearCycleOffset)
+            if (frame < 5) {
+                setanim(SPEAR_TIP, frame << 8)
+            }
+            else {
+                frame -= 5
+                if (frame < SpearTipHoldDuration) {
+                    ForceRetract()
+                    setanim(SPEAR_TIP, 4.0)
+                }
+                else {
+                    frame -= SpearTipHoldDuration 
+                    if (frame < 8) {
+                        if (frame == 0) {
+                            soundpitch(3.265)
+                            soundplay([Sp2iA], 0.5V)
+                        }
+                        sendevent(Event24, collider, SpearHitYVelocity)
+                        setanim(SPEAR_HALF, frame << 8)
+                    }
+                    else {
+                        frame -= 8
+                        if (frame < SpearHalfHoldDuration) {
+                            ForceRetract()
+                            sendevent(Event24, collider, SpearHitYVelocity)
+                            setanim(SPEAR_HALF, 7.0)
+                        }
+                        else {
+                            frame -= SpearHalfHoldDuration 
+                            if (frame < 12) {
+                                if (frame == 0) {
+                                    soundpitch(3.265)
+                                    soundplay([Sp2iA], 0.7V)
+                                }
+                                sendevent(Event24, collider, SpearHitYVelocity)
+                                setanim(SPEAR_FULL, frame << 8)
+                            }
+                            else {
+                                frame -= 12
+                                if (frame < SpearFullHoldDuration) {
+                                    ForceRetract()
+                                    setanim(SPEAR_FULL, 11.0)
+                                }
+                                else {
+                                    frame -= SpearFullHoldDuration 
+                                    if (frame < 17) {
+                                        if (frame == 0) {
+                                            soundpitch(2.54)
+                                            soundplay([Sp1iA], 0.7V)
+                                        }
+                                        setanim(SPEAR_RETRACT, frame << 8)
+                                    }
+                                    else {
+                                        frame -= 17
+                                        changestateifn(Spear_Wait, !(player -> stateflag & 0x20) && !player -> invincible)
+                                        statusb = 0
+                                        animseq = 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            playframe()
+        } while (1)
+    }
+}
+
+state Spear_Force_Retract { // 17
+    stateflag 0x4804081
+    statusc 0x80012
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_SIDES
+        soundpitch(2.540)
+        soundplay([Sp1iA], 0.7V)
+        if (animseq == getanim(SPEAR_TIP)) {
+            playframesback(SPEAR_TIP, 4.0, 0.0)
+        }
+        else if (animseq == getanim(SPEAR_HALF)) {
+            playframesback(SPEAR_HALF, 7.0, 0.0)
+        }
+        else {
+            playframes(SPEAR_RETRACT, 0.0, 16.0)
+        }
+        changestate(Spear_Wait)
+    }
+}
+
+state Spear_Wait { // 18
+    stateflag 0x4804081
+    statusc 0x80012
+    code() {
+        statusb = 0
+        animseq = 0
+        var wait = 0
+        wait = SpearCycleLength - SpearRetractedDuration 
+        do {
+            if (!(player -> stateflag & 0x20) && !player -> invincible) {
+                v0 = time(SpearCycleLength, SpearCycleOffset)
+                changestateif(Spear, v0 >= wait)
+            }
+            playframe()
+        } while (1)
+    }
+}
+
+state Pillar_2x2 { // 19
+    stateflag 0x4004081
+    statusc 0x1080012
+    trans => sub DarknessFX
+    code(yaw) {
+        roty = yaw
+        SetZindexField(24)
+        vfx = (vfx & 0xFFFF00FF) | 0x600
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | 0x400000
+        settrans(DarknessFX)
+        sleepanim(0, PILLAR_2X2)
+    }
+}
+
+state Pillar_2x3 { // 20
+    stateflag 0x4004081
+    statusc 0x1080012
+    trans => sub DarknessFX
+    code(yaw) {
+        roty = yaw
+        SetZindexField(24)
+        vfx = (vfx & 0xFFFF00FF) | 0x600
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | 0x400000
+        settrans(DarknessFX)
+        sleepanim(0, PILLAR_2X3)
+    }
+}
+
+state Egypt_Enemy_Fling { // 21
+    stateflag 0x30
+    statusc 0x32
+    code(h) {
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir(0x80000)
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    }
+    trans {
+        if (spawn == S_CROCODILE && EnableDarknessFX) {
+            DarknessFX()
+        }
+        EnemyFlingTrans(2m, EventFling)
+    }
+}
+
+state Egypt_Enemy_Squash { // 22
+    stateflag 0x23
+    statusc 0x32
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        playframe()
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        playframe()
+    }
+}
+
+state Kill { // 23
+    statusc 0
+    code() {}
+}
+
+sub SetParticleColor() {
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x05, 0xBD, 0xBE)
+    }
+    else if (r == 1) {
+        SetColor1(0x0D, 0x4C, 0x4C)
+    }
+    else if (r == 2) {
+        SetColor1(0xE7, 0x85, 0x81)
+    }
+}

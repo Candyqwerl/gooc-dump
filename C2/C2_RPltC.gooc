@@ -1,0 +1,393 @@
+#gool RPltC 26 6
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 2 -r pal "C2\C2_RPltC.gooc" "C2\Out\C2_RPltC.nsentry"
+
+#anim CRUMBLER_1  [Pr1fV] 53 1
+#anim CRUMBLER_2  [Pr2fV] 53 1
+#anim LEANER      [Pr3fV] 1 1
+#anim SPINNER     [Pr4fV] 1 1
+#anim PILLAR      [PlafV] 1 1
+#anim SIGN        [Si0fV] 1 1
+
+#spawn S_CRUMBLER_1       Crumbler_Init
+#spawn S_CRUMBLER_2       Crumbler_Init
+#spawn S_LEANER           Leaner
+#spawn S_SPINNER          Spinner
+#spawn S_ARRAY_SPAWNER    Pillar_Array_Spawner
+#spawn S_PILLAR_ARRAY_1   Pillar_Array
+#spawn S_PILLAR_ARRAY_2   Pillar_Array_Spawner
+#spawn S_SIGN             Path_Sign
+
+var RuinsVar1, LeanerCycleOffset, RuinsVar3, LastX, LastY, LastZ, RuinsVar7, PillarBaseY, RuinsVar9, RuinsVar10,
+    PillarTargetCount, PillarOrbitSpeed, PillarOrbitRadius, PillarRotSpeed, PillarBobSpeed, PillarBobAmplitude, PillarBobBaseY, 
+    RuinsVar18, RuinsVar19, RuinsVar20, RuinsVar21, RuinsVar22, RuinsVar23, RuinsVar24, RuinsVar25, RuinsVar26, RuinsVar27, PillarYOff, PillarShake
+
+sub PlatformSelect(type) {
+    if (type == 0) {
+        setanim(CRUMBLER_1)
+    }
+    else if (type == 1.0) {
+        setanim(CRUMBLER_2)
+    }
+    else if (type == 2.0) {
+        setanim(LEANER)
+    }
+    else if (type == 3.0) {
+        setanim(SPINNER)
+    }
+    animframe = 0
+}
+
+state Crumbler_Init { // 0
+    code(type, t) {
+        RuinsVar1 = t * 1s / 1.2s
+        zindex = 24
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        type = id & 1.0 ? 0 : 1.0
+        PlatformSelect(type)
+        changestate(Crumbler)
+    }
+}
+
+state Crumbler { // 1
+    stateflag 0x80000201
+    statusc 0x0
+    code() {
+        sleep()
+    }
+    trans { 
+        changestateif(Crumbler_Crumble, collider && statusa \ 0x4000)
+    }
+}
+
+state Crumbler_Crumble { // 2
+    stateflag 0x3
+    statusc 0x200002
+    code() {
+        sounddecay(6.4s)
+        SoundPitchDefault(0.23)
+        soundplay([RPlrA], 0.6V)
+        playframes(0.0, 52.0)
+        wait(1.7s)
+        wait(1.7s)
+        settrans(BrightnessFadeIn)
+        playframesback(52.0, 0.0)
+        changestate(Crumbler)
+    }
+    trans { 
+        if (frametime - statetime >= 1s) {
+            moda = seek(moda, 16.0, 0.8)
+            if (moda == 0) {
+                tpc = 0
+            }
+        }
+    }
+}
+
+sub BrightnessFadeIn() { 
+    moda = seek(moda, 0, 0.8)
+}
+
+inline sub PlatformVFX() {
+    vfx = (vfx & 0xFFFFFF00) | 0xF
+    vfx = (vfx & 0xFF00FFFF) | 0x40000
+    moda = 4.0
+    SetColor2(0xE17, 0x78B, -0x0B2)
+    SetColor1(0xFF, 0xFF, 0xFF)
+}
+
+state Spinner { // 3
+    statusc 0x200002
+    __transargs
+    code(type, cyclelen, cycleoffs, radius) {
+        zindex = 24
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | FLAG_NO_CAMERA_CLIP
+        rotx = radius
+        PlatformSelect(type)
+        sleep()
+    }
+    event(e, a) {
+        accevif (e == EventDespawn) {
+            voice = -1
+            soundsetup(0, voice, 5)
+            soundfadet(1s, voice)
+            soundfadev(0V, voice, 3)
+        }
+    }
+    trans {
+        once {
+            cyclelen = cyclelen * 1s / 1.2s
+            cycleoffs = cycleoffs * 1s / 1.2s
+            PlatformSelect(type)
+            RuinsVar3 = 0x100000 / cyclelen
+            PlatformVFX()
+            y += 1m
+        }
+        roty = time(cyclelen, cycleoffs) * RuinsVar3 >> 8
+        rotz = roty
+        troty = roty
+        if (roty == 0deg) {
+            soundpitch(1.6)
+            soundplay([FFarA], 1V)
+
+            sounddelay(cyclelen >> 2)
+            soundpitch(1.6)
+            soundplay([FFarA], 1V)
+
+            sounddelay(cyclelen >> 1)
+            soundpitch(1.6)
+            soundplay([FFarA], 1V)
+
+            sounddelay(((cyclelen * 3) >> 2))
+            soundpitch(1.6)
+            soundplay([FFarA], 1V)
+        }
+        unless (STATUS_FIRSTFRAME) {
+            getvert(vvec, self, 0)
+        }
+        if (collider && statusa \ 0x4000) {
+            sendevent(Event57, collider, troty)
+            setvel(rotx << 3, vtrot)
+            GroundCollider()
+            collider -> x += ((vecx - LastX) + trotx)
+            collider -> y += ((vecy - LastY) + troty)
+            collider -> z += ((vecz - LastZ) + trotz)
+        }
+        LastX = vecx
+        LastY = vecy
+        LastZ = vecz
+    }
+}
+
+state Leaner { // 4
+    statusc 0x200002
+    __transargs
+    code(type, cyclelen, cycleoffs, maxlean, yaw) {
+        zindex = 24
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        sleep()
+    }
+    trans {
+        once {
+            cyclelen = cyclelen * 1s / 1.2s
+            cycleoffs = cycleoffs * 1s / 1.2s
+            roty = yaw
+            rotz = roty
+            troty = roty
+            RuinsVar1 = cyclelen >> 1
+            LeanerCycleOffset = cycleoffs
+            RuinsVar3 = (maxlean << 1) / (RuinsVar1 + 1)
+            PlatformSelect(type)
+            PlatformVFX()
+            y += 1m
+        }
+        rotx = time(RuinsVar1 << 1, LeanerCycleOffset)
+        if (rotx == 0deg || rotx == RuinsVar1) {
+            soundpitch(2.0 - 1)
+            soundsetup(0, self, 5)
+            soundplay([FFarA], 1V)
+        }
+        if (rotx >= RuinsVar1) {
+            rotx = (RuinsVar1 >> 1) - sin(rotx - RuinsVar1, RuinsVar1)
+        }
+        else {
+            rotx = sin(rotx, RuinsVar1) - (RuinsVar1 >> 1)
+        }
+        rotx *= RuinsVar3
+        unless (STATUS_FIRSTFRAME) {
+            getvert(vvec, self, 0)
+        }
+        if (collider && statusa \ 0x4000) {
+            sendevent(Event57, collider, rotx > 0deg ? troty : troty + 180deg)
+            setvel(rotx << 4, vtrot)
+            GroundCollider()
+            collider -> x += ((vecx - LastX) + trotx)
+            collider -> y += ((vecy - LastY) + troty)
+            collider -> z += ((vecz - LastZ) + trotz)
+        }
+        LastX = vecx
+        LastY = vecy
+        LastZ = vecz
+    }
+}
+
+state Pillar_Array_Spawner { // 5
+    code(radius, speed, rat) {
+        PillarOrbitRadius = radius
+        PillarOrbitSpeed = speed
+        RuinsVar18 = 0
+        RuinsVar23 = 0
+        PillarTargetCount = 4.0
+        RuinsVar21 = RuinsVar19 - 30deg
+        RuinsVar26 = RuinsVar24 - 30deg
+        RuinsVar22 = RuinsVar20 + 30deg
+        RuinsVar27 = RuinsVar25 + 30deg
+        PillarRotSpeed = 0
+        PillarBobAmplitude = 0
+        PillarBobSpeed = 0
+        var bob_amp = -PillarBobAmplitude
+        var bob_inc = (PillarBobAmplitude / (PillarTargetCount >> 8)) << 1
+        var angle = 0
+        var angle_inc = 360deg / (PillarTargetCount >> 8)
+        var pillars = 0
+        do {
+            spawn(RPltC, S_PILLAR_ARRAY_1, 1,
+                angle,
+                PillarOrbitSpeed,
+                PillarOrbitRadius,
+                PillarRotSpeed,
+                PillarBobAmplitude,
+                PillarBobSpeed,
+                bob_amp,
+                rat)
+            bob_amp += bob_inc
+            angle += angle_inc
+            pillars += 1.0
+        } while (pillars < PillarTargetCount)
+        statusb = FLAG_INVISIBLE
+        sleepnull()
+    }
+}
+
+state Pillar_Array { // 6
+    stateflag 0x80000201
+    statusc 0x0
+    code(orbit_angle, speed, radius, rotspeed, bob_amp, bobspeed, bob_y, rat) {
+        PillarShake = 0
+        PillarYOff = 0
+        PillarBaseY = y
+        zindex = -10
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | FLAG_CARRY_COLLIDER
+        vecx = parent -> x
+        vecy = parent -> y
+        vecz = parent -> z
+        trotx = 0deg
+        troty = orbit_angle
+        trotz = 0deg
+        PillarOrbitSpeed = speed
+        PillarOrbitRadius = radius
+        PillarRotSpeed = rotspeed
+        PillarBobAmplitude = bob_amp
+        PillarBobSpeed = bobspeed
+        PillarBobBaseY = bob_y
+        if (rat == true) {
+            spawn(28, 2, 1, 3m, 0, 0, 0, -45deg, 0, 1.0) // RatOC 2
+            stateflag |= 0x800
+        }
+        sleepanim(0, PILLAR)
+    }
+    trans {
+        nofirst {
+            troty = spd(troty, PillarOrbitSpeed)
+            vectransf2(vvec, vtrans, 0, PillarOrbitRadius, 0)
+            if (parent -> spawn == S_PILLAR_ARRAY_2) {
+                y = PillarBaseY
+                    + sin(loopseek(PillarBobBaseY, PillarBobAmplitude,
+                        spd(PillarBobSpeed)), PillarBobAmplitude - spd(PillarBobSpeed))
+            }
+            var target_y = 0m
+            var angle = troty % 360deg
+            if (parent -> RuinsVar18) {
+                if (PillarOrbitSpeed < 0) {
+                    if (angle >= parent -> RuinsVar19) {
+                        if (angle <= parent -> RuinsVar20) {
+                            target_y = seek(PillarYOff, -30m, 1m)
+                        }
+                        else if (angle <= parent -> RuinsVar22) {
+                            if (PillarShake) {
+                                target_y = randi(-0.15m, 0.15m)
+                            }
+                            else {
+                                target_y = PillarYOff
+                            }
+                        }
+                    }
+                }
+                else if (angle <= parent -> RuinsVar20) {
+                    if (angle >= parent -> RuinsVar19) {
+                        target_y = seek(PillarYOff, -30m, 1m)
+                    }
+                    else if (angle >= parent -> RuinsVar21) {
+                        if (PillarShake) {
+                            target_y = randi(-0.15m, 0.15m)
+                        }
+                        else {
+                            target_y = PillarYOff
+                        }
+                    }
+                }
+            }
+            if (parent -> RuinsVar23) {
+                if (PillarOrbitSpeed < 0) {
+                    if (angle >= parent -> RuinsVar24) {
+                        if (angle <= parent -> RuinsVar25) {
+                            target_y = seek(PillarYOff, -30m, 1m)
+                        }
+                        else if (angle <= parent -> RuinsVar27) {
+                            if (PillarShake) {
+                                target_y = randi(-0.15m, 0.15m)
+                            }
+                            else {
+                                target_y = PillarYOff
+                            }
+                        }
+                    }
+                }
+                else if (angle <= parent -> RuinsVar25) {
+                    if (angle >= parent -> RuinsVar24) {
+                        target_y = seek(PillarYOff, -30m, 1m)
+                    }
+                    else if (angle >= parent -> RuinsVar26) {
+                        if (PillarShake) {
+                            target_y = randi(-0.15m, 0.15m)
+                        }
+                        else {
+                            target_y = PillarYOff
+                        }
+                    }
+                }
+            }
+            if (target_y == 7.7m) {
+                PillarYOff = seek(PillarYOff, 0, 1m)
+            }
+            else {
+                PillarYOff = target_y
+            }
+            y += PillarYOff
+            PillarShake = 1 - PillarShake
+            roty = spd(roty, PillarRotSpeed)
+        }
+    }
+}
+
+state Path_Sign { // 7
+    code() {
+        zindex = -20
+        groundy = y
+        y -= 4m
+        changestate(Path_Sign_Decend)
+    }
+}
+
+state Path_Sign_Decend { // 8
+    code() {
+        sleepanim(0, SIGN)
+    }
+    trans {
+        y = seek(y, groundy - 4m, spd(4m))
+        if (distance(player, DIST_NO_Y) < 10m) {
+            soundpitch(2.0 - 1)
+            soundplay([FFarA], 1V)
+            changestate(Path_Sign_Ascend)
+        }
+    }
+}
+
+state Path_Sign_Ascend { // 9
+    code => state Path_Sign_Decend
+    trans {
+        y = seek(y, groundy + 1.5m, spd(4m))
+        changestateif(Path_Sign_Decend, distance(player, DIST_NO_Y) > 11m)
+    }
+}

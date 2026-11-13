@@ -1,0 +1,356 @@
+#gool GurOC 59 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C3_ShadC.gooh"
+//gooc -c 3 -r pal "C3\C3_GurOC.gooc" "C3\Out\C3_GurOC.nsentry"
+
+#anim CARPET_BODY   [CA1mV] [CA1mG] 24 1 2
+#anim CARPET_SHADOW [CA2mV] [CA2mG] 24 1 2
+#anim CARPET_HEAD   [CH1mV] [CH1mG] 24 1 2
+#anim CARPET_URN    [GV2mV] [GV1mG] 46 1 2
+
+#spawn S_CARPET_ASS  Carpet_Ass_Init
+#spawn S_ASS_HEAD    Carpet_Ass_Head
+#spawn S_SHADOW      Carpet_Shadow_Init
+#spawn S_URN         Carpet_Urn
+
+event Event19 => sub KillVoice
+event Event26 => sub KillVoice
+
+var MovementMode, CycleLength, CycleOffset, LookAtPlayerCountdown,
+    TrackOffset, MaxTrackOffset, TrackAlongX,
+    ShadowZOffset, ShadowMinY, ShadowLastY
+
+state Carpet_Ass_Init { // 0
+    statusc 0
+    code(mode, cyclelen, cycleoffs, shadow, limit, xtrack) {
+        MovementMode = mode
+        CycleLength = cyclelen * 1s / 1.2s
+        MaxTrackOffset = limit
+        TrackAlongX = xtrack
+        if (MovementMode == 1) {
+            CycleLength = (CycleLength >> 1) << 1
+        }
+        CycleOffset = (cycleoffs * CycleLength) >> 8
+        if (CycleOffset < 0) {
+            CycleOffset = 0
+        }
+        if (CycleOffset >= CycleLength) {
+            CycleOffset = CycleLength - 1
+        }
+        TrackOffset = 0
+        SetZindexField(32)
+        if (shadow) {
+            statusb = FLAG_COLLIDABLE | FLAG_HAS_SHADOW
+            spawn(GurOC, S_SHADOW, 1, 0, 1S, -16)
+        }
+        else {
+            statusb = FLAG_COLLIDABLE
+        }
+        troty = roty
+        LookAtPlayerCountdown = -1
+        spawn(GurOC, S_ASS_HEAD, 1)
+        if (!MovementMode) {
+            changestate(Carpet_Ass_Active)
+        }
+        else {
+            changestate(Carpet_Ass_PathTrack)
+        }
+    }
+}
+
+state Carpet_Ass_Active { // 1
+    statusc 0
+    code() {
+        soundpitch(5.442)
+        soundcount(0xFFFF)
+        sounddecay(10s)
+        soundplay([CH1mA], 1V)
+        sleepframes(CARPET_BODY, 0.0, 23.0)
+    }
+    event(e, a) {
+        accevcstate(CarpetAss_Squash, e == EventJumpedOn || e == EventSlamHit || e == EventHit || e == EventFling || e == EventHitInvincible)
+        accevcstate(CarpetAss_Fling, e == EventSpinHit || e == EventSlideHit)
+    }
+    trans {
+        pathprog = time(CycleLength, CycleOffset)
+        pathprog = pathprog * (pathlen - 1.0) / CycleLength
+        calcpath(pathprog)
+        LookAtPlayerCountdown -= 1
+        if (LookAtPlayerCountdown < 0) {
+            LookAtPlayerCountdown = rand(62)
+            troty = atan2(player -> trans)
+        }
+        vecy = degdist(roty, troty) >> 4
+        if (vecy > 1.6deg) {
+            vecy = 1.6deg
+        }
+        if (vecy < -1.6deg) {
+            vecy = -1.6deg
+        }
+        roty = (roty + vecy) % 360deg
+        sendevent(EventHit, collider, 100.0)
+        changestateif(Carpet_Ass_Stop, eventaccepted)
+    }
+}
+
+state Carpet_Ass_PathTrack { // 2
+    statusc 0
+    event => state Carpet_Ass_Active
+    code() {
+        soundpitch(5.442)
+        soundcount(0xFFFF)
+        sounddecay(10s)
+        soundplay([CH1mA], 1V)
+        sleepframes(CARPET_BODY, 0.0, 23.0)
+    }
+    trans {
+        var returning, path_x, path_z, offs
+        pathprog = (time(CycleLength, CycleOffset) * (pathlen << 1)) / CycleLength
+        if (pathprog >= pathlen) {
+            returning = 1
+            pathprog = ((pathlen << 1) - 1) - pathprog
+        }
+        calcpath(pathprog, vvec)
+        path_x = vecx
+        path_z = vecz
+        if (!TrackAlongX) {
+            offs = player -> z - path_z
+        }
+        else {
+            offs = player -> x - path_x
+        }
+        if (offs > MaxTrackOffset) {
+            offs = MaxTrackOffset
+        }
+        if (offs < -MaxTrackOffset) {
+            offs = -MaxTrackOffset
+        }
+        offs -= TrackOffset
+        if (offs > 35.2) {
+            offs = 35.2
+        }
+        if (offs < -35.2) {
+            offs = -35.2
+        }
+        TrackOffset += offs
+        if (!TrackAlongX) {
+            vecz += TrackOffset
+        }
+        else {
+            vecx += TrackOffset
+        }
+        x += (vecx - x) >> 2
+        y += (vecy - y) >> 2
+        z += (vecz - z) >> 2
+        LookAtPlayerCountdown -= 1
+        if (LookAtPlayerCountdown < 0) {
+            LookAtPlayerCountdown = rand(62)
+            troty = atan2(player -> trans)
+        }
+        vecy = degdist(roty, troty) >> 4
+        if (vecy > 1.6deg) {
+            vecy = 1.6deg
+        }
+        if (vecy < -1.6deg) {
+            vecy = -1.6deg
+        }
+        roty = (roty + vecy) % 360deg
+        sendevent(EventHit, collider, 100.0)
+        changestateif(Carpet_Ass_Stop, eventaccepted)
+    }
+}
+
+state Carpet_Ass_Head { // 3
+    statusc 0
+    code() {
+        zindex = creator -> zindex
+        sleepframes(CARPET_HEAD, 0.0, 23.0)
+    }
+    trans {
+        once {
+            rotx = creator -> rotx
+            roty = creator -> roty
+            rotz = creator -> rotz
+        }
+        var yaw
+        save (roty) {
+            roty = creator -> roty
+            yaw = roty
+        }
+        getvert(vtrans, parent, 0.0)
+        vecy = degdist(roty, atan2(player -> trans)) >> 2
+        var0 = degdist(yaw, vecy + roty)
+        if (var0 > 80deg) {
+            var0 = 80deg
+        }
+        if (var0 < -80deg) {
+            var0 = -80deg
+        }
+        vecy = degdist(roty, var0 + yaw)
+        if (vecy >= 0deg) {
+            if (vecy > 4.75deg) {
+                vecy = 4.75deg
+            }
+        }
+        else if (vecy < -4.75deg) {
+            vecy = -4.75deg
+        }
+        roty = (roty + vecy) % 360deg
+        rotz = (degdist(roty, yaw) >> 2) + roty
+        rotx = degseek(rotx, atan2_3d(self, player -> trans) - 25deg, 90deg)
+    }
+}
+
+state Carpet_Ass_Stop { // 4
+    statusc 0
+    code() {
+        statusb = 0
+        do {
+            if (animseq != getanim(CARPET_BODY)) {
+                setanim(CARPET_BODY, -1.0)
+            }
+            playframe((animframe + 1.0) % 24.0)
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(CarpetAss_Squash, e == EventHitInvincible)
+    }
+}
+
+state CarpetAss_Fling { // 5
+    stateflag 0x30
+    statusc 0x32
+    code(h) {
+        EnemyFlingCombo(h)
+        soundpitch(4.716)
+        soundplay([GV2mA], 1V)
+        EnemyFlingSetDir(0x80000)
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    }
+    trans {
+        EnemyFlingTrans(2m, EventFling)
+    }
+}
+
+state CarpetAss_Squash { // 6
+    stateflag 0x23
+    statusc 0x32
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        soundpitch(4.716)
+        soundplay([GV2mA], 1V)
+        soundsetup(0, voice, 5)
+        playframe()
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        playframe()
+    }
+}
+
+sub SetParticleColor() {
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x05, 0xBD, 0xBE)
+    }
+    else if (r == 1) {
+        SetColor1(0x0D, 0x4C, 0x4C)
+    }
+    else if (r == 2) {
+        SetColor1(0xE7, 0x85, 0x81)
+    }
+}
+
+
+state Kill { // 7
+    statusc 0
+    code() {}
+}
+
+state Carpet_Shadow_Init { // 8
+    code(hdif, scale, zdif) {
+        ShadowZOffset = zdif
+        SetScale(scale)
+        SetRot(0deg)
+        parent -> field_60 = 0
+        groundy = hdif
+        ShadowMinY = -0x7FFFFFFF
+        statusb = 0x400 | FLAG_HAS_SHADOW
+        changestate(Carpet_Shadow)
+    }
+}
+
+state Carpet_Shadow { // 9
+    code() {
+        setanim(CARPET_SHADOW)
+        sleepframe(parent -> animframe)
+    }
+    trans {
+        zindex = parent -> zindex + ShadowZOffset
+        ShadowLastY = y
+        statusb &= ~FLAG_INVISIBLE
+        x = parent -> x
+        z = parent -> z
+        y = parent -> y + groundy
+        projectobjshadow(null)
+        projectzoneshadow(null)
+        field_61 = eventaccepted
+        if (eventaccepted && (parent -> statusb & FLAG_HAS_SHADOW) && !(parent -> statusa & 0x800000)) {
+            if (abs(ShadowLastY - vecy) > 0.5m) {
+                y = vecy
+            }
+            else {
+                y = seek(ShadowLastY, vecy, 0.1m)
+            }
+            parent -> field_63 = y
+        }
+        else {
+            parent -> field_63 = -0x7FFFFFFF
+            statusb |= FLAG_INVISIBLE
+        }
+        if (((field_61 & 0x3F0) >> 4) == 4) {
+            parent -> statusa &= ~0x800000
+        }
+        if (parent -> statusa & 1) {
+            y = parent -> y
+        }
+        x = parent -> x
+        z = parent -> z
+        roty = parent -> roty
+    }
+}
+
+state Carpet_Urn { // 10
+    statusc 0
+    code() {
+        statusb = FLAG_HAS_SHADOW
+        spawn(ShadC, ShadC_S_SHADOW, 1, 0, 0.5S, 0)
+        soundpitch(4.716)
+        soundplay([GV1mA], 1V)
+        playnull(28)
+        playframes(CARPET_URN, 0.0, 45.0)
+        soundpitch(4.716)
+        soundplay([GV2mA], 1V)
+        soundsetup(0, voice, 5)
+        playnull()
+    }
+    trans {
+        x = creator -> x
+        y = creator -> y 
+        z = creator -> z
+        rotx = creator -> rotx
+        roty = creator -> roty
+        rotz = creator -> rotz
+        zindex = creator -> zindex
+    }
+}
+
+sub KillVoice() {
+    voice = -1
+    soundfadet(1.5s, voice)
+    soundfadev(0V, voice, 3)
+    voice = -1
+    soundsetup(0, voice, 5)
+}

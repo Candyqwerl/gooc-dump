@@ -1,0 +1,543 @@
+#gool BosBC 67 2
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C3_DispC.gooh"
+//gooc -c 3 -r pal -l 6 "C3\C3_BosBC.gooc" "C3\Out\C3_BosBC.nsentry"
+//gooc -c 3 -r pal -h "C3\Out\C3_BosBC.gooh" "C3\C3_BosBC.gooc" "C3\Out\C3_BosBC.nsentry"
+
+#iflev 6
+#sprite BOSS_HUD [Tin1T]
+#tex 0x808080 1 0 0 3 384 64 64 64
+#tex 0x808080 0 2 1 4 192 16 32 16
+#tex 0x808080 0 2 2 4 224 16 32 16
+#tex 0x808080 0 2 3 4 256 16 32 16
+#tex 0x808080 0 2 3 4 256 16 32 16
+#tex 0x808080 0 2 3 4 256 16 32 16
+#tex 0x808080 0 2 3 4 256 16 32 16
+#tex 0x808080 0 2 3 4 256 16 32 16
+#tex 0x808080 0 2 3 4 256 16 32 16
+#tex 0x808080 0 2 3 4 256 16 32 16
+#eliflev 3
+#sprite BOSS_HUD [Din1T]
+#tex 0x808080 1 0 0 8 0 64 64 64
+#tex 0x808080 0 2 5 12 864 64 32 16
+#tex 0x808080 0 2 6 12 864 48 32 16
+#tex 0x808080 0 2 7 12 864 32 32 16
+#tex 0x808080 0 2 7 12 864 32 32 16
+#tex 0x808080 0 2 7 12 864 32 32 16
+#tex 0x808080 0 2 7 12 864 32 32 16
+#tex 0x808080 0 2 7 12 864 32 32 16
+#tex 0x808080 0 2 7 12 864 32 32 16
+#tex 0x808080 0 2 7 12 864 32 32 16
+#eliflev 4
+#sprite BOSS_HUD [Ntr2T]
+#tex 0x808080 1 0 0 2 256 64 64 64
+#tex 0x808080 0 2 2 4 0 16 32 16
+#tex 0x808080 0 2 3 4 32 16 32 16
+#tex 0x808080 0 2 4 4 64 16 32 16
+#tex 0x808080 0 2 4 4 64 16 32 16
+#tex 0x808080 0 2 4 4 64 16 32 16
+#tex 0x808080 0 2 4 4 64 16 32 16
+#tex 0x808080 0 2 4 4 64 16 32 16
+#tex 0x808080 0 2 4 4 64 16 32 16
+#tex 0x808080 0 2 4 4 64 16 32 16
+#eliflev 5
+#sprite BOSS_HUD [Ngn1T]
+#tex 0x808080 1 0 0 9 64 64 64 64
+#tex 0x808080 0 2 0 13 256 16 32 16
+#tex 0x808080 0 2 1 13 288 16 32 16
+#tex 0x808080 0 2 2 13 320 16 32 16
+#tex 0x808080 0 2 3 13 352 16 32 16
+#tex 0x808080 0 2 4 13 384 16 32 16
+#tex 0x808080 0 2 4 13 384 16 32 16
+#tex 0x808080 0 2 4 13 384 16 32 16
+#tex 0x808080 0 2 4 13 384 16 32 16
+#tex 0x808080 0 2 4 13 384 16 32 16
+#else
+#sprite BOSS_HUD [Neo1T]
+#tex 0x808080 1 0 0 2 0 64 64 64
+#tex 0x808080 0 2 8 5 576 16 32 16
+#tex 0x808080 0 2 9 5 608 16 32 16
+#tex 0x808080 0 2 10 5 640 16 32 16
+#tex 0x808080 0 2 10 5 640 16 32 16
+#tex 0x808080 0 2 10 5 640 16 32 16
+#tex 0x808080 0 2 10 5 640 16 32 16
+#tex 0x808080 0 2 10 5 640 16 32 16
+#tex 0x808080 0 2 10 5 640 16 32 16
+#tex 0x808080 0 2 10 5 640 16 32 16
+#endif
+
+#sprite BACKGROUND [Cr10T]
+#tex 0x646464 0 1 13 8 264 12 4 4 // Blend mode is bugged, idc enough to fix atm
+
+#font FONT_SMALL [1004I]
+#char 0x000000 0 0 0 0 0 0 1 1 400 400 // 0.0
+#char 0x000000 0 0 0 0 0 0 1 1 400 400 // 1.0
+#char 0x000000 0 0 0 0 0 0 1 1 400 400 // 2.0
+#char 0x000000 0 0 0 0 0 0 1 1 400 400 // 3.0
+#char 0x000000 0 0 0 0 0 0 1 1 400 400 // 4.0
+#char 0x000000 0 0 0 0 0 0 1 1 400 400 // 5.0
+#char 0x000000 0 0 0 0 0 0 1 1 400 400 // 6.0
+#char 0x000000 0 0 0 0 0 0 1 1 400 400 // 7.0
+#char 0x000000 0 0 0 0 0 0 1 1 400 400 // 8.0
+#char 0x000000 0 0 0 0 0 0 1 1 400 400 // 9.0
+#char 0x000000 0 0 0 0 0 0 1 1 400 400 // 10.0
+#char 0x000000 0 0 0 0 0 0 1 1 400 400 // 11.0
+#char 0x000000 0 0 0 0 0 0 1 1 400 400 // 12.0
+#char 0x000000 0 0 0 0 0 0 1 1 400 400 // 13.0
+#char 0x000000 0 0 0 0 0 0 1 1 400 400 // 14.0
+#char 0x000000 0 0 0 0 0 0 1 1 400 400 // 15.0
+
+#text TEXT  FONT_SMALL[Cr10T]
+"SUPER BAUCHLANDUNG"                                // 0.0 (German: Super body slam)
+"FUR STARKERE BAUCHLANDUNG"                         // 1.0 (German: For a more powerful body slam)
+"DRUCKE SPRUNGTASTE ~c0~sx800~(~sx400~~c1 UND"      // 2.0 (German: Press jump (Cross) and)
+"~c0~sx800~*~sx400~~c1 AM HOCHSTEN SPRUNGPUNKT."    // 3.0 (German: Circle at the highest point of the jump.)
+"SUPERPLANCHA"                                      // 4.0 (Spanish: Super body slam)
+"PARA UNA SUPERPLANCHA MAS"                         // 5.0 (Spanish: For a more)
+"POTENTE PULSA ~c0~sx800~(~sx400~~c1 PARA SALTAR"   // 6.0 (Spanish: Powerful body slam, press Cross to jump)
+"Y LUEGO PULSA ~c0~sx800~*~sx400~~c1 EN EL PUNTO"   // 7.0 (Spanish: And then press Circle at the)
+"MAS ALTO."                                         // 8.0 (Spanish: Highest point.)
+"SUPER PANCIATA"                                    // 9.0 (Italian: Super belly flop)
+"PER UNA PANCIATA PIU POTENTE"                      // 10.0 (Italian: For a more powerful belly flop)
+"PREMI ~c0~sx800~(~sx400~~c1 PER SALTARE POI"       // 11.0 (Italian: Press Cross to jump, then)
+"PREMI ~c0~sx800~*~sx400~~c1 QUANDO SEI NEL"        // 12.0 (Italian: Press Circle when you are at the)
+"PUNTO PIU ALTO DEL SALTO."                         // 13.0 (Italian: Highest point of the jump.)
+"SUPER PLAT"                                        // 14.0 (French: Super belly flop)
+"POUR FAIRE UN PLAT PLUS"                           // 15.0 (French: To perform a more)
+"PUISSANT, APPUIE SUR ~c0~sx800~(~sx400~~c1 POUR"   // 16.0 (French: Powerful belly flop, press Cross to)
+"SAUTER, PUIS APPUIE SUR ~c0~sx800~*"               // 17.0 (French: Jump, then press Circle)
+"EN HAUT DU SAUT."                                  // 18.0 (French: At the top of the jump.)
+"SUPER CHARGED BODY SLAM"                           // 19.0
+"FOR A MORE POWERFUL BELLY FLOP"                    // 20.0
+"PRESS ~c0~sx800~(~sx400~~c1 BUTTON TO JUMP,"       // 21.0
+"AND THEN PRESS ~c0~sx800~*~sx400~~c1 BUTTON"       // 22.0
+"AT THE TOP OF THE JUMP"                            // 23.0
+"DOPPELTER SPRUNG"                                  // 24.0 (German: Double jump)
+"FUR DOPPELT HOHEN SPRUNG"                          // 25.0 (German: To jump twice as high)
+"DRUCKE SPRUNGTASTE ~c0~sx800~(~sx400~~c1,"         // 26.0 (German: Press jump (Cross),)
+"AM HOCHSTEN SPRUNGPUNKT"                           // 27.0 (German: At the highest point of the jump)
+"DRUCKE NOCHMALS ~c0~sx800~(~sx400~~c1."            // 28.0 (German: Press Cross again.)
+"DOBLE SALTO"                                       // 29.0 (Spanish: Double jump)
+"PARA SALTAR EL DOBLE DE ALTO"                      // 30.0 (Spanish: To jump twice as high)
+"PULSA ~c0~sx800~(~sx400~~c1 PARA SALTAR Y LUEGO"   // 31.0 (Spanish: Press Cross to jump and then)
+"PULSA ~c0~sx800~(~sx400~~c1 EN EL PUNTO MAS ALTO." // 32.0 (Spanish: Press Cross at the highest point.)
+"DOPPIO SALTO"                                      // 33.0 (Italian: Double jump)
+"PER SALTARE PIU IN ALTO"                           // 34.0 (Italian: To jump higher)
+"PREMI ~c0~sx800~(~sx400~~c1 PER SALTARE E POI"     // 35.0 (Italian: Press Cross to jump and then)
+"PREMI ~c0~sx800~(~sx400~~c1 QUANDO SEI NEL"        // 36.0 (Italian: Press Cross when you are at the)
+"DOUBLE SAUT"                                       // 37.0 (French: Double jump)
+"POUR SAUTER DEUX FOIS PLUS"                        // 38.0 (French: To jump twice as)
+"HAUT, APPUIE SUR ~c0~sx800~(~sx400~~c1 POUR"       // 39.0 (French: High, press Cross to)
+"SAUTER PUIS APPUIE A NOUVEAU"                      // 40.0 (French: Jump, then press again)
+"SUR ~c0~sx800~(~sx400~~c1 EN HAUT DU SAUT."        // 41.0 (French: Cross at the top of the jump.)
+"DOUBLE JUMP"                                       // 42.0
+"TO JUMP TWICE AS HIGH"                             // 43.0
+"AND THEN PRESS ~c0~sx800~(~sx400~~c1 BUTTON"       // 44.0
+"AGAIN AT THE TOP OF THE JUMP"                      // 45.0
+"TODLICHE TORNADO DREHUNG"                          // 46.0 (German: Death tornado spin)
+"UM SICH LANGER UND SCHNELLER"                      // 47.0 (German: To turn longer and faster)
+"ZU DREHEN, ODER"                                   // 48.0 (German: In a spin, or)
+"UM IN DER LUFT ZU GLEITEN"                         // 49.0 (German: To glide in the air)
+"DRUCKE WIEDERHOLT ~c0~sx800~;~sx400~~c1."          // 50.0 (German: Press Square repeatedly.)
+"TORBELLINO DE LA MUERTE"                           // 51.0 (Spanish: Death tornado spin)
+"PARA GIRAR MAS TIEMPO Y MAS"                       // 52.0 (Spanish: To spin longer and)
+"RAPIDO O PARA PLANEAR DESDE"                       // 53.0 (Spanish: Faster or to glide through)
+"EL AIRE, PULSA ~c0~sx800~;~sx400~~c1 REPETIDAS"    // 54.0 (Spanish: The air, press Square repeated)
+"VECES."                                            // 55.0 (Spanish: Times.)
+"TORNADO MORTALE"                                   // 56.0 (Italian: Death tornado)
+"PER GIRARE PIU A LUNGO E PIU"                      // 57.0 (Italian: To spin longer and)
+"VELOCE O PER PLANARE SE SEI IN"                    // 58.0 (Italian: Faster or to glide while in the)
+"ARIA PREMI ~c0~sx800~;~sx400~~c1 RIPETUTAMENTE."   // 59.0 (Italian: Air, press Square repeatedly.)
+"TOURBILLON DE LA MORT"                             // 60.0 (French: Death tornado spin)
+"POUR TOURNER PLUS LONGTEMPS ET"                    // 61.0 (French: To spin longer and)
+"PLUS VITE, OU POUR PLANER EN"                      // 62.0 (French: Faster, or to glide in)
+"L'AIR, APPUIE SUR ~c0~sx800~;~sx400~~c1"           // 63.0 (French: The air, press Square)
+"A PLUSIEURS REPRISES."                             // 64.0 (French: Repeatedly.)
+"DEATH TORNADO SPIN"                                // 65.0
+"TO SPIN LONGER AND FASTER"                         // 66.0
+"OR TO GLIDE WHILE IN THE AIR"                      // 67.0
+"PRESS ~c0~sx800~;~sx400~~c1 BUTTON REPEATEDLY"     // 68.0
+"FRUCHT BAZOOKA"                                    // 69.0 (German: Fruit bazooka)
+"UM FRUCHT AUF ZIEL ZU FEUERN"                      // 70.0 (German: To fire fruit at a target)
+"DRUCKE L2 UM WAFFE ZU HEBEN"                       // 71.0 (German: Press L2 to raise the gun)
+"ZIELE MIT RICHTUNGSTASTE"                          // 72.0 (German: Aim with the directional button)
+"DRUCKE ~c0~sx800~*~sx400~~c1 UM ZU FEUERN."        // 73.0 (German: Press Circle to fire.)
+"FRUTA BAZOOKA"                                     // 74.0 (Spanish: Fruit bazooka)
+"PARA DISPARAR FRUTA A UN PUNTO"                    // 75.0 (Spanish: To fire fruit at a target)
+"PULSA L2 PARA SACAR EL ARMA."                      // 76.0 (Spanish: Press L2 to take out the gun.)
+"APUNTA CON EL BOTON DE"                            // 77.0 (Spanish: Aim with the)
+"DIRECCION Y DISPARA CON ~c0~sx800~*~sx400~~c1."    // 78.0 (Spanish: Directional button and fire with Circle.)
+"BAZOOKA FRUTTA"                                    // 79.0 (Italian: Fruit bazooka)
+"PER SPARARE ALL'OBIETTIVO"                         // 80.0 (Italian: To fire at the target)
+"PREMI L2 PER PRENDERE L'ARMA,"                     // 81.0 (Italian: Press L2 to take out the gun,)
+"MIRA CON I TASTI DIREZIONALI,"                     // 82.0 (Italian: Aim with the directional buttons,)
+"QUINDI PREMI ~c0~sx800~*~sx400~~c1 PER SPARARE."   // 83.0 (Italian: Then press Circle to fire.)
+"BAZOOKA A FRUITS"                                  // 84.0 (French: Fruit bazooka)
+"POUR TIRER SUR UN FRUIT APPUIE"                    // 85.0 (French: To shoot at a fruit, press)
+"SUR L2 POUR SORTIR L'ARME, SUR"                    // 86.0 (French: L2 to take out the gun, and)
+"LES TOUCHES DIRECTIONELLES"                        // 87.0 (French: The directional buttons)
+"POUR VISER, SUR ~c0~sx800~*~sx400~~c1 POUR TIRER." // 88.0 (French: To aim, and Circle to fire.)
+"FRUIT BAZOOKA"                                     // 89.0
+"TO FIRE FRUIT AT A TARGET"                         // 90.0
+"HOLD L2 BUTTON TO RAISE GUN,"                      // 91.0
+"AIM WITH DIRECTIONAL BUTTONS,"                     // 92.0
+"THEN PRESS ~c0~sx800~*~sx400~~c1 BUTTON TO FIRE"   // 93.0
+"SCHNELLIGKEITSSCHUHE"                              // 94.0 (German: Speed shoes)
+"UM SCHNELLER ZU RENNEN"                            // 95.0 (German: To run faster)
+"HALTE WAHREND DES RENNENS"                         // 96.0 (German: While running, keep)
+"DIE R2-TASTE GEDRUCKT."                            // 97.0 (German: The R2 button held down.)
+"SPANISH: ZAPATOS VELOCES"                          // 98.0 (Spanish: Spanish: Speed shoes)
+"PARA CORRER MAS RAPIDO MANTEN"                     // 99.0 (Spanish: To run faster, keep)
+"PULSADO R2 MIENTRAS CORRES."                       // 100.0 (Spanish: R2 held down while running.)
+"SCARPE VELOCI"                                     // 101.0 (Italian: Speed shoes)
+"PER CORRERE PIU VELOCE"                            // 102.0 (Italian: To run faster)
+"TIENI PREMUTO R2 MENTRE CORRI."                    // 103.0 (Italian: Hold R2 while running.)
+"CHAUSSURES DE VITESSE"                             // 104.0 (French: Speed shoes)
+"POUR COURIR PLUS VITE"                             // 105.0 (French: To run faster)
+"MAINTIENS LA TOUCHE R2"                            // 106.0 (French: Hold the R2 button)
+"QUAND TU COURS."                                   // 107.0 (French: While running.)
+"SPEED SHOES"                                       // 108.0
+"TO RUN FASTER"                                     // 109.0
+"HOLD DOWN R2 BUTTON"                               // 110.0
+"WHILE RUNNING"                                     // 111.0
+"WEITER MIT ~c0~sx800~)"                            // 112.0 (German: Continue with Triangle)
+"PULSA ~c0~sx800~)~sx400~~c1 PARA CONTINUAR"        // 113.0 (Spanish: Press Triangle to continue)
+"PREMI ~c0~sx800~)~sx400~~c1 PER CONTINUARE"        // 114.0 (Italian: Press Triangle to continue)
+"APPUIE SUR ~c0~sx800~)~sx400~~c1 POUR CONTINUER"   // 115.0 (French: Press Triangle to continue)
+"PRESS ~c0~sx800~)~sx400~~c1 BUTTON TO CONTINUE"    // 116.0
+
+#spawn S_HEALTH_TICK  Health_Tick
+#spawn S_HEALTH       Health
+#spawn S_REWARD_DESC  Reward_Description
+#spawn S_BACKGROUND   Background
+
+var mem1, mem2, mem3, mem4, mem5, mem6, mem7,
+    mem8, mem9, mem10, mem11,
+    TextTitleFrame, TextLine1Frame, TextLine2Frame, TextLine3Frame, TextLine4Frame
+
+expr POWER_ID_SUPER_BODY_SLAM = 700.0
+expr POWER_ID_DOUBLE_JUMP = 701.0
+expr POWER_ID_DEATH_TORNADO_SPIN = 702.0
+expr POWER_ID_FRUIT_BAZOOKA = 703.0
+expr POWER_ID_SPEED_SHOES = 704.0
+
+state Health { // 0
+    statusc 0
+    code(h) {
+        statusb = creator -> statusb
+        vfx = creator -> vfx
+        health = creator -> health
+        zindex = creator -> zindex - 1
+        SetScale(0x146, 0x103, 0x1000)
+        setanim(BOSS_HUD)
+        x = creator -> vecx + (creator -> x + 31.0 * (h >> 8))
+        y = creator -> y + creator -> vecy
+        while (h < health) {
+            health = creator -> health
+            playframe(h + 1.0)
+        }
+        do (var i = 0) {
+            playnull()
+            setanim(BOSS_HUD)
+            playframe(h + 1.0, 2)
+            i += 1.0
+        } while (i < 6.0)
+    }
+}
+
+state Health_Tick { // 1
+    statusc 0
+    __transargs
+    code(boss_health, format) {
+        movetolist(1.0, self)
+        zindex = 50
+        SetTrans(-220.0, 82.9609375, 0.0)
+        SetRot(0deg)
+        SetVFX2D()
+        while (GLOBAL_119 & 4.0 || GLOBAL_106) {
+            playnull()
+        }
+        vecx = 39.0
+        SetScale(0x28D, 0x40E, 0x1000)
+        if (var level = LEVEL; level == LEVEL_BossTiny) {
+            vecy = 15.0
+            vecx = 28.0
+        }
+        else if (level == LEVEL_BossDingodile) {
+            vecx = 36.0
+        }
+        else if (level == LEVEL_BossNTropy) {
+            vecx = 34.0
+        }
+        else if (level == LEVEL_BossNGin2) {
+            vecy = -0x38E
+            vecx = 37.0
+        }
+        else if (level == LEVEL_BossCortex2) {
+            scalex = 0x2DF
+            y = -0x7097
+            vecx = 30.0
+            vecy += 0x5ED
+        }
+        do (var i = 0) {
+            spawn2(BosBC, S_HEALTH, 1, i)
+            i += 1.0
+        } while (i < boss_health)
+        while (stalltime) {
+            playanim(0, BOSS_HUD)
+        }
+    }
+    trans {
+        if (LEVEL == LEVEL_BossNGin2) {
+            health = creator -> yzapproach
+        }
+        else {
+            health = creator -> health
+        }
+        if (format == 1) {
+            health = boss_health - (health << 8)
+        }
+        else if (format == 2) {
+            health = boss_health - health
+        }
+        else if (format == 3) {
+            health <<= 8
+        }
+    }
+}
+
+state Reward_Description { // 2
+    statusc 0
+    code(reward) {
+        movetolist(1.0, self)
+        SetScale(0xA3, 0x103, 0x1000)
+        SetTrans(0.0, 87.0, 0.0)
+        zindex = 200
+        SetRot(0deg)
+        TextLine3Frame = 0
+        TextLine4Frame = 0
+        var0 = 50
+        if (var r = reward; r == POWER_ID_SUPER_BODY_SLAM) {
+            if (var lang = GLOBAL_151; lang == LANG_DE) {
+                TextTitleFrame = 0.0
+                TextLine1Frame = 1.0
+                TextLine2Frame = 2.0
+                TextLine3Frame = 3.0
+            }
+            else if (lang == LANG_ES) {
+                TextTitleFrame = 4.0
+                TextLine1Frame = 5.0
+                TextLine2Frame = 6.0
+                TextLine3Frame = 7.0
+                TextLine4Frame = 8.0
+            }
+            else if (lang == LANG_IT) {
+                TextTitleFrame = 9.0
+                TextLine1Frame = 10.0
+                TextLine2Frame = 11.0
+                TextLine3Frame = 12.0
+                TextLine4Frame = 13.0
+            }
+            else if (lang == LANG_FR) {
+                TextTitleFrame = 14.0
+                TextLine1Frame = 15.0
+                TextLine2Frame = 16.0
+                TextLine3Frame = 17.0
+                TextLine4Frame = 18.0
+            }
+            else {
+                TextTitleFrame = 19.0
+                TextLine1Frame = 20.0
+                TextLine2Frame = 21.0
+                TextLine3Frame = 22.0
+                TextLine4Frame = 23.0
+            }
+        }
+        else if (r == POWER_ID_DOUBLE_JUMP) {
+            if (var lang = GLOBAL_151; lang == LANG_DE) {
+                TextTitleFrame = 24.0
+                TextLine1Frame = 25.0
+                TextLine2Frame = 26.0
+                TextLine3Frame = 27.0
+                TextLine4Frame = 28.0
+            }
+            else if (lang == LANG_ES) {
+                TextTitleFrame = 29.0
+                TextLine1Frame = 30.0
+                TextLine2Frame = 31.0
+                TextLine3Frame = 32.0
+            }
+            else if (lang == LANG_IT) {
+                TextTitleFrame = 33.0
+                TextLine1Frame = 34.0
+                TextLine2Frame = 35.0
+                TextLine3Frame = 36.0
+                TextLine4Frame = 13.0
+            }
+            else if (lang == LANG_FR) {
+                TextTitleFrame = 37.0
+                TextLine1Frame = 38.0
+                TextLine2Frame = 39.0
+                TextLine3Frame = 40.0
+                TextLine4Frame = 41.0
+            }
+            else {
+                TextTitleFrame = 42.0
+                TextLine1Frame = 43.0
+                TextLine2Frame = 21.0
+                TextLine3Frame = 44.0
+                TextLine4Frame = 45.0
+            }
+        }
+        else if (r == POWER_ID_DEATH_TORNADO_SPIN) {
+            if (var lang = GLOBAL_151; lang == LANG_DE) {
+                TextTitleFrame = 46.0
+                TextLine1Frame = 47.0
+                TextLine2Frame = 48.0
+                TextLine3Frame = 49.0
+                TextLine4Frame = 50.0
+            }
+            else if (lang == LANG_ES) {
+                TextTitleFrame = 51.0
+                TextLine1Frame = 52.0
+                TextLine2Frame = 53.0
+                TextLine3Frame = 54.0
+                TextLine4Frame = 55.0
+            }
+            else if (lang == LANG_IT) {
+                TextTitleFrame = 56.0
+                TextLine1Frame = 57.0
+                TextLine2Frame = 58.0
+                TextLine3Frame = 59.0
+            }
+            else if (lang == LANG_FR) {
+                TextTitleFrame = 60.0
+                TextLine1Frame = 61.0
+                TextLine2Frame = 62.0
+                TextLine3Frame = 63.0
+                TextLine4Frame = 64.0
+            }
+            else {
+                TextTitleFrame = 65.0
+                TextLine1Frame = 66.0
+                TextLine2Frame = 67.0
+                TextLine3Frame = 68.0
+            }
+        }
+        else if (r == POWER_ID_FRUIT_BAZOOKA) {
+            var0 = 200
+            if (var lang = GLOBAL_151; lang == LANG_DE) {
+                TextTitleFrame = 69.0
+                TextLine1Frame = 70.0
+                TextLine2Frame = 71.0
+                TextLine3Frame = 72.0
+                TextLine4Frame = 73.0
+            }
+            else if (lang == LANG_ES) {
+                TextTitleFrame = 74.0
+                TextLine1Frame = 75.0
+                TextLine2Frame = 76.0
+                TextLine3Frame = 77.0
+                TextLine4Frame = 78.0
+            }
+            else if (lang == LANG_IT) {
+                TextTitleFrame = 79.0
+                TextLine1Frame = 80.0
+                TextLine2Frame = 81.0
+                TextLine3Frame = 82.0
+                TextLine4Frame = 83.0
+            }
+            else if (lang == LANG_FR) {
+                TextTitleFrame = 84.0
+                TextLine1Frame = 85.0
+                TextLine2Frame = 86.0
+                TextLine3Frame = 87.0
+                TextLine4Frame = 88.0
+            }
+            else {
+                TextTitleFrame = 89.0
+                TextLine1Frame = 90.0
+                TextLine2Frame = 91.0
+                TextLine3Frame = 92.0
+                TextLine4Frame = 93.0
+            }
+        }
+        else if (r == POWER_ID_SPEED_SHOES) {
+            if (var lang = GLOBAL_151; lang == LANG_DE) {
+                TextTitleFrame = 94.0
+                TextLine1Frame = 95.0
+                TextLine2Frame = 96.0
+                TextLine3Frame = 97.0
+            }
+            else if (lang == LANG_ES) {
+                TextTitleFrame = 98.0
+                TextLine1Frame = 99.0
+                TextLine2Frame = 100.0
+            }
+            else if (lang == LANG_IT) {
+                TextTitleFrame = 101.0
+                TextLine1Frame = 102.0
+                TextLine2Frame = 103.0
+            }
+            else if (lang == LANG_FR) {
+                TextTitleFrame = 104.0
+                TextLine1Frame = 105.0
+                TextLine2Frame = 106.0
+                TextLine3Frame = 107.0
+            }
+            else {
+                TextTitleFrame = 108.0
+                TextLine1Frame = 109.0
+                TextLine2Frame = 110.0
+                TextLine3Frame = 111.0
+            }
+        }
+        spawn2(BosBC, S_BACKGROUND, 1, x, y - 73.0, 0x1327, 0x8E0, var0)
+        spawn2(DispC, DispC_S_MENU_TEXT, 1, getanim(TEXT), TextTitleFrame, 0, 0, 3, 4.0, 37.0)
+        spawn2(DispC, DispC_S_MENU_TEXT, 1, getanim(TEXT), TextLine1Frame, 0, -37.0, 3, 0, 37.0)
+        spawn2(DispC, DispC_S_MENU_TEXT, 1, getanim(TEXT), TextLine2Frame, 0, -56.0, 3, 0, 37.0)
+        if (TextLine3Frame) {
+            spawn2(DispC, DispC_S_MENU_TEXT, 1, getanim(TEXT), TextLine3Frame, 0, -75.0, 3, 0, 37.0)
+        }
+        if (TextLine4Frame) {
+            spawn2(DispC, DispC_S_MENU_TEXT, 1, getanim(TEXT), TextLine4Frame, 0, -94.0, 3, 0, 37.0)
+        }
+        if (var lang = GLOBAL_151; lang == LANG_DE) {
+            TextTitleFrame = 112.0
+        }
+        else if (lang == LANG_ES) {
+            TextTitleFrame = 113.0
+        }
+        else if (lang == LANG_IT) {
+            TextTitleFrame = 114.0
+        }
+        else if (lang == LANG_FR) {
+            TextTitleFrame = 115.0
+        }
+        else {
+            TextTitleFrame = 116.0
+        }
+        spawn2(DispC, DispC_S_MENU_TEXT, 1, getanim(TEXT), TextTitleFrame, 0, -125.0, 3, 7.0, 37.0)
+        until (buttonpress(PAD_TRIANGLE)) {
+            playnull()
+        }
+        sendevent(Event21, player, 0)
+    }
+}
+
+state Background { // 3
+    statusc 0
+    __transargs
+    code(px, py, sx, sy, zm) {
+        SetTrans(px, py, 0)
+        SetScale(sx, sy, 0)
+        SetVFX2D()
+        sleepanim(0, BACKGROUND)
+    }
+    trans {
+        zindex = parent -> zindex - zm
+    }
+}
+
+

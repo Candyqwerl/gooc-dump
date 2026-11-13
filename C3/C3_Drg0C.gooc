@@ -1,0 +1,273 @@
+#gool Drg0C 6 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_Drg0C.gooc" "C3\Out\C3_Drg0C.nsentry"
+
+#anim DRAGON_WAIT_HIGH    [Dr10V] [Drg0G] 17 1 2
+#anim DRAGON_READY_HIGH   [Dr20V] [Drg0G] 16 1 2
+#anim DRAGON_FLY_HIGH     [Dr30V] [Drg0G] 126 1 2
+#anim DRAGON_WAIT_LOW     [Dr40V] [Drg0G] 17 1 2
+#anim DRAGON_READY_LOW    [Dr50V] [Drg0G] 16 1 2
+#anim DRAGON_FLY_LOW      [Dr60V] [Drg0G] 126 1 2
+#anim DRAGON_FLY_LOWHIGH  [Dr70V] [Drg0G] 126 1 2
+
+#spawn S_DRAGON   Dragon_Init
+
+event Event10 => state Dragon_Die
+event Event19 => sub KillVoice
+event Event26 => sub KillVoice
+event Event29 => state Dragon_Die
+
+var TriggerDistance, FlightVariant, IdlePhase, FlightOffset, ZindexDefault, ZindexAlt, ZindexDistance
+
+inline sub UpdateZindex() {
+    if (CAMTRANSZ - z >= ZindexDistance) {
+        zindex = ZindexAlt
+    }
+    else {
+        zindex = ZindexDefault
+    }
+}
+
+inline sub playdragonframes(anim, end) {
+    setanim(anim, -1.0)
+    do {
+        playframe(animframe + 1.0)
+    } while (animframe + 1.0 <= end)
+}
+
+inline sub SoundDragonFly() {
+    soundpitch(6.892)
+    sounddecay(6.4s)
+    sounddelay(0.3s)
+    soundplay([Dr1aA], 0.8V)
+}
+
+state Dragon_Init { // 0
+    stateflag 0x4004081
+    statusc 0x0
+    code(variant, range, phase, yaw, mirror, skipwait, offset, zbase, zalt, depth) {
+        FlightVariant = variant
+        TriggerDistance = range
+        IdlePhase = phase * 1s / 1.2s
+        FlightOffset = offset * 1s / 1.2s
+        ZindexDefault = zbase
+        ZindexAlt = zalt
+        ZindexDistance = depth
+        roty = yaw
+        if (mirror) {
+            scalex = -abs(scalex)
+        }
+        statusb = FLAG_COLLIDABLE | FLAG_NO_CAMERA_CLIP
+        if (player -> stateflag & 0x2000 && skipwait) {
+            changestate(Dragon_Fly_Offset)
+        }
+        else {
+            changestate(Dragon_Wait_Player)
+        }
+    }
+}
+state Dragon_Wait_Player { // 1
+    stateflag 0x4004081
+    statusc 0x0
+    code() {
+        if (FlightVariant == 1) {
+            var0 = 17.0
+        }
+        else {
+            var0 = 17.0
+        }
+        animframe = ((IdlePhase & 0xFF) * (var0 >> 8)) >> 8 << 8
+        if (animframe) {
+            if (FlightVariant == 1) {
+                playframes(DRAGON_WAIT_LOW, animframe, 16.0)
+            }
+            else {
+                playframes(DRAGON_WAIT_HIGH, animframe, 16.0)
+            }
+        }
+        do {
+            changestateif(Dragon_Fly, player -> z <= z + TriggerDistance)
+            if (FlightVariant == 1) {
+                playframes(DRAGON_WAIT_LOW, 0.0, 16.0)
+            }
+            else {
+                playframes(DRAGON_WAIT_HIGH, 0.0, 16.0)
+            }
+        } while (1)
+    }
+    trans {
+        UpdateZindex()
+        sendevent(Event24, collider, 100.0)
+        if (eventaccepted) {
+            settrans(UpdateZindexWait)
+        }
+    }
+}
+
+sub UpdateZindexWait() { // S-96
+    UpdateZindex()
+}
+
+state Dragon_Fly { // 2
+    stateflag 0x4004081
+    statusc 0x0
+    code() {
+        SoundDragonFly()
+        if (FlightVariant == 0) {
+            playframes(DRAGON_READY_HIGH, 0.0, 15.0)
+            playframes(DRAGON_FLY_HIGH, 0.0, 125.0)
+        }
+        else if (FlightVariant == 1) {
+            playframes(DRAGON_READY_LOW, 0.0, 15.0)
+            playframes(DRAGON_FLY_LOW, 0.0, 125.0)
+        }
+        else {
+            playframes(DRAGON_READY_HIGH, 0.0, 15.0)
+            playframes(DRAGON_FLY_LOWHIGH, 0.0, 125.0)
+        }
+        KillEntity()
+    }
+    trans {
+        UpdateZindex()
+        sendevent(Event24, collider, 100.0)
+        if (eventaccepted) {
+            settrans(UpdateZindexFly)
+        }
+    }
+}
+
+sub UpdateZindexFly() { // S-172
+    UpdateZindex()
+}
+
+state Dragon_Fly_Offset { // 3
+    stateflag 0x4004081
+    statusc 0x0
+    code() {
+        var waiting, ready, flying, total
+        if (FlightOffset < 0) {
+            FlightOffset = -FlightOffset
+            if (FlightVariant == 1) {
+                waiting = 17
+            }
+            else {
+                waiting = 17
+            }
+            field_61 = FlightOffset % waiting
+            if (field_61) {
+                animframe = (waiting - field_61) << 8
+                if (FlightVariant == 1) {
+                    playframes(DRAGON_WAIT_LOW, animframe, 16.0)
+                }
+                else {
+                    playframes(DRAGON_WAIT_HIGH, animframe, 16.0)
+                }
+            }
+            field_61 = FlightOffset / waiting
+            FlightOffset = 0
+            while (field_61) {
+                if (FlightVariant == 1) {
+                    playdragonframes(DRAGON_WAIT_LOW, 16.0)
+                }
+                else {
+                    playdragonframes(DRAGON_WAIT_HIGH, 16.0)
+                }
+                field_61 -= 1
+            }
+        }
+        SoundDragonFly()
+        if (FlightVariant == 0) {
+            ready = 16
+            flying = 126
+        }
+        else if (FlightVariant == 1) {
+            ready = 16
+            flying = 126
+        }
+        else {
+            ready = 16
+            flying = 126
+        }
+        total = ready + flying
+        if (FlightOffset < total) {
+            if (FlightOffset < ready) {
+                animframe = FlightOffset << 8
+                if (FlightVariant == 0) {
+                    playframes(DRAGON_READY_HIGH, animframe, 15.0)
+                    playdragonframes(DRAGON_FLY_HIGH, 125.0)
+                }
+                else if (FlightVariant == 1) {
+                    playframes(DRAGON_READY_LOW, animframe, 15.0)
+                    playdragonframes(DRAGON_FLY_LOW, 125.0)
+                }
+                else {
+                    playframes(DRAGON_READY_HIGH, animframe, 15.0)
+                    playdragonframes(DRAGON_FLY_LOWHIGH, 125.0)
+                }
+            }
+            else {
+                FlightOffset -= ready
+                animframe = FlightOffset << 8
+                if (FlightVariant == 0) {
+                    playframes(DRAGON_FLY_HIGH, animframe, 125.0)
+                }
+                else if (FlightVariant == 1) {
+                    playframes(DRAGON_FLY_LOW, animframe, 125.0)
+                }
+                else {
+                    playframes(DRAGON_FLY_LOWHIGH, animframe, 125.0)
+                }
+            }
+        }
+        KillEntity()
+    }
+    trans {
+        UpdateZindex()
+        sendevent(Event24, collider, 100.0)
+        if (eventaccepted) {
+            settrans(UpdateZindexWaitFly)
+        }
+    }
+}
+
+sub UpdateZindexWaitFly() { // S-377
+    UpdateZindex()
+}
+
+state Dragon_Die { // 4
+    stateflag 0x23
+    statusc 0x32
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        scaley = (scaley * 12) >> 8
+        scalex = (scalex * 0x10C) >> 8
+        scalez = (scalez * 0x10C) >> 8
+        playframe()
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        playframe()
+    }
+}
+
+sub SetParticleColor() { // S-405
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x05, 0xBD, 0xBE)
+    }
+    else if (r == 1) {
+        SetColor1(0x0D, 0x4C, 0x4C)
+    }
+    else if (r == 2) {
+        SetColor1(0xE7, 0x85, 0x81)
+    }
+}
+
+sub KillVoice() { // S-428
+    voice = -1
+    soundfadet(0.7s, voice)
+    soundfadev(0, voice, 3)
+    voice = -1
+    soundsetup(0, voice, 5)
+}

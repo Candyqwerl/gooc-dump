@@ -1,0 +1,1280 @@
+#gool WStOC 78 2
+#interruptcount 84
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C3_DispC.gooh"
+//gooc -c 3 -r pal "C3\C3_WStOC.gooc" "C3\Out\C3_WStOC.nsentry"
+
+#sprite ICON_TINY [Wrp5T]
+#tex 0x808080 1 0 0 3 192 64 64 64
+#sprite ICON_DINGO [Wrp5T]
+#tex 0x808080 1 0 0 4 256 64 64 64
+#sprite ICON_NTRO [Wrp5T]
+#tex 0x808080 1 0 0 1 64 64 64 64
+#sprite ICON_NGIN [Wrp5T]
+#tex 0x808080 1 0 0 2 128 64 64 64
+#sprite ICON_CORTEX_1 [Wrp5T]
+#tex 0x808080 1 0 0 5 320 64 64 64
+#sprite ICON_CORTEX_2 [Sec2T]
+#tex 0x808080 1 0 0 6 320 64 64 64
+#sprite ICON_CRASH [Wrp1T]
+#tex 0x808080 1 0 0 2 0 64 64 64
+#sprite ICON_COCO [Wrp1T]
+#tex 0x808080 1 0 0 3 64 64 64 64
+#sprite BACKGROUND_DARK [Cr10T]
+#tex 0x282828 0 1 13 8 264 12 4 4
+#sprite BACKGROUND_LIGHT [Cr10T]
+#tex 0x505050 0 1 13 8 264 12 4 4
+
+#include "..\\Includes\\Fonts\\C3_FONT_SMALL.gooc"
+#include "..\\Includes\\Fonts\\C3_FONT_BIG.gooc"
+
+#text TEXT    FONT_SMALL[1022I]
+"UNKNOWN"             // 0.0
+"WARP ROOM"           // 1.0
+"TOAD VILLAGE"        // 2.0
+"UNDER PRESSURE"      // 3.0
+"ORIENT EXPRESS"      // 4.0
+"BONE YARD"           // 5.0
+"MAKIN' WAVES"        // 6.0
+"GEE WIZ"             // 7.0
+"HANG'EM HIGH"        // 8.0
+"HOG RIDE"            // 9.0
+"TOMB TIME"           // 10.0
+"MIDNIGHT RUN"        // 11.0
+"DINO MIGHT!"         // 12.0
+"DEEP TROUBLE"        // 13.0
+"HIGH TIME"           // 14.0
+"ROAD CRASH"          // 15.0
+"DOUBLE HEADER"       // 16.0
+"SPHYNXINATOR"        // 17.0
+"BYE BYE BLIMPS"      // 18.0
+"TELL NO TALES"       // 19.0
+"FUTURE FRENZY"       // 20.0
+"TOMB WADER"          // 21.0
+"GONE TOMORROW"       // 22.0
+"ORANGE ASPHALT"      // 23.0
+"FLAMING PASSION"     // 24.0
+"MAD BOMBERS"         // 25.0
+"BUG LITE"            // 26.0
+"SKI CRAZED"          // 27.0
+"AREA 51?"            // 28.0
+"RINGS OF POWER"      // 29.0
+"HOT COCO"            // 30.0
+"EGGIPUS REX"         // 31.0
+"TINY TIGER"          // 32.0
+"DINGODILE"           // 33.0
+"N. TROPY"            // 34.0
+"N. GIN"              // 35.0
+"N. CORTEX"           // 36.0
+"ZEIT-MODUS"          // 37.0
+"CONTRARRELOJ"        // 38.0
+"CRONOMETRO"          // 39.0
+"CHRONO"              // 40.0
+"TIME TRIAL"          // 41.0
+"ERFORDERT"           // 42.0
+"REQUIERE"            // 43.0
+"RICHIEDE"            // 44.0
+"BESOIN DE"           // 45.0
+"REQUIRES"            // 46.0
+"EINTRITT"            // 47.0
+"PARA ENTRAR"         // 48.0
+"PER ENTRARE"         // 49.0
+"POUR ENTRER"         // 50.0
+"TO ENTER"            // 51.0
+"%d"                  // 52.0
+"B %d G %d"           // 53.0
+"%3d %d:%02d %02d"    // 54.0
+"%3s %d:%02d:%02d"    // 55.0
+"    %d:%02d:%02d"    // 56.0
+
+#spawn S_WARP_STATS        Display_Init
+#spawn S_TEXT              Display_Text
+#spawn S_RECORD_TIME       Record_Time
+#spawn S_BACKGROUND        Panel_Background
+#spawn S_REWARDS           Reward_Panel
+#spawn S_REWARD_ICON       Reward_Icon
+#spawn S_TIME_TRIAL        TimeTrial_Panel
+#spawn S_TARGET_TIME       TargetTime_Init
+#spawn S_RELIC_REQUIREMENT Relic_Requirement_Panel
+#spawn S_RELIC_COUNT       Relic_Count_Text
+#spawn S_BOSS_ICON         Boss_Icon
+
+var mem1, mem2, mem3, mem4, mem5, mem6, mem7, mem8, mem9, mem10, mem11
+var PanelOffsetX, PanelOffsetY
+var CrystalIcon, FirstGemIcon, SecondGemIcon, RelicIcon
+var PreviousX, PreviousY
+var CrystalTransfer, FirstGemTransfer, SecondGemTransfer, RelicTransfer
+var CollectedGemCount, CollectedRewards, RewardBoss, RewardLevel
+
+expr RightPanel     = field_60
+expr BossIndex      = field_61
+expr IsBossLevel    = field_62
+expr DisplayLevel   = field_63
+expr RequestedLevel = groundy
+expr UpperElement   = speed
+expr CollectedPanel = groundtime
+expr TitleText      = density
+expr SapphireTarget = GLOBAL_121
+expr GoldTarget     = GLOBAL_122
+expr PlatinumTarget = GLOBAL_123
+expr TargetRelic    = RelicTransfer
+
+expr ID_RELIC_SAPP = 400.0
+expr ID_RELIC_GOLD = 500.0
+expr ID_RELIC_PLAT = 600.0
+expr ID_CRYSTAL    = 200.0
+expr ID_GEM        = 300.0
+
+state Display_Init { // 0
+    stateflag 0x1
+    statusc 0
+    code(boss) {
+        BossIndex = boss
+        changestate(Display_Wait)
+    }
+}
+
+sub GetLevelName() {
+    misc = 0
+    if (misc == LEVEL_WarpRoom)       misc = 1.0;
+    if (misc == LEVEL_ToadVillage)    misc = 2.0;
+    if (misc == LEVEL_UnderPressure)  misc = 3.0;
+    if (misc == LEVEL_OrientExpress)  misc = 4.0;
+    if (misc == LEVEL_BoneYard)       misc = 5.0;
+    if (misc == LEVEL_MakinWaves)     misc = 6.0;
+    if (misc == LEVEL_GeeWiz)         misc = 7.0;
+    if (misc == LEVEL_HangEmHigh)     misc = 8.0;
+    if (misc == LEVEL_HogRide)        misc = 9.0;
+    if (misc == LEVEL_TombTime)       misc = 11.0;
+    if (misc == LEVEL_MidnightRun)    misc = 12.0;
+    if (misc == LEVEL_DinoMight)      misc = 13.0;
+    if (misc == LEVEL_DeepTrouble)    misc = 14.0;
+    if (misc == LEVEL_HighTime)       misc = 15.0;
+    if (misc == LEVEL_RoadCrash)      misc = 16.0;
+    if (misc == LEVEL_DoubleHeader)   misc = 17.0;
+    if (misc == LEVEL_Sphynxinator)   misc = 18.0;
+    if (misc == LEVEL_ByeByeBlimps)   misc = 19.0;
+    if (misc == LEVEL_TellNoTales)    misc = 20.0;
+    if (misc == LEVEL_FutureFrenzy)   misc = 21.0;
+    if (misc == LEVEL_TombWader)      misc = 22.0;
+    if (misc == LEVEL_GoneTomorrow)   misc = 23.0;
+    if (misc == LEVEL_OrangeAsphalt)  misc = 24.0;
+    if (misc == LEVEL_FlamingPassion) misc = 25.0;
+    if (misc == LEVEL_MadBombers)     misc = 26.0;
+    if (misc == LEVEL_BugLite)        misc = 27.0;
+    if (misc == LEVEL_SkiCrazed)      misc = 28.0;
+    if (misc == LEVEL_Area51)         misc = 29.0;
+    if (misc == LEVEL_RingsOfPower)   misc = 30.0;
+    if (misc == LEVEL_HotCoco)        misc = 31.0;
+    if (misc == LEVEL_EggipusRex)     misc = 32.0;
+    if (misc == LEVEL_BossTiny)       misc = 33.0;
+    if (misc == LEVEL_BossDingodile)  misc = 34.0;
+    if (misc == LEVEL_BossNTropy)     misc = 35.0;
+    if (misc == LEVEL_BossNGin2)      misc = 36.0;
+    if (misc == LEVEL_BossCortex2)    misc = 37.0;
+}
+
+sub GetGemID() {
+    misc = 0
+    if (v0 == LEVEL_BoneYard)         misc = 301.0;
+    if (v0 == LEVEL_HangEmHigh)       misc = 302.0;
+    if (v0 == LEVEL_TombTime)         misc = 303.0;
+    if (v0 == LEVEL_DinoMight)        misc = 304.0;
+    if (v0 == LEVEL_DeepTrouble)      misc = 305.0;
+    if (v0 == LEVEL_HighTime)         misc = 306.0;
+    if (v0 == LEVEL_Sphynxinator)     misc = 307.0;
+    if (v0 == LEVEL_FutureFrenzy)     misc = 308.0;
+    if (v0 == LEVEL_TombWader)        misc = 309.0;
+    if (v0 == LEVEL_GoneTomorrow)     misc = 310.0;
+    if (v0 == LEVEL_FlamingPassion)   misc = 311.0;
+    if (v0 == LEVEL_BugLite)          misc = 312.0;
+    if (v0 == LEVEL_Area51)           misc = 313.0;
+    if (v0 == LEVEL_RingsOfPower)     misc = 314.0;
+}
+
+state Display_Wait { // 1
+    stateflag 0x1
+    statusc 0
+    code() {
+        cascadeevent(Event1, self)
+        sleepnull()
+    }
+    event(e, a) {
+        accevif (e == Event78) {
+            DisplayLevel = a[0]
+            RequestedLevel = DisplayLevel
+        }
+        accevcstate(Display_Show, e == Event78 && DisplayLevel)
+    }
+}
+
+state Display_Show { // 2
+    stateflag 0x1
+    statusc 0
+    code() {
+        cascadeevent(Event1, self)
+        playnull()
+        if (DisplayLevel == LEVEL_BossCortex2 || DisplayLevel == LEVEL_BossNGin2 || DisplayLevel == LEVEL_BossNTropy || DisplayLevel == LEVEL_BossDingodile || DisplayLevel == LEVEL_BossTiny) {
+            IsBossLevel = 1
+        }
+        else {
+            IsBossLevel = 0
+        }
+        var0 = DisplayLevel
+        GetLevelName()
+        UpperElement = 0
+        CollectedPanel = 0
+        RightPanel = 0
+        spawn(WStOC, S_TEXT, 1, 0, 0x9A12, misc, 0, 0, 0, 0, 0)
+        TitleText = objectspawned
+        if (IsBossLevel) {
+            spawn(WStOC, S_BOSS_ICON, 1, 192.0, 0x9A12, BossIndex)
+            UpperElement = objectspawned
+        }
+        else {
+            spawn(WStOC, S_REWARDS, 1, -368.0, 0x1097, 0, DisplayLevel, 0)
+            CollectedPanel = objectspawned
+            spawn(WStOC, S_REWARDS, 1, -368.0, 0x471C, BossIndex, DisplayLevel, CollectedPanel)
+            UpperElement = objectspawned
+            var locked, relics, bit
+            if (GLOBAL_119 & 0x200) {
+                bit = 63
+                while (bit >= 0) {
+                    CheckItemPool(bit, GLOBAL_175, GLOBAL_176)
+                    if (!misc) {
+                        CheckItemPool(bit, GLOBAL_177, GLOBAL_178)
+                    }
+                    if (misc) {
+                        relics += 1
+                    }
+                    bit -= 1
+                }
+                if (var level = DisplayLevel; level == LEVEL_SkiCrazed) {
+                    SetVec(5, 0, 0)
+                }
+                else if (level == LEVEL_HangEmHigh) {
+                    SetVec(10, 0, 0)
+                }
+                else if (level == LEVEL_Area51) {
+                    SetVec(15, 0, 0)
+                }
+                else if (level == LEVEL_FutureFrenzy) {
+                    SetVec(20, 0, 0)
+                }
+                else if (level == LEVEL_RingsOfPower) {
+                    SetVec(25, 0, 0)
+                }
+                else if (level == LEVEL_HotCoco) {
+                    SetVec(0, 0, 0)
+                }
+                else {
+                    SetVec(0, 0, 0)
+                }
+                if (relics < vecx) {
+                    locked = 1
+                }
+            }
+            if (locked) {
+                spawn(WStOC, S_RELIC_REQUIREMENT, 1, 368.0, 0x2BDA, BossIndex, DisplayLevel)
+                RightPanel = objectspawned
+            }
+            else {
+                CheckItemPool(DisplayLevel >> 8, SAVEDCRYSTALPOOL1, SAVEDCRYSTALPOOL2)
+                if (misc || (GLOBAL_119 & 0x200)) {
+                    spawn(WStOC, S_TIME_TRIAL, 1, 368.0, 0x2BDA, BossIndex, DisplayLevel)
+                    RightPanel = objectspawned
+                }
+            }
+        }
+        settrans(DisplayTrans)
+        setevent(DisplayEvent)
+        sleepnull()
+    }
+    event(e, a) {
+        accevif (e == Event78) {
+            RequestedLevel = a[0]
+        }
+        accevif (e == Event83) {
+            cascadeevent(Event83, self, a[0])
+        }
+    }
+}
+
+sub DisplayEvent(e, a) { // S-351
+    if (e == Event78) {
+        accev()
+        RequestedLevel = a[0]
+    }
+    if (e == Event14) {
+        accev()
+        if (UpperElement && !IsBossLevel) {
+            collider = UpperElement
+            sendevent(Event14, collider, a[0])
+        }
+    }
+    if (e == Event83) {
+        accev()
+        cascadeevent(Event83, self, a[0])
+    }
+}
+
+sub DisplayTrans() { // S-372
+    interrupter = TitleText
+    interrupter -> y = seek(interrupter -> y, 0x7425, spd(0x97b4))
+    if (IsBossLevel) {
+        interrupter = UpperElement
+        interrupter -> y = seek(interrupter -> y, 0x5555, spd(0x112F6))
+    }
+    else {
+        if (RightPanel) {
+            interrupter = RightPanel
+            interrupter -> x = seek(interrupter -> x, 160.0, spd(832.0))
+        }
+        interrupter = UpperElement
+        interrupter -> x = seek(interrupter -> x, -160.0, spd(832.0))
+        interrupter = CollectedPanel
+        interrupter -> x = seek(interrupter -> x, -160.0, spd(832.0))
+    }
+    if (distance(player, DIST_NO_Y) >= 8.89m, !(player -> stateflag & 0x2000)) {
+        RequestedLevel = 0
+    }
+    changestateifn(Display_Hide, DisplayLevel == RequestedLevel)
+}
+
+state Display_Hide { // 3
+    stateflag 0x1
+    statusc 0
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        accevif (e == Event78) {
+            RequestedLevel = a[0]
+        }
+    }
+    trans {
+        if (IsBossLevel) {
+            interrupter = UpperElement
+            interrupter -> y = seek(interrupter -> y, 0x9A12, spd(0x112F6))
+        }
+        else {
+            if (RightPanel) {
+                interrupter = RightPanel
+                interrupter -> x = seek(interrupter -> x, 368.0, spd(832.0))
+            }
+            interrupter = UpperElement
+            interrupter -> x = seek(interrupter -> x, -368.0, spd(832.0))
+            interrupter = CollectedPanel
+            interrupter -> x = seek(interrupter -> x, -368.0, spd(832.0))
+        }
+        interrupter = TitleText
+        interrupter -> y = seek(interrupter -> y, 0x9A12, spd(0x97B4))
+        if (interrupter -> y == 0x9A12) {
+            DisplayLevel = RequestedLevel
+            if (DisplayLevel) {
+                changestate(Display_Show)
+            }
+            else {
+                changestate(Display_Wait)
+            }
+        }
+    }
+}
+
+inline sub SetTextLanguage(frame, de, es, it, fr, en) {
+    if (var lang = GLOBAL_151; lang == LANG_DE) {
+        frame = de
+    }
+    else if (lang == LANG_ES) {
+        frame = es
+    }
+    else if (lang == LANG_IT) {
+        frame = it
+    }
+    else if (lang == LANG_FR) {
+        frame = fr
+    }
+    else {
+        frame = en
+    }
+}
+
+state TimeTrial_Panel { // 4
+    stateflag 0x1
+    statusc 0
+    code(px, py, boss, level) {
+        DisplayLevel = level
+        SetTrans(px, py, 0)
+        SetVFX2D()
+        zindex = 96
+        {
+            var relic
+            CheckItemPool(level >> 8, GLOBAL_175, GLOBAL_176)
+            if (misc) { relic += 1 }
+            CheckItemPool(level >> 8, GLOBAL_177, GLOBAL_178)
+            if (misc) { relic += 2 }
+            {
+                var frame
+                SetTextLanguage(frame, 37.0, 38.0, 39.0, 40.0, 41.0)
+                spawn(WStOC, S_TEXT, 1, x - 1.0, y + 37.0, frame, 0, 1, 0, 0, 0)
+            }
+            if (!relic || relic == 1 || ((GLOBAL_150 & 0x200000) && relic == 2)) {
+                spawn(WStOC, S_BACKGROUND, 1, x, y - 8.0, 0x706, 0x60D)
+                spawn(WStOC, S_TARGET_TIME, 1, DisplayLevel, relic + 1, x - 1.0, y + 17.0)
+                spawn(WStOC, S_RECORD_TIME, 1, DisplayLevel, 0, x - 1.0, y - 4.0)
+                spawn(WStOC, S_RECORD_TIME, 1, DisplayLevel, 1, x - 1.0, y - 21.0)
+                spawn(WStOC, S_RECORD_TIME, 1, DisplayLevel, 2, x - 1.0, y - 38.0)
+            }
+            else {
+                spawn(WStOC, S_BACKGROUND, 1, x, y - 1.0, 0x706, 0x540)
+                spawn(WStOC, S_RECORD_TIME, 1, DisplayLevel, 0, x - 1.0, y + 10.0)
+                spawn(WStOC, S_RECORD_TIME, 1, DisplayLevel, 1, x - 1.0, y - 7.0)
+                spawn(WStOC, S_RECORD_TIME, 1, DisplayLevel, 2, x - 1.0, y - 24.0)
+            }
+        }
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event1 && interrupter != self)
+    }
+}
+
+sub GetTargetTime(level) { // S-595
+    SapphireTarget = 0
+    GoldTarget = 0
+    PlatinumTarget = 0
+    if (level == LEVEL_ToadVillage) {
+        SapphireTarget = 0x60E
+        GoldTarget = 0x585
+        PlatinumTarget = 0x434
+    }
+    if (level == LEVEL_UnderPressure) {
+        SapphireTarget = 0xA5A
+        GoldTarget = 0x79C
+        PlatinumTarget = 0x6E2
+    }
+    if (level == LEVEL_OrientExpress) {
+        SapphireTarget = 0x401
+        GoldTarget = 0x2B7
+        PlatinumTarget = 0x1C4
+    }
+    if (level == LEVEL_BoneYard) {
+        SapphireTarget = 0xA0F
+        GoldTarget = 0x997
+        PlatinumTarget = 0x7B7
+    }
+    if (level == LEVEL_MakinWaves) {
+        SapphireTarget = 0x6A4
+        GoldTarget = 0x5AF
+        PlatinumTarget = 0x533
+    }
+    if (level == LEVEL_GeeWiz) {
+        SapphireTarget = 0x92E
+        GoldTarget = 0x7FB
+        PlatinumTarget = 0x640
+    }
+    if (level == LEVEL_HangEmHigh) {
+        SapphireTarget = 0x81B
+        GoldTarget = 0x50B
+        PlatinumTarget = 0x42E
+    }
+    if (level == LEVEL_HogRide) {
+        SapphireTarget = 0x465
+        GoldTarget = 0x40C
+        PlatinumTarget = 0x36C
+    }
+    if (level == LEVEL_TombTime) {
+        SapphireTarget = 0x9DD
+        GoldTarget = 0x6BD
+        PlatinumTarget = 0x52B
+    }
+    if (level == LEVEL_MidnightRun) {
+        SapphireTarget = 0x52D
+        GoldTarget = 0x3BB
+        PlatinumTarget = 0x1C7
+    }
+    if (level == LEVEL_DinoMight) {
+        SapphireTarget = 0x915
+        GoldTarget = 0x847
+        PlatinumTarget = 0x60E
+    }
+    if (level == LEVEL_DeepTrouble) {
+        SapphireTarget = 0xA73
+        GoldTarget = 0x851
+        PlatinumTarget = 0x7A7
+    }
+    if (level == LEVEL_HighTime) {
+        SapphireTarget = 0xCE4
+        GoldTarget = 0x643
+        PlatinumTarget = 0x590
+    }
+    if (level == LEVEL_RoadCrash) {
+        SapphireTarget = 0x84D
+        GoldTarget = 0x7E2
+        PlatinumTarget = 0x787
+    }
+    if (level == LEVEL_DoubleHeader) {
+        SapphireTarget = 0x87F
+        GoldTarget = 0x7ED
+        PlatinumTarget = 0x5CD
+    }
+    if (level == LEVEL_Sphynxinator) {
+        SapphireTarget = 0x9F6
+        GoldTarget = 0x812
+        PlatinumTarget = 0x589
+    }
+    if (level == LEVEL_ByeByeBlimps) {
+        SapphireTarget = 0x6BD
+        GoldTarget = 0x5B4
+        PlatinumTarget = 0x507
+    }
+    if (level == LEVEL_TellNoTales) {
+        SapphireTarget = 0x9F6
+        GoldTarget = 0x85D
+        PlatinumTarget = 0x65F
+    }
+    if (level == LEVEL_FutureFrenzy) {
+        SapphireTarget = 0xBD1
+        GoldTarget = 0x92E
+        PlatinumTarget = 0x7C7
+    }
+    if (level == LEVEL_TombWader) {
+        SapphireTarget = 0x1004
+        GoldTarget = 0xA42
+        PlatinumTarget = 0x834
+    }
+    if (level == LEVEL_GoneTomorrow) {
+        SapphireTarget = 0xC03
+        GoldTarget = 0x82A
+        PlatinumTarget = 0x5DF
+    }
+    if (level == LEVEL_OrangeAsphalt) {
+        SapphireTarget = 0x960
+        GoldTarget = 0x8EA
+        PlatinumTarget = 0x7FD
+    }
+    if (level == LEVEL_FlamingPassion) {
+        SapphireTarget = 0x9F6
+        GoldTarget = 0x70A
+        PlatinumTarget = 0x5B4
+    }
+    if (level == LEVEL_MadBombers) {
+        SapphireTarget = 0xC80
+        GoldTarget = 0xB40
+        PlatinumTarget = 0x996
+    }
+    if (level == LEVEL_BugLite) {
+        SapphireTarget = 0xA73
+        GoldTarget = 0x911
+        PlatinumTarget = 0x71F
+    }
+    if (level == LEVEL_SkiCrazed) {
+        SapphireTarget = 0x76C
+        GoldTarget = 0x4EE
+        PlatinumTarget = 0x341
+    }
+    if (level == LEVEL_Area51) {
+        SapphireTarget = 0xB09
+        GoldTarget = 0xAB9
+        PlatinumTarget = 0xA34
+    }
+    if (level == LEVEL_RingsOfPower) {
+        SapphireTarget = 0x802
+        GoldTarget = 0x632
+        PlatinumTarget = 0x540
+    }
+    if (level == LEVEL_HotCoco) {
+        SapphireTarget = 0x5DC
+        GoldTarget = 0x2F0
+        PlatinumTarget = 0x1F3
+    }
+    if (level == LEVEL_EggipusRex) {
+        SapphireTarget = 0x55F
+        GoldTarget = 0x4E2
+        PlatinumTarget = 0x460
+    }
+}
+
+state Relic_Requirement_Panel { // 5
+    stateflag 0x1
+    statusc 0
+    event => state TimeTrial_Panel
+    code(px, py, boss, level) {
+        DisplayLevel = level
+        SetTrans(px, py, 0)
+        SetVFX2D()
+        zindex = 96
+        spawn(WStOC, S_BACKGROUND, 1, x, y, 0x706, 0x522)
+        {
+            var frame
+            SetTextLanguage(frame, 42.0, 43.0, 44.0, 45.0, 46.0)
+            spawn(WStOC, S_TEXT, 1, x - 1.0, y + 38.0, frame, 0, 1, 0, 0, 0)
+            SetTextLanguage(frame, 47.0, 48.0, 49.0, 50.0, 51.0)
+            spawn(WStOC, S_TEXT, 1, x - 1.0, y - 22.0, frame, 0, 1, 0, 0, 0)
+        }
+        if (var l = level; l == LEVEL_SkiCrazed) {
+            SetVec(5, 0, 0)
+        }
+        else if (l == LEVEL_HangEmHigh) {
+            SetVec(10, 0, 0)
+        }
+        else if (l == LEVEL_Area51) {
+            SetVec(15, 0, 0)
+        }
+        else if (l == LEVEL_FutureFrenzy) {
+            SetVec(20, 0, 0)
+        }
+        else if (l == LEVEL_RingsOfPower) {
+            SetVec(25, 0, 0)
+        }
+        else if (l == LEVEL_HotCoco) {
+            SetVec(0, 0, 0)
+        }
+        else {
+            SetVec(0, 0, 0)
+        }
+        spawn(WStOC, S_RELIC_COUNT, 1, level, vecx, x - 1.0, y + 16.0)
+        sleepnull()
+    }
+}
+
+state Relic_Count_Text { // 6
+    stateflag 0x10001
+    statusc 0
+    event => state TimeTrial_Panel
+    code(level, count, px, py) {
+        SetVFX2D()
+        statusb = FLAG_STRING_CENTER
+        zindex = 102
+        SetRot(0deg)
+        SetTrans(px, py, 0)
+        TextDefaultScale()
+        TextDefaultColor()
+        PanelOffsetX = x - creator -> x
+        PanelOffsetY = y - creator -> y
+        spawn2(DispC, DispC_S_INVENTORY, 1, ID_RELIC_SAPP + level, x + 0x1400, y - 16.0, 0x20)
+        RelicIcon = objectspawned
+        spawn(WStOC, S_TEXT, 1, x - 4.0, y - 8.0, 0x3400, -1, 1, count, 0, 0)
+        settrans(UpdateRelicRequirementPos)
+        sleepnull()
+    }
+}
+
+sub UpdateRelicRequirementPos() { // S-920
+    x = creator -> x
+    y = creator -> y
+    x += PanelOffsetX
+    y += PanelOffsetY
+    interrupter = RelicIcon
+    interrupter -> x = x + 0x1400
+    interrupter -> y = y - 16.0
+}
+
+state Display_Text { // 7
+    stateflag 0x1
+    statusc 0
+    event => state TimeTrial_Panel
+    code(px, py, frame, align, follow, first, second, third) {
+        SetTrans(px, py, 0)
+        TextDefaultScale()
+        TextDefaultColor()
+        zindex = 235
+        SetVFX2D()
+        setanim(TEXT)
+        if (!align) {
+            statusb |= FLAG_STRING_CENTER
+        }
+        else if (align < 0) {
+            statusb |= 0x200000
+        }
+        if (follow) {
+            PanelOffsetX = x - creator -> x
+            PanelOffsetY = y - creator -> y
+            settrans(FollowTextPanel)
+        }
+        do (var v1, v2, v3) {
+            v3 = first
+            v2 = second
+            v1 = third
+            playframe(frame)
+        } while (1)
+    }
+}
+
+sub FollowTextPanel() { // S986
+    x = creator -> x
+    y = creator -> y
+    x += PanelOffsetX
+    y += PanelOffsetY
+}
+
+state Record_Time { // 8
+    stateflag 0x10001
+    statusc 0
+    event => state TimeTrial_Panel
+    code(level, rank, px, py) {
+        SetVFX2D()
+        statusb = FLAG_STRING_CENTER
+        TextDefaultColor()
+        zindex = 235
+        SetRot(0deg)
+        SetTrans(px, py, 0)
+        TextDefaultScale()
+        PanelOffsetX = x - creator -> x
+        PanelOffsetY = y - creator -> y
+        settrans(FollowRecordPanel)
+        var ticks, name0, name1, v6
+        getrank(level + rank, ticks, name0, name1)
+        v6 = 0
+        if ((!ticks || !name0) && rank < 3) {
+            if (var place = rank; place == 0) {
+                name0 = 0x545331
+            }
+            else if (place == 1) {
+                name0 = 0x444E32
+            }
+            else if (place == 2) {
+                name0 = 0x445233
+            }
+        }
+        if (ticks > 0x464F && rank < 3) {
+            ticks = 0x464F
+        }
+        do {
+            if (rank == 3) {
+                if (time(50) < 25) {
+                    var high = (name0 >> 24) & 0xFF
+                    var next = (name0 >> 16) & 0xFF
+                    setanim(TEXT)
+                    playframe(53.0)
+                }
+                else {
+                    var p = name1
+                    var s = (ticks / 25) % 60
+                    var m = ticks / 1500
+                    var n = name0 & 0xFFFF
+                    setanim(TEXT)
+                    playframe(54.0)
+                    
+                }
+            }
+            else {
+                var c = (ticks % 25) * 100 / 25
+                var s = (ticks / 25) % 60
+                var m = ticks / 1500
+                var n = &name0
+                setanim(TEXT)
+                playframe(55.0)
+            }
+        } while (1)
+    }
+}
+
+sub FollowRecordPanel() { // S-1094
+    x = creator -> x
+    y = creator -> y
+    x += PanelOffsetX
+    y += PanelOffsetY
+}
+
+state TargetTime_Init { // 9
+    stateflag 0x10001
+    statusc 0
+    event => state TimeTrial_Panel
+    code(level, relic, px, py) {
+        DisplayLevel = level
+        TargetRelic = relic
+        SetVFX2D()
+        statusb = FLAG_STRING_CENTER
+        zindex = 235
+        SetRot(0deg)
+        SetTrans(px, py, 0)
+        TextDefaultScale()
+        PanelOffsetX = x - creator -> x
+        PanelOffsetY = y - creator -> y
+        RelicIcon = 0
+        changestate(TargetTime_Show)
+    }
+}
+
+state TargetTime_Show { // 10
+    stateflag 0x10001
+    statusc 0
+    code() {
+        if (TargetRelic == 3 && !(GLOBAL_150 & 0x200000)) {
+            TargetRelic = 0
+        }
+        if (!TargetRelic) {
+            RelicIcon = 0
+            sleepnull()
+        }
+        GetTargetTime(DisplayLevel)
+        var target
+        if (var relic = TargetRelic; relic == 1) {
+            SetColor1(0x00, 0xA5, 0xFF)
+            SetColor2(0x00, 0xA5, 0xFF)
+            SetColor3(0x00, 0xA5, 0xFF)
+            SetColor4(0x00, 0xA5, 0xFF)
+            target = SapphireTarget
+            spawn2(DispC, DispC_S_INVENTORY, 1, ID_RELIC_SAPP + DisplayLevel, x - 0x3A00, y - 8.0, 8)
+            RelicIcon = objectspawned
+        }
+        else if (relic == 2) {
+            SetColor1(0xD8, 0xD2, 0x09)
+            SetColor2(0xD8, 0xD2, 0x09)
+            SetColor3(0xD8, 0xD2, 0x09)
+            SetColor4(0xD8, 0xD2, 0x09)
+            target = GoldTarget
+            spawn2(DispC, DispC_S_INVENTORY, 1, ID_RELIC_GOLD + DisplayLevel, x - 0x3A00, y - 8.0, 8)
+            RelicIcon = objectspawned
+        }
+        else {
+            SetColor1(0xFF, 0xED, 0xE9)
+            SetColor2(0xFF, 0xED, 0xE9)
+            SetColor3(0xFF, 0xED, 0xE9)
+            SetColor4(0xFF, 0xED, 0xE9)
+            target = PlatinumTarget
+            spawn2(DispC, DispC_S_INVENTORY, 1, ID_RELIC_PLAT + DisplayLevel, x - 0x3A00, y - 8.0, 8)
+            RelicIcon = objectspawned
+        }
+        settrans(UpdateTargetTimePos)
+        do {
+            var c = (target % 25) * 100 / 25
+            var s = (target / 25) % 60
+            var m = target / 1500
+            setanim(TEXT)
+            playframe(56.0)
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event1 && interrupter != self)
+        accevif (e == Event83) {
+            if (RelicIcon) {
+                collider = RelicIcon
+                save (x, y, z) {
+                    x = collider -> x
+                    y = collider -> y
+                    z = collider -> z
+                    spawn(9, 52, 2, collider -> colr1 >> 1, collider -> colg1 >> 1, collider -> colb1 >> 1, 1.0, 0x666)
+                    sendevent(Event1, collider)
+                    RelicIcon = 0
+                }
+            }
+            TargetRelic = a[0]
+            accevcstate(TargetTime_Show)
+        }
+    }
+}
+
+sub UpdateTargetTimePos() { // S-1262
+    x = creator -> x 
+    y = creator -> y
+    x += PanelOffsetX
+    y += PanelOffsetY
+    interrupter = RelicIcon
+    if (interrupter) {
+        interrupter -> x = x - 0x3A00
+        interrupter -> y = y - 8.0
+    }
+}
+
+state Panel_Background { // 11
+    stateflag 0x1
+    statusc 0
+    event => state TimeTrial_Panel
+    code(px, py, scx, scy) {
+        SetTrans(px, py, 0)
+        SetScale(scx, scy, 0)
+        SetVFX2D()
+        zindex = 0x62
+        PanelOffsetX = x - creator -> x
+        PanelOffsetY = y - creator -> y
+        settrans(FollowBackgroundPanel)
+        if (GLOBAL_119 & 0x200) {
+            setanim(BACKGROUND_LIGHT)
+        }
+        else {
+            setanim(BACKGROUND_DARK)
+        }
+        sleepframe(0)
+    }
+}
+
+sub FollowBackgroundPanel() { // S-1305
+    x = creator -> x
+    y = creator -> y
+    x += PanelOffsetX
+    y += PanelOffsetY
+}
+
+state Reward_Icon { // 12
+    stateflag 0x1
+    statusc 0
+    event => state TimeTrial_Panel
+    code(px, py, boss, level) {
+        SetTrans(px, py, 0)
+        zindex = 0x66
+        SetVFX2D()
+        SetScale(0x28D, 0x40E, 0x1000)
+        if (var icon = boss; icon == 1) {
+            setanim(ICON_TINY)
+            y += 9.0
+        }
+        else if (icon == 2) {
+            setanim(ICON_DINGO)
+            y += 2.0
+        }
+        else if (icon == 3) {
+            setanim(ICON_NTRO)
+            y += 9.0
+        }
+        else if (icon == 4) {
+            setanim(ICON_NGIN)
+            y += 1.0
+            x -= 3.0
+        }
+        else if (icon == 5) {
+            setanim(ICON_CORTEX_1)
+        }
+        else if (icon == 6) {
+            setanim(ICON_CORTEX_2)
+        }
+        else if (level == LEVEL_MakinWaves || level == LEVEL_TellNoTales || level == LEVEL_SkiCrazed || level == LEVEL_OrientExpress || level == LEVEL_MidnightRun || level == LEVEL_ByeByeBlimps) {
+            setanim(ICON_COCO)
+            y -= 4.0
+        }
+        else {
+            setanim(ICON_CRASH)
+            x -= 2.0
+            y -= 7.0
+        }
+        PanelOffsetX = x - creator -> x
+        PanelOffsetY = y - creator -> y
+        settrans(FollowRewardPanel)
+        sleepframe(0)
+    }
+}
+
+sub FollowRewardPanel() { // S-1393
+    x = creator -> x
+    y = creator -> y
+    x += PanelOffsetX
+    y += PanelOffsetY
+}
+
+state Reward_Panel { // 13
+    stateflag 0x1
+    statusc 0
+    code(px, py, boss, level, linked) {
+        SetTrans(px, py, 0)
+        RewardBoss = boss
+        RewardLevel = level
+        CollectedRewards = linked
+        PreviousX = x
+        PreviousY = y
+        SetVFX2D()
+        zindex = 0x60
+        CrystalIcon = 0
+        FirstGemIcon = 0
+        SecondGemIcon = 0
+        RelicIcon = 0
+        CrystalTransfer = 0
+        FirstGemTransfer = 0
+        SecondGemTransfer = 0
+        RelicTransfer = 0
+        spawn(WStOC, S_BACKGROUND, 1, x, y, 0x706, 0x243)
+        spawn(WStOC, S_REWARD_ICON, 1, x - 0x3C00, y, RewardBoss, level)
+        SetColor2(0xE07, -0x3E3, 0x6A2)
+        CheckItemPool(level >> 8, SAVEDCRYSTALPOOL1, SAVEDCRYSTALPOOL2)
+        if (misc) {
+            if (!RewardBoss) {
+                spawn2(DispC, DispC_S_INVENTORY, 1, ID_CRYSTAL + level, x - 18.0, y, 32)
+                CrystalIcon = objectspawned
+            }
+        }
+        else {
+            if (RewardBoss && !(level == LEVEL_EggipusRex || level == LEVEL_Area51 || level == LEVEL_HotCoco || level == LEVEL_SkiCrazed || level == LEVEL_RingsOfPower)) {
+                spawn2(DispC, DispC_S_INVENTORY, 1, ID_CRYSTAL + level, x - 18.0, y, 32)
+                CrystalIcon = objectspawned
+            }
+        }
+        {
+            var icon, upper, lower, gem, first, second
+            CollectedGemCount = 0
+            var0 = level
+            GetGemID()
+            icon = misc
+            if (icon) {
+                gem = icon - ID_GEM
+                CheckItemPool(gem >> 8, SAVEDGEMPOOL1, SAVEDGEMPOOL2)
+                if (misc) {
+                    CollectedGemCount += 1
+                    if (!RewardBoss) {
+                        second = 1
+                    }
+                }
+                else if (RewardBoss) {
+                    second = 1
+                }
+            }
+            CheckItemPool(level >> 8, SAVEDGEMPOOL1, SAVEDGEMPOOL2)
+            if (misc) {
+                CollectedGemCount += 1
+                if (!RewardBoss) {
+                    first = 1
+                }
+            }
+            else if (RewardBoss) {
+                first = 1
+            }
+            upper = 0
+            lower = 0
+            if (first && second) {
+                lower = -0xBDA
+                upper = 0x97B
+            }
+            SetColor2(0xE56, 0x3E3, 0x5EF)
+            if (first) {
+                spawn2(DispC, DispC_S_INVENTORY, 1, ID_GEM + level, x + 22.0, y + upper, 32)
+                FirstGemIcon = objectspawned
+            }
+            if (second) {
+                spawn2(DispC, DispC_S_INVENTORY, 1, icon, x + 22.0, y + lower, 32)
+                SecondGemIcon = objectspawned
+            }
+        }
+        var0 = 0
+        CheckItemPool(level >> 8, GLOBAL_175, GLOBAL_176)
+        if (misc) { var0 += 1 } 
+        CheckItemPool(level >> 8, GLOBAL_177, GLOBAL_178)
+        if (misc) { var0 += 2 }
+        SetColor2(0xD4E, 0, 0x8E4)
+        if (var0) {
+            if (!RewardBoss) {
+                if (var relic = var0; relic == 1) {
+                    spawn2(DispC, DispC_S_INVENTORY, 1, ID_RELIC_SAPP + level, x + 66.0, y, 32)
+                    RelicIcon = objectspawned
+                }
+                else if (relic == 2) {
+                    spawn2(DispC, DispC_S_INVENTORY, 1, ID_RELIC_GOLD + level, x + 66.0, y, 32)
+                    RelicIcon = objectspawned
+                }
+                else {
+                    spawn2(DispC, DispC_S_INVENTORY, 1, ID_RELIC_PLAT + level, x + 66.0, y, 32)
+                    RelicIcon = objectspawned
+                }
+            }
+        }
+        else if (RewardBoss) {
+            spawn2(DispC, DispC_S_INVENTORY, 1, ID_RELIC_SAPP + level, x + 66.0, y, 32)
+            RelicIcon = objectspawned
+        }
+        settrans(UpdateRewardPanel)
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event1 && interrupter != self)
+        accevif (e == Event14) {
+            if (var reward = a[0]; reward >= 399.0) {
+                if (reward == ID_RELIC_GOLD + RewardLevel || reward == ID_RELIC_PLAT + RewardLevel) {
+                    if (RelicIcon) {
+                        collider = RelicIcon
+                        save (x, y, z) {
+                            x = collider -> x
+                            y = collider -> y
+                            z = collider -> z
+                            spawn(9, 52, 2, collider -> colr1 >> 1, collider -> colg1 >> 1, collider -> colb1 >> 1, 1.0, 0x666)
+                            sendevent(Event1, collider)
+                            RelicIcon = 0
+                        }
+                    }
+                    if (CollectedRewards) {
+                        collider = CollectedRewards
+                        sendevent(Event82, collider, reward)
+                    }
+                }
+                else if (RelicIcon) {
+                    collider = RelicIcon
+                    if (collider -> stalltime == reward) {
+                        RelicTransfer = reward
+                    }
+                }
+                if (reward == ID_RELIC_SAPP + RewardLevel) {
+                    sendevent(Event83, parent, 2)
+                }
+                else if (reward == ID_RELIC_GOLD + RewardLevel) {
+                    sendevent(Event83, parent, 3)
+                }
+                else {
+                    sendeventif(Event83, parent, reward == ID_RELIC_PLAT + RewardLevel, 0)
+                }
+            }
+            else if (reward >= ID_GEM) {
+                if (FirstGemIcon) {
+                    collider = FirstGemIcon
+                    if (collider -> stalltime == reward) {
+                        FirstGemTransfer = reward
+                        if (CollectedRewards) {
+                            collider = CollectedRewards
+                            sendevent(Event81, collider)
+                        }
+                    }
+                }
+                if (SecondGemIcon) {
+                    collider = SecondGemIcon
+                    if (collider -> stalltime == reward) {
+                        SecondGemTransfer = reward
+                        if (CollectedRewards) {
+                            collider = CollectedRewards
+                            sendevent(Event81, collider)
+                        }
+                    }
+                }
+            }
+            else if (reward >= ID_CRYSTAL) {
+                if (CrystalIcon) {
+                    collider = CrystalIcon
+                    if (collider -> stalltime == reward) {
+                        CrystalTransfer = reward
+                    }
+                }
+            }
+        }
+        accevif (e == Event81) {
+            CollectedGemCount += 1
+            FirstGemTransfer = 1
+            SecondGemTransfer = 1
+        }
+        accevif (e == Event82) {
+            if (RelicIcon) {
+                collider = RelicIcon
+                sendevent(Event1, collider)
+            }
+            SetColor2(0xD4E, 0x000, 0x8E4)
+            spawn2(DispC, DispC_S_INVENTORY, 1, a[0], x + 66.0, y, 48)
+            RelicIcon = objectspawned
+        }
+    }
+}
+
+sub UpdateRewardPanel() { // S-2161
+    if (CrystalTransfer || RelicTransfer || FirstGemTransfer || SecondGemTransfer || x != PreviousX || y != PreviousY) {
+        PreviousX = x
+        PreviousY = y
+        if (CrystalIcon) {
+            interrupter = CrystalIcon
+            if (CrystalTransfer) {
+                interrupter -> x = x - 18.0
+                interrupter -> y = seek(interrupter -> y, y - 0x3684, -0x45C)
+            }
+            else {
+                interrupter -> x = x - 18.0
+                interrupter -> y = y
+            }
+        }
+        if (RelicIcon) {
+            interrupter = RelicIcon
+            if (RelicTransfer) {
+                interrupter -> x = x + 66.0
+                interrupter -> y = seek(interrupter -> y, y - 0x3684, -0x45C)
+            }
+            else {
+                interrupter -> x = x + 66.0
+                interrupter -> y = y
+            }
+        }
+        if (FirstGemIcon || SecondGemIcon) {
+            var upper, lower
+            if (RewardBoss) {
+                if (FirstGemTransfer) {
+                    if (SecondGemTransfer) {
+                        upper = -0x2D09
+                        lower = -0x425E
+                    }
+                    else if (CollectedGemCount) {
+                        upper = -0x2D09
+                        lower = -0xBDA
+                    }
+                    else {
+                        upper = -0x3684
+                        lower = 0
+                    }
+                }
+                else if (SecondGemTransfer) {
+                    if (CollectedGemCount) {
+                        upper = 0x97B
+                        lower = -0x425E
+                    }
+                    else {
+                        lower = -0x3684
+                        upper = 0
+                    }
+                }
+                else {
+                    upper = 0
+                    lower = 0
+                    if (FirstGemIcon && SecondGemIcon) {
+                        lower = -0xBDA
+                        upper = 0x97B
+                    }
+                }
+            }
+            else {
+                if (CollectedGemCount < 2) {
+                    upper = 0
+                    lower = 0
+                }
+                else {
+                    upper = 0x97B
+                    lower = -0xBDA
+                }
+            }
+            if (FirstGemIcon) {
+                interrupter = FirstGemIcon
+                interrupter -> x = x + 22.0
+                interrupter -> y = seek(interrupter -> y, y + upper, -0x45C)
+            }
+            if (SecondGemIcon) {
+                interrupter = SecondGemIcon
+                interrupter -> x = x + 22.0
+                interrupter -> y = seek(interrupter -> y, y + lower, -0x45C)
+            }
+        }
+    }
+}
+
+state Boss_Icon { // 14
+    stateflag 0x1
+    statusc 0
+    event => state TimeTrial_Panel
+    code(px, py, boss) {
+        SetTrans(px, py, 0)
+        zindex = 0x66
+        SetVFX2D()
+        SetScale(0x28D, 0x40E, 0x1000)
+        if (var icon = boss; icon == 1) {
+            setanim(ICON_TINY)
+        }
+        else if (icon == 2) {
+            setanim(ICON_DINGO)
+        }
+        else if (icon == 3) {
+            setanim(ICON_NTRO)
+        }
+        else if (icon == 4) {
+            setanim(ICON_NGIN)
+        }
+        else {
+            setanim(ICON_CORTEX_1)
+        }
+        sleepframe(0)
+    }
+}
+
+state Kill { // 15
+    stateflag 0x20
+    statusc 0
+    code() {}
+}
+

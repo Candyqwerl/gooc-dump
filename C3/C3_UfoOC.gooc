@@ -1,0 +1,399 @@
+#gool UfoOC 82 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_UfoOC.gooc" "C3\Out\C3_UfoOC.nsentry"
+
+#anim UFO_IDLE     [Uf1rV] [Uf1rG] 17 1 2
+#anim UFO_ARMED_1  [Uf2rV] [Uf1rG] 04 1 2
+#anim UFO_ARMED_2  [Uf3rV] [Uf1rG] 03 1 2
+#anim UFO_FIRE     [Uf5rV] [Uf1rG] 17 1 2
+#anim SPARKS       [Uf4rV] [Uf2rG] 17 1 2
+#anim ASS_HEAD     [Uf6rV] [Uf4rG] 01 1 2
+#anim UFO_SHADOW   [Uf7rV] [Uf5rG] 01 1 2
+
+#spawn S_UFO       UFO_Init
+#spawn S_HEAD      Head
+#spawn S_SPARKS    Sparks
+#spawn S_SHADOW    Shadow
+
+event EventJumpedOn      => state UFO_Squash
+event EventHit           => state UFO_Squash
+event EventSpinHit       => state UFO_Fling
+event EventHitInvincible => state UFO_Squash
+event EventFling         => state UFO_Fling
+
+var CycleOffset, CycleLength, TurnDuration, FireAnimLoops, IdleAnimLoops, UFOTrackOffset, HoverHeight, TravelDuration
+
+inline sub SpawnReflection() {
+    if (ZONEFLAGS & 0x800) {
+        spawn(77, 11, 1) // FutOC-11
+    }
+}
+
+state UFO_Init {
+    code(limit, cyclelen, cycleoffs, turndur, height, fire, idle, pathloop) {
+        FireAnimLoops = fire + 1.0
+        IdleAnimLoops = idle - 1.0
+        pathdist = limit
+        CycleLength = cyclelen * 1s / 1.2s
+        CycleOffset = cycleoffs * 1s / 1.2s
+        TurnDuration = turndur * 1s / 1.2s
+        UFOTrackOffset = 0m
+        HoverHeight = height
+        density = 0.15m
+        SetZindexField(25)
+        groundy = y
+        trotx = 720deg
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_SIDES
+        TravelDuration = (CycleLength - (TurnDuration << 1)) >> 1
+        spawn(UfoOC, S_SHADOW, 1)
+        SpawnReflection()
+        spawn(UfoOC, S_HEAD, 1, 0)
+        spawn(UfoOC, S_SPARKS, 1)
+        if (pathloop == true) {
+            changestate(UFO_Loop)
+        }
+        else {
+            changestate(UFO)
+        }
+    }
+}
+
+state UFO {
+    stateflag 0x4085
+    statusc 0
+    code() {
+        do {
+            do {
+                do (var loops = 0) {
+                    playframes(UFO_IDLE, 0.0, 16.0)
+                    loops += 1.0
+                } while (loops < IdleAnimLoops)
+                unless (HoverHeight < 2.25m) {
+                    break
+                }
+            } while (1)
+            playanim(0, UFO_ARMED_1)
+            playanim(1, UFO_ARMED_1)
+            playanim(2, UFO_ARMED_1)
+            playanim(2, UFO_ARMED_1)
+            do (var loops = 0) {
+                playframes(UFO_FIRE, 0.0, 16.0)
+                loops += 1.0
+            } while (loops < FireAnimLoops)
+            playanim(0, UFO_ARMED_2)
+            playanim(1, UFO_ARMED_2)
+            playanim(1, UFO_ARMED_2)
+        } while (1)
+    }
+    event(e, a) {
+        rejevret(e == EventSpinHit && (player -> y < y + 0.5m || player -> vely >= 0))
+        accevcstate(UFO_Abduct_Player, e == Event81)
+    }
+    trans {
+        unless (STATUS_FIRSTFRAME) {
+            var cycletime = time(CycleLength, CycleOffset)
+            var phase = 0
+            if (cycletime >= 0 && cycletime <= TurnDuration) {
+                phase = cycletime
+                var yaw = troty + (phase * degdist(troty, troty + 180deg)) / TurnDuration
+                roty = yaw
+                calcpath(0)
+            }
+            else if (cycletime >= TurnDuration && cycletime <= TurnDuration + TravelDuration) {
+                phase = cycletime - TurnDuration
+                var prog = (phase * (pathlen - 1.0)) / ((TurnDuration + TravelDuration) - TurnDuration)
+                calcpath(prog)
+            }
+            else if (cycletime >= TurnDuration + TravelDuration && cycletime <= TurnDuration + (TurnDuration + TravelDuration)) {
+                phase = cycletime - (TurnDuration + TravelDuration)
+                var yaw = troty + (phase * degdist(troty, troty + 180deg)) / ((TurnDuration + (TurnDuration + TravelDuration)) - (TurnDuration + TravelDuration))
+                roty = yaw
+                calcpath(pathlen - 1.0)
+            }
+            else if (cycletime >= TurnDuration + (TurnDuration + TravelDuration) && cycletime <= CycleLength) {
+                phase = cycletime - (TurnDuration + (TurnDuration + TravelDuration))
+                var prog = (pathlen - 1.0) + (phase * -(pathlen - 1.0)) / (CycleLength - (TurnDuration + (TurnDuration + TravelDuration)))
+                calcpath(prog)
+            }
+        }
+        if (pathdist) {
+            var v1 = 0
+            var deg_to_player = 0deg
+            var pathrot = troty
+            save (troty, statusa, statusb, x, y, z, pathprog) {
+                statusb = FLAG_PATH_CALCS | FLAG_TRACK_PATH_SIGN
+                x = player -> x
+                y = player -> y
+                z = player -> z
+                calcpath(0)
+                v1 = troty
+                troty += 90deg
+                setvel(UFOTrackOffset, vvel)
+            }
+            x += velx
+            z += velz
+            if (abs(UFOTrackOffset - vecy) > 0.1m) {
+                deg_to_player = degdist(troty, atan2(player -> trans))
+                if (abs(deg_to_player) < 60deg) {
+                    if (deg_to_player < -45deg) {
+                        deg_to_player = -45deg
+                    }
+                    else if (deg_to_player > 45deg) {
+                        deg_to_player = 45deg
+                    }
+                    troty += deg_to_player
+                }
+            }
+            UFOTrackOffset = seek(UFOTrackOffset, vecy, spd(3m))
+            if (UFOTrackOffset < -pathdist) {
+                troty = pathrot
+                UFOTrackOffset = -pathdist
+            }
+            else if (UFOTrackOffset > pathdist) {
+                UFOTrackOffset = pathdist
+                troty = pathrot
+            }
+        }
+        y += HoverHeight
+        vecx = CAMTRANSX
+        vecy = CAMTRANSY
+        vecz = CAMTRANSZ
+        roty = atan2(self, vecx)
+        if (collider) {
+            if (!(player -> statusa & FLAG_GROUNDLAND) && (((player -> stateflag & 0x10) && y + 0.5m < player -> y) | (!(player -> stateflag & 0x10) && y < player -> y))) {
+                sendevent(EventHit, collider, 100.0)
+            }
+            else {
+                sendevent(Event24, collider, 100.0)
+            }
+        }
+    }
+}
+
+state UFO_Loop {
+    stateflag 0x4085
+    statusc 0
+    code => state UFO
+    event => state UFO
+    trans {
+        unless (STATUS_FIRSTFRAME) {
+            var cycletime = time(CycleLength, CycleOffset)
+            if (cycletime >= 0 && cycletime <= CycleLength) {
+                calcpath((cycletime * (pathlen - 1.0)) / CycleLength)
+            }
+        }
+        if (pathdist) {
+            var deg_to_player = 0deg
+            var pathrot = troty
+            save (troty, statusa, statusb, x, y, z, pathprog) {
+                statusb = FLAG_PATH_CALCS | FLAG_TRACK_PATH_SIGN
+                x = player -> x
+                y = player -> y
+                z = player -> z
+                calcpath(0)
+                troty += 90deg
+                setvel(UFOTrackOffset, vvel)
+            }
+            x += velx
+            z += velz
+            if (abs(UFOTrackOffset - vecy) > 0.1m) {
+                deg_to_player = degdist(troty, atan2(player -> trans))
+                if (abs(deg_to_player) < 60deg) {
+                    if (deg_to_player < -45deg) {
+                        deg_to_player = -45deg
+                    }
+                    else if (deg_to_player > 45deg) {
+                        deg_to_player = 45deg
+                    }
+                    troty += deg_to_player
+                }
+            }
+            UFOTrackOffset = seek(UFOTrackOffset, vecy, spd(3m))
+            if (UFOTrackOffset < -pathdist) {
+                troty = pathrot
+                UFOTrackOffset = -pathdist
+            }
+            else if (UFOTrackOffset > pathdist) {
+                UFOTrackOffset = pathdist
+                troty = pathrot
+            }
+            y += HoverHeight
+            vecx = CAMTRANSX
+            vecy = CAMTRANSY
+            vecz = CAMTRANSZ
+            roty = atan2(self, vecx)
+            if (collider) {
+                if (player -> vely < 0 || y - 0.5m < player -> y) {
+                    sendevent(EventHit, collider, 100.0)
+                }
+                else {
+                    sendevent(Event24, collider, 100.0)
+                }
+            }
+        }
+    }
+}
+
+state UFO_Abduct_Player {
+    stateflag 0x4085
+    statusc 0x10
+    code() {
+        velx = player -> x - x
+        vecx = player -> x
+        velz = player -> z - z
+        vecz = player -> z
+        vely = 0
+        statusb = FLAG_COLLIDABLE | FLAG_PHYSICS_ENGINE
+        do {
+            x += player -> x - vecx
+            vecx = player -> x
+            z += player -> z - vecz
+            vecz = player -> z
+            y = seek(y, player -> y + 2m, spd(1m))
+            if (frametime - statetime >= 1s) {
+                statusb = 0
+            }
+            if (animseq != getanim(UFO_FIRE)) {
+                setanim(UFO_FIRE, -1.0)
+            }
+            playframe((animframe + 1.0) % 17.0)
+        } while (1)
+    }
+}
+
+state UFO_Fling {
+    stateflag 0x30
+    statusc 0x32
+    code(h) {
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir(0x80000)
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    } 
+    trans {
+        EnemyFlingTrans(2m, EventFling)
+    }
+}
+
+state UFO_Squash {
+    stateflag 0x23
+    statusc 0x32
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        playframe()
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        playframe()
+    }
+}
+
+sub SetParticleColor() {
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x05, 0xBD, 0xBE)
+    }
+    else if (r == 1) {
+        SetColor1(0x0D, 0x4C, 0x4C)
+    }
+    else if (r == 2) {
+        SetColor1(0xE7, 0x85, 0x81)
+    }
+}
+
+state Head {
+    statusc 0x12
+    __transargs
+    code(vertex) {
+        vfx = (vfx & 0xFFFFFF00) | 0x5
+        statusb = FLAG_ROT_Y | 0x2000
+        trotx = 360deg
+        yzapproach = 90deg
+        zindex = 32
+        SpawnReflection()
+        sleepanim(0, ASS_HEAD)
+    }
+    trans {
+        getvert(vtrans, parent, vertex)
+        troty = degseek(atan2(player -> trans), 1750deg)
+        trotz = degseek(atan2_3d(self, player -> trans), 750deg)
+    }
+}
+
+state Sparks {
+    statusc 0x12
+    code() {
+        var0 = 0
+        zindex = 32
+        voice = 0
+        SpawnReflection()
+        do {
+            if (parent -> animseq == getanim(UFO_FIRE)) {
+                if (var0 == 2) {
+                    soundfadet(0.1s, voice)
+                    soundfadev(0V, voice, 3)
+                }
+                if (var0 != 1) {
+                    soundpitch(0x343)
+                    soundplay([Uf2rA], 1V)
+                    soundpitch(0x2E7)
+                    soundcount(0xFFFF)
+                    sounddecay(0xF5)
+                    soundplay([Uf4rA], 1V)
+                }
+                var0 = 1
+                statusb = FLAG_COLLIDABLE
+                setanim(SPARKS)
+                playframe(parent -> animframe)
+            }
+            else {
+                if (var0 == 1) {
+                    soundfadet(0.1s, voice)
+                    soundfadev(0V, voice, 3)
+                }
+                if (var0 != 2) {
+                    soundpitch(0x343)
+                    soundplay([Uf3rA], 1V)
+                    soundpitch(0x343)
+                    soundcount(0xFFFF)
+                    sounddecay(0xF5)
+                    soundplay([Uf1rA], 1V)
+                }
+                var0 = 2
+                statusb = 0
+                playnull()
+            }
+        } while (1)
+    }
+    event(e, a) {
+        accevif (e == Event10) {
+            sendevent(Event10, parent, a[0])
+        }
+    }
+    trans {
+        rotx = parent -> rotx
+        roty = parent -> roty
+        rotz = parent -> rotz
+        x = parent -> x
+        y = parent -> y
+        z = parent -> z
+        if ((!(player -> stateflag & 0x20) && !player -> invincible) && !(parent -> stateflag & 0x20)) {
+            sendevent(Event24, collider, 100.0)
+            sendeventif(Event81, parent, eventaccepted)
+        }
+    }
+}
+
+state Shadow {
+    statusc 0x12
+    code() {
+        zindex = 32
+        do {
+            x = parent -> x
+            z = parent -> z
+            roty = parent -> roty
+            playanim(0, UFO_SHADOW)
+        } while (1)
+    }
+}

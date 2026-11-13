@@ -1,0 +1,467 @@
+#gool BeeOC 18 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C2_ShadC.gooh"
+//gooc -c 2 -r pal "C2\C2_BeeOC.gooc" "C2\Out\C2_BeeOC.nsentry"
+
+#anim BEE           [Be1lV] 8 0
+#anim BEE_HIVE_1    [Be2lV] 13 1
+#anim BEE_HIVE_2    [Be3lV] 22 1
+#anim BEE_HIVE_3    [Be4lV] 13 1
+#anim BEE_HIVE_4    [Be5lV] 22 1
+
+#spawn S_BEE_HIVE   Hive_Init
+#spawn S_BEE        Bee_Init
+#spawn S_HIVE       Hive
+#spawn S_BEE_SWARM  Hive_Init
+
+event EventHit           => state Bee_Squash
+event EventSpinHit       => state Bee_Fling
+event EventHitInvincible => state Bee_Squash
+event Event14            => state Bee_Returned
+event EventSlamHit       => state Bee_Squash
+
+var TrackOffset, BeeVar2, PathSpeed, PathStartX, PathStartZ,
+    PathEndX, PathEndZ, TriggerDelay, PathY, BeeVoice
+
+expr PlayerWithinPathSpan = (((player -> x - PathStartX) >> 8) * ((PathEndX - PathStartX) >> 8) + ((player -> z - PathStartZ) >> 8) * ((PathEndZ - PathStartZ) >> 8)) >= 0
+    && (((player -> x - PathEndX) >> 8) * ((PathStartX - PathEndX) >> 8) + ((player -> z - PathEndZ) >> 8) * ((PathStartZ - PathEndZ) >> 8)) >= 0
+
+state Hive_Init { // 0
+    stateflag 0x80000201
+    statusc 0x22
+    code(pathoffs, limit, swarm, delay) {
+        if (swarm) {
+            spawn = S_BEE_SWARM
+        }
+        TriggerDelay = delay * 1s / 1.2s
+        statusb = FLAG_TRACK_PATH_SIGN
+        pathprog = pathoffs
+        TrackOffset = limit
+        calcpath(pathprog)
+        troty += 90deg
+        setvel(TrackOffset)
+        x += velx
+        z += velz
+        y -= 2m
+        statusb = 0
+        zindex = 24
+        save (vecx, vecy, vecz) {
+            calcpath(pathlen - 1.0, vvec)
+            PathEndX = vecx
+            PathEndZ = vecz
+            calcpath(0, vvec)
+            PathStartX = vecx
+            PathStartZ = vecz
+        }
+        BeeVar2 = 0
+        if (spawn == S_BEE_SWARM) {
+            PathSpeed = 12.0
+        }
+        else {
+            PathSpeed = 6.0
+        }
+        soundpitch(1.6)
+        soundplay([bu1lA], 0V)
+        BeeVoice = voice
+        changestate(Hive_Idle)
+    }
+}
+
+state Hive_Idle { // 1
+    stateflag 0x80000201
+    statusc 0x22
+    event => state Hive_Triggered
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        voice = BeeVoice
+        soundfadet(0.5s, voice)
+        soundfadev(0V, voice, 2)
+        if (spawn == S_BEE_SWARM) {
+            sleepanim(0, BEE_HIVE_1)
+        }
+        else {
+            sleepanim(0, BEE_HIVE_3)
+        }
+    }
+    trans {
+        once {
+            var0 = false
+        }
+        if (PlayerWithinPathSpan && !(player -> stateflag & 0x20000000) && !(player -> stateflag & 0x20) && !(player -> stateflag & 0x400000)) {
+            if (player -> stateflag & 0x20000000) {
+                var0 = true
+            }
+            changestateif(Hive_Triggered, frametime - statetime >= TriggerDelay || var0)
+        }
+        else {
+            statetime = frametime
+        }
+    }
+}
+
+state Hive_Triggered { // 2
+    stateflag 0x80000201
+    statusc 0x22
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        voice = BeeVoice
+        soundfadet(0.5s, voice)
+        soundfadev(0.8V, voice, 2)
+        do {
+            changestateif(Hive_Idle, var0)
+            if (spawn == S_BEE_SWARM) {
+                playframes(BEE_HIVE_1, 0.0, 12.0)
+            }
+            else {
+                playframes(BEE_HIVE_3, 0.0, 12.0)
+            }
+            if ((!(player -> stateflag & 0x20) && !player -> invincible) && BeeVar2 < 1.0) {
+                if (spawn == S_BEE_SWARM) {
+                    playframes(BEE_HIVE_2, 0.0, 18.0)
+                }
+                else {
+                    playframes(BEE_HIVE_4, 0.0, 18.0)
+                }
+                playframes(19.0, 21.0)
+                spawn(BeeOC, S_BEE, 1)
+                BeeVar2 += 1.0
+                if (spawn == S_BEE_SWARM) {
+                    do (var bees = 0) {
+                        if (BeeVar2 < 5.0) {
+                            playframe(animframe, 0.12s)
+                            spawn(BeeOC, S_BEE, 1)
+                            BeeVar2 += 1.0
+                        }
+                    } while ({ bees += 1.0 }; bees < 4.0)
+                }
+            }
+            if (spawn == S_BEE_SWARM) {
+                playframes(BEE_HIVE_1, 0.0, 12.0)
+            }
+            else {
+                playframes(BEE_HIVE_3, 0.0, 12.0)
+            }
+        } while (1)
+    }
+    event(e, a) {
+        accevif (e == EventTriggered) {
+            BeeVar2 -= 1.0
+        }
+        accevif (e == EventRespawn) {
+            voice = -1
+            soundfadet(0.1s, voice)
+            soundfadev(0V, voice, 3)
+        }
+    }
+    trans {
+        var0 = false
+        var v1 = PlayerWithinPathSpan
+        if (!v1 || player -> stateflag & 0x20000000 || player -> stateflag & 0x20 || player -> stateflag \ 0x400004) {
+            var0 = true
+            cascadeevent(Event14, self, !v1)
+        }
+        unless (rand(4)) {
+            voice = BeeVoice
+            soundfadet(0.5s, voice)
+            soundsetup(1.6 + rand(2.4), voice, 2, 1)
+        }
+    }
+}
+
+state Bee_Init { // 3
+    code() {
+        zindex = 25
+        statusb = FLAG_ROT_Y | FLAG_TRACK_PATH_ROT | FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | FLAG_SOLID_ALL | FLAG_HAS_SHADOW | 0x800 | 0x2000
+        spawn(ShadC, ShadC_S_SHADOW_GROUND, 1, parent -> y, 1S, 0)
+        trotx = 360deg
+        yzapproach = 180deg
+        y += 1.5m
+        pathdist = 8m
+        troty = atan2(player -> trans)
+        roty = troty
+        entity = parent -> entity
+        pathlen = parent -> pathlen
+        pathprog = parent -> pathprog
+        TrackOffset = parent -> TrackOffset
+        PathSpeed = 0
+        SetScale(0S)
+        SetVec(0, 0, 0)
+        soundpitch(4.0)
+        soundplay([bu1lA], 0.8V)
+        BeeVoice = voice
+        changestate(Bee_Path_Chase)
+    }
+}
+
+state Bee_Path_Chase { // 4
+    statusc 0x0
+    code() {
+        do {
+            playanim(0, BEE)
+            playanim(1, BEE)
+            playanim(2, BEE)
+            playanim(2, BEE)
+            playanim(3, BEE)
+            playanim(4, BEE)
+            playanim(5, BEE)
+            playanim(6, BEE)
+        } while (1)
+    }
+    event(e, a) {
+        if (e == Event14) {
+            if (a[0]) {
+                player = parent
+                accevcstate(Bee_Homing)
+            }
+            else {
+                if (distance(player, DIST_NO_Y) < 0.5m) {
+                    accevcstate(Bee_Homing)
+                }
+                else {
+                    rejevret()
+                }
+            }
+        }
+        accevcstate(Bee_Fling, e == EventSpinHit && player -> stateflag & 0x20000000)
+        if (e == EventSlideHit) {
+            accevcstate(Bee_Fling, abs(degdist(player -> roty, atan2(player, x))) < 145deg)
+            sp = true
+            rejevif (sp) {
+                sendevent(Event24, player, 100.0)
+            }
+        }
+        accevif (e == Event19) {
+            voice = -1
+            soundfadet(0.1s, voice)
+            soundfadev(0V, voice, 3)
+        }
+    }
+    trans { 
+        if (STATUS_FIRSTFRAME) {
+            vecx = rand(2m)
+        }
+        SetScale(seek(scalex, 1S, 0.13333S), scalex, scalex)
+        PathSpeed = seek(PathSpeed, parent -> PathSpeed, spd(parent -> PathSpeed * 2))
+        if (pathprog >= 0) {
+            pathprog = seek(pathprog, pathlen - 1.0, spd(PathSpeed))
+        }
+        else {
+            pathprog = seek(pathprog, 0, spd(PathSpeed))
+        }
+        BeeVar2 = y
+        calcpath(abs(pathprog))
+        PathY = y
+        y = seek(BeeVar2, player -> y + 0.5m, spd(4m))
+        var0 = PathY - y
+        if (var0 > 2m) {
+            y = PathY - 2m
+        }
+        else if (var0 < -2m) {
+            y = PathY + 2m
+        }
+        {
+            var v1 = 0
+            var deg_to_player = 0deg
+            var pathrot = troty
+            save (troty, statusa, statusb, x, y, z, pathprog) {
+                statusb = FLAG_PATH_CALCS | FLAG_TRACK_PATH_SIGN
+                x = player -> x
+                y = player -> y
+                z = player -> z
+                calcpath(0)
+                var0 = troty
+                troty += 90deg
+                setvel(TrackOffset + (loopseek(vecx, 2m, 0.2m) - 1m))
+            }
+            x += velx
+            z += velz
+            if (abs(TrackOffset - vecy) > 0.1m) {
+                deg_to_player = degdist(troty, atan2(player -> trans))
+                troty += deg_to_player
+            }
+            TrackOffset = seek(TrackOffset, vecy, spd(4m))
+            if (TrackOffset < -pathdist) {
+                TrackOffset = -pathdist
+            }
+            else if (TrackOffset > pathdist) {
+                TrackOffset = pathdist
+            }
+        }
+        if (abs(degdist(var0, atan2(player -> trans))) < 90deg) {
+            pathprog = abs(pathprog)
+        }
+        else {
+            pathprog = -abs(pathprog)
+        }
+        if (collider) {
+            sendevent(EventSting, collider, 100.0)
+            changestateif(Bee_Squash, eventaccepted, -1.0)
+            changestateif(Bee_Squash, collider -> stateflag & 0x20, 100.0)
+            changestateif(Bee_Homing, collider -> stateflag & 0x20000000)
+        }
+        unless (rand(4)) {
+            voice = BeeVoice
+            soundfadet(0.5s, voice)
+            soundsetup(3.2 + rand(3.2), voice, 2, 1)
+        }
+    }
+}
+
+state Bee_Homing { // 5
+    stateflag 0x20
+    statusc 0x0
+    code() {
+        statusb = FLAG_ROT_Y | FLAG_COLLIDABLE | FLAG_PHYSICS_ENGINE | FLAG_HAS_SHADOW
+        vely = 0
+        sendevent(EventTriggered, parent)
+        do {
+            if (animseq != getanim(BEE)) {
+                setanim(BEE, -1.0)
+            }
+            playframe((animframe + 1.0) & 8.0 - 1)
+        } while (1)
+    }
+    event(e, a) {
+        rejevret(e == Event14)
+        accevcstate(Bee_Fling, e == EventSpinHit && player -> stateflag & 0x20000000)
+        if (e == EventSlideHit) {
+            accevcstate(Bee_Fling, abs(degdist(player -> roty, atan2(player, x))) < 145deg)
+            sp = true
+            rejevif (sp) {
+                sendevent(Event24, player, 100.0)
+            }
+        }
+        accevif (e == Event19) {
+            voice = -1
+            soundfadet(0.1s, voice)
+            soundfadev(0V, voice, 3)
+        }
+    }
+    trans {
+        once {
+            vecx = !rand(2) ? 1m + rand(1m) : -(1m + rand(1m))
+            vecy = !rand(2) ? 1m + rand(1m) : -(1m + rand(1m))
+            vecz = !rand(2) ? 1m + rand(1m) : -(1m + rand(1m))
+        }
+        troty = atan2(player -> trans)
+        setvel(6m)
+        var dist = distance(player, DIST_NO_Y)
+        if (dist < 3m) {
+            vecx = 0
+            vecy = 0
+            vecz = 0
+        }
+        else if (!rand(10)) {
+            vecx = !rand(2) ? 1m + rand(1m) : -(1m + rand(1m))
+            vecy = !rand(2) ? 1m + rand(1m) : -(1m + rand(1m))
+            vecz = !rand(2) ? 1m + rand(1m) : -(1m + rand(1m))
+        }
+        y = seek(y, player -> y + (vecy + 1.5m), spd(2m))
+        if (dist < 0.5m) {
+            if (player == parent) {
+                statusb &= ~FLAG_PHYSICS_ENGINE
+                x = seek(x, parent -> x + vecx, spd(1m))
+                z = seek(z, parent -> z + vecz, spd(1m))
+                SetScale(seek(scalex, 0S, 0.2S), scalex, scalex)
+                if (x == parent -> x && z == parent -> z) {
+                    statusc &= ~0x20
+                    changestate(Bee_Returned)
+                }
+            }
+            else {
+                player = parent
+            }
+        }
+        else {
+            unless (player == parent || player -> stateflag & 0x20 || player -> stateflag & 0x20000000) {
+                player = parent
+            }
+            SetScale(seek(scalex, 1S, 0.4S / 3), scalex, scalex)
+        }
+        sendevent(EventSting, collider, 100.0)
+        changestateif(Bee_Squash, eventaccepted, -1.0)
+    }
+}
+
+state Bee_Returned { // 6
+    stateflag 0x20
+    statusc 0x0
+    code() {
+        sendevent(EventTriggered, parent)
+    }
+}
+
+state Bee_Squash { // 7
+    stateflag 0x21
+    statusc 0x32
+    code(h) {
+        voice = BeeVoice
+        soundfadet(0.4s, voice)
+        soundfadev(0V, voice, 3)
+        if (h != -1.0) {
+            spawn(9, 4, 1, getins(SetParticleColor), 1)
+        }
+        KillEntity()
+        sendevent(EventTriggered, parent)
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        playframe()
+    }
+}
+
+sub SetParticleColor() {
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x4D, 0x1D, 0x00)
+    }
+    else if (r == 1) {
+        SetColor1(0xE2, 0xB6, 0x3E)
+    }
+    else if (r == 2) {
+        SetColor1(0xCF, 0x00, 0x00)
+    }
+}
+
+state Bee_Fling { // 8
+    stateflag 0x30
+    statusc 0x32
+    code(h) {
+        voice = BeeVoice
+        soundfadet(0.4s, voice)
+        soundfadev(0V, voice, 3)
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir()
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+        sendevent(EventTriggered, parent)
+    }
+    event(e, a) {
+        accevif (e == EventDespawn) {
+            sendevent(EventTriggered, parent)
+        }
+    }
+    trans {
+        unless (STATUS_FIRSTFRAME) {
+            EnemyFlingTransSendEv(2m, EventFling)
+            if (eventaccepted) {
+                unless (player -> stateflag & 0x20000000) {
+                    health += 1.0
+                }
+            }
+            unless (ZONEFLAGS & 0x800) {
+                vecy = y - 1m
+                do {
+                    y = vecy + 1m
+                    projectzoneshadow(var0)
+                } until (!eventaccepted || y >= vecy + 1m)
+            }
+            scalex -= 1S / 30
+            scaley -= 1S / 30
+            scalez -= 1S / 30
+            EnemyFlingAccel()
+            rotz = troty
+            roty = spd(roty, 90deg)
+            rotx = spd(rotx, 720deg)
+        }
+    }
+}

@@ -1,0 +1,314 @@
+#gool OcMiC 42 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_OcMiC.gooc" "C3\Out\C3_OcMiC.nsentry"
+
+#fraganim MINE_1 [Wat2T] 9
+#frag 0x808080 1 3 0 1 0 8 32 32 -300 100 -100 300
+#frag 0x808080 1 3 0 1 32 8 32 32 -100 100 100 300
+#frag 0x808080 0 3 1 0 704 64 32 32 100 100 300 300
+#frag 0x808080 1 3 0 1 64 96 32 32 -300 -100 -100 100
+#frag 0x808080 1 3 0 1 64 64 32 32 -100 -100 100 100
+#frag 0x808080 0 3 2 0 704 32 32 32 100 -100 300 100
+#frag 0x808080 1 3 0 1 64 32 32 32 -300 -300 -100 -100
+#frag 0x808080 0 3 3 0 736 64 32 32 -100 -300 100 -100
+#frag 0x808080 0 3 4 0 736 32 32 32 100 -300 300 -100
+#frag 0x808080 1 3 0 1 96 96 32 32 -300 100 -100 300
+#frag 0x808080 1 3 0 1 96 64 32 32 -100 100 100 300
+#frag 0x808080 0 3 1 0 768 96 32 32 100 100 300 300
+#frag 0x808080 1 3 0 1 96 32 32 32 -300 -100 -100 100
+#frag 0x808080 1 3 0 1 128 96 32 32 -100 -100 100 100
+#frag 0x808080 0 3 2 0 768 64 32 32 100 -100 300 100
+#frag 0x808080 1 3 0 1 128 64 32 32 -300 -300 -100 -100
+#frag 0x808080 0 3 5 0 768 32 32 32 -100 -300 100 -100
+#frag 0x808080 0 3 4 0 800 96 32 32 100 -300 300 -100
+#frag 0x808080 1 3 0 1 128 32 32 32 -300 100 -100 300
+#frag 0x808080 1 3 0 1 160 96 32 32 -100 100 100 300
+#frag 0x808080 0 3 1 0 800 64 32 32 100 100 300 300
+#frag 0x808080 1 3 0 1 160 64 32 32 -300 -100 -100 100
+#frag 0x808080 1 3 0 1 160 32 32 32 -100 -100 100 100
+#frag 0x808080 0 3 2 0 800 32 32 32 100 -100 300 100
+#frag 0x808080 1 3 0 1 192 96 32 32 -300 -300 -100 -100
+#frag 0x808080 0 3 6 0 832 96 32 32 -100 -300 100 -100
+#frag 0x808080 0 3 4 0 832 64 32 32 100 -300 300 -100
+#frag 0x808080 1 3 0 1 192 64 32 32 -300 100 -100 300
+#frag 0x808080 1 3 0 1 192 32 32 32 -100 100 100 300
+#frag 0x808080 0 3 1 0 832 32 32 32 100 100 300 300
+#frag 0x808080 1 3 0 1 224 96 32 32 -300 -100 -100 100
+#frag 0x808080 1 3 0 1 224 64 32 32 -100 -100 100 100
+#frag 0x808080 0 3 2 0 864 96 32 32 100 -100 300 100
+#frag 0x808080 1 3 0 1 224 32 32 32 -300 -300 -100 -100
+#frag 0x808080 0 3 7 0 864 64 32 32 -100 -300 100 -100
+#frag 0x808080 0 3 4 0 864 32 32 32 100 -300 300 -100
+#frag 0x808080 1 3 0 1 256 96 32 32 -300 100 -100 300
+#frag 0x808080 1 3 0 1 256 64 32 32 -100 100 100 300
+#frag 0x808080 0 3 1 0 896 96 32 32 100 100 300 300
+#frag 0x808080 1 3 0 1 256 32 32 32 -300 -100 -100 100
+#frag 0x808080 1 3 0 1 288 96 32 32 -100 -100 100 100
+#frag 0x808080 0 3 2 0 896 64 32 32 100 -100 300 100
+#frag 0x808080 1 3 0 1 288 64 32 32 -300 -300 -100 -100
+#frag 0x808080 0 3 8 0 896 32 32 32 -100 -300 100 -100
+#frag 0x808080 0 3 4 0 928 96 32 32 100 -300 300 -100
+#frag 0x808080 1 3 0 1 288 32 32 32 -300 100 -100 300
+#frag 0x808080 1 3 0 1 320 96 32 32 -100 100 100 300
+#frag 0x808080 0 3 1 0 928 64 32 32 100 100 300 300
+#frag 0x808080 1 3 0 1 320 64 32 32 -300 -100 -100 100
+#frag 0x808080 1 3 0 1 320 32 32 32 -100 -100 100 100
+#frag 0x808080 0 3 2 0 928 32 32 32 100 -100 300 100
+#frag 0x808080 1 3 0 1 352 96 32 32 -300 -300 -100 -100
+#frag 0x808080 0 3 9 0 960 96 32 32 -100 -300 100 -100
+#frag 0x808080 0 3 4 0 960 64 32 32 100 -300 300 -100
+
+#fraganim MINE_2 [Wat1T] 9
+#frag 0x808080 1 3 0 4 32 32 32 32 -300 100 -100 300
+#frag 0x808080 1 3 0 4 64 32 32 32 -100 100 100 300
+#frag 0x808080 0 3 7 5 832 32 32 32 100 100 300 300
+#frag 0x808080 1 3 0 4 96 32 32 32 -300 -100 -100 100
+#frag 0x808080 1 3 0 4 128 32 32 32 -100 -100 100 100
+#frag 0x808080 0 3 8 5 864 32 32 32 100 -100 300 100
+#frag 0x808080 1 3 0 4 160 32 32 32 -300 -300 -100 -100
+#frag 0x808080 1 3 0 4 192 32 32 32 -100 -300 100 -100
+#frag 0x808080 0 3 9 5 896 32 32 32 100 -300 300 -100
+#frag 0x808080 1 3 0 4 224 32 32 32 -300 100 -100 300
+#frag 0x808080 1 3 0 4 256 32 32 32 -100 100 100 300
+#frag 0x808080 0 3 10 5 928 32 32 32 100 100 300 300
+#frag 0x808080 1 3 0 4 288 32 32 32 -300 -100 -100 100
+#frag 0x808080 1 3 0 4 320 32 32 32 -100 -100 100 100
+#frag 0x808080 0 3 8 5 960 32 32 32 100 -100 300 100
+#frag 0x808080 1 3 0 4 352 32 32 32 -300 -300 -100 -100
+#frag 0x808080 1 3 0 4 384 32 32 32 -100 -300 100 -100
+#frag 0x808080 0 3 9 5 992 32 32 32 100 -300 300 -100
+
+#sprite CANNON_BALL [Wat0T]
+#tex 0x808080 0 1 9 0 256 64 64 64
+
+#anim CANNON_FIRE [Ca1dV] [Ca1dG] 26 0 2
+
+#spawn S_MINE_DRIFT  Mine_Drift
+#spawn S_MINE_ORBIT  Mine_Orbit
+#spawn S_CANNON      Cannon_Fire
+#spawn S_CANNONBALL  Cannonball
+
+var DriftCycleLength, DriftCycleOffset, DriftSpeed
+var MineVar4, MineVar5, MineVar6, MineVar7, MineVar8, MineVar9
+var MineVar10, MineVar11, MineVar12, MineVar13, MineVar14
+
+expr OrbitCenterX = vecx
+expr OrbitCenterY = vecy
+expr OrbitCenterZ = vecz
+
+inline sub PlayMineFramesBack(anim, start, end) {
+    setanim(anim)
+    animframe = start
+    do {
+        playframe(animframe - 1.0, 2)
+    } while (animframe - 1.0 >= end)
+}
+
+inline sub SleepMineFrames() {
+    PlayMineFramesBack(MINE_1, 1.0 + (rand(4.0) + 1.0), 0)
+    do {
+        playanim(0, MINE_1, 2)
+        playanim(1, MINE_1, 2)
+        playanim(2, MINE_1, 2)
+        playanim(3, MINE_1, 2)
+        playanim(4, MINE_1, 2)
+        playanim(5, MINE_1, 2)
+        playanim(0, MINE_2, 2)
+        playanim(1, MINE_2, 2)
+        PlayMineFramesBack(MINE_2, 2.0, 0)
+        PlayMineFramesBack(MINE_1, 6.0, 0.0)
+    } while (1)
+}
+
+state Mine_Orbit { // 0
+    stateflag 0x1
+    statusc 0x0
+    __transargs
+    code(cyclelen, cycleoffs, radius) {
+        statusb = FLAG_COLLIDABLE
+        zindex = 80
+        SetScale(2S)
+        density = 0.4m
+        SleepMineFrames()
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            OrbitCenterX = x
+            OrbitCenterY = y
+            OrbitCenterZ = z
+            cyclelen = (cyclelen * 80s) / 120s
+            cycleoffs = (cycleoffs * 80s) / 120s
+        }
+        troty = (time(cyclelen, cycleoffs) * -360deg) / cyclelen
+        vectransf2(vvec, vtrans, radius, 0, 0)
+        y = ins79(x, null) + 0.47m
+        changestateif(Mine_Explode, collider && STATUS_PLAYER_D_COLLIDER)
+    }
+}
+
+state Mine_Drift { // 1
+    stateflag 0x1
+    statusc 0x0
+    __transargs
+    code(cyclelen, cycleoffs) {
+        statusb = FLAG_COLLIDABLE
+        zindex = 80
+        SetScale(2S)
+        density = 0.4m
+        SleepMineFrames()
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            DriftCycleLength = (cyclelen * 80s) / 120s
+            DriftCycleOffset = (cycleoffs * (DriftCycleLength + 1)) >> 16
+            DriftSpeed = (pathlen << 1) / (DriftCycleLength + 1)
+        }
+        {
+            var cycletime = time((DriftCycleLength * 1s) / 1.2s, DriftCycleOffset)
+            pathprog = abs((cycletime - (((DriftCycleLength * 1s) / 1.2s) >> 1)) * DriftSpeed)
+            calcpath(pathprog)
+            if (cycletime >= (((DriftCycleLength * 1s) / 1.2s) >> 1)) {
+                statusa |= 0x4
+            }
+        }
+        y = ins79(x, null) + 0.47m
+        changestateif(Mine_Explode, collider && STATUS_PLAYER_D_COLLIDER)
+    }
+}
+
+state Mine_Explode { // 2
+    stateflag 0x3
+    statusc 0x2
+    code() {
+        KillEntity()
+        statusb = 0
+        SoundPitchDefault(0.34)
+        sounddecay(9.2s)
+        soundplay([Mi1dA], 1V)
+        soundsetup(0, voice, 5)
+        if (var dist = distance(player); dist < 5m) {
+            dist = 0x4C + (0xB2 - (dist / 0x7D0))
+            if (GLOBAL_112 && GLOBAL_113 > dist) {
+                dist = GLOBAL_113
+            }
+            GLOBAL_112 = 7
+            GLOBAL_113 = dist
+        }
+        if (!SHAKEY) {
+            SHAKEY = 7.0
+        }
+        do (var particles = 0) {
+            spawn(9, 21, 1, 0, randi(-2m, 2m), 8m, randi(-2m, 2m), 2S, 2.4, 24, 1)
+        } while ({ particles += 1.0 }; particles < 5.0)
+        spawn(9, 4, 1, getins(SetParticleColor), 2)
+        sendevent(EventExplode, player, 100.0)
+        playnull(10)
+    }
+}
+
+sub SetParticleColor() { // S-326
+    if (var r = rand(6); r == 0) {
+        SetColor1(0x20, 0x20, 0x20)
+    }
+    else if (r == 1) {
+        SetColor1(0x40, 0x40, 0x40)
+    }
+    else if (r == 2) {
+        SetColor1(0x80, 0x80, 0x80)
+    }
+    else if (r == 3) {
+        SetColor1(0xC8, 0x46, 0x32)
+    }
+    else if (r == 4) {
+        SetColor1(0xC8, 0x89, 0x46)
+    }
+    else if (r == 5) {
+        SetColor1(0xC8, 0x1E, 0x5A)
+    }
+    SetScale(3S)
+}
+
+state Cannon_Fire { // 3
+    stateflag 0x1
+    statusc 0x0
+    code(vertex) {
+        zindex = creator -> zindex + 30
+        getvert(vtrans, creator, vertex)
+        roty = creator -> troty
+        if (vertex >= 5.0) {
+            scalex = -abs(scalex)
+        }
+        playframes(CANNON_FIRE, 0.0, 19.0)
+        if (scalex < 0S) {
+            spawn(OcMiC, S_CANNONBALL, 1, 0, roty + 90deg)
+        }
+        else {
+            spawn(OcMiC, S_CANNONBALL, 1, 0, roty - 90deg)
+        }
+        playframes(20.0, 25.0)
+    }
+}
+
+state Cannonball { // 4
+    stateflag 0x1
+    statusc 0x0
+    __transargs
+    code(vertex, yaw) {
+        movetolist(4.0, self)
+        SoundPitchDefault(0.43)
+        sounddecay(9.2s)
+        soundsetup(8, self, 8)
+        soundplay([Ca2dA], 1V)
+        SetRot(0deg)
+        zindex = 250
+        SetScale(2S)
+        getvert(vtrans, creator, vertex)
+        troty = yaw
+        setvel(12m)
+        statusb = FLAG_COLLIDABLE | FLAG_GRAVITY | FLAG_PHYSICS_ENGINE | FLAG_SOLID_GROUND
+        vely = 10m
+        if (FRAMETIME < 36) {
+            var0 = 4.0
+        }
+        else {
+            var0 = 2.0
+        }
+        do (var particles = 0) {
+            spawn(9, 21, 1, -1.0, (velx >> 1) + randi(-4m, 4m), randi(-1m, 1m), (velz >> 1) + randi(-4m, 4m), 2S, 16.0, 0, 17)
+        } while ({ particles += 1.0 }; particles < var0)
+        playanim(0, CANNON_BALL, 42)
+        playanim(0, CANNON_BALL, 31)
+        statusb &= ~FLAG_SOLID_GROUND
+        playanim(0, CANNON_BALL, 6)
+        WaitChildNull()
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            trotz = 360deg
+        }
+        if (abs(degdist(CAMROTY + 90deg, yaw)) < 90deg) {
+            trotz = abs(trotz)
+        }
+        else {
+            trotz = -abs(trotz)
+        }
+        rotz = spd(rotz, trotz)
+        groundy = ins79(x, null)
+        if (STATUS_GROUNDLAND) {
+            zindex = 48
+            vely = (groundvel * -3) >> 2
+            trotz = (trotz * 9) >> 3
+            if (distance(player, DIST_NO_Y) < 20m) {
+                spawn(15, 30, 1, 1m)
+                SoundPitchDefault(0.25)
+                soundsetup(6, self, 8)
+                soundplay([Ca1dA], 0.4V)
+            }
+        }
+        sendevent(EventHit, collider, yaw)
+    }
+}
+
+
+

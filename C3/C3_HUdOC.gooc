@@ -1,0 +1,441 @@
+#gool HUdOC 91 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_HUdOC.gooc" "C3\Out\C3_HUdOC.nsentry"
+
+#anim HOT_UFO [UF1BV] [UF1BG] 1 1 2
+
+#spawn S_HOT_UFO  HotUFO_Init
+
+event Event19 => sub RetireRaceObject
+event Event80 => sub RetireHotUFO
+
+array HotUFOTrackHitTargets = {
+    0x25100, 0xC800,
+    0x25F00, 0xC900,
+    0x27600, 0xCA00,
+    0x31D00, 0xCB00,
+    0x37C00, 0xCC00,
+    0x45A00, 0xCD00,
+    0x5EC00, 0xCE00,
+    0x90B00, 0xCF00,
+    0x91600, 0xD000,
+    0xA0D00, 0xD100,
+    0xA1800, 0xD200,
+    0xA2600, 0xD300,
+    0xA3100, 0xD400,
+    0xAF600, 0xD500,
+    0xF423F00
+}
+
+var PlayerBehind, OpponentOrder, TrackProgress, TrackSpeed, TargetTrackSpeed, StartDelay, TrackStart,
+    TrackLength, TrackEntity, FinishProgress, PlayerDistance, DisplayDistance, DepartureHeight, NextTrackHit, TrackHitIndex
+
+expr EngineVoice = groundvel
+expr UseApproachPath = stalltime
+expr RockVelocity = field_62
+expr RockAngle = trotz
+expr BasePitch = troty
+expr SelectedUFOLightSource = GLOBAL_120
+
+inline sub UpdateUFOLightSource() {
+    if (SelectedUFOLightSource) {
+        interrupter = SelectedUFOLightSource
+        if (interrupter != self && interrupter -> spawn == S_HOT_UFO) {
+            var other_behind, other_dist, own_dist
+            own_dist = PlayerDistance
+            if (!PlayerBehind) {
+                own_dist = own_dist << 1
+            }
+            other_dist = interrupter -> PlayerDistance
+            other_behind = interrupter -> PlayerBehind
+            if (!other_behind) {
+                other_dist = other_dist << 2
+            }
+            if (own_dist < other_dist) {
+                SelectedUFOLightSource = self
+            }
+        }
+    }
+    else {
+        SelectedUFOLightSource = self
+    }
+}
+
+inline sub UpdateUFORock() {
+    if (RockVelocity | RockAngle) {
+        var old_angle = RockAngle
+        if (RockAngle >= 0) {
+            RockAngle += RockVelocity - 6
+            RockVelocity -= 6
+            if (RockAngle <= 0) {
+                RockVelocity += -(RockVelocity >> 2)
+                if (abs(RockVelocity) < 2) {
+                    RockVelocity = 0
+                    RockAngle = 0
+                }
+            }
+        }
+        else {
+            RockAngle += RockVelocity + 6
+            RockVelocity += 6
+            if (RockAngle >= 0) {
+                RockVelocity += -(RockVelocity >> 2)
+                if (abs(RockVelocity) < 2) {
+                    RockVelocity = 0
+                    RockAngle = 0
+                }
+            }
+        }
+    }
+    rotx = BasePitch + RockAngle
+}
+
+inline sub CheckUFOCollision() {
+    if (PlayerDistance <= 3m) {
+        if (distance(x, player, DIST_EXACT | DIST_NO_Y) < 2m && player -> y < y + 2m && y - 2m < player -> y) {
+            sendevent(Event27, player, 2m, 0.5)
+        }
+        if (eventaccepted) {
+            if (frametime - statetime >= 1s) {
+                if (player -> speed > 2m) {
+                    soundpitch(4.715)
+                    sounddecay(8.05s)
+                    soundplay([HR2kA], 1V)
+                    soundpitch(4.715)
+                    sounddecay(8s)
+                    soundplay([Hu1kA], 1V)
+                }
+                statetime = frametime
+                var impulse
+                impulse = rand(31) + 18
+                if (rand(2)) {
+                    impulse = -impulse
+                }
+                RockVelocity += impulse
+            }
+        }
+    }
+}
+
+inline sub UpdateUFOPosition() {
+    var yc, ys, offset
+    offset = -roty
+    yc = cos(offset)
+    ys = sin(offset)
+    offset = ((((player -> z - z) >> 8) * ys) + (((player -> x - x) >> 8) * yc)) >> 4
+    if (abs(offset) <= 20m) {
+        offset = ((((player -> z - z) >> 8) * yc) - (((player -> x - x) >> 8) * ys)) >> 4
+        if (abs(offset) <= 8m) {
+            if (offset >= 0) {
+                if (PlayerBehind) {
+                    PlayerBehind = 0
+                    sendeventif(Event14, creator, creator && FinishProgress != 99999.0, OpponentOrder + 1)
+                }
+            }
+            else {
+                if (!PlayerBehind) {
+                    PlayerBehind = 1
+                    sendeventif(Event14, creator, creator && FinishProgress != 99999.0, OpponentOrder + 2)
+                }
+            }
+        }
+    }
+}
+
+state HotUFO_Init { // 0
+    statusc 0
+    code(approach, rail_id, unused, order, speed, delay, start, finish, retries, retry_speed) {
+        EngineVoice = 0
+        OpponentOrder = order
+        TargetTrackSpeed = speed
+        TrackSpeed = 0
+        StartDelay = delay
+        TrackStart = start
+        UseApproachPath = approach
+        FinishProgress = finish
+        BasePitch = 0
+        RockAngle = 0
+        RockVelocity = 0
+        PlayerBehind = 1
+        playnull()
+        playnull()
+        vfx = (vfx & 0xFFFF00FF) | 0x600
+        if (!GLOBAL_105 && !(0x100 & SAVEDGEMPOOL1) && !(0x100 & GEMPOOL1)) {
+            var0 = SECTIONDEATHCOUNT >> 8
+            if (var0 > retries) {
+                var0 = retries
+            }
+            TargetTrackSpeed += ((retry_speed - TargetTrackSpeed) * var0) / retries
+        }
+        creator = 0
+        if (rail_id) {
+            creator = objectget(rail_id)
+        }
+        if (UseApproachPath || !creator) {
+            TrackProgress = 0
+            pathprog = 4.0
+            calcpath(pathprog, vvec)
+            calcpath(TrackProgress)
+        }
+        else {
+            save (pathlen, entity) {
+                CopyCreatorPath()
+                TrackProgress = TrackStart
+                pathprog = TrackProgress + 4.0
+                calcpath(pathprog, vvec)
+                calcpath(TrackProgress)
+            }
+        }
+        roty = atan(vecx - x, vecz - z)
+        zindex = 30
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        changestate(HotUFO_WaitStart)
+    }
+}
+
+sub SelectTrackHitTargets() { // S-75
+    vecx = HotUFOTrackHitTargets
+    TrackHitIndex = 0
+    do {
+        NextTrackHit = vecx[TrackHitIndex]
+        if (NextTrackHit >= TrackProgress) {
+            break
+        }
+        TrackHitIndex += 2.0
+    } while (1)
+}
+
+sub ProcessTrackHitTargets() { // S86
+    vecx = HotUFOTrackHitTargets
+    do {
+        NextTrackHit = vecx[TrackHitIndex]
+        if (NextTrackHit > TrackProgress) {
+            return
+        }
+        TrackHitIndex += 1.0
+        vecy = vecx[TrackHitIndex]
+        TrackHitIndex += 1.0
+        if (PlayerDistance <= 60m) {
+            interrupter = objectget(vecy)
+            sendevent(EventHit, interrupter, 100.0)
+        }
+    } while (1)
+}
+
+state HotUFO_WaitStart { // 1
+    statusc 0
+    code => state HotUFO_Race
+    trans {
+        DisplayDistance = distance(player, DIST_NO_Y)
+        PlayerDistance = DisplayDistance
+        if (player -> stateflag & 0x2000) {
+            statetime = frametime
+        }
+        else if (frametime - statetime >= StartDelay) {
+            if (UseApproachPath) {
+                changestate(HotUFO_Approach)
+            }
+            else {
+                changestate(HotUFO_JoinTrack)
+            }
+        }
+        if (!rand(20)) {
+            soundpitch(5.442)
+            soundplay([HR1kA], 1V)
+        }
+        if (distance(x, player, DIST_EXACT | DIST_NO_Y) < 2m && player -> y < y + 2m && y - 2m < player -> y) {
+            sendevent(Event27, player, 2m, 0.5)
+        }
+        if (eventaccepted) {
+            if (frametime - statetime >= 1s) {
+                if (player -> speed > 2m) {
+                    soundpitch(4.715)
+                    soundplay([HR2kA], 1V)
+                }
+                statetime = frametime
+            }
+        }
+        UpdateUFOLightSource()
+    }
+}
+
+state HotUFO_Approach { // 2
+    statusc 0
+    code => state HotUFO_Race
+    trans {
+        DisplayDistance = distance(player, DIST_NO_Y)
+        PlayerDistance = DisplayDistance
+        TrackSpeed = seek(TrackSpeed, TargetTrackSpeed, 2.5)
+        TrackProgress = spd(TrackProgress, TrackSpeed)
+        if (TrackProgress >= pathlen) {
+            TrackStart += pathlen - TrackProgress
+            changestate(HotUFO_JoinTrack)
+        }
+        {
+            var lookahead, path_yaw
+            calcpath(TrackProgress)
+            lookahead = TrackProgress + TrackSpeed
+            if (lookahead >= pathlen) {
+                lookahead = pathlen - 1
+            }
+            calcpath(lookahead, vvec)
+            path_yaw = atan(vecx - x, vecz - z)
+            roty = degseek(roty, path_yaw, 360deg)
+        }
+        if (DisplayDistance <= 110m) {
+            CheckUFOCollision()
+            UpdateUFOPosition()
+        }
+        UpdateUFORock()
+        UpdateUFOLightSource()
+    }
+}
+
+state HotUFO_JoinTrack { // 3
+    statusc 0
+    code() {
+        changestateifn(HotUFO_Idle, creator)
+        save (pathlen, entity) {
+            CopyCreatorPath()
+            TrackLength = pathlen
+            TrackEntity = entity
+            if (FinishProgress < 0) {
+                FinishProgress = TrackLength - 1
+            }
+        }
+        TrackProgress = TrackStart
+        TrackHitIndex = 0
+        SelectTrackHitTargets()
+        changestate(HotUFO_Race)
+    }
+}
+
+state HotUFO_Race { // 4
+    stateflag 0x10001
+    statusc 0
+    code() {
+        do {
+            if (DisplayDistance < 110m) {
+                if (DisplayDistance > 100m) {
+                    moda = (((DisplayDistance - 100m) >> 8) << 12) / 0xFA0
+                }
+                else {
+                    moda = 0
+                }
+                playanim(0, HOT_UFO)
+            }
+            else {
+                if (FinishProgress == 99999.0) {
+                    KillEntity()
+                    changestate(Kill)
+                }
+                playnull()
+            }
+        } while (1)
+    }
+    trans {
+        TrackSpeed = seek(TrackSpeed, TargetTrackSpeed, 2.5)
+        {
+            var lookahead
+            DisplayDistance = distance(player, DIST_NO_Y)
+            PlayerDistance = DisplayDistance
+            TrackProgress = spd(TrackProgress, TrackSpeed)
+            if (TrackProgress >= FinishProgress) {
+                FinishProgress = 99999.0
+                sendevent(EventTriggered, creator)
+                DepartureHeight = y
+                vely = 0
+            }
+            if (TrackProgress >= TrackLength) {
+                TrackProgress -= TrackLength
+            }
+            save (pathlen, entity) {
+                pathlen = TrackLength
+                entity = TrackEntity
+                calcpath(TrackProgress)
+                if (FinishProgress == 99999.0) {
+                    vely += 1m
+                    DepartureHeight = spd(DepartureHeight, vely)
+                    if (DepartureHeight > 60m) {
+                        DepartureHeight = 60m
+                    }
+                    y = DepartureHeight
+                }
+                if (DisplayDistance <= 110m) {
+                    UpdateUFOPosition()
+                    if (DisplayDistance >= 5m) {
+                        vecx = CAMTRANSX
+                        vecz = CAMTRANSZ
+                        vecy = atan2(self, vecx) + 180deg
+                        if (abs(degdist(vecy, CAMROTY + 180deg)) > 55deg) {
+                            DisplayDistance = 110m
+                        }
+                    }
+                    if (DisplayDistance <= 20m) {
+                        CheckUFOCollision()
+                        misc = EngineVoice
+                        if (misc) {
+                            soundcheck(EngineVoice)
+                            misc = misc != -1
+                        }
+                        if (!misc) {
+                            soundpitch(6.892)
+                            sounddecay(10s)
+                            soundplay([Hu4kA], 1V)
+                            EngineVoice = voice
+                        }
+                    }
+                    lookahead = TrackProgress + TrackSpeed
+                    if (lookahead >= pathlen) {
+                        lookahead = pathlen - 1
+                    }
+                    calcpath(lookahead, vvec)
+                    vecy = atan(vecx - x, vecz - z)
+                    rotz = degseek(roty, vecy, 360deg)
+                    roty = rotz
+                }
+            }
+        }
+        if (TrackProgress >= NextTrackHit) {
+            ProcessTrackHitTargets()
+        }
+        UpdateUFORock()
+        UpdateUFOLightSource()
+    }
+}
+
+state HotUFO_Idle { // 5
+    statusc 0
+    code() {
+        do {
+            PlayerDistance = distance(player, DIST_NO_Y)
+            if (PlayerDistance < 110m) {
+                playanim(0, HOT_UFO)
+            }
+            else {
+                playnull()
+            }
+        } while (1)
+    }
+}
+
+sub RetireHotUFO() { // S-1648
+    miscfunc(x, player, 0, 9)
+    stateflag &= ~0x10000
+    id = 0
+    changestate(Kill)
+}
+
+sub RetireRaceObject() { // S-1654
+    miscfunc(x, player, 0, 9)
+    stateflag &= ~0x10000
+    id = 0
+    changestate(Kill)
+}
+
+state Kill { // 6
+    stateflag 0
+    statusc 0
+    code() {}
+}

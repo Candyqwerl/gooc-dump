@@ -1,0 +1,986 @@
+#gool BOMOC 55 3
+#interruptcount 83
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C3_FruiC.gooh"
+//gooc -c 3 -r pal "C3\C3_BOMOC.gooc" "C3\Out\C3_BOMOC.nsentry"
+
+#anim BOMBER_COCKPIT [Bo1jV] [Bo1jG] 1 1 2
+
+#anim BOMBER_HIGH_1  [BM1jV] [BM1jG] 1 1 2
+#anim BOMBER_HIGH_2  [BM2jV] [BM2jG] 1 1 2
+#anim BOMBER_HIGH_3  [BM3jV] [BM3jG] 1 1 2
+#anim BOMBER_HIGH_4  [BM4jV] [BM4jG] 1 1 2
+
+#anim BOMBER_LOW_1   [BS1jV] [BS1jG] 1 1 2
+#anim BOMBER_LOW_2   [BS2jV] [BS2jG] 1 1 2
+#anim BOMBER_LOW_3   [BS3jV] [BS3jG] 1 1 2
+#anim BOMBER_LOW_4   [BS4jV] [BS4jG] 1 1 2
+
+#anim BOMBER_FRAME              [BW1jV] [BW1jG] 1 1 2
+#anim BOMBER_WING_DAMAGED_NONE  [BW2jV] [BW2jG] 1 1 2
+#anim BOMBER_WING_DAMAGED_LEFT  [BW3jV] [BW3jG] 1 1 2
+#anim BOMBER_WING_DAMAGED_RIGHT [BW4jV] [BW4jG] 1 1 2
+#anim BOMBER_WING_DAMAGED_BOTH  [BW5jV] [BW5jG] 1 1 2
+#anim BOMBER_WING_EXPLODE       [BE2jV] [BE2jG] 13 0 2
+
+#sprite BOMBER_WHEEL [Ba3jT]
+#tex 0x808080 0 2 6 10 928 64 32 32
+#tex 0x808080 0 2 7 10 928 32 32 32
+#tex 0x808080 0 2 8 10 960 96 32 32
+#tex 0x808080 0 2 9 10 960 64 32 32
+#tex 0x808080 0 2 10 10 960 32 32 32
+#tex 0x808080 0 2 11 10 992 96 32 32
+#tex 0x808080 0 2 12 10 992 64 32 32
+#tex 0x808080 0 2 13 10 992 32 32 32
+
+#spawn S_BOMBER     Bomber_Init
+#spawn S_WHEEL      Bomber_Wheel
+#spawn S_FRAME      Bomber_Frame
+#spawn S_WING       Bomber_Wing
+#spawn S_EXPLOSION  Bomber_Wing_Explode
+
+var LeftWingHealth, RightWingHealth, DropPattern, PlayerDistance
+var BomberVar5, EngineVoice, DetailLevel, DropTable, DropIndex
+var DistantHighAnim, DistantLowAnim, PathLoopLength
+
+expr LeftWingHits      = groundvel
+expr RightWingHits     = groundtime
+expr WheelBaseDepth    = groundvel
+expr DeathCount        = var0
+expr DropVertex        = var0
+expr PathSpeed         = field_61
+expr DescentSpeed      = field_61
+expr WingAnim          = field_61
+expr DescentRollAmount = invincibletime
+expr ClockBalloonOBJ   = 50.0
+
+array BomberDrops1 = { 0xFFFFFFFF, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xFFFFFFFF }
+array BomberDrops2 = { 0xFFFFFFFF, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xFFFFFFFF }
+array BomberDrops3 = { 0xFFFFFFFF, 0x0, 0x0, 0x100, 0x0, 0x0, 0x0, 0xFFFFFFFF }
+array BomberDrops4 = { 0xFFFFFFFF, 0x100, 0x0, 0x0, 0x0, 0x100, 0x0, 0xFFFFFFFF }
+
+inline sub SetParticleColor() {
+    if (var r = rand(4); r == 0) {
+        SetColor1(0x1E, 0x00, 0x00)
+    }
+    else if (r == 1) {
+        SetColor1(0x60, 0x10, 0x00)
+    }
+    else if (r == 2) {
+        SetColor1(0x57, 0x57, 0x00)
+    }
+    else if (r == 3) {
+        SetColor1(0x9C, 0x0F, 0x00)
+    }
+}
+
+inline sub SetVelocity() {
+    velx >>= 2
+    vely >>= 2
+    velz >>= 2
+}
+
+inline sub SpawnExplosionParticle(vertex) {
+    spawn(9, 21, 1, vertex, 0m, 0m, 0m, 4S, 2.4, 24, 1)
+}
+
+inline sub SoundBomberExplosion() {
+    soundpitch(((8.0 + rand(3.2)) << 6) >> 8)
+    sounddecay(8s)
+    soundplay([Zp5jA], 1V)
+}
+
+state Bomber_Init { // 0
+    stateflag 0x1
+    statusc 0x0
+    code(unused, drops, speed) {
+        BomberVar5 = unused
+        DropPattern = drops
+        PathSpeed = speed
+        PathLoopLength = pathlen - 1.0
+        EngineVoice = 0
+        playnull()
+        playnull()
+        vfx = (vfx & 0xFFFFFF00) | 0x5
+        LeftWingHits = 0
+        RightWingHits = 0
+        DeathCount = 0
+        if (!GLOBAL_105) {
+            CheckItemPool(LEVEL >> 8, SAVEDCRYSTALPOOL1, SAVEDCRYSTALPOOL2)
+            if (!misc) {
+                DeathCount = SECTIONDEATHCOUNT >> 8
+            }
+        }
+        if (var deaths = DeathCount; deaths == 0 || deaths == 1) {
+            LeftWingHealth = 10
+        }
+        else if (deaths == 2 || deaths == 3) {
+            LeftWingHealth = 9
+        }
+        else if (deaths == 4 || deaths == 5) {
+            LeftWingHealth = 8
+        }
+        else {
+            LeftWingHealth = 7
+        }
+        RightWingHealth = LeftWingHealth
+        pathprog = 0
+        {
+            var prog
+            prog = pathprog + PathSpeed
+            if (prog >= PathLoopLength) {
+                prog -= PathLoopLength
+            }
+            calcpath(prog, vvec)
+            calcpath(pathprog, vtrans)
+            troty = atan(vecx - x, vecz - z)
+            roty = troty
+            rotx = 0
+            rotz = 0
+        }
+        DetailLevel = 100
+        PlayerDistance = distance(player, DIST_NO_Y)
+        {
+            var lod
+            if (PlayerDistance >= 70m) {
+                lod = 2
+            }
+            else if (PlayerDistance >= 40m) {
+                lod = 1
+            }
+            else {
+                lod = 0
+            }
+            if (DetailLevel != lod) {
+                if (!DetailLevel) {
+                    cascadeevent(Event81, self)
+                }
+                DetailLevel = lod
+                if (!DetailLevel) {
+                    spawn(BOMOC, S_FRAME)
+                    spawn(BOMOC, S_WING)
+                    spawn(BOMOC, S_WHEEL, 1, 1.0)
+                    spawn(BOMOC, S_WHEEL, 1, 2.0)
+                    spawn(BOMOC, S_WHEEL, 1, 3.0)
+                    spawn(BOMOC, S_WHEEL, 1, 4.0)
+                }
+            }
+        }
+        if (DetailLevel) {
+            changestate(Bomber_Distant)
+        }
+        else {
+            changestate(Bomber_Fly)
+        }
+    }
+}
+
+state Bomber_Fly { // 1
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepanim(0, BOMBER_COCKPIT)
+    }
+    event(e, a) {
+        accevif (e == EventHit) {
+            save (interrupter) {
+                interrupter = objectget(ClockBalloonOBJ)
+                sendevent(EventHit, interrupter, 100.0)
+                entitysetspawn(ClockBalloonOBJ, 0)
+            }
+            save (vecx, vecy, vecz) {
+                if (LeftWingHealth) {
+                    getvert(vvec, self, 5.0)
+                    if (distance(vecx, interrupter, 0) <= 3m) {
+                        LeftWingHits += 1
+                    }
+                }
+                if (RightWingHealth) {
+                    getvert(vvec, self, 6.0)
+                    if (distance(vecx, interrupter, 0) <= 3m) {
+                        RightWingHits += 1
+                    }
+                }
+            }
+        }
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            PlayerDistance = distance(player, DIST_NO_Y)
+            var lod
+            if (PlayerDistance >= 70m) {
+                lod = 2
+            }
+            else if (PlayerDistance >= 40m) {
+                lod = 1
+            }
+            else {
+                lod = 0
+            }
+            if (DetailLevel != lod) {
+                if (!DetailLevel) {
+                    cascadeevent(Event81, self)
+                }
+                DetailLevel = lod
+                if (!DetailLevel) {
+                    spawn(BOMOC, S_FRAME)
+                    spawn(BOMOC, S_WING)
+                    spawn(BOMOC, S_WHEEL, 1, 1.0)
+                    spawn(BOMOC, S_WHEEL, 1, 2.0)
+                    spawn(BOMOC, S_WHEEL, 1, 3.0)
+                    spawn(BOMOC, S_WHEEL, 1, 4.0)
+                }
+            }
+            changestateif(Bomber_Distant, DetailLevel)
+            statusb = FLAG_COLLIDABLE | FLAG_NO_CAMERA_CLIP
+        }
+        PlayerDistance = distance(player, DIST_NO_Y)
+        changestateif(Bomber_Distant, PlayerDistance >= 40m)
+        if (PlayerDistance >= 8m) {
+            vecx = CAMTRANSX
+            vecz = CAMTRANSZ
+            changestateif(Bomber_Hidden, abs(degdist(atan2(self, vecx), CAMROTY)) > 75deg)
+        }
+        if (EngineVoice > 0) {
+            sp = EngineVoice
+            soundcheck(sp)
+        }
+        if (EngineVoice <= 0 || misc == -1) {
+            soundpitch(4.0)
+            soundsetup(7, self, 8)
+            sounddecay(10.2s)
+            soundcount(0xFFFF)
+            soundfadet(1s, self)
+            soundsetup(1V, self, 2, 0)
+            soundplay([Bo2jA], 0.01V)
+            EngineVoice = voice
+        }
+        if (PlayerDistance <= 6.5m) {
+            {
+                var dx, dy, dz, c, s
+                vecx = player -> x - x
+                vecy = player -> y - y
+                vecz = player -> z - z
+                dx = vecx >> 8
+                dz = vecz >> 8
+                c = cos(-roty)
+                s = sin(-roty)
+                vecz = ((dz * c) - (dx * s)) >> 4
+                vecx = ((dz * s) + (dx * c)) >> 4
+                dy = vecy >> 8
+                dz = vecz >> 8
+                c = cos(rotx)
+                s = sin(rotx)
+                vecz = ((dz * c) - (dy * s)) >> 4
+                vecy = ((dz * s) + (dy * c)) >> 4
+                dx = vecx >> 8
+                dy = vecy >> 8
+                c = cos(rotz)
+                s = sin(rotz)
+                vecx = ((dx * c) - (dy * s)) >> 4
+                vecy = ((dx * s) + (dy * c)) >> 4
+            }
+            if (vecy <= 2.5m && vecy >= -0.25m && ((vecz <= 2.5m && vecz >= -1m) || (abs(vecx) <= 1.5m && vecz <= 4m && vecz >= -6m))) {   
+                player -> collider = self
+            }
+        }
+        pathprog = spd(pathprog, PathSpeed)
+        if (pathprog >= PathLoopLength) {
+            pathprog -= PathLoopLength
+        }
+        if (LeftWingHits) {
+            LeftWingHealth -= LeftWingHits
+            if (LeftWingHealth <= 0) {
+                LeftWingHealth = 0
+                spawn(BOMOC, S_EXPLOSION, 1, 5.0)
+                cascadeevent(Event82, self)
+                sendevent(Event82, self)
+            }
+            LeftWingHits = 0
+            SoundBomberExplosion()
+            spawn(9, 10, 1, 5.0, getins(InitLeftWingDebris), 0)
+        }
+        if (RightWingHits) {
+            RightWingHealth -= RightWingHits
+            if (RightWingHealth <= 0) {
+                RightWingHealth = 0
+                spawn(BOMOC, S_EXPLOSION, 1, 6.0)
+                cascadeevent(Event82, self)
+                sendevent(Event82, self)
+            }
+            RightWingHits = 0
+            SoundBomberExplosion()
+            spawn(9, 10, 1, 6.0, getins(InitRightWingDebris), 0)
+        }
+        if (LeftWingHealth <= 0) {
+            if (!(frametime & 7)) {
+                SpawnExplosionParticle(5.0)
+            }
+        }
+        if (RightWingHealth <= 0) {
+            if ((frametime & 7) == 4) {
+                SpawnExplosionParticle(6.0)
+            }
+        }
+        changestateif(Bomber_Crash, LeftWingHealth <= 0 && RightWingHealth <= 0)
+        {
+            var prog = 0
+            prog = pathprog + PathSpeed
+            if (prog >= PathLoopLength) {
+                prog -= PathLoopLength
+            }
+            calcpath(prog, vvec)
+            calcpath(pathprog, vtrans)
+            troty = atan(vecx - x, vecz - z)
+            vecx = atan2_3d(self, vecx)
+            vecy = degdist(roty, troty) >> 3
+        }
+        if (abs(vecy) > 3.55deg) {
+            if (vecy >= 0deg) {
+                vecy = 3.55deg
+            }
+            else {
+                vecy = -3.55deg
+            }
+        }
+        roty += vecy
+        rotz += ((vecy * 2.2deg) - rotz) >> 5
+        vecx = degdist(rotx, vecx) >> 4
+        if (abs(vecx) > 2.4deg) {
+            if (vecx >= 0deg) {
+                vecx = 2.4deg
+            }
+            else {
+                vecx = -2.4deg
+            }
+        }
+        rotx += vecx
+    }
+}
+
+sub InitRightWingDebris() { // S-912
+    SetParticleColor()
+    SetScale(2S)
+    SetVelocity()
+}
+
+sub InitLeftWingDebris() { // S-947
+    SetParticleColor()
+    SetScale(2S)
+    SetVelocity()
+}
+
+state Bomber_Hidden { // 2
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        if (EngineVoice) {
+            voice = EngineVoice
+            soundcount(1, voice)
+            soundfadet(1s, voice)
+            soundfadev(0V, voice, 3)
+            EngineVoice = 0
+        }
+        sleepnull()
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            PlayerDistance = distance(player, DIST_NO_Y)
+            var lod = 0
+            if (PlayerDistance >= 70m) {
+                lod = 2
+            }
+            else if (PlayerDistance >= 40m) {
+                lod = 1
+            }
+            else {
+                lod = 0
+            }
+            if (DetailLevel != lod) {
+                if (!DetailLevel) {
+                    cascadeevent(Event81, self)
+                }
+                DetailLevel = lod
+                if (!DetailLevel) {
+                    spawn(BOMOC, S_FRAME)
+                    spawn(BOMOC, S_WING)
+                    spawn(BOMOC, S_WHEEL, 1, 1.0)
+                    spawn(BOMOC, S_WHEEL, 1, 2.0)
+                    spawn(BOMOC, S_WHEEL, 1, 3.0)
+                    spawn(BOMOC, S_WHEEL, 1, 4.0)
+                }
+            }
+            changestateif(Bomber_Distant, DetailLevel)
+            cascadeevent(Event81, self)
+            changestateif(Bomber_Crash, LeftWingHealth <= 0 && RightWingHealth <= 0)
+            statusb = 0
+        }
+        PlayerDistance = distance(player, DIST_NO_Y)
+        changestateif(Bomber_Distant, PlayerDistance >= 40m)
+        vecx = CAMTRANSX
+        vecz = CAMTRANSZ
+        if (PlayerDistance < 8m || abs(degdist(atan2(self, vecx), CAMROTY)) < 75deg + 1) {
+            DetailLevel = 100
+            changestate(Bomber_Fly)
+        }
+        pathprog = spd(pathprog, PathSpeed)
+        if (pathprog >= PathLoopLength) {
+            pathprog -= PathLoopLength
+        }
+        {
+            var prog = 0
+            prog = pathprog + PathSpeed
+            if (prog >= PathLoopLength) {
+                prog -= PathLoopLength
+            }
+            calcpath(prog, vvec)
+            calcpath(pathprog, vtrans)
+            troty = atan(vecx - x, vecz - z)
+            vecx = atan2_3d(self, vecx)
+            vecy = degdist(roty, troty) >> 3
+        }
+        if (abs(vecy) > 3.55deg) {
+            if (vecy >= 0deg) {
+                vecy = 3.55deg
+            }
+            else {
+                vecy = -3.55deg
+            }
+        }
+        roty += vecy
+        rotz += ((vecy * 2.2deg) - rotz) >> 5
+        vecx = degdist(rotx, vecx) >> 4
+        if (abs(vecx) > 2.4deg) {
+            if (vecx >= 0deg) {
+                vecx = 2.4deg
+            }
+            else {
+                vecx = -2.4deg
+            }
+        }
+        rotx += vecx
+    }
+}
+
+state Bomber_Distant { // 3
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        if (EngineVoice) {
+            voice = EngineVoice
+            soundcount(1, voice)
+            soundfadet(1s, voice)
+            soundfadev(0V, voice, 3)
+            EngineVoice = 0
+        }
+        if (LeftWingHealth <= 0) {
+            if (RightWingHealth <= 0) {
+                DistantHighAnim = BOMBER_HIGH_4
+                DistantLowAnim = BOMBER_LOW_4
+            }
+            else {
+                DistantHighAnim = BOMBER_HIGH_2
+                DistantLowAnim = BOMBER_LOW_2
+            }
+        }
+        else {
+            if (RightWingHealth <= 0) {
+                DistantHighAnim = BOMBER_HIGH_3
+                DistantLowAnim = BOMBER_LOW_3
+            }
+            else {
+                DistantHighAnim = BOMBER_HIGH_1
+                DistantLowAnim = BOMBER_LOW_1
+            }
+        }
+        do {
+            if (PlayerDistance >= 70m) {
+                animseq = getanim(DistantLowAnim)
+                playframe(0)
+            }
+            else {
+                animseq = getanim(DistantHighAnim)
+                playframe(0)
+            }
+        } while (1)
+    }
+    event(e, a) {
+        accevif (e == Event82) {
+            if (LeftWingHealth <= 0) {
+                if (RightWingHealth <= 0) {
+                    DistantHighAnim = BOMBER_HIGH_4
+                    DistantLowAnim = BOMBER_LOW_4
+                }
+                else {
+                    DistantHighAnim = BOMBER_HIGH_2
+                    DistantLowAnim = BOMBER_LOW_2
+                }
+            }
+            else {
+                if (RightWingHealth <= 0) {
+                    DistantHighAnim = BOMBER_HIGH_3
+                    DistantLowAnim = BOMBER_LOW_3
+                }
+                else {
+                    DistantHighAnim = BOMBER_HIGH_1
+                    DistantLowAnim = BOMBER_LOW_1
+                }
+            }
+        }
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            PlayerDistance = distance(player, DIST_NO_Y)
+            var lod = 0
+            if (PlayerDistance >= 70m) {
+                lod = 2
+            }
+            else if (PlayerDistance >= 40m) {
+                lod = 1
+            }
+            else {
+                lod = 0
+            }
+            if (DetailLevel != lod) {
+                if (!DetailLevel) {
+                    cascadeevent(Event81, self)
+                }
+                DetailLevel = lod
+                if (!DetailLevel) {
+                    spawn(BOMOC, S_FRAME)
+                    spawn(BOMOC, S_WING)
+                    spawn(BOMOC, S_WHEEL, 1, 1.0)
+                    spawn(BOMOC, S_WHEEL, 1, 2.0)
+                    spawn(BOMOC, S_WHEEL, 1, 3.0)
+                    spawn(BOMOC, S_WHEEL, 1, 4.0)
+                }
+            }
+            changestateifn(Bomber_Fly, DetailLevel)
+            statusb = 0
+            changestateif(Bomber_Crash, LeftWingHealth <= 0 && RightWingHealth <= 0)
+        }
+        PlayerDistance = distance(player, DIST_NO_Y)
+        changestateif(Bomber_Fly, PlayerDistance < 40m)
+        pathprog = spd(pathprog, PathSpeed)
+        if (pathprog >= PathLoopLength) {
+            pathprog -= PathLoopLength
+        }
+        {
+            var prog
+            prog = pathprog + PathSpeed
+            if (prog >= PathLoopLength) {
+                prog -= PathLoopLength
+            }
+            calcpath(prog, vvec)
+            calcpath(pathprog, vtrans)
+            troty = atan(vecx - x, vecz - z)
+            vecx = atan2_3d(self, vecx)
+            vecy = degdist(roty, troty) >> 3
+        }
+        if (abs(vecy) > 3.55deg) {
+            if (vecy >= 0deg) {
+                vecy = 3.55deg
+            }
+            else {
+                vecy = -3.55deg
+            }
+        }
+        roty += vecy
+        rotz += ((vecy * 2.2deg) - rotz) >> 5
+        vecx = degdist(rotx, vecx) >> 4
+        if (abs(vecx) > 2.4deg) {
+            if (vecx >= 0deg) {
+                vecx = 2.4deg
+            }
+            else {
+                vecx = -2.4deg
+            }
+        }
+        rotx += vecx
+    }
+}
+
+expr ZeppC = 36
+expr ZeppC_S_BALLOON = 1
+
+state Bomber_Crash { // 4
+    stateflag 0x21
+    statusc 0x0
+    code() {
+        if (EngineVoice) {
+            voice = EngineVoice
+            soundcount(1, voice)
+            soundfadet(1s, voice)
+            soundfadev(0V, voice, 3)
+            EngineVoice = 0
+        }
+        sleepanim(0, BOMBER_COCKPIT)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            save (x, y, z) {
+                var prog
+                prog = pathprog + (PathSpeed / 25)
+                if (prog >= PathLoopLength) {
+                    prog -= PathLoopLength
+                }
+                calcpath(prog, vvec)
+                calcpath(pathprog, vtrans)
+                sp = distance(vecx, self, DIST_EXACT)
+                statusb = FLAG_COLLIDABLE | FLAG_NO_CAMERA_CLIP
+                DescentSpeed = sp * 25
+            }
+            PlayerDistance = 0
+            {
+                var lod
+                if (PlayerDistance >= 70m) {
+                    lod = 2
+                }
+                else if (PlayerDistance >= 40m) {
+                    lod = 1
+                }
+                else {
+                    lod = 0
+                }
+                if (DetailLevel != lod) {
+                    if (!DetailLevel) {
+                        cascadeevent(Event81, self)
+                    }
+                    DetailLevel = lod
+                    if (!DetailLevel) {
+                        spawn(BOMOC, S_FRAME)
+                        spawn(BOMOC, S_WING)
+                        spawn(BOMOC, S_WHEEL, 1, 1.0)
+                        spawn(BOMOC, S_WHEEL, 1, 2.0)
+                        spawn(BOMOC, S_WHEEL, 1, 3.0)
+                        spawn(BOMOC, S_WHEEL, 1, 4.0)
+                    }
+                }
+            }
+            PlayerDistance = distance(player, DIST_NO_Y)
+            DescentRollAmount = 0
+            interrupter = GLOBAL_11
+            sendevent(EventTriggered, interrupter)
+            {
+                var type = DeathCount
+                DropPattern = DeathCount
+                DropIndex = 0
+                if (!type) {
+                    if (!DropPattern) {
+                        interrupter = GLOBAL_110
+                        sendevent(Event20, interrupter, 0)
+                        if (!(player -> stateflag & 0x20)) {
+                            var owned = 0
+                            CheckItemPool(LEVEL >> 8, SAVEDCRYSTALPOOL1, SAVEDCRYSTALPOOL2)
+                            owned = misc
+                            if (owned) {
+                                sendevent(EventWarp, player, 0)
+                            }
+                            else if (200.0 + LEVEL) {
+                                spawn2(FruiC, FruiC_S_FRUIT_AUTO, 1, 200.0 + LEVEL, 0)
+                            }
+                        }
+                    }
+                    DropTable = 0
+                }
+                else if (type == 1) {
+                    DropTable = BomberDrops1[0]
+                }
+                else if (type == 2) {
+                    DropTable = BomberDrops2[0]
+                }
+                else if (type == 3) {
+                    DropTable = BomberDrops3[0]
+                }
+                else {
+                    DropTable = BomberDrops4[0]
+                }
+            }
+            SoundBomberExplosion()
+            if (!rand(2)) {
+                soundpitch(((8.0 + rand(3.2)) * 0x4B) >> 8)
+                sounddecay(0xD2)
+                soundplay([VL1jA], 1V)
+            }
+            else {
+                soundpitch(((8.0 + rand(3.2)) * 0x4B) >> 8)
+                sounddecay(0xD2)
+                soundplay([VL2jA], 1V)
+            }
+        }
+        if (LeftWingHealth <= 0) {
+            if (!(frametime & 7)) {
+                SpawnExplosionParticle(5.0)
+            }
+        }
+        if (RightWingHealth <= 0) {
+            if ((frametime & 7) == 4) {
+                SpawnExplosionParticle(6.0)
+            }
+        }
+        vecy = degdist(roty, troty) >> 3
+        if (abs(vecy) > 3.55deg) {
+            if (vecy >= 0deg) {
+                vecy = 3.55deg
+            }
+            else {
+                vecy = -3.55deg
+            }
+        }
+        roty += vecy
+        vecx = degdist(rotx, 35deg) >> 4
+        if (abs(vecx) > 2.4deg) {
+            if (vecx >= 0deg) {
+                vecx = 2.4deg
+            }
+            else {
+                vecx = -2.4deg
+            }
+        }
+        rotx += vecx
+        DescentRollAmount += 1
+        if (DescentRollAmount > 2.4deg) {
+            DescentRollAmount = 2.4deg
+        }
+        rotz = (rotz + DescentRollAmount) % 360deg
+        DescentSpeed = seek(DescentSpeed, 12m, 0.1m)
+        vectransf(vtrans, vtrans, spd(DescentSpeed), 0, 0)
+        if ((frametime & 15) == 8) {
+            SpawnExplosionParticle(5.0)
+        }
+        if (!(frametime & 15)) {
+            SpawnExplosionParticle(6.0)
+        }
+        changestateif(Bomber_Explode, y <= 2m)
+        if (DropTable) {
+            if (frametime - statetime >= 0.5s) {
+                var type
+                statetime = frametime
+                var item
+                type = DropTable[DropIndex]
+                if (type >= 0) {
+                    item = DropTable[DropIndex + 1.0]
+                    DropIndex += 2.0
+                    save (x, y, z, rotx, roty, rotz) {
+                        if (rand(2)) {
+                            DropVertex = 5.0
+                            sp = 90deg + rand(80deg)
+                        }
+                        else {
+                            DropVertex = 6.0
+                            sp = -90deg - rand(80deg)
+                        }
+                        rotx = 0
+                        rotz = 0
+                        roty = sp
+                        getvert(vtrans, self, DropVertex)
+                        vectransf(vtrans, vvec, 3m, 0, 0)
+                        vecx -= x
+                        vecy -= y
+                        vecz -= z
+                        if (!vecy) {
+                            vecy = 1
+                        }
+                        spawn(ZeppC, ZeppC_S_BALLOON, 1, type, item, vecx, vecy, vecz)
+                    }
+                }
+                else {
+                    DropTable = 0
+                }
+            }
+        }
+    }
+}
+
+state Bomber_Explode { // 5
+    stateflag 0x21
+    statusc 0x0
+    code() {
+        sleepnull()
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            soundpitch(((8.0 + rand(3.2)) << 6) >> 8)
+            sounddecay(10s)
+            soundsetup(0, self, 8)
+            soundsetup(0, self, 5)
+            soundplay([Zp5jA], 1V)
+            spawn(9, 4, 1, getins(InitBomberExplosion), 0)
+        }
+        if (frametime - statetime >= 1.2s && !child) {
+            KillEntity()
+            changestate(Kill)
+        }
+    }
+}
+
+sub InitBomberExplosion() { // S-2492
+    SetParticleColor()
+    SetScale(2S)
+    SetVelocity()
+}
+
+state Bomber_Frame { // 6
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        vfx = (vfx & 0xFFFFFF00) | 0x5
+        zindex = creator -> zindex
+        statusb = FLAG_NO_CAMERA_CLIP
+        do {
+            if (creator -> animseq) {
+                playanim(0, BOMBER_FRAME)
+            }
+            else {
+                playnull()
+            }
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event81)
+    }
+    trans {
+        CopyCreatorRot()
+        CopyCreatorTrans()
+    }
+}
+
+state Bomber_Wing { // 7
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        vfx = (vfx & 0xFFFFFF00) | 0x5
+        zindex = creator -> zindex
+        statusb = FLAG_NO_CAMERA_CLIP
+        LeftWingHealth = creator -> LeftWingHealth
+        RightWingHealth = creator -> RightWingHealth
+        if (LeftWingHealth <= 0) {
+            if (RightWingHealth <= 0) {
+                WingAnim = BOMBER_WING_DAMAGED_BOTH
+            }
+            else {
+                WingAnim = BOMBER_WING_DAMAGED_LEFT
+            }
+        }
+        else {
+            if (RightWingHealth <= 0) {
+                WingAnim = BOMBER_WING_DAMAGED_RIGHT
+            }
+            else {
+                WingAnim = BOMBER_WING_DAMAGED_NONE
+            }
+        }
+        do {
+            if (creator -> animseq) {
+                animseq = getanim(WingAnim)
+                playframe(0)
+            }
+            else {
+                playnull()
+            }
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event81)
+        accevif (e == Event82) {
+            LeftWingHealth = creator -> LeftWingHealth
+            RightWingHealth = creator -> RightWingHealth
+            if (LeftWingHealth <= 0) {
+                if (RightWingHealth <= 0) {
+                    WingAnim = BOMBER_WING_DAMAGED_BOTH
+                }
+                else {
+                    WingAnim = BOMBER_WING_DAMAGED_LEFT
+                }
+            }
+            else {
+                if (RightWingHealth <= 0) {
+                    WingAnim = BOMBER_WING_DAMAGED_RIGHT
+                }
+                else {
+                    WingAnim = BOMBER_WING_DAMAGED_NONE
+                }
+            }
+        }
+    }
+    trans {
+        CopyCreatorRot()
+        CopyCreatorTrans()
+    }
+}
+
+state Bomber_Wing_Explode { // 8
+    stateflag 0x1
+    statusc 0x0
+    code(vertex) {
+        vfx = (vfx & 0xFFFFFF00) | 0x5
+        CopyCreatorRot()
+        zindex = creator -> zindex
+        getvert(vtrans, creator, vertex)
+        playframes(BOMBER_WING_EXPLODE, 0.0, 12.0)
+    }
+}
+
+state Bomber_Wheel { // 9
+    stateflag 0x1
+    statusc 0x0
+    code(vertex) {
+        SetScale(0.625S)
+        SetRot(0deg)
+        animseq = getanim(BOMBER_WHEEL)
+        WheelBaseDepth = parent -> zindex
+        do (var angle, offset) {
+            getvert(vtrans, parent, vertex)
+            vecx = CAMTRANSX
+            vecy = CAMTRANSY
+            vecz = CAMTRANSZ
+            offset = degdist(atan2(self, vecx), CAMROTY)
+            if (abs(offset) > 45deg) {
+                if (offset >= 0) {
+                    offset = 45deg
+                }
+                else {
+                    offset = -45deg
+                }
+            }
+            offset = (11.25deg * offset) >> 8
+            rotx = parent -> rotz
+            angle = ((parent -> roty + -(CAMROTY + 180deg)) + offset) % 360deg
+            if (angle <= 90deg) {
+                zindex = 5
+                scalex = abs(scalex)
+            }
+            else if (angle <= 180deg) {
+                zindex = 5
+                angle = 180deg - angle
+                scalex = -abs(scalex)
+            }
+            else if (angle <= 270deg) {
+                zindex = -5
+                angle -= 180deg
+                scalex = abs(scalex)
+            }
+            else {
+                angle = 360deg - angle
+                scalex = -abs(scalex)
+                zindex = -5
+            }
+            zindex += WheelBaseDepth
+            animframe = angle >> 7
+            if (animframe > 7) {
+                animframe = 7
+            }
+            playframe(7.0 - (animframe << 8))
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event81)
+    }
+}
+
+state Kill { // 10
+    stateflag 0x1
+    statusc 0x0
+    code() {}
+}

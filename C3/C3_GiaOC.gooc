@@ -1,0 +1,341 @@
+#gool GiaOC 81 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_GiaOC.gooc" "C3\Out\C3_GiaOC.nsentry"
+
+#anim GIANT_HEAD    [GiHbV] [GiHbG] 01 1 2
+#anim GIANT_BOUNCE  [GiDbV] [GiBbG] 10 1 2
+#anim GIANT_TOPPLE  [GiBbV] [GiBbG] 16 1 2
+#anim ANIM_0xF00    [1015I] [1014I] 65 0 2
+#anim ANIM_0x1400   [1017I] [1016I] 33 0 2
+#anim GIANT_SWING   [GiaPV] [GiaPG] 45 0 2
+#anim GIANT_SHADOW  [GiSPV] [GiSPG] 23 0 2
+
+#spawn S_GIANT    Giant_Init
+#spawn S_HEAD     Head_Init
+#spawn S_SHADOW   Shadow_Init
+
+var GiantVar1, PlayerCanBounce, FrameOffset, BouncePropulsion, ToppleHeight, GiantVertex, HeadTurn
+
+state Giant_Init { // 0
+    stateflag 0x4001
+    statusc 0x80010
+    code(yaw, offs, shadow, propulsion, height) {
+        roty = yaw
+        BouncePropulsion = propulsion
+        ToppleHeight = height
+        FrameOffset = (offs * 45) >> 8
+        if (FrameOffset < 0) {
+            FrameOffset = 0
+        }
+        if (FrameOffset >= 45) {
+            FrameOffset = 44
+        }
+        SetZindexField(24)
+        setanim(GIANT_SWING, 0)
+        changestateif(Giant_Dead, entitygetstate(2))
+        statusb = FLAG_COLLIDABLE
+        spawn(GiaOC, S_HEAD, 1, 0.0, 54)
+        spawn(GiaOC, S_HEAD, 1, 1.0, 45)
+        if (shadow) {
+            spawn(GiaOC, S_SHADOW)
+        }
+        GiantVar1 = 0
+        PlayerCanBounce = 0
+        changestate(Giant_Active)
+    }
+}
+
+state Giant_Active { // 1
+    stateflag 0x4081
+    statusc 0x80010
+    code() {
+        setanim(GIANT_SWING)
+        do {
+            animframe = time(45, FrameOffset) << 8
+            playframe()
+        } while (1)
+    }
+    event(e, a) {
+        if ((e == EventSpinHit || e == EventSlideHit) && interrupter == player && player -> statusb & FLAG_DPAD_CONTROL) {
+            save (velx, vely, velz, troty) {
+                troty = atan2(player -> trans)
+                interrupter -> speed = 10m
+                interrupter -> troty = atan2(player -> trans)
+                setvel(10m)
+                interrupter -> velx = velx
+                interrupter -> vely = vely 
+                interrupter -> velz = velz
+                interrupter -> statusb &= ~FLAG_DPAD_CONTROL
+            }
+        }
+        rejevret(e == EventJumpedOn && player -> y - y < ToppleHeight)
+        accevcstate(Giant_Fling, e == EventHitInvincible && player -> invincible == 5)
+        accevcstate(Giant_Topple, e == EventSlamHit || e == EventFling || e == EventJumpedOn || e == EventHit)
+    }
+    trans {
+        nofirst {
+            if (collider) {
+                changestateif(Giant_Topple, player -> y - y >= ToppleHeight)
+                sendevent(Event32, player, atan2(player -> trans), 10m)
+            }
+            if (animframe >= 2.0 && animframe <= 8.0) {
+                if (animframe == 2.0) {
+                    var0 = 0.8m
+                    soundpitch(3.263)
+                    soundsetup(6, self, 8)
+                    soundplay([jmp0A], 1V)
+                }
+                else {
+                    var0 = 1.325m
+                }
+                getvert(vvec, self, 2.0)
+                if (player -> y < y + ToppleHeight, distance(vecx, player, DIST_NO_Y) <= var0, abs(vecy - (player -> y + 1m)) <= 1.5m) {
+                    sendevent(Event24, player, 100.0)
+                }
+                else {
+                    getvert(vvec, self, 3.0)
+                    if (player -> y < y + ToppleHeight, distance(vecx, player, DIST_NO_Y) <= 1.325m, abs(vecy - (player -> y + 1m)) <= 1.5m) {
+                        sendevent(Event24, player, 100.0)
+                    }
+                }
+            }
+            else if (animframe >= 24.0 && animframe <= 30.0) {
+                if (animframe == 24.0) {
+                    var0 = 0.8m
+                    soundsetup(6, self, 8)
+                    SoundPitchDefault()
+                    soundplay([jmp0A], 1V)
+                }
+                else {
+                    var0 = 1.325m
+                }
+                getvert(vvec, self, 4.0)
+                if (player -> y < y + ToppleHeight, distance(vecx, player, DIST_NO_Y) <= var0, abs(vecy - (player -> y + 1m)) <= 1.5m) {
+                    sendevent(Event24, player, 100.0)
+                }
+                else {
+                    getvert(vvec, self, 5.0)
+                    if (player -> y < y + ToppleHeight, distance(vecx, player, DIST_NO_Y) <= 1.325m, abs(vecy - (player -> y + 1m)) <= 1.5m) {
+                        sendevent(Event24, player, 100.0)
+                    }
+                }
+            }
+        }
+    }
+}
+
+state Head_Init { // 2
+    stateflag 0x4001
+    statusc 0x0
+    code(vertex, turn) {
+        GiantVertex = vertex
+        HeadTurn = turn
+        groundy = creator -> y
+        zindex = creator -> zindex
+        changestate(Head)
+    }
+}
+
+state Head { // 3
+    stateflag 0x4001
+    statusc 0x80010
+    code() {
+        sleepanim(0, GIANT_HEAD)
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event1)
+    }
+    trans {
+        once {
+            rotx = creator -> rotx
+            roty = creator -> roty
+            rotz = creator -> rotz
+        }
+        var yaw
+        save (roty) {
+            roty = creator -> roty
+            yaw = roty
+        }
+        getvert(vtrans, parent, GiantVertex)
+        vecy = degdist(roty, atan2(player -> trans)) >> 2
+        var0 = degdist(yaw, vecy + roty)
+        if (var0 > 45deg) {
+            var0 = 45deg
+        }
+        if (var0 < -45deg) {
+            var0 = -45deg
+        }
+        vecy = degdist(roty, var0 + yaw)
+        if (vecy >= 0deg) {
+            if (vecy > HeadTurn) {
+                vecy = HeadTurn
+            }
+        }
+        else if (vecy < -HeadTurn) {
+            vecy = -HeadTurn
+        }
+        roty = (roty + vecy) % 360deg
+        rotz = (degdist(roty, yaw) >> 2) + roty
+        vecz = atan2_3d(self, player -> trans) - 25deg
+        if (abs(vecz) > 45deg) {
+            if (vecz >= 0deg) {
+                vecz = 45deg
+            }
+            else {
+                vecz = -45deg
+            }
+        }
+        rotx = degseek(rotx, vecz, 90deg)
+    }
+}
+
+state Shadow_Init { // 4
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        roty = creator -> roty
+        zindex = creator -> zindex
+        zindex -= 14
+        moda = 11.2
+        changestate(Shadow)
+    }
+}
+
+state Shadow { // 5
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        setanim(GIANT_SHADOW)
+        do {
+            animframe = creator -> animframe
+            CopyCreatorTrans()
+            if (animframe >= 23.0) {
+                animframe -= 23.0
+                scalex = -abs(scalex)
+            }
+            else {
+                scalex = abs(scalex)
+            }
+            playframe()
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event1)
+    }
+}
+
+state Giant_Topple { // 6
+    stateflag 0x4004081
+    statusc 0x1080010
+    code() {
+        cascadeevent(Event1, self)
+        entitysetstate(1)
+        save (x, y, z) {
+            CopyPlayerTrans()
+            spawn(9, 4, 1, getins(SetDustColor), 1)
+        }
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | 0x400000
+        soundpitch(4.0)
+        soundplay([Ga3bA], 1V)
+        playframes(GIANT_TOPPLE, 0.0, 15.0)
+        changestate(Giant_Dead)
+    }
+}
+
+sub SetDustColor() { // S-322
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x50, 0x50, 0x50)
+    }
+    else if (r == 1) {
+        SetColor1(0x18, 0x18, 0x18)
+    }
+    else if (r == 2) {
+        SetColor1(0xE7, 0xE7, 0xE7)
+    }
+}
+
+state Giant_Dead { // 7
+    stateflag 0x4081
+    statusc 0x80010
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | 0x400000
+        sleepanim(0, GIANT_BOUNCE)
+    }
+    event(e, a) {
+        if (player -> y > y + 0.25m && interrupter == player && (e == EventJumpedOn || e == EventSlamHit)) {
+            PlayerCanBounce = 1
+        }
+        rejevret(e == EventJumpedOn || e == EventSlamHit || e == EventSlideHit || e == EventSpinHit || e == EventHitInvincible || e == EventFling)
+        accevcstate(Giant_Jumped_On, e == EventHit)
+    }
+    trans {
+        if (collider, player -> y <= y + 0.25m, distance(player, DIST_NO_Y) <= 1.7m) {
+            PlayerCanBounce = 1
+        }
+        if (PlayerCanBounce) {
+            sendevent(EventBounce, interrupter, BouncePropulsion)
+            changestate(Giant_Jumped_On)
+        }
+    }
+}
+
+state Giant_Jumped_On { // 8
+    stateflag 0x4081
+    statusc 0x80010
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | 0x400000
+        PlayerCanBounce = 0
+        soundpitch(0x3A0)
+        soundplay([bnc0A], 1V)
+        playframes(GIANT_BOUNCE, 1.0, 9.0)
+        changestate(Giant_Dead)
+    }
+}
+
+state Giant_Squash { // 9
+    stateflag 0x23
+    statusc 0x32
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        playframe()
+        spawn(9, 4, 1, getins(SetParticleColor2), 1)
+        playframe()
+    }
+}
+
+sub SetParticleColor2() { // S-417
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x05, 0xBD, 0xBE)
+    }
+    else if (r == 1) {
+        SetColor1(0x0D, 0x4C, 0x4C)
+    }
+    else if (r == 2) {
+        SetColor1(0xE7, 0x85, 0x81)
+    }
+}
+
+state Giant_Fling { // 10
+    stateflag 0x20
+    statusc 0x32
+    code(h) {
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir(0x80000)
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    } 
+    trans {
+        EnemyFlingTrans(2m, EventFling)
+    }
+}
+
+state Kill { // 11
+    stateflag 0x1
+    statusc 0x0
+    code() {}
+}

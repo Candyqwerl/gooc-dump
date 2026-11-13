@@ -1,0 +1,635 @@
+#gool BikOC 43 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_BikOC.gooc" "C3\Out\C3_BikOC.nsentry"
+
+#iflev k
+#anim SKYBOX [Sk1kV] [Sk1kG] 01 1 2
+#eliflev l
+#anim SKYBOX [Sk1lV] [Sk1lG] 01 1 2
+#eliflev w
+#anim SKYBOX [Sk1wV] [Sk1wG] 01 1 2
+#else
+#anim SKYBOX [Sk1BV] [Sk1BG] 01 1 2
+#endif
+
+#anim SIGN_SPEED           [SSpkV] [SSpkG] 38 1 2
+
+#iflev l
+#anim SIGN_ZIGZAG          [SZilV] [SZilG] 01 1 2
+#anim SIGN_ZIGZAG_FALL     [ZBilV] [ZBilG] 26 1 2
+#anim SIGN_CURVE           [SC1lV] [SC1lG] 01 1 2
+#anim SIGN_CURVE_BREAK     [SC2lV] [SC2lG] 26 1 2
+#anim SIGN_CURVE_HARD      [SC3lV] [SC3lG] 01 1 2
+#anim SIGN_CURVE_HARD_FALL [SC4lV] [SC4lG] 26 1 2
+#else
+#anim SIGN_ZIGZAG          [SZikV] [SZikG] 01 1 2
+#anim SIGN_ZIGZAG_FALL     [ZBikV] [ZBikG] 26 1 2
+#anim SIGN_CURVE           [SC1kV] [SC1kG] 01 1 2
+#anim SIGN_CURVE_BREAK     [SC2kV] [SC2kG] 26 1 2
+#anim SIGN_CURVE_HARD      [SC3kV] [SC3kG] 01 1 2
+#anim SIGN_CURVE_HARD_FALL [SC4kV] [SC4kG] 26 1 2
+#endif
+
+#anim SIGN_ALIEN           [SA3kV] [SA3kG] 01 1 2
+#anim SIGN_ALIEN_FALL      [SA4kV] [SA4KG] 26 1 2
+#anim CONE                 [ConBV] [ConBG] 19 1 2
+
+#iflev l
+#anim FENCE                [Br1lV] [Br1lG] 01 1 2
+#anim FENCE_BREAK          [Br2lV] [Br2lG] 13 1 2
+#else
+#anim FENCE                [Br1kV] [Br1kG] 01 1 2
+#anim FENCE_BREAK          [Br2kV] [Br2kG] 13 1 2
+#endif
+
+#sprite LIGHT [Cr10T]
+#tex 0xFFFFFF 0 2 2 9 800 32 32 32
+
+#spawn S_CAM_CONTROL      Camera_Controller_Init
+#spawn S_SIGN_SPEED       Sign_Speed_Spawn
+#spawn S_SIGN_ZIGZAG      Sign_Spawn
+#spawn S_SIGN_CURVE       Sign_Spawn
+#spawn S_SIGN_CURVE_HARD  Sign_Spawn
+#spawn S_SKYBOX           SkyBox
+#spawn S_FENCE            Fence_Spawn
+#spawn S_TURBO_PAD        Turbo_Pad_Spawn
+#spawn S_PIT_RETURN       Pit_Return
+#spawn S_PIT_GRABBER      Pit_Grabber
+#spawn S_GAS_SIGN         Sign_Sound
+#spawn S_GAS              Gas_Station_Sounds
+#spawn S_DINER_SIGN       Sign_Sound
+#spawn S_DINER            __s_13
+#spawn S_ENTROPHY         Sign_Sound
+#spawn S_MAYOR            Sign_Sound
+#spawn S_SHERIFF          Sign_Sound
+#spawn S_HEADLIGHTS       Headlights
+#spawn S_SIGN_ALIEN       Sign_Alien_Spawn
+#spawn S_CONE             Cone_Spawn
+
+var CameraYaw, TargetCameraYaw, CameraPitch, TargetCameraPitch,
+    CameraDistance, CameraTargetVertex, Reserved7, BikeVar8
+
+expr PropPlayerDistance = CameraYaw
+expr ConeLightFade = TargetCameraYaw
+expr ConeHitX = CameraPitch
+expr ConeHitZ = TargetCameraPitch
+
+inline sub CheckBikePropCollision(radius) {
+    if (distance(x, player, DIST_NO_Y | DIST_EXACT) < radius && player -> y < y + 0.125m && player -> y > y - 0.125m) {
+        sendevent(Event27, player, radius, 0.6)
+    }
+    else {
+        eventaccepted = false
+    }
+}
+
+state Camera_Controller_Init { // 0
+    stateflag 0x10001
+    statusc 0
+    code() {
+        ins72(10.0, self)
+        GLOBAL_97 = self
+        CameraTargetVertex = -1.0
+        trotx = 180deg
+        yzapproach = 500deg
+        CameraYaw = 0
+        TargetCameraYaw = CameraYaw
+        CameraDistance = 3m
+        y = player -> y + 2.5m
+        changestate(Camera_Chase)
+    }
+}
+
+state Camera_Chase { // 1
+    stateflag 0x10001
+    statusc 0
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Camera_Controller_Init, e == Event19)
+        accevif (e == Event34) {
+            CameraTargetVertex = a[0]
+        }
+        accevcstate(Camera_Finish, e == Event22)
+    }
+    trans {
+        GAMEFLAGS |= 0x40000000
+        vecx = player -> x
+        vecy = player -> y
+        vecz = player -> z
+        var0 = degseek(GAMEDIR, player -> roty + 180deg, 1125deg)
+        unless (abs(degdist(TargetCameraYaw, var0)) > 80deg) {
+            TargetCameraYaw = var0
+        }
+        CameraYaw += degdist(CameraYaw, TargetCameraYaw) >> 4
+        TargetCameraPitch = 0
+        CameraPitch += degdist(CameraPitch, TargetCameraPitch) >> 2
+        save (y, trotx, troty, trotz, vecx, vecy, vecz) {
+            trotx = CameraPitch
+            troty = CameraYaw
+            trotz = CameraYaw
+            vectransf2(vvec, vtrans, CameraDistance, 0, 0)
+        }
+        y += ((vecy + 2.5m) - y) >> 1
+        if (y < 1.5m) {
+            y = 1.5m
+        }
+        if (CameraTargetVertex == -1.0) {
+            vecy += 1.5m
+        }
+        else {
+            getvert(vvec, player, CameraTargetVertex)
+        }
+        troty = atan2(self, vecx)
+        roty = troty
+        trotz = -atan2_3d(self, vecx)
+        rotx += degdist(rotx, trotz) >> 2
+        ins72(11.0, self)
+    }
+}
+
+state Camera_Finish { // 2
+    stateflag 0x10001
+    statusc 0
+    code => state Camera_Chase
+    event(e, a) {
+        accevcstate(Camera_Controller_Init, e == Event19)
+    }
+    trans {
+        GAMEFLAGS |= 0x40000000
+        getvert(vtrans, player, 0.0)
+        y += 0.2m
+        vecx = player -> x
+        vecy = player -> y
+        vecz = player -> z
+        vecy += 1.5m
+        troty = atan2(self, vecx)
+        roty = troty
+        trotz = -atan2_3d(self, vecx)
+        rotx += degdist(rotx, trotz) >> 2
+        ins72(11.0, self)
+    }
+}
+
+state Sign_Speed_Spawn { // 3
+    statusc 0
+    code(yaw) {
+        roty = yaw
+        SetScale(1.5S)
+        zindex = 24
+        changestate(Sign_Speed)
+    }
+}
+
+state Sign_Speed { // 4
+    statusc 0
+    code() {
+        sleepanim(0, SIGN_SPEED)
+    }
+    trans {
+        if (distance(player, DIST_NO_Y) <= 3m) {
+            CheckBikePropCollision(1m)
+            changestateif(Sign_Speed_Fall, eventaccepted)
+        }
+    }
+}
+
+state Sign_Speed_Fall { // 5
+    statusc 0
+    code() {
+        statusb = 0
+        soundpitch(4.0)
+        soundplay([SC1kA], 1V)
+        playframes(SIGN_SPEED, 1.0, 37.0)
+    }
+}
+
+state Sign_Spawn { // 6
+    statusc 0
+    code(yaw, mirror) {
+        roty = yaw
+        if (mirror) {
+            scalex = -abs(scalex)
+        }
+        zindex = 24
+        changestate(Sign)
+    }
+}
+
+state Sign { // 7
+    statusc 0
+    code() {
+        if (spawn == S_SIGN_CURVE) {
+            sleepanim(0, SIGN_CURVE)
+        }
+        else if (spawn == S_SIGN_ZIGZAG) {
+            sleepanim(0, SIGN_ZIGZAG)
+        }
+        else {
+            sleepanim(0, SIGN_CURVE_HARD)
+        }
+    }
+    trans {
+        if (distance(player, DIST_NO_Y) <= 3m) {
+            CheckBikePropCollision(1m)
+            changestateif(Sign_Speed_Fall, eventaccepted)
+        }
+    }
+}
+
+state Sign_Hit { // 8
+    statusc 0
+    code() {
+        statusb = 0
+        soundpitch(4.0)
+        soundplay([SC1kA], 1V)
+        if (spawn == S_SIGN_CURVE) {
+            playframes(SIGN_CURVE_BREAK, 0.0, 25.0)
+        }
+        else if (spawn == S_SIGN_ZIGZAG) {
+            playframes(SIGN_ZIGZAG_FALL, 0.0, 25.0)
+            KillEntity()
+            sleep()
+        }
+        else {
+            playframes(SIGN_CURVE_HARD_FALL, 0.0, 25.0)
+            KillEntity()
+            sleep()
+        }
+    }
+}
+
+state Sign_Alien_Spawn { // 9
+    statusc 0
+    code(yaw, mirror) {
+        roty = yaw
+        if (mirror) {
+            scalex = -abs(scalex)
+        }
+        zindex = 24
+        changestate(Sign_Alien)
+    }
+}
+
+state Sign_Alien { // 10
+    statusc 0
+    code() {
+        sleepanim(0, SIGN_ALIEN)
+    }
+    trans {
+        if (distance(player, DIST_NO_Y) <= 3m) {
+            CheckBikePropCollision(1m)
+            changestateif(Sign_Alien_Fall, eventaccepted)
+        }
+    }
+}
+
+state Sign_Alien_Fall { // 11
+    statusc 0
+    code() {
+        statusb = 0
+        sendevent(Event22, player, 0)
+        soundpitch(4.0)
+        soundplay([SC1kA], 1V)
+        playframes(SIGN_ALIEN_FALL, 0.0, 25.0)
+    }
+}
+
+state Fence_Spawn { // 12
+    statusc 0
+    code(yaw, mirror, solid) {
+        roty = yaw
+        if (mirror) {
+            scalex = -abs(scalex)
+        }
+        zindex = 24
+        changestateif(Fence_Solid, solid)
+        vfx = (vfx & 0xFFFF00FF) | 0x600
+        changestate(Fence_Breakable)
+    }
+}
+
+state Fence_Breakable { // 13
+    statusc 0
+    code() {
+        if (LEVEL == LEVEL_Area51) {
+            settrans(UpdateFenceHitAndLighting)
+            UpdateFenceHitAndLighting()
+        }
+        else {
+            settrans(CheckFenceHit)
+            CheckFenceHit()
+        }
+        sleepanim(0, FENCE)
+    }
+}
+
+sub CheckFenceHit() {
+    if (distance(player, DIST_NO_Y) <= 3m) {
+        CheckBikePropCollision(1.5m)
+        changestateif(Fence_Break, eventaccepted)
+    }
+}
+
+sub UpdateFenceHitAndLighting() {
+    PropPlayerDistance = distance(player, DIST_NO_Y)
+    if (PropPlayerDistance <= 3m) {
+        CheckBikePropCollision(1.5m)
+        changestateif(Fence_Break, eventaccepted)
+    }
+    var0 = PropPlayerDistance - 10m
+    if (var0 < 0) {
+        var0 = 0
+    }
+    if (var0 > 45m) {
+        var0 = 45m
+    }
+    moda = ((var0 >> 8) << 12) / 0x4650
+}
+
+state Fence_Break { // 14
+    statusc 0
+    code() {
+        if (LEVEL == LEVEL_Area51) {
+            settrans(UpdatePropLighting)
+            UpdatePropLighting()
+        }
+        statusb = 0
+        soundpitch(4.0)
+        soundplay([Br1kA], 1V)
+        playframes(FENCE_BREAK, 0.0, 12.0)
+    }
+}
+
+sub UpdatePropLighting() {
+    var0 = distance(player, DIST_NO_Y) - 10m
+    if (var0 < 0) {
+        var0 = 0
+    }
+    if (var0 > 45m) {
+        var0 = 45m
+    }
+    moda = ((var0 >> 8) << 12) / 0x4650
+}
+
+state Fence_Solid { // 15
+    statusc 0
+    code() {
+        if (LEVEL == LEVEL_Area51) {
+            settrans(UpdatePropLighting)
+            UpdatePropLighting()
+        }
+        SetScale(0.5S)
+        statusb = 0
+        sleepanim(0, FENCE)
+    }
+}
+
+state Cone_Spawn { // 16
+    statusc 0
+    code() {
+        zindex = 24
+        vfx = (vfx & 0xFFFF00FF) | 0x600
+        changestate(Cone)
+    }
+}
+
+state Cone { // 17
+    statusc 0
+    code() {
+        if (LEVEL == LEVEL_Area51) {
+            settrans(UpdateConeHitAndLighting)
+            UpdateConeHitAndLighting()
+        }
+        else {
+            settrans(CheckConeHit)
+            CheckConeHit()
+        }
+        sleepanim(0, CONE)
+    }
+    event(e, a) {
+        if (e == EventHit) {
+            ConeHitX = interrupter -> x
+            ConeHitZ = interrupter -> z
+            accevcstate(Cone_Fling)
+        }
+    }
+}
+
+sub CheckConeHit() {
+    if (distance(player, DIST_NO_Y) < 3m) {
+        CheckBikePropCollision(1m)
+        if (eventaccepted) {
+            ConeHitX = player -> x
+            ConeHitZ = player -> z
+            changestate(Cone_Fling)
+        }
+    }
+}
+
+sub UpdateConeHitAndLighting() {
+    PropPlayerDistance = distance(player, DIST_NO_Y)
+    if (PropPlayerDistance <= 3m) {
+        if (distance(player, DIST_NO_Y | DIST_EXACT) < 1m) {
+            ConeHitX = player -> x
+            ConeHitZ = player -> z
+            changestate(Cone_Fling)
+        }
+    }
+    var0 = PropPlayerDistance - 10m
+    if (var0 < 0) {
+        var0 = 0
+    }
+    if (var0 > 45m) {
+        var0 = 45m
+    }
+    moda = ((var0 >> 8) << 12) / 0x4650
+}
+
+state Cone_Fling { // 18
+    statusc 0
+    code() {
+        KillEntity()
+        soundpitch((8.0 + rand(1.6)) * 0.25 >> 8)
+        soundplay([spa0A], 0.35V)
+        SetVec(ConeHitX, y, ConeHitZ)
+        vecx = atan2(self, vecx) + 180deg
+        velx = 0.195m * sin(vecy) >> 4
+        velz = 0.195m * cos(vecy) >> 4
+        vely = 0
+        if (LEVEL == LEVEL_Area51) {
+            ConeLightFade = 1.0
+            settrans(UpdateConeFlightAndLighting)
+            UpdateConeFlightAndLighting()
+        }
+        else {
+            settrans(UpdateConeFlight)
+            UpdateConeFlight()
+        }
+        statusb = 0
+        playframes(CONE, 1.0, 18.0)
+    }
+}
+
+sub UpdateConeFlightAndLighting() {
+    x = spd(x, velx)
+    z = spd(z, velz)
+    var0 = distance(player, DIST_NO_Y) - 10m
+    if (var0 < 0) {
+        var0 = 0
+    }
+    if (var0 > 45m) {
+        var0 = 45m
+    }
+    var0 = (((45m - var0) >> 8) << 12) / 0x4650
+    ConeLightFade = seek(ConeLightFade, 0, 13)
+    var0 = (var0 * ConeLightFade) >> 8
+    moda = 16.0 - var0
+}
+
+sub UpdateConeFlight() {
+    x = spd(x, velx)
+    z = spd(z, velz)
+}
+
+state SkyBox { // 19
+    stateflag 0x10001
+    statusc 0
+    code() {
+        movetolist(2.0, self)
+        statusb = FLAG_NO_CAMERA_CLIP
+        SetScale(0.1S)
+        zindex = -4000
+        vfx = (vfx & 0xFFFF00FF) | 0x600
+        sleepanim(0, SKYBOX)
+    }
+    trans {
+        x = CAMTRANSX
+        y = CAMTRANSY
+        z = CAMTRANSZ
+    }
+}
+
+state Turbo_Pad_Spawn { // 20
+    statusc 0
+    code(yaw) {
+        roty = yaw
+        SetScale(3S, 1S, 3S)
+        changestate(Turbo_Pad)
+    }
+}
+
+state Turbo_Pad { // 21
+    statusc 0
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_INVISIBLE
+        sleepanim(0, LIGHT)
+    }
+    trans {
+        sendevent(Event60, collider, roty)
+        changestateif(Turbo_Pad_Cooldown, eventaccepted)
+    }
+}
+
+state Turbo_Pad_Cooldown { // 22
+    statusc 0
+    code() {
+        statusb = 0
+        playnull(6)
+        changestate(Turbo_Pad)
+    }
+}
+
+state Pit_Return { // 23
+    statusc 0
+    __transargs
+    code(dist) {
+        sleepnull()
+    }
+    event(e, a) {
+        accevif (e == Event76 && distance(player, DIST_NO_Y) < dist) {
+            sendevent(Event50, player, x, y, z)
+        }
+    }
+}
+
+state Pit_Grabber { // 24
+    statusc 0
+    code() {
+        SetScale(4S, 2S, 4S)
+        statusb = FLAG_COLLIDABLE | FLAG_INVISIBLE
+        sleepanim(0, LIGHT)
+    }
+    trans {
+        sendeventif(Event9, collider, !(player -> stateflag & 0x20) && !player -> invincible, 100.0)
+    }
+}
+
+state Sign_Sound { // 25
+    statusc 0
+    code() {
+        vecz = player -> z
+        do {
+            if (player -> z < z && z < vecz) {
+                soundsetup(7, self, 0, 8)
+                SoundPitchDefault(0.25)
+                soundplay([SC2kA], 1V)
+            }
+            vecz = player -> z
+            playnull(6)
+        } while (1)
+    }
+}
+
+state Gas_Station_Sounds { // 26
+    statusc 0
+    code() {
+        do {
+            if (!rand(0, 2)) {
+                if (!rand(0, 2)) {
+                    soundsetup(7, self, 0, 8)
+                    SoundPitchDefault(0.25)
+                    soundplay([SC4kA], 1V)
+                }
+                else {
+                    soundsetup(7, self, 0, 8)
+                    SoundPitchDefault(0.25)
+                    soundplay([SC3kA], 1V)
+                }
+            }
+            playnull(21)
+        } while (1)
+    }
+}
+
+state Headlights { // 27
+    stateflag 0x10003
+    statusc 0x22
+    code() {
+        GLOBAL_55 = 1.0
+        GLOBAL_54 = self
+        GLOBAL_120 = 0
+        do {
+            if (parent -> animseq) {
+                getvert(vtrans, parent, 0.0)
+                getvert(vvec, parent, 2.0)
+                roty = atan2(self, vecx)
+            }
+            else {
+                roty = CAMROTY
+            }
+            x = parent -> x
+            z = parent -> z
+            y = parent -> y + 2m
+            save (trotx, troty, trotz, vecx, vecy, vecz) {
+                SetTRot(0, roty, 0)
+                vectransf2(vvec, vtrans, -10m, 0, 0)
+                SetVec(x, y, z)
+            }
+            playnull()
+        } while (1)
+    }
+}
+

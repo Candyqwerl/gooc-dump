@@ -1,0 +1,1122 @@
+#gool NTroC 89 3
+#interruptcount 85
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C3_FruiC.gooh"
+#include "..\\Includes\\C3_BosBC.gooh"
+#include "..\\Includes\\C3_ShadC.gooh"
+#include "..\\Includes\\C3_WEfOC.gooh"
+//gooc -c 3 -r pal "C3\C3__NTroC.gooc" "C3\Out\C3__NTroC.nsentry"
+
+#anim NTROPY_PREPARE_ORB         [Nn14V] [NT14G] 29 0 2
+#anim NTROPY_WAIT_FOR_ORB        [Nn34V] [NT14G] 25 0 2
+#anim NTROPY_PREPARE_LAZER       [Nn44V] [NT14G] 34 0 2
+#anim NTROPY_STAND_1             [Nn54V] [NT14G] 25 0 2
+#anim NTROPY_WAIT_FOR_LAZER      [Nn74V] [NT14G] 25 0 2
+#anim NTROPY_TRIGGER_PLATFORMS_1 [Nn84V] [NT14G] 38 0 2
+#anim NTROPY_KNEEL_1             [Nn94V] [NT14G] 38 0 2
+#anim NTROPY_KNEEL_2             [Nna4V] [NT14G] 17 0 2
+#anim NTROPY_STAND_UP            [Nnb4V] [NT14G] 17 0 2
+#anim NTROPY_ATTACK_PLAYER_1     [Nnc4V] [NT14G] 30 0 2
+
+#anim NTROPY_ATTACKED   [Nnd4V] [NT14G] 48 0 2
+#anim NTROPY_TRANSITION [Nne4V] [NT14G] 38 0 2
+#anim NTROPY_DEATH      [Nnf4V] [NT14G] 23 0 2
+#anim NTROPY_DEAD       [Nng4V] [NT14G] 12 0 2
+#anim NTROPY_LAUGH      [Nnj4V] [NT14G] 38 0 2
+#anim NTROPY_STAND_2    [Nnp4V] [NT14G] 12 0 2
+
+#anim NTROPY_WIN_1    [Nnk4V] [NT14G] 12 0 2
+#anim NTROPY_WIN_2    [Nnl4V] [NT14G] 12 0 2
+#anim NTROPY_INTRO_1  [Nnm4V] [NT14G] 97 0 2
+#anim NTROPY_INTRO_2  [Nnn4V] [NT14G] 99 0 2
+#anim NTROPY_INTRO_3  [Mno4V] [NT14G] 25 0 2
+
+#anim NTROPY_FIRE_LAZER          [Nn64V] [NTa4G] 12 0 2
+#anim NTROPY_ATTACK_PLAYER_2     [Nni4V] [NTa4G] 30 0 2
+#anim NTROPY_FIRE_ORB            [Nn24V] [NTa4G] 12 0 2
+#anim NTROPY_TRIGGER_PLATFORMS_2 [Nnh4V] [NT94G] 05 0 2
+
+#anim TIME_FORK_1  [Ns14V] [NT34G] 29 0 2
+#anim TIME_FORK_2  [Ns24V] [NT34G] 12 0 2
+#anim TIME_FORK_3  [Ns34V] [NT34G] 25 0 2
+#anim TIME_FORK_4  [Ns44V] [NT34G] 34 0 2
+#anim TIME_FORK_5  [Ns54V] [NT34G] 25 0 2
+#anim TIME_FORK_6  [Ns64V] [NT34G] 12 0 2
+#anim TIME_FORK_7  [Ns74V] [NT34G] 25 0 2
+#anim TIME_FORK_8  [Ns84V] [NT34G] 38 0 2
+#anim TIME_FORK_9  [Ns94V] [NT34G] 38 0 2
+#anim TIME_FORK_0  [Nsa4V] [NT34G] 17 0 2
+#anim TIME_FORK_A  [Nsb4V] [NT34G] 17 0 2
+#anim TIME_FORK_B  [Nsc4V] [NT34G] 30 0 2
+#anim TIME_FORK_C  [Nsd4V] [NT34G] 48 0 2
+#anim TIME_FORK_D  [Nsf4V] [NT34G] 48 0 2
+#anim TIME_FORK_E  [Nsj4V] [NT34G] 38 0 2
+#anim TIME_FORK_F  [Nsp4V] [NT34G] 12 0 2
+#anim TIME_FORK_G  [Nsk4V] [NT34G] 12 0 2
+#anim TIME_FORK_H  [Nsl4V] [NT34G] 12 0 2
+#anim TIME_FORK_I  [Nsm4V] [NT34G] 97 0 2
+#anim TIME_FORK_J  [Nsn4V] [NT34G] 99 0 2
+#anim TIME_FORK_K  [Mso4V] [NT34G] 25 0 2
+#anim TIME_FORK_L  [Nfd4V] [NT44G] 48 0 2
+#anim TIME_FORK_M  [Nse4V] [NT44G] 38 0 2
+#anim TIME_FORK_N  [Nsg4V] [NT44G] 26 0 2
+
+#anim NTROPY_WARPOUT_1  [Nf14V] [NT54G] 12 1 2
+#anim NTROPY_WARPOUT_2  [Nf24V] [NT64G] 25 1 2
+#anim NTROPY_WARPOUT_3  [Nf34V] [NT64G] 12 1 2
+#anim WARPOUT_SHOCKWAVE [Nf44V] [NT74G] 26 1 2
+#anim INTRO_CLOCK       [Nc14V] [NT84G] 80 1 2
+
+#spawn S_NTROPY     NTropy_Intro
+#spawn S_FORK       Time_Fork
+#spawn S_WARPOUT    Warpout_Shockwave
+#spawn S_CLOCK      Intro_Clock
+
+event Event1 => state Kill
+
+var FightPhase, AttackStep, PlatformLayout, TimeVoice, NTropySpeechOBJ
+
+expr ActiveOrbs          = var0
+expr PlatformMaskLow     = var0
+expr PlatformMaskHigh    = field_61
+expr PowerupAlreadyOwned = field_61
+expr ExitReward          = var0
+expr ForkVerticesReady   = var0
+
+inline sub SoundNTropyWarp() {
+    soundpitch(4.0)
+    sounddecay(8s)
+    soundsetup(6, self, 8)
+    soundplay([NTa4A], 1V)
+}
+
+inline sub SoundNTropyAttacked() {
+    soundpitch(4.715)
+    sounddecay(8s)
+    soundsetup(7, self, 8)
+    soundplay([NT24A], 1V)
+}
+
+state NTropy_Intro { // 0
+    stateflag 0x4004081
+    statusc 0x2
+    code() {
+        UpdateTextureGroups(0)
+        SetScale(1.5S)
+        zindex = 32
+        GLOBAL_150 |= 0x40000
+        if (GLOBAL_27 & 0x10) {
+            SECTIONDEATHCOUNT = 0
+        }
+        health = 3.0
+        spawn(BosBC, BosBC_S_HEALTH_TICK, 1, 3.0, 0)
+        spawn2(NTroC, S_FORK)
+        statusb = FLAG_ROT_Y | FLAG_COLLIDABLE | FLAG_SOLID_SIDES | FLAG_SOLID_TOP | FLAG_NO_CAMERA_CLIP | FLAG_HAS_SHADOW | FLAG_STALL
+        trotx = 360deg
+        field_60 = 0
+        spawn(ShadC, ShadC_S_BOSS_VIDO, 1, 0, 2S, 0)
+        spawn2(90, 0)
+        creator = objectspawned
+        FightPhase = 0
+        AttackStep = 0
+        soundpitch(4.715)
+        sounddecay(10.2s)
+        soundsetup(6, self, 8)
+        soundcount(0xFFFF)
+        soundplay([NT74A], 0.1V)
+        TimeVoice = voice
+        if (!RESPAWNCOUNT) {
+            spawn(NTroC, S_CLOCK)
+            playnull(1)
+            playnull(1)
+            playnull(1)
+            playnull(19)
+            NTropySpeechOBJ = 0
+            if (SFXVOL) {
+                if (var lang = GLOBAL_151; lang == LANG_FR) {
+                    spawn2(9, 44, 1, [F004O], [F014O], 2.0, 1000s, 8.0)
+                    NTropySpeechOBJ = objectspawned
+                }
+                else if (lang == LANG_DE) {
+                    spawn2(9, 44, 1, [G004O], [G014O], 2.0, 1000s, 8.0)
+                    NTropySpeechOBJ = objectspawned
+                }
+                else if (lang == LANG_IT) {
+                    spawn2(9, 44, 1, [I004O], [I014O], 2.0, 1000s, 8.0)
+                    NTropySpeechOBJ = objectspawned
+                }
+                else if (lang == LANG_ES) {
+                    spawn2(9, 44, 1, [S004O], [S014O], 2.0, 1000s, 8.0)
+                    NTropySpeechOBJ = objectspawned
+                }
+                else {
+                    spawn2(9, 44, 1, [E004O], [E014O], 2.0, 1000s, 8.0)
+                    NTropySpeechOBJ = objectspawned
+                }
+            }
+            onstateexit(ClearWarpEffect)
+            vfx = (vfx & 0xFF00FFFF) | 0x70000
+            moda = 16.0
+            SoundNTropyWarp()
+            soundpitch(4.715)
+            sounddelay(1.32s)
+            sounddecay(8s)
+            soundsetup(7, self, 8)
+            soundplay([NT64A], 1V)
+            playframes(NTROPY_INTRO_1, 0.0, 96.0)
+            SoundNTropyAttacked()
+            SoundNTropyAttacked()
+            soundpitch(3.302)
+            soundsetup(7, self, 8)
+            sounddelay(0.7s)
+            soundplay([Bp10A], 1V)
+            setanim(NTROPY_INTRO_2, -1.0)
+            do {
+                animframe += 1.0
+                if (animframe == 24.0) {
+                    interrupter = NTropySpeechOBJ
+                    sendevent(EventTriggered, interrupter)
+                    NTropySpeechOBJ = 0
+                }
+                playframe()
+            } while (animframe + 1.0 <= 98.0)
+            playframes(NTROPY_INTRO_3, 0.0, 24.0)
+        }
+        changestate(NTropy_SelectAttack)
+    }
+    event(e, a) {
+        accevcstate(NTropy_SelectAttack, e == Event67)
+    }
+    trans {
+        moda = seek(moda, 0, 0.64)
+        if (!moda) {
+            vfx &= 0xFF00FFFF
+        }
+    }
+}
+
+sub ClearWarpEffect() { // S-153
+    vfx &= 0xFF00FFFF
+    moda = 0
+}
+
+state NTropy_SelectAttack { // 1
+    stateflag 0x4004081
+    statusc 0x0
+    code() {
+        if (TimeVoice > 0) {
+            sp = TimeVoice
+            soundcheck(sp)
+        }
+        if (TimeVoice > 0 && misc != -1) {
+            voice = TimeVoice
+            soundfadet(0.4s, voice)
+            soundfadev(1V, voice, 2)
+        }
+        else {
+            soundpitch(4.715)
+            sounddecay(10.2s)
+            soundsetup(6, self, 8)
+            soundcount(0xFFFF)
+            soundplay([NT74A], 0.1V)
+            TimeVoice = voice
+        }
+        do {
+            if (var phase = FightPhase; phase == 0) {
+                if (var step = AttackStep % 7.0; step == 0.0) {
+                    changestate(NTropy_TriggerPlatforms, 1, 1.0)
+                }
+                else if (step == 1.0) {
+                    changestate(NTropy_FireOrb, 1.0)
+                }
+                else if (step == 2.0) {
+                    changestate(NTropy_FireLazer, 0)
+                }
+                else if (step == 3.0) {
+                    changestate(NTropy_FireLazer, 3.0)
+                }
+                else if (step == 4.0) {
+                    changestate(NTropy_FireLazer, 2.0)
+                }
+                else if (step == 5.0) {
+                    changestate(NTropy_TriggerPlatforms, 40, 0.0)
+                }
+                else {
+                    changestateif(NTropy_DazedRecover, step == 6.0, 6s)
+                }
+            }
+            else if (phase == 1.0) {
+                if (var step = AttackStep % 8.0; step == 0) {
+                    changestate(NTropy_TriggerPlatforms, 2, 1.0)
+                }
+                else if (step == 1.0) {
+                    changestate(NTropy_FireOrb, 2.0)
+                }
+                else if (step == 2.0) {
+                    changestate(NTropy_FireLazer, 0.0)
+                }
+                else if (step == 3.0) {
+                    changestate(NTropy_FireLazer, 0.0)
+                }
+                else if (step == 4.0) {
+                    changestate(NTropy_FireLazer, 3.0)
+                }
+                else if (step == 5.0) {
+                    changestate(NTropy_FireLazer, 0.0)
+                }
+                else if (step == 6.0) {
+                    changestate(NTropy_TriggerPlatforms, 50, 0.0)
+                }
+                else {
+                    changestateif(NTropy_DazedRecover, step == 7.0, 5s)
+                }
+            }
+            else if (phase == 2.0) {
+                if (var step = AttackStep % 9.0; step == 0) {
+                    changestate(NTropy_TriggerPlatforms, 3, 1.0)
+                }
+                else if (step == 1.0) {
+                    changestate(NTropy_FireOrb, 3.0)
+                }
+                else if (step == 2.0) {
+                    changestate(NTropy_FireLazer, 2.0)
+                }
+                else if (step == 3.0) {
+                    changestate(NTropy_FireLazer, 3.0)
+                }
+                else if (step == 4.0) {
+                    changestate(NTropy_FireLazer, 0)
+                }
+                else if (step == 5.0) {
+                    changestate(NTropy_FireLazer, 2.0)
+                }
+                else if (step == 6.0) {
+                    changestate(NTropy_FireLazer, 2.0)
+                }
+                else if (step == 7.0) {
+                    changestate(NTropy_TriggerPlatforms, 60, 0.0)
+                }
+                else {
+                    changestateif(NTropy_DazedRecover, step == 8.0, 4s)
+                }
+            }
+        } while (1)
+    }
+}
+
+state NTropy_Wait { // 2
+    stateflag 0x4004081
+    statusc 0x0
+    code(count) {
+        troty = 0
+        do (var i = 0) {
+            playframes(NTROPY_STAND_1, 0.0, 24.0)
+        } while ({ i += 1.0 }; i < count)
+        AttackStep += 1.0
+        changestate(NTropy_SelectAttack)
+    }
+}
+
+state NTropy_DazedRecover { // 3
+    stateflag 0x1
+    statusc 0x0
+    code(len) {
+        troty = 0
+        do (var start = frametime) {
+            if (animseq != getanim(NTROPY_KNEEL_2)) {
+                setanim(NTROPY_KNEEL_2, -1.0)
+            }
+            playframe((animframe + 1.0) % 17.0)
+        } while (frametime - start < len)
+        playframes(NTROPY_STAND_UP, 0.0, 16.0)
+        changestateif(NTropy_AttackPlayer, distance(player) < 6m)
+        AttackStep += 1.0
+        changestate(NTropy_SelectAttack)
+    }
+    event(e, a) {
+        accevcstate(NTropy_Attacked, e == EventJumpedOn || e == EventSpinHit || e == EventSlideHit || e == EventSlamHit || e == EventHit)
+    }
+    trans {
+        sendevent(EventHit, collider, 100.0)
+    }
+}
+
+state NTropy_AttackPlayer { // 4
+    stateflag 0x41
+    statusc 0x0
+    code() {
+        troty = atan2(player -> trans)
+        trotx = 360deg
+        playframes(NTROPY_ATTACK_PLAYER_1, 0.0, 12.0)
+        soundpitch(5.805)
+        soundsetup(7, self, 8)
+        sounddecay(8s)
+        soundplay([NT44A], 1V)
+        playanim(13, NTROPY_ATTACK_PLAYER_2)
+        spawn(90, 5, 1, 4.0, 1)
+        spawn(90, 5, 1, 4.0, 2)
+        playframes(13.0, 24.0)
+        playframes(NTROPY_ATTACK_PLAYER_1, 25.0, 29.0)
+        changestateif(NTropy_Victory, player -> stateflag & 0x8000000)
+        AttackStep += 1.0
+        changestate(NTropy_SelectAttack)
+    }
+}
+
+state NTropy_FireOrb { // 5
+    stateflag 0x40040C1
+    statusc 0x0
+    code(count) {
+        playframes(NTROPY_PREPARE_ORB, 0.0, 28.0)
+        ActiveOrbs = 0
+        do (var i = 0) {
+            spawn2(90, 2, 1, 4.0, 5.0)
+            if (objectspawned) {
+                ActiveOrbs += 1.0
+            }
+            playframes(NTROPY_FIRE_ORB, 0.0, 11.0)
+            playframes(NTROPY_WAIT_FOR_ORB, 0.0, 24.0)
+        } while ({ i += 1.0 }; i < count)
+
+        while (ActiveOrbs) {
+            if (animseq != getanim(NTROPY_WAIT_FOR_ORB)) {
+                setanim(NTROPY_WAIT_FOR_ORB, -1.0)
+            }
+            playframe((animframe + 1.0) % 25.0)
+            changestateif(NTropy_Victory, player -> stateflag & 0x8000000)
+            changestateif(NTropy_AttackPlayer, distance(player) < 6m)
+        }
+        troty = 0deg
+        playframes(NTROPY_PREPARE_LAZER, 0.0, 33.0)
+        AttackStep += 1.0
+        changestate(NTropy_SelectAttack)
+    }
+    event(e, a) {
+        accevif (e == EventTriggered) {
+            ActiveOrbs -= 1.0
+        }
+    }
+}
+
+state NTropy_FireLazer { // 6
+    stateflag 0x40040C1
+    statusc 0x0
+    code(dir) {
+        spawn(90, 4, 1, 4.0, dir)
+        spawn(90, 4, 1, 5.0, dir)
+        playframes(NTROPY_FIRE_LAZER, 0.0, 7.0)
+        spawn(90, 3, 1, dir)
+        playframes(8.0, 11.0)
+        playframes(NTROPY_WAIT_FOR_LAZER, 0.0, 24.0)
+        changestateif(NTropy_Victory, player -> stateflag & 0x8000000)
+        changestateif(NTropy_AttackPlayer, distance(player) < 6m)
+        playframes(0.0, 12.0)
+        AttackStep += 1.0
+        changestate(NTropy_SelectAttack)
+    }
+}
+
+sub GetPlatformMasks(layout) { // S-514
+    if (var id = layout; id == 1) {
+        PlatformMaskLow = -0x2000000
+        PlatformMaskHigh = 0xFF
+    }
+    else if (id == 2) {
+        PlatformMaskLow = -0x40000000
+        PlatformMaskHigh = 0xFF
+    }
+    else if (id == 3) {
+        PlatformMaskLow = -0x80000000
+        PlatformMaskHigh = 0xFB
+    }
+    else if (id == 41) {
+        PlatformMaskLow = 0x31818E
+        PlatformMaskHigh = 0x63
+    }
+    else if (id == 42) {
+        PlatformMaskLow = -0x7F39EFFA
+        PlatformMaskHigh = 56
+    }
+    else if (id == 43) {
+        PlatformMaskLow = 0x8021004
+        PlatformMaskHigh = 0x71
+    }
+    else if (id == 44) {
+        PlatformMaskLow = -0x77FDEF80
+        PlatformMaskHigh = 0x71
+    }
+    else if (id == 45) {
+        PlatformMaskLow = 0x840118E
+        PlatformMaskHigh = 0x73
+    }
+    else if (id == 46) {
+        PlatformMaskLow = 0x180219CE
+        PlatformMaskHigh = 0x73
+    }
+    else if (id == 51) {
+        PlatformMaskLow = 0x10412100
+        PlatformMaskHigh = 32
+    }
+    else if (id == 52) {
+        PlatformMaskLow = 0x200444
+        PlatformMaskHigh = 0x73
+    }
+    else if (id == 53) {
+        PlatformMaskLow = 0x8041042
+        PlatformMaskHigh = 0x71
+    }
+    else if (id == 54) {
+        PlatformMaskLow = 0x10023100
+        PlatformMaskHigh = 0xE3
+    }
+    else if (id == 55) {
+        PlatformMaskLow = 0x18801080
+        PlatformMaskHigh = 0x63
+    }
+    else if (id == 56) {
+        PlatformMaskLow = 0x8021080
+        PlatformMaskHigh = 0xF3
+    }
+    else if (id == 61) {
+        PlatformMaskLow = 0x801A310
+        PlatformMaskHigh = 64
+    }
+    else if (id == 62) {
+        PlatformMaskLow = -0x6F7FDFFA
+        PlatformMaskHigh = 24
+    }
+    else if (id == 63) {
+        PlatformMaskLow = 0x8010C2
+        PlatformMaskHigh = 49
+    }
+    else if (id == 64) {
+        PlatformMaskLow = 0x43080C
+        PlatformMaskHigh = 0xF1
+    }
+    else if (id == 0x41) {
+        PlatformMaskLow = 0x420080
+        PlatformMaskHigh = 0x61
+    }
+    else if (id == 0x42) {
+        PlatformMaskLow = 0x18C019E
+        PlatformMaskHigh = 0x71
+    }
+    else if (id == 0x65) {
+        PlatformMaskLow = 0x7FFF
+        PlatformMaskHigh = 0
+    }
+    else if (id == 0x66) {
+        PlatformMaskLow = 0x3FF
+        PlatformMaskHigh = 0
+    }
+    else if (id == 0x67) {
+        PlatformMaskLow = 0x1DF
+        PlatformMaskHigh = 0
+    }
+    else if (id == 0x8D) {
+        PlatformMaskLow = -0x7E73FF3A
+        PlatformMaskHigh = 0x71
+    }
+    else if (id == 0x8E) {
+        PlatformMaskLow = 0x863011C
+        PlatformMaskHigh = 0x60
+    }
+    else if (id == 0x8F) {
+        PlatformMaskLow = 0x840108E
+        PlatformMaskHigh = 32
+    }
+    else if (id == 0x90) {
+        PlatformMaskLow = 0x840118E
+        PlatformMaskHigh = 1
+    }
+    else if (id == 0x91) {
+        PlatformMaskLow = -0x77FDEF32
+        PlatformMaskHigh = 0x71
+    }
+    else if (id == 0x92) {
+        PlatformMaskLow = -0x67BFE732
+        PlatformMaskHigh = 0x73
+    }
+    else if (id == 0x97) {
+        PlatformMaskLow = -0x7B7DF7FC
+        PlatformMaskHigh = 0
+    }
+    else if (id == 0x98) {
+        PlatformMaskLow = 0x200400CE
+        PlatformMaskHigh = 34
+    }
+    else if (id == 0x99) {
+        PlatformMaskLow = 0x820108E
+        PlatformMaskHigh = 0x42
+    }
+    else if (id == 0x9A) {
+        PlatformMaskLow = -0x73BFF739
+        PlatformMaskHigh = 0
+    }
+    else if (id == 0x9B) {
+        PlatformMaskLow = 0x80118C6
+        PlatformMaskHigh = 1
+    }
+    else if (id == 0x9C) {
+        PlatformMaskLow = 0x84010CF
+        PlatformMaskHigh = 1
+    }
+    else if (id == 0xA1) {
+        PlatformMaskLow = -0x3A7FEFFE
+        PlatformMaskHigh = 8
+    }
+    else if (id == 0xA2) {
+        PlatformMaskLow = 0x4010918
+        PlatformMaskHigh = 0x60
+    }
+    else if (id == 0xA3) {
+        PlatformMaskLow = 0x801008C
+        PlatformMaskHigh = 0x43
+    }
+    else if (id == 0xA4) {
+        PlatformMaskLow = 0x10C2008F
+        PlatformMaskHigh = 48
+    }
+    else if (id == 0xA5) {
+        PlatformMaskLow = 0x420086
+        PlatformMaskHigh = 1
+    }
+    else if (id == 0xA6) {
+        PlatformMaskLow = -0x7FCE7F72
+        PlatformMaskHigh = 0x79
+    }
+}
+
+state NTropy_TriggerPlatforms { // 7
+    stateflag 0x40040C1
+    statusc 0x0
+    code(layout, brief) {
+        voice = TimeVoice
+        soundfadet(0.4s, voice)
+        soundfadev(1V, voice, 2)
+        if (animseq == getanim(NTROPY_STAND_UP) || animseq == getanim(NTROPY_TRANSITION) || animseq == getanim(NTROPY_INTRO_3)) {
+            playframes(NTROPY_TRIGGER_PLATFORMS_1, 25.0, 37.0)
+        }
+        else {
+            playframes(NTROPY_TRIGGER_PLATFORMS_1, 0.0, 37.0)
+        }
+        spawn(90, 5, 1, 5.0, 0.0)
+        playanim(0, NTROPY_TRIGGER_PLATFORMS_2)
+        playanim(1, NTROPY_TRIGGER_PLATFORMS_2)
+        playanim(2, NTROPY_TRIGGER_PLATFORMS_2)
+        playanim(3, NTROPY_TRIGGER_PLATFORMS_2)
+        playanim(3, NTROPY_TRIGGER_PLATFORMS_2)
+        if (layout > 10) {
+            if (SECTIONDEATHCOUNT <= 4.0) {
+                layout += 1 + rand(3)
+            }
+            else if (SECTIONDEATHCOUNT <= 9.0) {
+                layout += 2 + rand(3)
+            }
+            else if (SECTIONDEATHCOUNT <= 14.0) {
+                layout += 3 + rand(3)
+            }
+            else {
+                layout += 4 + rand(3)
+            }
+        }
+        PlatformLayout = layout
+        {
+            var low, high
+            save (var0, field_61) {
+                GetPlatformMasks(PlatformLayout)
+                low = PlatformMaskLow
+                high = PlatformMaskHigh
+            }
+            sendevent(Event83, creator, low, high)
+            soundpitch(5.805)
+            soundsetup(7, self, 8)
+            sounddecay(8s)
+            soundplay([NT44A], 1V)
+        }
+        if (brief) {
+            playframes(NTROPY_KNEEL_1, 5.0, 16.0)
+        }
+        else {
+            playframes(NTROPY_KNEEL_1, 5.0, 37.0)
+        }
+        AttackStep += 1.0
+        changestate(NTropy_SelectAttack)
+    }
+}
+
+state NTropy_Transition { // 8
+    stateflag 0x40040C1
+    statusc 0x0
+    code(layout) {
+        {
+            var low, high
+            save (var0, field_61) {
+                PlatformLayout = layout
+                GetPlatformMasks(PlatformLayout)
+                low = PlatformMaskLow
+                high = PlatformMaskHigh
+            }
+            sendevent(Event84, creator, low, high, 0)
+        }
+        voice = TimeVoice
+        soundfadet(5, voice)
+        soundfadev(1V, voice, 2)
+        SoundNTropyWarp()
+        playframes(NTROPY_TRANSITION, 0.0, 37.0)
+        vfx &= 0xFF00FFFF
+        moda = 0
+        sendevent(Event21, player, 0)
+        FightPhase += 1.0
+        AttackStep = 0
+        changestate(NTropy_SelectAttack)
+    }
+    trans {
+        once {
+            vfx = (vfx & 0xFF00FFFF) | 0x70000
+            moda = 16.0
+            setanim(NTROPY_STAND_1, 0.0)
+        }
+        unless (GLOBAL_119 & 0x8000000) {
+            settrans(BeginWarpIn)
+        }
+        BeginWarpIn()
+    }
+}
+
+sub BeginWarpIn() { // S-877
+    FADECONTROL = 0
+    settrans(UpdateWarpIn)
+    UpdateWarpIn()
+}
+
+sub UpdateWarpIn() { // S-881
+    moda = seek(moda, 0, 109)
+    if (!moda) {
+        tpc = 0
+        vfx &= 0xFF00FFFF
+    }
+}
+
+state NTropy_Attacked { // 9
+    stateflag 0x4004083
+    statusc 0x0
+    code() {
+        SoundNTropyAttacked()
+        SoundPitchDefault(0.294)
+        sounddecay(8.4s + 1)
+        soundsetup(7, self, 8)
+        soundplay([Bp10A], 1V)
+        GLOBAL_101 = 2
+        GLOBAL_100 = 0xFF
+        health -= 1.0
+        changestateif(NTropy_Death, health <= 0)
+        statusb &= ~FLAG_COLLIDABLE
+        EnemyFlingSetDir(0x80000)
+        setvel(3m)
+        statusb |= FLAG_PHYSICS_ENGINE
+        troty += 180deg
+        roty = troty
+        soundpitch(4.0)
+        sounddecay(8s)
+        soundsetup(6, self, 8)
+        soundplay([NT84A], 1V)
+        playframes(NTROPY_ATTACKED, 0.0, 9.0)
+        statusb &= ~FLAG_PHYSICS_ENGINE
+        playanim(10, NTROPY_ATTACKED)
+        sendevent(Event34, player, 0)
+        GAMEFLAGS |= 0x800000
+        ins72(0, 0x1000)
+        settrans(BeginWarpOut)
+        playanim(11, NTROPY_ATTACKED)
+        playframes(12.0, 41.0)
+        FadeToBlack()
+        voice = TimeVoice
+        soundfadet(0.2s, voice)
+        soundfadev(0.05V, voice, 2)
+        playframes(41.0, 47.0)
+        until (FADECONTROL == -1) {
+            playframe()
+        }
+        ins72(0, 0x1000)
+        save (y) {
+            calcpath(0, vtrans)
+        }
+        troty = 0
+        roty = troty
+        y += 50m
+        statusb |= FLAG_COLLIDABLE
+        sendevent(EventTriggered, creator)
+        player -> y = y
+        player -> x = -player -> x
+        player -> z = -player -> z
+        player -> troty += 180deg
+        player -> roty += 180deg
+        ins72(0x400, 0x100)
+        playframe()
+        UpdateTextureGroups(FightPhase + 1.0)
+        FadeFromBlack()
+        changestate(NTropy_Transition, PlatformLayout + 100)
+    }
+}
+
+sub BeginWarpOut() __trans { // S-1037
+    once {
+        vfx = (vfx & 0xFF00FFFF) | 0x70000
+        moda = 0
+    }
+    if (GLOBAL_119 & 0x8000000) {
+        settrans(UpdateWarpOut)
+    }
+    UpdateWarpOut()
+}
+
+sub BeginWarpOutFade() __trans { // S-1048
+    once {
+        FADECONTROL = 0
+    }
+    UpdateWarpOut()
+}
+
+sub UpdateWarpOut() { // S-1052
+    moda = seek(moda, 16.0, 148)
+    if (moda == 16.0) {
+        tpc = 0
+        vfx &= 0xFF00FFFF
+        animseq = 0
+    }
+}
+
+state NTropy_Death { // 10
+    stateflag 0x40040A3
+    statusc 0x0
+    code() {
+        KillEntity()
+        GAMEFLAGS |= -0x80000000
+        NTropySpeechOBJ = 0
+        if (SFXVOL) {
+            if (var lang = GLOBAL_151; lang == LANG_FR) {
+                spawn2(9, 44, 1, [F104O], [F114O], [F124O], 3.0, 1000s, 8.0)
+                NTropySpeechOBJ = objectspawned
+            }
+            else if (lang == LANG_DE) {
+                spawn2(9, 44, 1, [G104O], [G114O], [G124O], 3.0, 1000s, 8.0)
+                NTropySpeechOBJ = objectspawned
+            }
+            else if (lang == LANG_IT) {
+                spawn2(9, 44, 1, [I104O], [I114O], [I124O], 3.0, 1000s, 8.0)
+                NTropySpeechOBJ = objectspawned
+            }
+            else if (lang == LANG_ES) {
+                spawn2(9, 44, 1, [S104O], [S114O], [S124O], 3.0, 1000s, 8.0)
+                NTropySpeechOBJ = objectspawned
+            }
+            else {
+                spawn2(9, 44, 1, [E104O], [E114O], [E124O], 3.0, 1000s, 8.0)
+                NTropySpeechOBJ = objectspawned
+            }
+        }
+        soundpitch(4.0)
+        soundsetup(7, self, 8)
+        sounddecay(8s)
+        soundplay([NT14A], 1V)
+        voice = TimeVoice
+        soundfadet(15, voice)
+        soundfadev(0.3V, voice, 3)
+        EnemyFlingSetDir(0x80000)
+        setvel(3m)
+        statusb |= FLAG_PHYSICS_ENGINE
+        troty += 180deg
+        roty = troty
+        playframes(NTROPY_DEATH, 0.0, 9.0)
+        statusb &= ~FLAG_PHYSICS_ENGINE
+        playframes(10.0, 22.0)
+        interrupter = NTropySpeechOBJ
+        sendevent(EventTriggered, interrupter)
+        playframe(animframe, 42)
+        playframes(NTROPY_DEAD, 0.0, 11.0)
+        soundpitch(4.715)
+        soundsetup(7, self, 8)
+        sounddecay(8s)
+        soundplay([NT34A], 0.8V)
+        playframes(NTROPY_WARPOUT_1, 0.0, 11.0)
+        voice = TimeVoice
+        soundfadet(0.1s, voice)
+        soundfadev(0V, voice, 3)
+        spawn(NTroC, S_WARPOUT)
+        playframes(NTROPY_WARPOUT_2, 0.0, 24.0)
+        if (GLOBAL_160 & 0x4) {
+            PowerupAlreadyOwned = true
+        }
+        else {
+            save (x, y, z) {
+                PowerupAlreadyOwned = false
+                y += 2m
+                spawn2(FruiC, FruiC_S_FRUIT_HOP, 1, 702.0, 0)
+            }
+        }
+        var0 = GLOBAL_160
+        statetime = frametime
+        do {
+            if (var0 != GLOBAL_160 || (PowerupAlreadyOwned && frametime - statetime >= 1s)) {
+                if (!(PREVBOXCOUNT & 0x4000) && SFXVOL) {
+                    GLOBAL_190 = 2.0
+                    GLOBAL_191 = 14
+                }
+                if (PowerupAlreadyOwned) {
+                    ExitReward = 0
+                }
+                else {
+                    ExitReward = 702.0
+                }
+                spawn2(WEfOC, WEfOC_S_WARP_OUT, 1, 5m, 0m, 9.5m, 16m, 2S, ExitReward)
+                creator = objectspawned
+                PowerupAlreadyOwned = false
+                var0 = GLOBAL_160
+            }
+            if (animseq != getanim(NTROPY_WARPOUT_3)) {
+                setanim(NTROPY_WARPOUT_3, -1.0)
+            }
+            playframe((animframe + 1.0) % 12.0)
+        } while (1)
+        GLOBAL_186 = 0
+    }
+}
+
+state NTropy_Victory { // 11
+    stateflag 0x4004083
+    statusc 0x0
+    code() {
+        if (animseq == getanim(NTROPY_WAIT_FOR_ORB)) {
+            playframes(NTROPY_WIN_2, 0.0, 11.0)
+        }
+        else if (animseq == getanim(NTROPY_WAIT_FOR_LAZER)) {
+            playframes(NTROPY_WIN_1, 0.0, 11.0)
+        }
+        playframes(NTROPY_LAUGH, 0.0, 37.0)
+        sleepframes(NTROPY_STAND_2, 0.0, 11.0)
+    }
+}
+
+state Time_Fork { // 12
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        statusb = FLAG_NO_CAMERA_CLIP
+        playnull()
+        ForkVerticesReady = false
+        vfx = (vfx & 0xFFFFFF00) | 0xA
+        moda = 4.0
+        SetColor1(0xC8, 0xBE, 0xB2)
+        do {
+            start :
+            SetColor2(-0xF26, -0x4A5, 0x23F)
+            if (!parent -> animseq
+                || parent -> animseq == getanim(NTROPY_DEAD)
+                || parent -> animseq == getanim(NTROPY_WARPOUT_1)
+                || parent -> animseq == getanim(NTROPY_WARPOUT_2)
+                || parent -> animseq == getanim(NTROPY_WARPOUT_3)) {
+                    playnull()
+                    ForkVerticesReady = false
+                    goto start;
+                }
+            else if (parent -> animseq == getanim(NTROPY_PREPARE_ORB)) {
+                setanim(TIME_FORK_1)
+            }
+            else if (parent -> animseq == getanim(NTROPY_FIRE_ORB)) {
+                SetColor1(0xFF, 0x60, 0x14)
+                SetColor2(0x135, 0xDB9, 0x823)
+                setanim(TIME_FORK_2)
+            }
+            else if (parent -> animseq == getanim(NTROPY_WAIT_FOR_ORB)) {
+                setanim(TIME_FORK_3)
+            }
+            else if (parent -> animseq == getanim(NTROPY_PREPARE_LAZER)) {
+                setanim(TIME_FORK_4)
+            }
+            else if (parent -> animseq == getanim(NTROPY_STAND_1)) {
+                setanim(TIME_FORK_5)
+            }
+            else if (parent -> animseq == getanim(NTROPY_FIRE_LAZER)) {
+                SetColor1(0xFF, 0xB6, 0x5C)
+                SetColor2(0x135, 0xDB9, 0x823)
+                setanim(TIME_FORK_6)
+            }
+            else if (parent -> animseq == getanim(NTROPY_WAIT_FOR_LAZER)) {
+                setanim(TIME_FORK_7)
+            }
+            else if (parent -> animseq == getanim(NTROPY_TRIGGER_PLATFORMS_1)) {
+                setanim(TIME_FORK_8)
+            }
+            else if (parent -> animseq == getanim(NTROPY_TRIGGER_PLATFORMS_2)) {
+                SetColor1(0x5C, 0xB6, 0xFF)
+                SetColor2(0x135, 0xDB9, 0x823)
+                setanim(TIME_FORK_9)
+            }
+            else if (parent -> animseq == getanim(NTROPY_KNEEL_1)) {
+                setanim(TIME_FORK_9)
+            }
+            else if (parent -> animseq == getanim(NTROPY_KNEEL_2)) {
+                setanim(TIME_FORK_0)
+            }
+            else if (parent -> animseq == getanim(NTROPY_STAND_UP)) {
+                setanim(TIME_FORK_A)
+            }
+            else if (parent -> animseq == getanim(NTROPY_ATTACK_PLAYER_1)) {
+                setanim(TIME_FORK_B)
+            }
+            else if (parent -> animseq == getanim(NTROPY_ATTACK_PLAYER_2)) {
+                SetColor1(0xFF, 0xB6, 0x5C)
+                SetColor2(0x135, 0xDB9, 0x823)
+                setanim(TIME_FORK_B)
+            }
+            else if (parent -> animseq == getanim(NTROPY_TRANSITION)) {
+                setanim(TIME_FORK_M)
+            }
+            else if (parent -> animseq == getanim(NTROPY_DEATH)) {
+                SetVel(-1m, 0.5m, -0.5m)
+                statusb |= FLAG_PHYSICS_ENGINE
+                setanim(TIME_FORK_D)
+            }
+            else if (parent -> animseq == getanim(NTROPY_LAUGH)) {
+                setanim(TIME_FORK_E)
+            }
+            else if (parent -> animseq == getanim(NTROPY_STAND_2)) {
+                setanim(TIME_FORK_F)
+            }
+            else if (parent -> animseq == getanim(NTROPY_WIN_1)) {
+                setanim(TIME_FORK_G)
+            }
+            else if (parent -> animseq == getanim(NTROPY_WIN_2)) {
+                setanim(TIME_FORK_H)
+            }
+            else if (parent -> animseq == getanim(NTROPY_INTRO_1)) {
+                if (((parent -> vfx >> 16) & 0xFF) == 7 && parent -> animframe <= 25.0) {
+                    setanim(TIME_FORK_N)
+                }
+                else {
+                    SetColor1(0xC8, 0xBE, 0xB2)
+                    setanim(TIME_FORK_I)
+                }
+            }
+            else if (parent -> animseq == getanim(NTROPY_INTRO_2)) {
+                setanim(TIME_FORK_J)
+            }
+            else if (parent -> animseq == getanim(NTROPY_INTRO_3)) {
+                setanim(TIME_FORK_K)
+            }
+            else if (parent -> animseq == getanim(NTROPY_ATTACKED)) {
+                if (((parent -> vfx >> 16) & 0xFF) == 7) {
+                    setanim(TIME_FORK_L)
+                }
+                else {
+                    SetColor1(0xFF, 0xFF, 0xFF)
+                    setanim(TIME_FORK_C)
+                }
+            }
+            animframe = parent -> animframe
+            zindex = parent -> zindex
+            CopyParentRot()
+            CopyParentTrans()
+            if (((parent -> vfx >> 16) & 0xFF) == 7) {
+                vfx = (vfx & 0xFF00FFFF) | 0x70000
+                SetColor1(0, 0, 0)
+                moda = parent -> moda
+            }
+            else {
+                vfx = (vfx & 0xFF00FFFF) | 0x40000
+                colr1 = seek(colr1, 0xC8, 0x14)
+                colg1 = seek(colg1, 0xBE, 0x14)
+                colb1 = seek(colb1, 0xB2, 0x14)
+            }
+            if (ForkVerticesReady) {
+                save (rotx, roty, rotz) {
+                    getvert(vtrot, self, 1.0)
+                    getvert(vvec, self, 2.0)
+                    getvert(vvel, self, 3.0)
+                    getvert(vrot, self, 0.0)
+                    trotx -= rotx
+                    vecx -= rotx
+                    velx -= rotx
+                    troty -= roty
+                    vecy -= roty
+                    vely -= roty
+                    trotz -= rotz
+                    vecz -= rotz
+                    velz -= rotz
+                }
+            }
+            ForkVerticesReady = true
+            playframe()
+        } while (1)
+    }
+    event(e, a) {
+        accevif (e == Event67) {
+            SetColor1(0xC8, 0xBE, 0xB2)
+        }
+    }
+}
+
+state Warpout_Shockwave { // 13
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        playframes(WARPOUT_SHOCKWAVE, 0.0, 25.0)
+        sleep()
+    }
+}
+
+state Intro_Clock { // 14
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        zindex = 32
+        while (parent -> animframe < 29.0) {
+            playanim(0, INTRO_CLOCK)
+        }
+        playframes(INTRO_CLOCK, 0.0, 63.0)
+        zindex = -20
+        playframes(64.0, 79.0)
+        playnull(3)
+        if (!SHAKEY) {
+            SHAKEY = 10.0
+        }
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event67)
+    }
+}
+
+sub UpdateTextureGroups(group) {
+    if (group == 0) {
+        loadfile2([Ntr3T])
+        loadfile2([Ntr4T])
+        loadfile2([Ntr5T])
+        deloadfile([Ntr3T])
+        deloadfile([Ntr4T])
+        deloadfile([Ntr5T])
+    }
+    else if (group == 1.0) {
+        loadfile2([Ntc3T])
+        loadfile2([Ntc4T])
+        loadfile2([Ntc5T])
+        deloadfile([Ntc3T])
+        deloadfile([Ntc4T])
+        deloadfile([Ntc5T])
+    }
+    else if (group == 2.0) {
+        loadfile2([Nta3T])
+        deloadfile([Nta3T])
+        loadfile2([Nta4T])
+        deloadfile([Nta4T])
+    }
+}
+
+state Kill { // 15
+    stateflag 0x20
+    statusc 0x0
+    code() {}
+}
+
+

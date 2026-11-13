@@ -1,0 +1,261 @@
+#gool SharC 47 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_SharC.gooc" "C3\Out\C3_SharC.nsentry"
+
+#anim SHARK_SWIM  [Fi1dV] [FiadG] 27 1 2
+#anim SHARK_TURN  [FiadV] [FiadG] 24 1 2
+#anim SHARK_BITE  [Fi2dV] [FiadG] 12 1 2
+#anim SHARK_CHEW  [Fi3dV] [FiadG] 21 1 2
+#anim SHARK_SPIT  [Fi4dV] [FiadG] 26 1 2
+
+#spawn S_SHARK Shark_Init
+
+event EventHitInvincible => state Shark_Die
+
+var SharkWaveY, SharkVar2, SharkDefaultColor, SharkVar4, SharkVar5, SharkVar6, SharkVar7, SharkWaterFX
+var SharkVar9, SharkVar10, SharkPathSpeed, MaxTrackOffset, SharkTrackOffset, SharkVar14
+
+state Shark_Init { // 0
+    stateflag 0x1
+    statusc 0x12
+    code(limit, speed, prog, offs) {
+        MaxTrackOffset = limit
+        SharkPathSpeed = speed
+        pathprog = prog
+        SharkTrackOffset = offs
+        zindex = 25
+        yzapproach = 120deg
+        trotx = 180deg
+        statusb |= (FLAG_ROT_Y | 0x20000000)
+        statusa &= ~FLAG_PATH_END
+        pathprog = 0
+        statusb = -0x5FFFFFE9
+        calcpath(0, vtrans)
+        roty = troty
+        SharkSetWaterFX()
+        changestate(Shark_Swim)
+    }
+}
+
+sub SharkSetWaterFX() { // S-18
+    vfx = (vfx & 0xFFFF00FF) | 0xA00
+    field_61 = &SharkWaveY
+    zindex = 0
+    SharkVar2 = 2
+    SharkDefaultColor = 0x3F3F3F
+    SharkVar4 = 0
+    SharkVar5 = &SharkWaterFX
+    SharkVar6 = 56
+    SharkVar7 = -36
+    SharkWaveY = 0
+    SharkWaterFX = 0
+    SharkVar9 = 0
+    SharkVar10 = 0
+}
+
+state Shark_Swim { // 1
+    stateflag 0x5
+    statusc 0x0
+    code() {
+        sleepframes(SHARK_SWIM, 0.0, 26.0)
+    }
+    trans {
+        once {
+            trotx = 180deg
+            statusb |= (FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN | 0x20000000)
+            statusb &= ~FLAG_ROT_Y2
+            statusa &= ~FLAG_PATH_END
+        }
+        LoopPathProg(spd(SharkPathSpeed))
+        changestateif(Shark_Turn, STATUS_PATH_END)
+        {
+            var v1 = 0
+            var deg_to_player = 0deg
+            var pathrot = troty
+            save (troty, statusa, statusb, x, y, z, pathprog) {
+                statusb = FLAG_PATH_CALCS | FLAG_TRACK_PATH_SIGN
+                x = player -> x
+                y = player -> y
+                z = player -> z
+                calcpath(0)
+                v1 = troty
+                troty += 90deg
+                setvel(SharkTrackOffset, vvel)
+            }
+            x += velx
+            z += velz
+            if (abs(SharkTrackOffset - vecy) > 0.1m) {
+                deg_to_player = degdist(troty, atan2(player -> trans))
+                if (abs(deg_to_player) < 60deg) {
+                    if (deg_to_player < -45deg) {
+                        deg_to_player = -45deg
+                    }
+                    else if (deg_to_player > 45deg) {
+                        deg_to_player = 45deg
+                    }
+                    troty += deg_to_player
+                }
+            }
+            SharkTrackOffset = seek(SharkTrackOffset, vecy, spd(2.5m))
+            if (SharkTrackOffset < -MaxTrackOffset) {
+                troty = pathrot
+                SharkTrackOffset = -MaxTrackOffset
+            }
+            else if (SharkTrackOffset > MaxTrackOffset) {
+                troty = pathrot
+                SharkTrackOffset = MaxTrackOffset
+            }
+        }
+        y = ins79(x, vecx)
+        SharkWaveY = y
+        ins80(vecx, SharkWaterFX)
+        sendevent(EventHit, collider, 100.0)
+        changestateif(Shark_Attack, eventaccepted)
+        if (animframe == 1.0 || animframe == 13.0) {
+            soundpitch(2.54)
+            soundplay([Sh4eA], 0.3V)
+        }
+    }
+}
+
+state Shark_Turn { // 2
+    stateflag 0x5
+    statusc 0x0
+    code() {
+        if (!(animseq == getanim(SHARK_SWIM) && animframe == 26.0)) {
+            playframes4(SHARK_SWIM, -1.0, 26.0)
+        }
+        soundpitch(3.263)
+        soundplay([Sh5eA], 0.3V)
+        playframes(SHARK_TURN, 0.0, 23.0)
+        roty += 180deg
+        changestate(Shark_Swim)
+    }
+    trans {
+        once {
+            statusb &= ~(FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN | 0x20000000)
+            trotx = 190deg
+        }
+        calcpath(abs(pathprog), vtrans)
+        {
+            var v1
+            var deg_to_player = 0deg
+            var pathrot = troty
+            save (troty, statusa, statusb, x, y, z, pathprog) {
+                statusb = FLAG_PATH_CALCS | FLAG_TRACK_PATH_SIGN
+                x = player -> x
+                y = player -> y
+                z = player -> z
+                calcpath(0)
+                v1 = troty
+                troty += 90deg
+                setvel(SharkTrackOffset, vvel)
+            }
+            x += velx
+            z += velz
+            if (abs(SharkTrackOffset - vecy) > 0.1m) {
+                deg_to_player = degdist(troty, atan2(player -> trans))
+                if (abs(deg_to_player) < 60deg) {
+                    if (deg_to_player < -45deg) {
+                        deg_to_player = -45deg
+                    }
+                    else if (deg_to_player > 45deg) {
+                        deg_to_player = 45deg
+                    }
+                    troty += deg_to_player
+                }
+            }
+            SharkTrackOffset = seek(SharkTrackOffset, vecy, spd(2.5m))
+            if (SharkTrackOffset < -MaxTrackOffset) {
+                troty = pathrot
+                SharkTrackOffset = -MaxTrackOffset
+            }
+            else if (SharkTrackOffset > MaxTrackOffset) {
+                troty = pathrot
+                SharkTrackOffset = MaxTrackOffset
+            }
+        }
+        y = ins79(x, vecx)
+        SharkWaveY = y
+        ins80(vecx, SharkWaterFX)
+        sendevent(EventHit, collider, 100.0)
+        changestateif(Shark_Attack, eventaccepted)
+    }
+}
+
+state Shark_Attack { // 3
+    stateflag 0x21
+    statusc 0x0
+    code() {
+        statusb = -0x7FFFFFFF
+        troty = atan2(player -> trans)
+        trotx = abs(degdist(roty, troty)) * 6
+        soundpitch(3.263)
+        soundplay([Sh2eA], 1V)
+        setanim(SHARK_BITE, -1.0)
+        do {
+            animframe += 1.0
+            if (animframe == 4.0) {
+                GAMEFLAGS &= ~0x10
+            }
+            playframe()
+        } while (animframe + 1.0 <= 11.0)
+        settrans(SharkTransWave)
+        soundpitch(3.263)
+        soundplay([Sh1eA], 1V)
+        do (var loops = 0) {
+            playframes(SHARK_CHEW, 0.0, 20.0)
+        } while ({ loops += 1.0 }; loops < 2.0)
+        if (!rand(2)) {
+            trotx = 360deg
+            troty = 0deg
+        }
+        setanim(SHARK_SPIT, -1.0)
+        do {
+            animframe += 1.0
+            if (animframe == 8.0) {
+                spawn(15, 27, 1, 20m, 0, roty, 0)
+                soundpitch(3.263)
+                soundplay([Sh3eA], 1V)
+            }
+            playframe()
+        } while (animframe + 1.0 <= 25.0)
+        playframes(SHARK_TURN, 0.0, 23.0)
+        troty = roty + 180deg
+        roty = troty
+        vely = 0m
+        setvel(2m)
+        statusb = -0x7FFFFFC0
+        do {
+            soundpitch(2.54)
+            soundplay([Sh4eA], 0.3v)
+            soundpitch(2.54)
+            sounddelay(0.5s)
+            soundplay([Sh4eA], 0.3v)
+            playframes(SHARK_SWIM, 0.0, 26.0)
+        } while (1)
+    }
+    trans {
+        x = seek(x, player -> x, spd(15m))
+        z = seek(z, player -> z, spd(15m))
+        y = ins79(x, vecx)
+        SharkWaveY = y
+        ins80(vecx, SharkWaterFX)
+    }
+}
+
+sub SharkTransWave() { // S-335
+    y = ins79(x, vecx)
+    SharkWaveY = y
+    ins80(vecx, SharkWaterFX)
+}
+
+state Shark_Die { // 4
+    stateflag 0x7
+    statusc 0x0
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+    }
+}

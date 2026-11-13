@@ -1,0 +1,157 @@
+#gool SpinC 83 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_SpinC.gooc" "C3\Out\C3_SpinC.nsentry"
+
+#anim SPINNER_1 [Sp1rV] [Sp1rG] 11 1 2
+#anim SPINNER_2 [Sp2rV] [Sp1rG] 14 1 2
+#anim SPINNER_3 [Sp3rV] [Sp1rG] 24 1 2
+#anim SPINNER_4 [Sp4rV] [Sp1rG] 26 1 2
+
+#spawn S_SPINNER           Spinner_Init
+
+event EventJumpedOn        => state Spinner_Squash
+event EventHit             => state Spinner_Flip
+event EventSpinHit         => state Spinner_Fling
+event EventHitInvincible   => state Spinner_Squash
+event EventFling           => state Spinner_Fling
+event EventSlideHit        => state Spinner_Fling
+event EventSlamHit         => state Spinner_Squash
+
+var SpikeTime, ClosedTime, JumpHeight
+
+state Spinner_Init { // 0
+    code(c, o) {
+        ClosedTime = c * 80s / 120s
+        SpikeTime = o * 1s / 1.2s
+        JumpHeight = 2m
+        groundy = y
+        zindex = 32
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_GROUND | FLAG_SOLID_ALL
+        if (entitygetstate(2)) {
+            statusc = 0
+            changestate(Spinner_Flip)
+        }
+        else {
+            changestate(Spinner)
+        }
+    }
+}
+
+state Spinner { // 1
+    statusc 0
+    code() {
+        if (animseq == getanim(SPINNER_2)) {
+            soundpitch(2.285)
+            soundplay([Sp5rA], 1V)
+            playframesback(SPINNER_1, 10.0, 0.0)
+        }
+        WaitFrame(0, SPINNER_1, ClosedTime)
+        soundpitch(3.263)
+        soundplay([Sp5rA], 1V)
+        playframes(SPINNER_1, 0.0, 10.0)
+        changestate(Spinner_Spike)
+    }
+    trans {
+        sendevent(EventHit, collider, 0)
+    }
+}
+
+state Spinner_Spike { // 2
+    stateflag 0x41
+    statusc 0
+    code() {
+        soundpitch(3.263)
+        sounddelay(0.3s)
+        soundplay([Sp3rA], 1V)
+        playframes(SPINNER_2, 0.0, 13.0)
+        WaitFrame(animframe, SpikeTime)
+        soundpitch(3.263)
+        sounddelay(0.2s)
+        soundplay([Sp2rA], 1V)
+        playframesback(SPINNER_2, 13.0, 0.0)
+        changestate(Spinner)
+    }
+    event(e, a) {
+        rejevret(e == EventJumpedOn || e == EventSpinHit || e == EventSlideHit || e == EventSlamHit)
+    }
+    trans {
+        sendevent(Event24, collider, 100.0)
+    }
+}
+
+state Spinner_Flip { // 3
+    stateflag 0x3
+    statusc 0
+    code() {
+        statusb |= FLAG_GRAVITY | FLAG_PHYSICS_ENGINE
+        vely = 0
+        if (animseq == getanim(SPINNER_1) && animframe > 2.0) {
+            playframesback(SPINNER_1, animframe - 2.0, 0.0)
+        }
+        else if (animseq == getanim(SPINNER_2)) {
+            soundpitch(3.263)
+            soundplay([Sp2rA], 1V)
+            playframesback(SPINNER_2, 11.0, 0.0)
+        }
+        if (entitygetstate(2)) {
+            playanim(23, SPINNER_3)
+        }
+        else {
+            soundpitch(3.263)
+            soundplay([Sp1rA], 1V)
+            playframes(SPINNER_3, 0.0, 23.0)
+        }
+        entitysetstate(1)
+        statetime = frametime
+        do { playframe() } until (frametime - statetime >= 6s)
+        playframes(SPINNER_4, 0.0, 25.0)
+        entitysetstate(0)
+        statusb &= ~FLAG_PHYSICS_ENGINE
+        changestate(Spinner)
+    }
+    event(e, a) {
+        accevif (e == EventHit) {
+            statetime = frametime
+        }
+    }
+}
+
+state Spinner_Fling { // 4
+    stateflag 0x30
+    statusc 0x32
+    code(h) {
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir(0x80000)
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    } 
+    trans {
+        EnemyFlingTrans(2m, EventFling)
+    }
+}
+
+state Spinner_Squash { // 5
+    stateflag 0x23
+    statusc 0x32
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        playframe()
+    }
+}
+
+sub SetParticleColor() {
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x05, 0xBD, 0xBE)
+    }
+    else if (r == 1) {
+        SetColor1(0x0D, 0x4C, 0x4C)
+    }
+    else if (r == 2) {
+        SetColor1(0xE7, 0x85, 0x81)
+    }
+}

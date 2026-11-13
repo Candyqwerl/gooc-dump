@@ -1,0 +1,5 @@
+expr BosBC = 31
+
+expr BosBC_S_HEALTH = 0
+expr BosBC_S_HEALTH_TICK = 1
+expr BosBC_S_KOMODO_MUG = 2

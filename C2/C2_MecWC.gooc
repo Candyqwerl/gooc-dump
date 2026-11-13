@@ -1,0 +1,261 @@
+#gool MecWC 21 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C2_ShadC.gooh"
+//gooc -c 2 -r pal "C2\C2_MecWC.gooc" "C2\Out\C2_MecWC.nsentry"
+
+#anim MECH_BOB              [Mw1cV] 32 1
+#anim MECH_FLOATER          [Mw2cV] 32 1
+
+#spawn S_MECH_FLOATER       Mech_Init
+#spawn S_MECH_HANGER        Mech_Init
+#spawn S_MECH_OLD           Mech_Init
+#spawn S_MECH_BOB           Mech_Init
+#spawn S_MECH_PATH          Mech_Init
+#spawn S_MECH_PATH_FLOATER  Mech_Init
+
+event EventHit           => state Mech_Squash
+event EventHitInvincible => state Mech_Squash
+event EventFling         => state Mech_Fling
+
+var MechVar1, CycleOffset, CycleLength, TurnDuration, MechVar5, MechTrackOffset, TravelDuration
+
+state Mech_Init {
+    statusc 0x12
+    code(limit, cyclelen, cycleoffs, turntime) {
+        pathdist = limit
+        CycleLength = cyclelen * 1s / 1.2s
+        CycleOffset = cycleoffs * 1s / 1.2s
+        TurnDuration = turntime
+        MechTrackOffset = 0
+        density = 0.15m
+        zindex = 25
+        MechVar5 = 0
+        spawn(ShadC, ShadC_S_SHADOW_STATIONARY, 1, 0, 1S, 10)
+        if (spawn == S_MECH_BOB) {
+            statusb = FLAG_ROT_Y | FLAG_COLLIDABLE | FLAG_SOLID_ALL | 0x20000000
+            changestate(Mech_Bob)
+        }
+        if (spawn == S_MECH_PATH || spawn == S_MECH_PATH_FLOATER) {
+            statusb = FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | FLAG_SOLID_ALL | 0x20000000
+            changestate(Mech_Path)
+        }
+        statusb = FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | FLAG_SOLID_SIDES | 0x800 | 0x2000 | 0x20000000
+        TravelDuration = CycleLength - (TurnDuration << 1) >> 1
+        changestate(Mech_Path_Track)
+    }
+}
+
+inline sub SpawnTrailSmoke() {
+    if (FRAMETIME < 36 && !rand(15)) {
+        spawn(9, 0, 1, 0)
+    }
+}
+
+state Mech_Path {
+    stateflag 0x5
+    statusc 0
+    code => state Mech_Path_Track
+    event => state Mech_Path_Track
+    trans {
+        SpawnTrailSmoke()
+        pathprog = (pathprog + spd(CycleLength)) % (pathlen - 1.0)
+        calcpath(pathprog)
+        sendevent(EventHit, collider, 100.0)
+    }
+}
+
+state Mech_Bob {
+    stateflag 0x5
+    statusc 0
+    code => state Mech_Path_Track
+    event => state Mech_Path_Track
+    trans {
+        SpawnTrailSmoke()
+        var halfcycle = CycleLength >> 1
+        var cycletime = time(CycleLength, CycleOffset)
+        var phase = 0
+        if (halfcycle > 0 && cycletime >= 0 && cycletime <= halfcycle) {
+            phase = cycletime
+            var prog = (phase * (pathlen - 1.0)) / halfcycle
+            calcpath(prog)
+            pathprog = prog
+        }
+        else if (CycleLength - halfcycle > 0 && cycletime >= halfcycle && cycletime <= CycleLength) {
+            phase = cycletime - halfcycle
+            var prog = (pathlen - 1.0) + ((phase * -(pathlen - 1.0)) / (CycleLength - halfcycle))
+            calcpath(prog)
+            pathprog = prog
+        }
+        troty = atan2(player -> trans)
+        sendevent(EventHit, collider, 100.0)
+    }
+}
+
+state Mech_Path_Track {
+    stateflag 0x5
+    statusc 0
+    code() {
+        trotx = 180deg
+        yzapproach = 120deg
+        if (id & 1.0) {
+            if (spawn == S_MECH_BOB || spawn == S_MECH_PATH_FLOATER) {
+                playframe(31.0)
+            }
+            else if (spawn == S_MECH_FLOATER || spawn == S_MECH_HANGER || spawn == S_MECH_PATH) {
+                playframe(31.0)
+            }
+        }
+        do {
+            if (spawn == S_MECH_BOB || spawn == S_MECH_PATH_FLOATER) {
+                playframes(MECH_BOB, 0.0, 31.0)
+            }
+            else if (spawn == S_MECH_FLOATER || spawn == S_MECH_HANGER || spawn == S_MECH_PATH) {
+                playframes(MECH_FLOATER, 0.0, 31.0)
+            }
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Mech_Fling, spawn == S_MECH_OLD && (e == EventSpinHit || e == EventSlideHit))
+        rejevif (e == EventSpinHit || e == EventSlideHit) {
+            sendevent(Event24, interrupter, 100.0)
+        }
+    }
+    trans {
+        if (spawn != S_MECH_OLD) {
+            SpawnTrailSmoke()
+        }
+        var cycletime = time(CycleLength, CycleOffset)
+        var phase = 0
+        var prog = 0
+        if (TurnDuration > 0 && cycletime >= 0 && cycletime <= TurnDuration) {
+            phase = cycletime
+            roty = troty - ((cycletime * 180deg) / TurnDuration)
+            statusb &= ~(FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN)
+        }
+        else if (cycletime >= TurnDuration && cycletime <= TurnDuration + TravelDuration) {
+            phase = cycletime - TurnDuration
+            prog = (phase * (pathlen - 1.0)) / TravelDuration
+            statusb |= FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN
+            calcpath(prog)
+        }
+        else if (TurnDuration > 0 && cycletime >= TurnDuration + TravelDuration && cycletime <= (TurnDuration << 1) + TravelDuration) {
+            phase = cycletime - (TurnDuration + TravelDuration)
+            roty = troty - ((phase * 180deg) / TurnDuration)
+            statusb &= ~(FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN)
+        }
+        else if (cycletime >= (TurnDuration << 1) + TravelDuration && cycletime <= CycleLength) {
+            phase = cycletime - ((TurnDuration << 1) + TravelDuration)
+            var returndur = CycleLength - ((TurnDuration << 1) + TravelDuration)
+            prog = (pathlen - 1.0) + ((phase * -(pathlen - 1.0)) / returndur)
+            statusb |= FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN
+            calcpath(prog)
+            troty += 180deg
+        }
+
+        if (pathdist) {
+            var v1 = 0
+            var deg_to_player = 0deg
+            var pathrot = troty
+            save (troty, statusa, statusb, x, y, z, pathprog) {
+                statusb = FLAG_PATH_CALCS | FLAG_TRACK_PATH_SIGN
+                x = player -> x
+                y = player -> y
+                z = player -> z
+                calcpath(0)
+                v1 = troty
+                troty += 90deg
+                setvel(MechTrackOffset, vvel)
+            }
+            x += velx
+            z += velz
+            if (abs(MechTrackOffset - vecy) > 0.1m) {
+                deg_to_player = degdist(troty, atan2(player -> trans))
+                if (abs(deg_to_player) < 60deg) {
+                    if (deg_to_player < -45deg) {
+                        deg_to_player = -45deg
+                    }
+                    else if (deg_to_player > 45deg) {
+                        deg_to_player = 45deg
+                    }
+                    troty += deg_to_player
+                }
+            }
+            MechTrackOffset = seek(MechTrackOffset, vecy, spd(2m))
+            if (MechTrackOffset < -pathdist) {
+                troty = pathrot
+                MechTrackOffset = -pathdist
+            }
+            else if (MechTrackOffset > pathdist) {
+                troty = pathrot
+                MechTrackOffset = pathdist
+            }
+        }
+        sendevent(EventHit, collider, 100.0)
+    }
+}
+
+state Mech_Path_Old {
+    stateflag 0x5
+    statusc 0
+    code => state Mech_Path_Track
+    event => state Mech_Path_Track
+    trans {
+        once {
+            TurnDuration = (pathlen << 1) / (CycleLength + 1)
+        }
+        if (spawn == S_MECH_BOB) {
+            var cycletime = time(CycleLength, CycleOffset)
+            pathprog = abs((cycletime - (CycleLength >> 1)) * TurnDuration)
+            calcpath(pathprog)
+            if (cycletime >= CycleLength >> 1) {
+                statusa |= 0x4
+            }
+            troty = atan2(player -> trans)
+        }
+        else {
+            calcpath(time(CycleLength, CycleOffset) * (pathlen / CycleLength))
+        }
+        SpawnTrailSmoke()
+        sendevent(EventHit, collider, 100.0)
+    }
+}
+
+state Mech_Squash {
+    stateflag 0x23
+    statusc 0x12
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        EnemyDieClearFlags()
+        playframe()
+    }
+}
+
+sub SetParticleColor() {
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x6D, 0x17, 0x00)
+    }
+    else if (r == 1) {
+        SetColor1(0x3F, 0x7F, 0xFF)
+    }
+    else if (r == 2) {
+        SetColor1(0x49, 0x81, 0x88)
+    }
+}
+
+
+state Mech_Fling {
+    stateflag 0x30
+    statusc 0x12
+    code(h) {
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir()
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    } 
+    trans {
+        EnemyFlingTrans(2m, EventFling)
+    }
+}

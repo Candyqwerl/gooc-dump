@@ -1,0 +1,634 @@
+#gool DoctC 5 1
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C3_FruiC.gooh"
+//gooc -c 3 -r pal "C3\C3_DoctC.gooc" "C3\Out\C3_DoctC.nsentry"
+//gooc -c 3 -r pal -h "Includes\C3_DoctC.gooh" "C3\C3_DoctC.gooc" "C3\Out\C3_DoctC.nsentry"
+
+#anim WITCH_DOCTOR        [WD10V] [WD10G] 01 0 2
+#anim WITCH_DOCTOR_GOLD   [WD10V] [WD30G] 01 0 2
+#anim ANIM_0xA00          [1010I] [1009I] 06 1 2
+#anim ANIM_0xF00          [1011I] [1009I] 13 1 2
+#anim FEATHER             [WD20V] [WD20G] 16 0 2
+
+#sprite SPARKLE_ORANGE [Cr10T]
+#tex 0x20A0FF 0 3 4 10 928 32 32 32
+#tex 0x1980CC 0 3 4 10 928 32 32 32
+#tex 0x136099 0 3 4 10 928 32 32 32
+#tex 0x0D4066 0 3 4 10 928 32 32 32
+#tex 0x062033 0 3 4 10 928 32 32 32
+
+#sprite SPARKLE_WHITE [Cr10T]
+#tex 0xFFFFFF 0 3 4 10 928 32 32 32
+
+#spawn S_DOCTOR          Witch_Doctor_Init
+#spawn S_1               __s_1
+#spawn S_FEATHER         Doctor_Feather
+#spawn S_SPARKLE         Doctor_Sparkle
+#spawn S_PARTICLE        Doctor_Particle
+#spawn S_PARTICLE_DECEL  Doctor_Particle
+#spawn S_6               __s_6
+#spawn S_7               __s_7
+#spawn S_DOCTOR_ALT      Witch_Doctor_Init
+
+event Event15 => sub DoctorStatus
+event Event19 => sub KillDoctor
+
+var mem1, mem2, mem3, mem4, mem5, mem6, mem7, mem8, mem9
+var mem10, mem11, mem12, mem13, mem14, mem15, mem16, mem17, mem18
+var mem19, mem20, mem21, mem22, mem23, DoctorHealth, DoctorFloatOFfset, DoctorFollowMode, DoctorFollowAngle
+var DoctorXDistance, DoctorSize, DoctorLookTime, DoctorRemainingLightTime
+
+inline sub SoundDoctorCollect() {
+    soundpitch(3.625)
+    soundsetup(6, self, 8)
+    sounddecay(9.8s)
+    soundplay([WD10A], 1V)
+}
+
+inline sub SoundKillDoctor() {
+    soundpitch(3.263)
+    sounddelay(4)
+    sounddecay(9.6s)
+    soundplay([WD20A], 1V)
+}
+
+inline sub SoundDoctorHit() {
+    soundpitch(3.625)
+    sounddecay(10s)
+    soundplay([sht0A], 0.7V)
+}
+
+sub FollowTarget() { // S-0
+    var mode = player -> stateflag & -0x10000000
+    var fast = false
+    if (mode == -0x20000000 || mode == -0x50000000 || mode == 0x30000000 || mode == -0x60000000) {
+        fast = true
+    }
+    var0 = distance(vecx, self, 0)
+    if (DoctorHealth == 3.0) {
+        x = seek(x, vecx, spd(20m))
+        y = seek(y, vecy, spd(20m))
+        z = seek(z, vecz, spd(20m))
+        changestateif(Witch_Doctor_On_Willy, x == vecx && y == vecy && z == vecz)
+    }
+    else if (var0 > 30m) {
+        x = x + vecx >> 1
+        y = y + vecy >> 1
+        z = z + vecz >> 1
+    }
+    else if (DoctorFollowMode == 3 || mode == 0x50000000) {
+        DoctorFollowMode = 3
+        x += (vecx - x) >> 2
+        y += (vecy - y) >> 2
+        z += (vecz - z) >> 2
+        SetVel(0m)
+        if (mode != 0x50000000) {
+            DoctorFollowMode = 0
+        }
+    }
+    else if (DoctorFollowMode == 2) {
+        trotz = var0 + 1m
+        velx += ((spd(vecx - x)) << 6) + (player -> velx << 1) / 3
+        vely += ((spd(vecy - y)) << 6) + (player -> vely << 1) / 3
+        velz += ((spd(vecz - z)) << 6) + (player -> velz << 1) / 3
+        DoctorXDistance = 2.5m
+        if (var0 < 0.75m && player -> speed < 1m) {
+            DoctorLookTime = frametime
+            DoctorFollowMode = 0
+        }
+    }
+    else if (DoctorFollowMode == 1) {
+        trotz = var0 + 1m
+        velx = spd(velx, (vecx - x) << 5) 
+        vely = spd(vely, (vecy - y) << 5) 
+        velz = spd(velz, (vecz - z) << 5) 
+        DoctorXDistance = 1.5m
+        if (var0 < 0.75m) {
+            DoctorLookTime = frametime
+            DoctorFollowMode = 0
+        }
+        if (fast && var0 > 1.5m) {
+            DoctorFollowMode = 2
+        }
+    }
+    else {
+        trotz = (var0 >> 3) + 0.2m
+        velx = spd(velx, (vecx - x) << 2) 
+        vely = spd(vely, (vecy - y) << 6) 
+        velz = spd(velz, (vecz - z) << 2) 
+        if (fast) {
+            if (var0 > 1.5m) {
+                DoctorFollowMode = 2
+            }
+        }
+        else if (var0 > 1m) {
+            DoctorFollowMode = 1
+        }
+        DoctorXDistance = 1m
+        if (frametime - 15s >= DoctorLookTime) {
+            DoctorLookTime = frametime
+        }
+    }
+    if (trotz > 4.5m) {
+        trotz = 4.5m
+    }
+}
+
+sub SetTargetPosition() { // S-166
+    if (DoctorHealth == 1.0 || DoctorHealth == 2.0) {
+        save (trotx, troty, trotz) {
+            vecx = player -> x
+            vecy = player -> y
+            vecz = player -> z
+            SetTRot(0, DoctorFollowAngle, 0)
+            vectransf2(vvec, player, 0, DoctorXDistance, 1.3m + sin(abs(DoctorFloatOFfset), 0.3m))
+        }
+    }
+    else if (DoctorHealth == 3.0) {
+        getvert(vvec, player, 1.0)
+    }
+}
+
+state Witch_Doctor_Init { // 0
+    stateflag 0x1
+    statusc 0x2
+    code(health) {
+        vfx = (vfx & 0xFFFF00FF) | 0x600
+        player -> creator = self
+        DOCTOR = self
+        zindex = 15
+        SetTRot(4m)
+        DoctorFloatOFfset = 0
+        trotx = 200deg
+        DoctorFollowMode = 0
+        DoctorSize = 1S
+        DoctorLookTime = frametime
+        DoctorXDistance = 1.5m
+        if (health == 1.0) {
+            DoctorHealth = 1.0
+            seqplay(DoctorHealth)
+            statusb = FLAG_ROT_Y | FLAG_PHYSICS_ENGINE | 0x400 | 0x1000
+            x = player -> x
+            y = player -> y + 3m
+            z = player -> z
+            changestate(Witch_Doctor)
+        }
+        else if (health == 2.0 || health == 3.0) {
+            DoctorHealth = 2.0
+            seqplay(DoctorHealth)
+            statusb = FLAG_ROT_Y | FLAG_PHYSICS_ENGINE | 0x400 | 0x1000
+            DoctorSize = 1.3S
+            x = CAMTRANSX
+            y = CAMTRANSY
+            z = CAMTRANSZ + -2m
+            changestate(Witch_Doctor)
+        }
+        else {
+            changestate(Witch_Doctor_Dead)
+        }
+    }
+}
+
+state Witch_Doctor { // 1
+    stateflag 0x8009
+    statusc 0x0
+    code() {
+        do {
+            if (GAMEFLAGS & 0x100000) {
+                playnull()
+            }
+            else if (DoctorHealth == 1.0) {
+                playanim(0, WITCH_DOCTOR)
+            }
+            else {
+                playanim(0, WITCH_DOCTOR_GOLD)
+            }
+        } while (1)
+    }
+    event(e, a) {
+        if (e == Event6) {
+            rejevret(DoctorHealth > 3.0 || (DoctorHealth >= 2.0 &&
+                (LEVEL == LEVEL_DeepTrouble 
+                    || LEVEL == LEVEL_UnderPressure
+                    || LEVEL == LEVEL_MidnightRun
+                    || LEVEL == LEVEL_OrientExpress
+                    || LEVEL == LEVEL_Area51
+                    || LEVEL == LEVEL_OrangeAsphalt
+                    || LEVEL == LEVEL_RoadCrash
+                    || LEVEL == LEVEL_HogRide
+                    || LEVEL == LEVEL_BossNGin2 
+                    || LEVEL == LEVEL_RingsOfPower
+                    || LEVEL == LEVEL_MadBombers 
+                    || LEVEL == LEVEL_ByeByeBlimps
+                    || LEVEL == LEVEL_HotCoco
+                    || LEVEL == LEVEL_SkiCrazed
+                    || LEVEL == LEVEL_TellNoTales
+                    || LEVEL == LEVEL_MakinWaves) && player -> stateflag & 0x2000000))
+            if (interrupter -> spawn != FruiC_S_FRUIT_AUTO) {
+                sendevent(Event40, player, a[0], -2)
+                rejevret(!eventaccepted)
+            }
+            DoctorHealth += 1.0
+            if (DoctorHealth > 3.0) {
+                DoctorHealth = 3.0
+            }
+            seqplay(DoctorHealth)
+            DoctorPlayEffects(1, DoctorHealth)
+            if (DoctorHealth >= 3.0) {
+                sendevent(Event6, player, a[0], 0)
+                invincible = 5
+                invincibletime = frametime
+                accevret()
+            }
+            else {
+                DoctorSize = 1.3S
+                SetScale(2S)
+            }
+            accevcstate(Doctor_Collect)
+        }
+        accevcstate(Witch_Doctor_Die, e == Event7)
+        if (e == EventHit) {
+            creator = player -> interrupter
+            sendevent(EventHitInvincible, creator, 0)
+            if (eventaccepted) {
+                SoundDoctorHit()
+            }
+            creator = player -> collider
+            broadcastevent(Event43, 0, 0)
+            if (DoctorHealth >= 3.0) {
+                accevret()
+            }
+            if (DoctorHealth == 2.0) {
+                DoctorHealth -= 1.0
+                DoctorPlayEffects(0, DoctorHealth)
+                spawn(DoctC, S_FEATHER, 1, 0x00, 0x17, 0xFF)
+                spawn(DoctC, S_FEATHER, 1, 0xFF, 0xE6, 0x00)
+                spawn(DoctC, S_FEATHER, 1, 0xFF, 0x23, 0x00)
+                spawn(DoctC, S_FEATHER, 1, 0xB4, 0x00, 0xEB)
+                spawn(DoctC, S_FEATHER, 1, 0x00, 0xBE, 0x00)
+                SetInvincible(4)
+                DoctorSize = 1S
+                SetScale(1.5S)
+                seqplay(DoctorHealth)
+                accevret()
+            }
+            accevcstate(Witch_Doctor_Die)
+        }
+    }
+    trans {
+        if (DoctorHealth == 2.0) {
+            if (FRAMETIME < 32) {
+                unless (time(0.15s)) {
+                    spawn(DoctC, S_SPARKLE, 1, 34.0, self, 0.3s)
+                }
+            }
+            else unless (time(0.55s)) {
+                spawn(DoctC, S_SPARKLE, 1, 34.0, self, 0.3s)
+            }
+        }
+        if ((player -> vfx >> 8 & 0xFF) == 10) {
+            zindex = player -> zindex + player -> mem22
+        }
+        else {
+            zindex = player -> zindex
+        }
+        {
+            var angle = player -> roty + 140deg
+            if (DoctorFollowMode) {
+                angle = player -> roty + 90deg
+            }
+            if (DoctorFollowMode != 2) {
+                if (abs(degdist(angle, CAMROTY)) < 40deg) {
+                    angle += 180deg
+                }
+            }
+            DoctorFollowAngle = degseek(DoctorFollowAngle, angle, 180deg)
+        }
+        if (!DoctorFollowMode && frametime - DoctorLookTime >= 1s && !(frametime - DoctorLookTime >= 6s)) {
+            trotx = 60deg
+            troty = GAMEDIR
+        }
+        else {
+            trotx = 200deg
+            troty = player -> roty + (abs(DoctorFloatOFfset >> 6) + -(abs(DoctorFloatOFfset >> 7)))
+        }
+        rotz = roty
+        rotx = abs(DoctorFloatOFfset >> 7)
+        if (scalex != DoctorSize) {
+            scalex = seek(scalex, DoctorSize, 0.1S)
+            scaley = seek(scaley, DoctorSize, 0.1S)
+            scalez = seek(scalez, DoctorSize, 0.1S)
+        }
+        SetTargetPosition()
+        FollowTarget()
+    }
+}
+
+state Witch_Doctor_On_Willy { // 2
+    stateflag 0x9
+    statusc 0x0
+    event => state Witch_Doctor
+    code() {
+        statusb &= ~FLAG_ROT_Y
+        DoctorSize = 1.5S
+        while (player -> invincible && !(player -> stateflag \ 0x10800)) {
+            playanim(0, WITCH_DOCTOR_GOLD)
+        }
+        SoundKillDoctor()
+        DoctorHealth -= 1.0
+        seqplay(DoctorHealth)
+        DoctorSize = 1S
+        statusb |= FLAG_ROT_Y
+        invincible = 0
+        invincibletime = frametime
+        if (player -> invincible == 5) {
+            player -> invincible = 0
+        }
+        changestate(Witch_Doctor)
+    }
+    trans {
+        if (!time(4)) {
+            spawn(DoctC, S_SPARKLE, 1, 0x2200, self, 7)
+        }
+        if ((player -> vfx >> 8 & 0xFF) == 10) {
+            zindex = player -> zindex + player -> mem22
+        }
+        else {
+            zindex = player -> zindex
+        }
+        zindex += sin(90deg - (abs(degdist(CAMROTY, player -> roty)))) / 409
+        roty = player -> roty
+        rotz = roty
+        getvert(vtrans, player, 1.0)
+        rotx = player -> field_60 >> 8
+        creator = player -> collider
+        sendevent(EventHitInvincible, creator, 0)
+        if (eventaccepted) {
+            SoundDoctorHit()
+            spawn(DoctC, S_PARTICLE, 10)
+        }
+        SetTRot(1m, 3m, 1m)
+        broadcastevent(EventHitInvincible, 5, 0)
+        if (eventaccepted) {
+            SoundDoctorHit()
+            spawn(DoctC, S_PARTICLE, 10)
+        }
+        if (scalex != DoctorSize) {
+            scalex = seek(scalex, DoctorSize, 0.1S)
+            scaley = seek(scaley, DoctorSize, 0.1S)
+            scalez = seek(scalez, DoctorSize, 0.1S)
+        }
+    }
+}
+
+state Witch_Doctor_Die { // 3
+    stateflag 0xB
+    statusc 0x0
+    event => state Witch_Doctor_Dead
+    code() {
+        statusb &= ~(FLAG_ROT_Y | FLAG_GRAVITY | FLAG_PHYSICS_ENGINE)
+        DoctorPlayEffects(0, 0)
+        spawn(DoctC, S_FEATHER, 1, 0x00, 0x17, 0xFF)
+        spawn(DoctC, S_FEATHER, 1, 0xFF, 0xE6, 0x00)
+        spawn(DoctC, S_FEATHER, 1, 0xFF, 0x23, 0x00)
+        spawn(DoctC, S_FEATHER, 1, 0xB4, 0x00, 0xEB)
+        spawn(DoctC, S_FEATHER, 1, 0x00, 0xBE, 0x00)
+        while (scalex > 0xA3) {
+            playanim(0, WITCH_DOCTOR)
+        }
+        changestate(Witch_Doctor_Dead)
+    }
+    trans {
+        once {
+            DoctorHealth = 0
+            seqplay(DoctorHealth)
+            if (player -> invincible == 5) {
+                player -> invincible = 0
+            }
+            var0 = 1S
+        }
+        scalex = loopseek(var0, 1.2S, 0.2S)
+        scaley = scalex
+        scalez = scalex
+    }
+}
+
+state Witch_Doctor_Dead { // 4
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        statusb = FLAG_INVISIBLE
+        invincible = 0
+        invincibletime = frametime
+        DoctorHealth = 0
+        seqplay(DoctorHealth)
+        sleepanim(0, SPARKLE_WHITE)
+    }
+    event(e, a) {
+        if (e == Event6) {
+            if (interrupter -> spawn != FruiC_S_FRUIT_AUTO) {
+                sendevent(Event40, player, a[0], -2)
+                if (!eventaccepted) {
+                    rejevret()
+                }
+            }
+            DoctorHealth = 1.0
+            seqplay(DoctorHealth)
+            creator = a[0]
+            CopyCreatorTrans()
+            SetVel(0m)
+            SetRot(0deg)
+            DoctorFloatOFfset = 0
+            trotx = 200deg
+            DoctorFollowMode = 0
+            DoctorXDistance = 1.5m
+            DoctorPlayEffects(1, DoctorHealth)
+            SetScale(1S)
+            DoctorSize = 1S
+            statusb = FLAG_ROT_Y | FLAG_PHYSICS_ENGINE | FLAG_STRING_CENTER | 0x1000
+            accevcstate(Doctor_Collect)
+        }
+    }
+}
+
+sub DoctorPlayEffects(collect, health) { // S-636
+    if (collect == 1) {
+        SoundDoctorCollect()
+    }
+    else if (collect == 0) {
+        SoundKillDoctor()
+    }
+    save (var0) {
+        if (collect == 1 && health == 1.0) {
+            var0 = 1m
+        }
+        else {
+            var0 = 0m
+        }
+        spawn(9, 28, 1, -1.0, var0, 3S + rand(1S), 60, 1)
+    }
+    spawn(DoctC, S_PARTICLE_DECEL, 10)
+}
+
+state Doctor_Sparkle { // 5
+    stateflag 0x28001
+    statusc 0x2
+    event => state Doctor_Feather
+    code(vertex, obj, loops) {
+        player = obj
+        zindex = 24
+        SetRot(0deg) 
+        SetScale(0S)
+        field_61 = loops - 5
+        getvert(vtrans, player, rand(vertex))
+        do (var frame = 0) {
+            playanim(0, SPARKLE_ORANGE)
+        } while ({ frame += 1.0 }; frame < loops << 8)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            var0 = 0.3S
+        }
+        unless (STATUS_FIRSTFRAME) {
+            scalex = seek(scalex, var0, 0xF5)
+            scaley = seek(scaley, var0, 0xF5)
+            scalez = seek(scalez, var0, 0xF5)
+            if (frametime - statetime >= field_61) {
+                var0 = 0S
+            }
+        }
+        changestateif(Kill, GAMEFLAGS & 0x100000)
+    }
+}
+
+sub DoctorParticleAnim() { // S-736
+    playanim(4, SPARKLE_ORANGE)
+    playframe(3.0)
+    playframe(4.0)
+    playframe(2.0)
+    playframe(1.0)
+    playframe(0, 0.1s)
+    save (animseq) { playanim(0, SPARKLE_WHITE) }
+    playframe(0)
+    playframe(1.0, 0.1s)
+    playframe(2.0, 0.1s)
+    save (animseq) { playanim(0, SPARKLE_WHITE) }
+    playframe(3.0, 0.1s)
+    playframe(4.0, 0.1s)
+}
+
+state Kill { // 6
+    stateflag 0x20
+    statusc 0x0
+    code() {}
+}
+
+state Doctor_Feather { // 7
+    stateflag 0x40
+    statusc 0x2
+    code(cr, cg, cb) {
+        SetScale(1.5S)
+        DoctorFloatOFfset = y
+        v0 = -10m
+        SetColor(cr << 1, cg << 1, cb << 1)
+        moda = 16.0
+        x += randi(-0.2m, 0.2m)
+        z += randi(-0.2m, 0.2m)
+        y += 0.2m
+        zindex = 25
+        SetRot(0deg, rand(360deg), 0deg)
+        ExplodeParticleSetSpeed(1m, 1m, 3.5m, 1.5m)
+        statusb = FLAG_PHYSICS_ENGINE | FLAG_STRING_CENTER
+        setanim(FEATHER, rand(16.0))
+        do {
+            animframe = (animframe + 1.0) % 16.0
+            playframe(animframe, 0.1s)
+        } until (vely < 0)
+        vely = -0.2m
+        v0 >>= 4
+        while (scalex > 0.1S) {
+            velx >>= 1
+            velz >>= 1
+            animframe = (animframe + 1.0) % 16.0
+            playframe(animframe, 0.1s)
+        }
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event19)
+    }
+    trans {
+        unless (STATUS_FIRSTFRAME) {
+            vely += spd(v0)
+            roty += 2deg
+            if (y < DoctorFloatOFfset - 2m) {
+                scalex -= 0.2S
+                scaley -= 0.2S
+                scalez -= 0.2S
+            }
+        }
+    }
+}
+
+state Doctor_Particle { // 8
+    stateflag 0x28040
+    statusc 0x2
+    event => state Doctor_Feather
+    code() {
+        movetolist(3.0, self)
+        zindex = 100
+        SetRot(0deg, 0deg, rand(360deg))
+        y += 0.75m
+        velx = randi(-10m, 10m)
+        vely = randi(-10m, 10m)
+        velz = randi(-10m, 10m)
+        statusb = FLAG_PHYSICS_ENGINE
+        SetScale(0.4S)
+        DoctorParticleAnim()
+    }
+    trans {
+        rotz += 10deg
+        if (frametime - statetime >= 1 && spawn == S_PARTICLE_DECEL) {
+            velx = (velx * 0xB3) >> 8
+            vely = (vely * 0xB3) >> 8
+            velz = (velz * 0xB3) >> 8
+        }
+        changestateif(Kill, GAMEFLAGS & 0x100000)
+    }
+}
+
+sub DoctorStatus(request) { // S-993
+    if (interrupter) {
+        if (request == 4.0) {
+            interrupter -> var0 = DoctorHealth
+        }
+        else if (request == 7.0) {
+            DoctorRemainingLightTime = interrupter -> var0
+        }
+    }
+}
+
+sub KillDoctor() { // S-1004
+    changestateif(Witch_Doctor_Dead, spawn == S_DOCTOR)
+}
+
+state Doctor_Collect { // 9
+    stateflag 0x4800B
+    statusc 0x0
+    code() {}
+    event(e, a) {
+        if (e == Event6) {
+            DoctorHealth += 1.0
+            seqplay(DoctorHealth)
+            accevcstate(Witch_Doctor)
+        }
+        accevif (e == Event19 && health) {
+            health = 2
+        }
+    }
+    trans {
+        changestate(Witch_Doctor)
+    }
+}
+
+sub S_1021() {} // S-1021

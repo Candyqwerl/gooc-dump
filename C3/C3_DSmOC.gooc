@@ -1,0 +1,320 @@
+#gool DSmOC 40 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_DSmOC.gooc" "C3\Out\C3_DSmOC.nsentry"
+
+#anim SMASHER_CLOSE   [Sm1iV] [Sm1iG] 08 1 2
+#anim SMASHER_OPEN    [Sm2iV] [Sm1iG] 24 1 2
+
+#spawn S_SMASHER      Smasher_Init
+
+var SmasherMode, OpenDuration, ClosedDuration, CycleOffset,
+    IsChild, SmasherChild, CycleLength, PlayerCrushed,
+    ZindexFar, ZindexNear, ZindexDistance
+   
+state Smasher_Init { // 0
+    stateflag 0x4004081
+    statusc 0x80012
+    code(mode, ischild, opendur, closedur, cycleoffs, far, near, range) {
+        SmasherMode = mode
+        IsChild = ischild
+        OpenDuration = opendur * 1s / 1.2s
+        ClosedDuration = closedur * 1s / 1.2s
+        CycleOffset = cycleoffs
+        ZindexFar = far
+        ZindexNear = near
+        ZindexDistance = range
+        OpenDuration -= 25
+        if (OpenDuration < 1) {
+            OpenDuration = 1
+        }
+        ClosedDuration -= 8
+        if (ClosedDuration < 1) {
+            ClosedDuration = 1
+        }
+        CycleLength = 25 + OpenDuration + (8 + ClosedDuration)
+        CycleOffset = CycleLength * CycleOffset >> 8
+        if (CycleOffset < 8) {
+            CycleOffset = 8
+        }
+        if (CycleOffset >= CycleLength) {
+            CycleOffset = CycleLength - 1
+        }
+        if (IsChild) {
+            SmasherChild = 0
+            scalex = -abs(scalex)
+        }
+        else {
+            spawn(DSmOC, S_SMASHER, 1, mode, 1, opendur, closedur, cycleoffs, far, near, range)
+            SmasherChild = objectspawned
+        }
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_SIDES | FLAG_NO_CAMERA_CLIP
+        if (SmasherMode) {
+            changestateif(Trigger_Force_Wait_Open, z > player -> z)
+            changestate(Trigger_Wait_Closed)
+        }
+        else {
+            changestateif(Cycle_Force_Wait_Open, z > player -> z)
+            changestate(Smasher_Cycle)
+        }
+    }
+}
+
+inline sub SoundSmasherOpen(r) {
+    soundpitch((r + rand(3.2)) * 0.205 >> 8)
+    soundsetup(6, self, 8)
+    soundplay([Sm2iA], 0.7V)
+}
+
+inline sub SoundSmasherClose() {
+    SoundPitchDefault()
+    soundsetup(6, self, 8)
+    soundplay([Sm1iA], 1V)
+}
+
+inline sub SetZindex() {
+    if (CAMTRANSZ - z >= ZindexDistance) {
+        zindex = ZindexNear
+    }
+    else {
+        zindex = ZindexFar
+    }
+}
+
+state Trigger_Wait_Closed { // 1
+    stateflag 0x40040C1
+    statusc 0x80012
+    code() {
+        setanim(SMASHER_CLOSE)
+        sleepframe(7.0)
+    }
+    event(e, a) {
+        accevcstate(Trigger_Open, e == EventTriggered || e == Event21)
+    }
+    trans {
+        changestateif(Trigger_Force_Open_2, z > player -> z + 1.61m)
+        changestateif(Trigger_Open, player -> invincible == 5)
+        if (collider && abs(z - player -> z) <= 1.61m) {
+            sendevent(EventCrush, collider, 100.0)
+            if (eventaccepted) {
+                PlayerCrushed = 1
+                if (IsChild) {
+                    interrupter = parent
+                    sendevent(Event21, interrupter, 100.0)
+                }
+                changestate(Trigger_Open)
+            }
+        }
+        SetZindex()
+    }
+}
+
+state Trigger_Open { // 2
+    stateflag 0x4004081
+    statusc 0x80012
+    code() {
+        if (SmasherChild) {
+            interrupter = SmasherChild
+            sendevent(Event21, interrupter, 100.0)
+        }
+        SoundSmasherOpen(17.6)
+        playframes(SMASHER_OPEN, 0.0, 23.0)
+        changestate(Trigger_Wait_Open)
+    }
+    trans {
+        SetZindex()
+    }
+}
+
+state Trigger_Wait_Open { // 3
+    stateflag 0x4004081
+    statusc 0x80012
+    trans => state Trigger_Open
+    code() {
+        setanim(SMASHER_OPEN)
+        do {
+            playframe(23.0)
+        } until (frametime - statetime >= OpenDuration && !(player -> stateflag & 0x20) && !player -> invincible)
+
+        if (z > player -> z + 1.61m) {
+            changestate(Trigger_Force_Wait_Open)
+        }
+        else {
+            changestate(Trigger_Close)
+        }
+    }
+    event(e, a) {
+        accevif (e == EventTriggered || e == Event21) {
+            statetime = frametime
+            if (SmasherChild) {
+                interrupter = SmasherChild
+                sendevent(Event21, interrupter, 100.0)
+            }
+        }
+    }
+}
+
+state Trigger_Close { // 4
+    stateflag 0x40040C1
+    statusc 0x80012
+    code() {
+        SoundSmasherOpen(17.6)
+        playanim(0, SMASHER_CLOSE)
+        playanim(1, SMASHER_CLOSE)
+        playanim(2, SMASHER_CLOSE)
+        playanim(2, SMASHER_CLOSE)
+        playanim(3, SMASHER_CLOSE)
+        playanim(4, SMASHER_CLOSE)
+        playanim(5, SMASHER_CLOSE)
+        playanim(6, SMASHER_CLOSE)
+        if (!SHAKEY) SHAKEY = 5.0;
+        SoundSmasherClose()
+        if (PlayerCrushed) {
+            if (IsChild) {
+                interrupter = parent
+                sendevent(Event21, interrupter, 100.0)
+            }
+            changestate(Trigger_Open)
+        }
+        else {
+            changestate(Trigger_Wait_Closed)
+        }
+    }
+    event(e, a) {
+        accevcstate(Trigger_Open, e == Event21)
+    }
+    trans {
+        once {
+            setanim(SMASHER_CLOSE, 0)
+            PlayerCrushed = 0
+        }
+        if (collider && abs(z - player -> z) <= 1.61m) {
+            sendevent(EventCrush, collider, 100.0)
+            if (eventaccepted) {
+                PlayerCrushed = 1
+            }
+        }
+        changestateif(Trigger_Force_Open, abs(z - CAMTRANSZ) <= 4m)
+        SetZindex()
+    }
+}
+
+state Trigger_Force_Open { // 5
+    stateflag 0x4004081
+    statusc 0x80012
+    trans => state Trigger_Open
+    code() {
+        playframesback(animframe, 0.0)
+        changestate(Trigger_Force_Wait_Open)
+    }
+}
+
+state Trigger_Force_Open_2 { // 6
+    stateflag 0x4004081
+    statusc 0x80012
+    trans => state Trigger_Open
+    code() {
+        playframes(SMASHER_OPEN, 0.0, 23.0)
+        changestate(Trigger_Force_Wait_Open)
+    }
+}
+
+state Trigger_Force_Wait_Open { // 7
+    stateflag 0x4004081
+    statusc 0x80012
+    trans => state Trigger_Open
+    code() {
+        setanim(SMASHER_OPEN)
+        do {
+            playframe(23.0)
+        } until (player -> z > z + 6m && !(player -> stateflag & 0x20) && !player -> invincible)
+        changestate(Trigger_Close)
+    }
+}
+
+state Smasher_Cycle { // 8
+    stateflag 0x4004081
+    statusc 0x80012
+    trans => state Trigger_Open
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_SIDES | FLAG_NO_CAMERA_CLIP
+        do {
+            v0 = time(CycleLength, CycleOffset)
+            if (v0 < 24) {
+                stateflag &= ~0x40
+                setanim(SMASHER_OPEN, v0 << 8)
+                if (v0 == 0) {
+                    SoundSmasherOpen(17.6)
+                }
+            }
+            else {
+                v0 -= 24
+                if (v0 < OpenDuration) {
+                    stateflag &= ~0x40
+                    changestateif(Cycle_Force_Wait_Open, !(!(player -> stateflag & 0x20) && !player -> invincible) || z > player -> z + 1.61m)
+                    setanim(SMASHER_OPEN, 23.0)
+                }
+                else {
+                    v0 -= OpenDuration
+                    if (v0 < 8) {
+                        stateflag |= 0x40
+                        sendeventif(EventCrush, collider, collider && abs(z - player -> z) <= 1.61m, 100.0)
+                        if (v0 == 0) {
+                            SoundSmasherOpen(14.4)
+                        }
+                        setanim(SMASHER_CLOSE, v0 << 8)
+                        if (animseq == getanim(SMASHER_CLOSE) && animframe == 7.0) {
+                            if (!SHAKEY) SHAKEY = 5.0;
+                            SoundSmasherClose()
+                        }
+                        changestateif(Cycle_Force_Open, abs(z - CAMTRANSZ) <= 4m)
+                    }
+                    else {
+                        v0 -= 8
+                        changestateif(Cycle_Force_Open_2, player -> invincible == 5 || z > player -> z + 1.61m)
+                        sendeventif(EventCrush, collider, v0 < 2 && collider && abs(z - player -> z) <= 1.61m, 100.0)
+                        setanim(SMASHER_CLOSE, 7.0)
+                    }
+                }
+            }
+            playframe()
+        } while (1)
+    }
+}
+
+state Cycle_Force_Open { // 9
+    stateflag 0x4004081
+    statusc 0x80012
+    trans => state Trigger_Open
+    code() {
+        playframesback(animframe, 0.0)
+        changestate(Cycle_Force_Wait_Open)
+    }
+}
+
+state Cycle_Force_Open_2 { // 10
+    stateflag 0x4004081
+    statusc 0x80012
+    trans => state Trigger_Open
+    code() {
+        SoundSmasherOpen(17.6)
+        playframes(SMASHER_OPEN, 0.0, 23.0)
+        changestate(Cycle_Force_Wait_Open)
+    }
+}
+
+state Cycle_Force_Wait_Open { // 11
+    stateflag 0x4004081
+    statusc 0x80012
+    trans => state Trigger_Open
+    code() {
+        setanim(SMASHER_OPEN)
+        do {
+            if (player -> z > z + 6m && !(player -> stateflag & 0x20) && !player -> invincible) {
+                v0 = time(CycleLength, CycleOffset)
+                changestateif(Smasher_Cycle, v0 > 1s && v0 <= 1s + OpenDuration)
+            }
+            playframe(23.0)
+        } while (1)
+    }
+}

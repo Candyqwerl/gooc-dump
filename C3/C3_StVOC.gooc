@@ -1,0 +1,230 @@
+#gool StVOC 85 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_StVOC.gooc" "C3\Out\C3_StVOC.nsentry"
+
+#anim GEYSER_START  [ts2cV] [ts2cG] 9 1 2
+#anim GEYSER_ACTIVE [ts3cV] [ts2cG] 28 1 2
+#anim GEYSER_STOP   [ts4cV] [ts2cG] 13 1 2
+
+#spawn S_GEYSER      Geyser_Init
+#spawn S_1            __s_1
+
+event Event19 => sub KillVoice
+event Event26 => sub KillVoice
+
+var GeyserMode, CycleOffset, FrameOffset, ActiveDuration, IdleDuration, CycleLength
+
+expr GEYSER_MODE_CONST = 0
+expr GEYSER_MODE_CYCLE = 1
+
+state Geyser_Init {
+    statusc 0
+    code(mode, cycleoffs, animoffs, loops, idle, override) {
+        GeyserMode = mode
+        if (GeyserMode == GEYSER_MODE_CONST) {
+            if (!creator) {
+                var0 = rand(1.0)
+                if (abs(var0 - animoffs) < 2) {
+                    var0 = rand(1.0)
+                }
+                spawn(StVOC, S_GEYSER, 1, mode, cycleoffs, var0, loops, idle, override)
+                scalex = -abs(scalex)
+            }
+            if (override >= 0) {
+                idle = override
+            }
+            idle = idle * 1s / 1.2s
+            FrameOffset = (animoffs * 28) >> 8
+            if (FrameOffset < 0) {
+                FrameOffset = 0
+            }
+            if (FrameOffset >= 28) {
+                FrameOffset = 27
+            }
+            stalltime = 0
+            zindex = 26
+            statusb = FLAG_COLLIDABLE | FLAG_SOLID_SIDES | FLAG_SOLID_TOP | FLAG_NO_CAMERA_CLIP | 0x100000
+            changestate(Geyser_Constant)
+        }
+        else if (GeyserMode == GEYSER_MODE_CYCLE) {
+            if (!creator) {
+                var0 = cycleoffs + 10
+                if (var0 >= 1.0) {
+                    var0 -= 1.0
+                }
+                spawn(StVOC, S_GEYSER, 1, mode, var0, animoffs, loops, idle, override)
+                scalex = -abs(scalex)
+            }
+            if (override >= 0) {
+                idle = override
+            }
+            idle = idle * 1s / 1.2s
+            ActiveDuration = loops * 28
+            IdleDuration = idle
+            CycleLength = 9 + (ActiveDuration + (13 + IdleDuration))
+            CycleOffset = (CycleLength * cycleoffs) >> 8
+            if (CycleOffset < 0) {
+                CycleOffset = 0
+            }
+            if (CycleOffset >= CycleLength) {
+                CycleOffset = CycleLength - 1
+            }
+            stalltime = 0
+            zindex = 26
+            statusb = FLAG_COLLIDABLE | FLAG_SOLID_SIDES | FLAG_SOLID_TOP | FLAG_NO_CAMERA_CLIP | 0x100000
+            var0 = time(CycleLength, CycleOffset)
+            changestateif(Geyser_Start, var0 < 9)
+            var0 -= 9
+            changestateif(Geyser_Active, var0 < ActiveDuration)
+            var0 -= ActiveDuration
+            changestateif(Geyser_Stop, var0 < 13)
+            changestate(Geyser_Dormant)
+        }
+    }
+}
+
+state Geyser_Constant {
+    stateflag 0x4004081
+    statusc 0
+    code() {
+        animframe = time(28, FrameOffset) << 8
+        setanim(GEYSER_ACTIVE)
+        animframe -= 1.0
+        do {
+            animframe += 1.0
+            if (animframe == 0) {
+                soundsetup(6, self, 8)
+                sounddecay(10s)
+                soundpitch(4.58)
+                soundplay([ts1cA], 0.7V)
+            }
+            stalltime = (((animframe >> 8) + 3) & 15) * 1.2s / 1s
+            playframe()
+        } while (animframe + 1.0 <= 27.0)
+        do {
+            setanim(GEYSER_ACTIVE, -1.0)
+            do {
+                animframe += 1.0
+                if (animframe == 0) {
+                    soundsetup(6, self, 8)
+                    sounddecay(10s)
+                    soundpitch(4.58)
+                    soundplay([ts1cA], 0.7V)
+                }
+                stalltime = (((animframe >> 8) + 3) & 15) * 1.2s / 1s
+                playframe()
+            } while (animframe + 1.0 <= 27.0)
+        } while (1)
+    }
+    trans {
+        rotx = CAMROTX
+        roty = CAMROTY
+        sendeventif(EventBurn, player, player -> y <= y + 3.25m && player -> y >= y - 0.25m && distance(player, DIST_NO_Y) <= 1.3m, 100.0)
+    }
+}
+
+state Geyser_Start {
+    stateflag 0x4004081
+    statusc 0
+    code() {
+        statusb = FLAG_NO_CAMERA_CLIP | 0x100000
+        setanim(GEYSER_START)
+        do {
+            var0 = time(CycleLength, CycleOffset)
+            changestateif(Geyser_Active, var0 >= 9)
+            animframe = var0 << 8
+            moda = ((8 - var0) << 12) / 9
+            stalltime = (((animframe >> 8) + 3) & 15) * 1.2s / 1s
+            playframe()
+        } while (1)
+    }
+    trans {
+        rotx = CAMROTX
+        roty = CAMROTY
+    }
+}
+
+state Geyser_Active {
+    stateflag 0x4004081
+    statusc 0
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_SIDES | FLAG_SOLID_TOP | FLAG_NO_CAMERA_CLIP | 0x100000
+        setanim(GEYSER_ACTIVE)
+        moda = 0
+        do {
+            var0 = time(CycleLength, CycleOffset) - 9
+            changestateif(Geyser_Start, var0 < 0)
+            changestateif(Geyser_Stop, var0 >= ActiveDuration)
+            var0 %= 28
+            animframe = var0 << 8
+            if (animframe == 0) {
+                soundsetup(6, self, 8)
+                sounddecay(10s)
+                soundpitch(4.58)
+                soundplay([ts1cA], 0.7V)
+            }
+            stalltime = (((animframe >> 8) + 3) & 15) * 1.2s / 1s
+            playframe()
+        } while (1)
+    }
+    trans {
+        rotx = CAMROTX
+        roty = CAMROTY
+        misc = (player -> y <= y + 3.25m && player -> y >= y - 0.25m) && distance(player, DIST_NO_Y) <= 1.3m
+        sendeventif(EventBurn, player, misc, 100.0)
+    }
+}
+
+state Geyser_Stop {
+    stateflag 0x4004081
+    statusc 0
+    code() {
+        statusb = FLAG_NO_CAMERA_CLIP | 0x100000
+        setanim(GEYSER_STOP)
+        do {
+            var0 = time(CycleLength, CycleOffset) - (ActiveDuration + 9)
+            changestateif(Geyser_Active, var0 < 0)
+            changestateif(Geyser_Dormant, var0 >= 13)
+            animframe = var0 << 8
+            if (animframe == 0) {
+                soundsetup(6, self, 8)
+                sounddecay(10s)
+                soundpitch(4.58)
+                soundplay([ts1cA], 0.7V)
+            }
+            moda = (var0 << 12) / 13
+            stalltime = (((animframe >> 8) + 3) & 15) * 1.2s / 1s
+            playframe()
+        } while (1)
+    }
+    trans {
+        rotx = CAMROTX
+        roty = CAMROTY
+    }
+}
+
+state Geyser_Dormant {
+    stateflag 0x4004081
+    statusc 0
+    code() {
+        statusb = 0
+        do {
+            var0 = time(CycleLength, CycleOffset) - (ActiveDuration + 22) 
+            changestateif(Geyser_Start, var0 < 0)
+            playnull()
+        } while (1)
+    }
+    trans {
+        rotx = CAMROTX
+        roty = CAMROTY
+    }
+}
+
+sub KillVoice() {
+    voice = -1
+    soundsetup(50, voice, 6)
+    soundsetup(0, voice, 3, 0)
+    voice = -1
+    soundsetup(0, voice, 5)
+}

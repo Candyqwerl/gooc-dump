@@ -1,0 +1,261 @@
+#gool MinOC 23 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_MinOC.gooc" "C3\Out\C3_MinOC.nsentry"
+
+#spawn S_MINE      Mine_Init
+#spawn S_CHAIN     Chain_Init
+
+#anim MINE         [Mf1eV] [Mf1eG] 13 1 2
+#anim MINE_EXPLODE [Mf2eV] [Mf2eG] 09 1 2
+#sprite CHAIN      [At3eT] 
+#tex 0x808080 0 3 12 6 928 64 32 32
+
+var ChainStaggerActive, ChainStaggerTimer, MineSpeed, ChainLinkIndex,
+    ChainLinkLenRaw, ChainLinkLen, ChainLinkCount, ChainAnchorX, ChainAnchorY,
+    ChainLinkLenSq, ChainMinY, RemainingChainLenSq, ChainAngleShift, Staggered
+
+state Chain_Init { // 0
+    statusc 0
+    code(index, len, count, anchor_x, anchor_y, min_y, stagger) {
+        ChainLinkIndex = index
+        ChainLinkLenRaw = len
+        ChainLinkCount = count
+        ChainAnchorX = anchor_x
+        ChainAnchorY = anchor_y
+        ChainMinY = min_y
+        if (ChainLinkIndex) {
+            ChainLinkLen = creator -> ChainLinkLen
+            ChainLinkLenSq = creator -> ChainLinkLenSq
+            zindex += 1
+        }
+        else {
+            ChainLinkLen = len >> 8
+            ChainLinkLenSq = ChainLinkLen * ChainLinkLen
+            zindex -= count
+        }
+        var0 = (ChainLinkLen * ((ChainLinkCount - 1) - ChainLinkIndex)) + (ChainLinkLen >> 3)
+        RemainingChainLenSq = var0 * var0
+        if (ChainLinkIndex < count - 1) {
+            spawn(MinOC, S_CHAIN, 1, ChainLinkIndex + 1, ChainLinkLenRaw, ChainLinkCount, ChainAnchorX, ChainAnchorY, ChainMinY, stagger)
+        }
+        x += ((ChainAnchorX - x) * (ChainLinkIndex + 1)) / ChainLinkCount
+        y += ((ChainAnchorY - y) * (ChainLinkIndex + 1)) / ChainLinkCount
+        ChainAngleShift = ChainLinkIndex - ChainLinkCount
+        if (ChainAngleShift < -3) {
+            ChainAngleShift = -3
+        }
+        if (ChainLinkIndex < stagger) {
+            Staggered = false
+        }
+        else {
+            Staggered = 1
+        }
+        SetScale(0.5S)
+        changestate(Chain)
+    }
+}
+
+state Chain { // 1
+    statusc 0
+    code() {
+        sleepanim(0, CHAIN)
+    }
+    event(e, a) {
+        accevcstate(Chain_Kill, e == Event12)
+    }
+    trans {
+        ChainStaggerActive = creator -> ChainStaggerActive
+        if (!Staggered || !ChainStaggerActive || ((ChainLinkIndex & 1) == (frametime & 1))) {
+            var dist_sq, angle, target_angle
+            var old_x = x
+            var old_y = y
+            y -= 0.04m
+            if (y < ChainMinY) {
+                y = ChainMinY
+            }
+            vecx = (x - creator -> x) >> 8
+            vecy = (y - creator -> y) >> 8
+            dist_sq = (vecx * vecx) + (vecy * vecy)
+            if (dist_sq > ChainLinkLenSq) {
+                angle = atan(y - creator -> y, x - creator -> x)
+                x = creator -> x + ((ChainLinkLen * cos(angle)) >> 4)
+                y = creator -> y + ((ChainLinkLen * sin(angle)) >> 4)
+            }
+            vecx = (x - ChainAnchorX) >> 8
+            vecy = (y - ChainAnchorY) >> 8
+            dist_sq = (vecx * vecx) + (vecy * vecy)
+            if (dist_sq > RemainingChainLenSq) {
+                target_angle = atan(ChainAnchorY - creator -> y, ChainAnchorX - creator -> x)
+                angle = atan(y - creator -> y, x - creator -> x)
+                angle += degdist(angle, target_angle) << ChainAngleShift
+                x = creator -> x + ((ChainLinkLen * cos(angle)) >> 4)
+                y = creator -> y + ((ChainLinkLen * sin(angle)) >> 4)
+            }
+            if (Staggered && ChainStaggerActive) {
+                var0 = -2
+            }
+            else {
+                var0 = -1
+            }
+            x = old_x + ((x - old_x) << var0)
+            y = old_y + ((y - old_y) << var0)
+        }
+    }
+}
+
+state Chain_Kill { // 2
+    stateflag 0x23
+    statusc 0x32
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        spawn(9, 8, 1, -1.0, 0, x + randi(-1m, 1m), y + 2m + rand(4m), z + randi(-1m, 1m), 0.2S, 0.2S + rand(0.2S), 1m + rand(1m))
+        WaitChildNull()
+    }
+}
+
+state Mine_Init { // 3
+    statusc 0
+    code(limit, range_nx, range_px, range_py, range_ny, chain_count, stagger, angle, speed, limit_alt, chain_alt, speed_alt) {
+        pathdist = limit
+        if (limit_alt >= 0) {
+            pathdist = limit_alt
+        }
+        field_60 = x
+        field_63 = y
+        groundvel = x - range_nx
+        groundtime = x + range_px
+        stalltime = y + range_py
+        invincibletime = y - range_ny
+        MineSpeed = speed
+        if (speed_alt >= 0) {
+            MineSpeed = speed_alt
+        }
+        SetScale(2S)
+        statusb = FLAG_COLLIDABLE
+        z = player -> z
+        MineSpeed /= 25
+        zindex = fieldval(ENTITY_FIELD_ZINDEX)
+        x += (((pathdist >> 8) * cos(angle)) >> 4)
+        y += (((pathdist >> 8) * sin(angle)) >> 4)
+        if (y > stalltime) {
+            y = stalltime
+        }
+        if (y < invincibletime) {
+            y = invincibletime
+        }
+        if (x > groundtime) {
+            x = groundtime
+        }
+        if (x < groundvel) {
+            x = groundvel
+        }
+        ChainStaggerActive = 1
+        ChainStaggerTimer = 2
+        if (chain_alt >= 0) {
+            chain_count = chain_alt
+        }
+        if (chain_count >= 2) {
+            var0 = pathdist / chain_count
+            spawn(MinOC, S_CHAIN, 1, 0, var0, chain_count, field_60, field_63, invincibletime, stagger)
+        }
+        soundpitch(4.0)
+        sounddecay(10.18s)
+        soundcount(0xFFFF)
+        soundfadet(0.5s, self)
+        soundfadev(0.3V, self, 2)
+        soundplay([Mf2eA], 0.01V)
+        changestate(Mine)
+    }
+}
+
+state Mine { // 4
+    stateflag 0x4081
+    statusc 0
+    code() {
+        sleepframes(MINE, 0.0, 12.0)
+    }
+    event(e, a) {
+        accevcstate(Mine_Explode, e == EventHit || e == EventHitInvincible || e == EventSlideHit)
+    }
+    trans {
+        sendevent(EventExplode, collider, 100.0)
+        changestateif(Mine_Explode, eventaccepted, 0)
+        var angle, target_x, target_y, target_dist
+        save(x, y) {
+            x = field_60
+            y = field_63
+            target_dist = distance(player, DIST_EXACT)
+            angle = atan(player -> y - field_63, player -> x - field_60)
+        }
+        if (target_dist > pathdist) {
+            target_dist = pathdist
+        }
+        var0 = target_dist >> 8
+        target_x = field_60 + ((var0 * cos(angle)) >> 4)
+        target_y = field_63 + ((var0 * sin(angle)) >> 4)
+        GLOBAL_82 = target_x
+        GLOBAL_83 = (angle * 0x168) >> 12
+        if (target_x > groundtime) {
+            target_x = groundtime
+        }
+        if (target_x < groundvel) {
+            target_x = groundvel
+        }
+        if (target_y > stalltime) {
+            target_y = stalltime
+        }
+        if (target_y < invincibletime) {
+            target_y = invincibletime
+        }
+        vecx = (target_x - x) >> 1
+        if (vecx > MineSpeed) {
+            vecx = MineSpeed
+        }
+        if (vecx < -MineSpeed) {
+            vecx = -MineSpeed
+        }
+        x += vecx
+        vecy = (target_y - y) >> 1
+        if (vecy > MineSpeed) {
+            vecy = MineSpeed
+        }
+        if (vecy < -MineSpeed) {
+            vecy = -MineSpeed
+        }
+        y += vecy
+        if (ChainStaggerTimer > 0) {
+            ChainStaggerTimer -= 1
+            if (ChainStaggerTimer < 1) {
+                ChainStaggerActive = false
+            }
+        }
+        else if (FRAMETIME > 34) {
+            ChainStaggerActive = 1
+            ChainStaggerTimer = rand(10) + 2
+        }
+    }
+}
+
+state Mine_Explode {
+    stateflag 0x23
+    statusc 0x32
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        cascadeevent(Event12, self, self)
+        do (var particles = 0) {
+            spawn(9, 8, 1, -1.0, 0, x + randi(-1m, 1m), y + 2m + rand(4m), z + randi(-1m, 1m), 0.2S, 0.2S + rand(0.2S), 1m + rand(1m))
+            particles += 1.0
+        } while (particles < 4.0)
+        soundfadet(0.3s, self)
+        soundfadev(0V, voice, 3)
+        soundpitch(4.0)
+        sounddecay(8.5s)
+        soundsetup(0, self, 5)
+        soundplay([Mf1eA], 1V)
+        playframes(MINE_EXPLODE, 0.0, 7.0)
+        WaitChildNull()
+    }
+}

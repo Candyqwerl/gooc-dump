@@ -1,0 +1,281 @@
+#gool FshOC 22 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_FshOC.gooc" "C3\Out\C3_FshOC.nsentry"
+
+#anim FISH [SfseV] [SFseG] 13 1 2
+
+#spawn S_FISH_SCHOOL Fish_School_Init
+#spawn S_FISH_MEMBER Fish_Member_Init
+
+var SwimLimitX, SwimLimitY, SchoolCenterX, SchoolCenterY,
+    SwimMinX, SwimMaxX, SwimMaxY, SwimMinY,
+    PlayerSpacing, SwimCountdown, FollowOffsetY
+
+state Fish_School_Init {
+    statusc 0
+    code(school_size, swim_limit_x, swim_limit_y) {
+        SwimLimitX = swim_limit_x
+        SwimLimitY = swim_limit_y
+        SchoolCenterX = x
+        SchoolCenterY = y
+        school_size -= 1
+        if (school_size > 0) {
+            spawn(FshOC, S_FISH_MEMBER, 1, school_size - 1)
+        }
+        changestate(Fish_Init)
+    }
+}
+
+state Fish_Member_Init {
+    statusc 0
+    code(remaining_fish) {
+        if (remaining_fish >> 1) {
+            spawn(FshOC, S_FISH_MEMBER, 1, remaining_fish - 2)
+            spawn(FshOC, S_FISH_MEMBER, 1, 0)
+        }
+        else if (remaining_fish) {
+            spawn(FshOC, S_FISH_MEMBER, 1, 0)
+        }
+        changestate(Fish_Init)
+    }
+}
+
+state Fish_Init {
+    statusc 0
+    code() {
+        if (creator) {
+            SwimLimitX = creator -> SwimLimitX
+            SwimLimitY = creator -> SwimLimitY
+            SchoolCenterX = creator -> SchoolCenterX
+            SchoolCenterY = creator -> SchoolCenterY
+            troty = creator -> roty
+            roty = creator -> roty
+            x = creator -> x
+            y = creator -> y
+            z = creator -> z
+            velx = creator -> velx
+            vely = creator -> vely
+            velz = creator -> velz
+            do {
+                vecx = ((2m - rand(4m)) + x) - SchoolCenterX
+            } while (abs(vecx) > SwimLimitX)
+            x = SchoolCenterX + vecx
+            do {
+                vecy = ((2m - rand(4m)) + y) - SchoolCenterY
+            } while (abs(vecy) > SwimLimitY)
+            y = SchoolCenterY + vecy
+            FollowOffsetY = y - creator -> y
+        }
+        else {
+            if (atan2(player -> trans) >= 0deg) {
+                troty = 89deg
+            }
+            else {
+                troty = -89deg
+            }
+            roty = troty
+            vecx = SwimLimitX - rand(SwimLimitX << 1)
+            vecy = SwimLimitY - rand(SwimLimitY << 1)
+            x = SchoolCenterX + vecx
+            y = SchoolCenterY + vecy
+            FollowOffsetY = 0.5m - rand(1m)
+        }
+        z -= rand(1m)
+        SwimMinX = SchoolCenterX - SwimLimitX
+        SwimMaxX = SchoolCenterX + SwimLimitX
+        SwimMaxY = SchoolCenterY + SwimLimitY
+        SwimMinY = SchoolCenterY - SwimLimitY
+        animframe = rand(13) << 8
+        statusb = 0
+        velx = 0.1m
+        PlayerSpacing = rand(3.5m)
+        changestate(Fish_Track_Player)
+    }
+}
+
+inline sub FishAnimCycle() {
+    if (animseq != getanim(FISH)) {
+        setanim(FISH, -1.0)
+    }
+    while (animframe < 12.0) {
+        playframe(animframe + 1.0)
+    }
+    sleepframes(FISH, 0.0, 12.0)
+}
+
+state Fish_Track_Player {
+    statusc 0
+    code() {
+        FishAnimCycle()
+    }
+    trans {
+        var dist_thresh = PlayerSpacing
+        if (abs(degdist(roty, player -> roty)) > 90deg) {
+            dist_thresh += 2m
+        }
+        vecx = player -> x - x
+        changestateif(Fish_Cruise, (vecx ^ velx) & 0x80000000)
+        if (abs(vecx) < dist_thresh) {
+            if (rand(0, 4)) {
+                if (velx >= 0m) {
+                    troty = 270deg
+                    velx = -0.2m - 0.04m
+                }
+                else {
+                    troty = 90deg
+                    velx = 0.2m - 0.04m
+                }
+            }
+            changestate(Fish_Avoid_Player)
+        }
+        if (velx >= 0) {
+            changestateif(Fish_Turn, x >= SwimMaxX)
+            vecx = (vecx - dist_thresh) >> 5
+            if (vecx > 48.0) {
+                vecx = 48.0
+            }
+            if (vecx < 16.0) {
+                vecx = 16.0
+            }
+        }
+        else {
+            changestateif(Fish_Turn, x <= SwimMinX)
+            vecx = (vecx + dist_thresh) >> 5
+            if (vecx < -48.0) {
+                vecx = -48.0
+            }
+            if (vecx > -16.0) {
+                vecx = -16.0
+            }
+        }
+        velx = seek(velx, vecx, 0.01m)
+        x += velx
+        if (creator) {
+            vecy = parent -> y + FollowOffsetY
+        }
+        else {
+            vecy = player -> y + FollowOffsetY
+        }
+        if (vecy > SwimMaxY) {
+            vecy = SwimMaxY
+        }
+        if (vecy < SwimMinY) {
+            vecy = SwimMinY
+        }
+        vecy = (vecy - y) >> 4
+        if (vecy > 24.0) {
+            vecy = 24.0
+        }
+        if (vecy < -24.0) {
+            vecy = -24.0
+        }
+        y += vecy
+        roty = degseek(roty, troty, 1000deg)
+    }
+}
+
+state Fish_Cruise {
+    statusc 0
+    code() {
+        FishAnimCycle()
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            SwimCountdown = rand(75) + 5
+        }
+        if (velx >= 0m) {
+            changestateif(Fish_Turn, x >= SwimMaxX)
+        }
+        else {
+            changestateif(Fish_Turn, x <= SwimMinX)
+        }
+        SwimCountdown -= 1
+        changestateif(Fish_Turn, SwimCountdown < 1)
+        x += velx
+        roty = degseek(roty, troty, 1000deg)
+    }
+}
+
+state Fish_Avoid_Player {
+    statusc 0
+    code() {
+        FishAnimCycle()
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            SwimCountdown = rand(25) + 25
+            PlayerSpacing = rand(3.5m)
+            if (velx >= 0) {
+                velx = 0.2m - 0.04m
+            }
+            else {
+                velx = -0.2m - 0.04m
+            }
+        }
+        if (velx >= 0m) {
+            if (x >= SwimMaxX) {
+                troty = 270deg
+                velx = -0.2m - 0.04m
+                SwimCountdown += 7
+            }
+        }
+        else {
+            if (x <= SwimMinX) {
+                troty = 90deg
+                velx = 0.2m - 0.04m
+                SwimCountdown += 7
+            }
+        }
+        if (SwimCountdown >= 0) {
+            SwimCountdown -= 1
+        }
+        else {
+            changestateif(Fish_Track_Player, abs(player -> x - x) > PlayerSpacing)
+        }
+        if (velx >= 0m) {
+            velx = seek(velx, 0.1m, 0.01m)
+        }
+        else {
+            velx = seek(velx, -0.1m, 0.01m)
+        }
+        x += velx
+        roty = degseek(roty, troty, 1000deg)
+    }
+}
+
+state Fish_Turn {
+    statusc 0
+    code() {
+        FishAnimCycle()
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            if (velx >= 0m) {
+                troty = 270deg
+                velx = -0.2m - 0.04m
+            }
+            else {
+                troty = 90deg
+                velx = 0.2m - 0.04m
+            }
+            SwimCountdown = rand(12) + 6
+        }
+        if (velx >= 0m) {
+            velx = seek(velx, 0.1m, 0.01m)
+            changestateif(Fish_Turn, x >= SwimMaxX)
+        }
+        else {
+            velx = seek(velx, -0.1m, 0.01m)
+            changestateif(Fish_Turn, x <= SwimMinX)
+        }
+        if (SwimCountdown > 0) {
+            SwimCountdown -= 1
+        }
+        else {
+            changestate(Fish_Track_Player)
+        }
+        x += velx
+        roty = degseek(roty, troty, 1000deg)
+    }
+}

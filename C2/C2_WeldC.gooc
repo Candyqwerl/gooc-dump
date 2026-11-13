@@ -1,0 +1,226 @@
+#gool WeldC 16 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C2_ShadC.gooh"
+//gooc -c 2 -r pal "C2\C2_WeldC.gooc" "C2\Out\C2_WeldC.nsentry"
+
+#anim WELDER_WELD          [We1aV] 22 1
+#anim WELDER_FLAME_START   [We2aV] 22 1
+#anim WELDER_FLAME         [We3aV] 21 1
+#anim WELDER_FLAME_STOP    [We4aV] 12 1
+#anim WELDER_ATTACKED      [We5aV] 8 1
+#anim WELDER_RECOVER_1     [We6aV] 12 1
+#anim WELDER_RECOVER_2     [We7aV] 7 1
+
+#sprite WELDER_FLAME_OLD[Cr10T]
+#tex 0x00CEFF 0 3 0 9 768 96 32 32
+#tex 0x00A7FF 0 3 1 9 768 64 32 32
+#tex 0x006DFF 0 3 2 9 768 32 32 32
+#tex 0x004FF4 0 3 3 9 800 96 32 32
+#tex 0x003ADF 0 3 4 9 800 64 32 32
+#tex 0x0020CC 0 3 5 9 800 32 32 32
+#tex 0x001AB0 0 3 6 9 832 96 32 32
+#tex 0x001A90 0 3 7 9 832 64 32 32
+#tex 0x001A63 0 3 8 9 832 32 32 32
+#tex 0x001A44 0 3 9 9 864 96 32 32
+#tex 0x001333 0 3 0 9 864 64 32 32
+
+#sprite WELDER_SPARK[Se5aT]
+#tex 0x808080 1 3 0 2 32 32 32 32
+
+#spawn S_WELDER   Welder_Init
+#spawn S_1        __s_1
+#spawn S_SPARK    Spark
+
+event EventHit           => state Welder_Die
+event EventSpinHit       => state Welder_Die
+event EventHitInvincible => state Welder_Die
+event EventFling         => state Welder_Die
+
+var WelderFlameSweep, WelderLastYaw, FlameLoops, WeldLoops, EntityID
+
+state Welder_Init { // 0
+    code(flame, weld, obj) {
+        FlameLoops = flame
+        WeldLoops = weld
+        EntityID = obj
+        spawn(ShadC, ShadC_S_SHADOW, 1, -5m, 1.7S, 26)
+        statusb = FLAG_ROT_Y | FLAG_COLLIDABLE | FLAG_SOLID_SIDES | 0x2000 | FLAG_HAS_SHADOW
+        trotx = 360deg
+        yzapproach = 60deg
+        roty = atan2(player -> trans)
+        WelderFlameSweep = 0
+        WelderLastYaw = 0
+        health = 1.0
+        SetColor1(0xFF, 0xF5, 0xAF)
+        changestate(Welder)
+    }
+}
+
+inline sub WelderFlameLoop() {
+    do (var loops = 0) {
+        playframes(WELDER_FLAME, 0.0, 20.0)
+        loops += 1.0
+    } while (loops < FlameLoops)
+}
+
+inline sub WelderWeldLoop() {
+    do (var loops = 0) {
+        playframes(WELDER_WELD, 0.0, 21.0)
+        loops += 1.0
+    } while (loops < WeldLoops)
+}
+
+state Welder { // 1
+    statusc 0
+    trans => sub WelderFlames
+    code() {
+        onstateexit(ResetBrightness)
+        do {
+            tpc = 0
+            soundpitch(2.904)
+            sounddelay(0.5s)
+            sounddecay(6.4s)
+            soundplay([WFlSA], 0.4V)
+            moda = 0
+            playframes(WELDER_FLAME_START, 0.0, 11.0)
+            settrans(WelderFlames)
+            playframes(11.0, 21.0)
+            interrupter = objectget(EntityID)
+            sendevent(EventTriggered, interrupter)
+            WelderFlameLoop()
+            tpc = 0
+            playframesback(WELDER_FLAME_STOP, 11.0, 0.0)
+            settrans(SparkFlickers)
+            spawn(WeldC, S_SPARK, 1, 0)
+            do { WelderWeldLoop() } until (!((abs(degdist(atan2(player -> trans), GAMEDIR + 180deg))) < 90deg) || distance(player) < 3m)
+        } while (1)
+    }
+    event(e, a) {
+        if (tpc == getins(WelderFlames)) {
+            if (e == EventSpinHit && interrupter == player && player -> statusb \ FLAG_DPAD_CONTROL) {
+                save (velx, vely, velz, troty) {
+                    troty = atan2(player -> trans)
+                    interrupter -> speed = 15m
+                    interrupter -> troty = atan2(player -> trans)
+                    setvel(15m)
+                    interrupter -> velx = velx
+                    interrupter -> vely = vely
+                    interrupter -> velz = velz
+                    interrupter -> statusb &= ~FLAG_DPAD_CONTROL
+                }
+            }
+        }
+    }
+}
+
+sub WelderFlames() {
+    var yaw = atan2(player -> trans)
+    troty = yaw + ((degdist(WelderLastYaw, yaw) << 3) + (loopseek(WelderFlameSweep, 50deg, 22)) - 25deg)
+    WelderLastYaw = yaw
+    SetVec(x, y - 3m, z)
+    trotz = -(atan2_3d(player, vec))
+    if (trotz > 30deg) {
+        trotz = 30deg
+    }
+    rotz = roty
+    if (!time(2)) {
+        spawn(9, 15, 1, 0, troty + randi(-5deg, 5deg), trotz + (20deg + rand(5deg)), 2m + rand(0.2m), 0.4S)
+    }
+}
+
+sub SparkFlickers() {
+    if (!rand(5)) {
+        moda = rand(4.8)
+    }
+    trotz = 0deg
+    rotz = roty
+}
+
+sub ResetBrightness() {
+    moda = 0
+}
+
+state Welder_Die { // 2
+    stateflag 0x32
+    statusc 0x12
+    code(h) {
+        health -= 1.0
+        if (health == 0) {
+            KillEntity()
+        }
+        soundpitch((15.2 + rand(0.8)) * 0.205 >> 8)
+        soundplay([ASciA], 0.3V + rand(0.2V))
+        soundsetup(0, voice, 5)
+        save (statusb) {
+            statusb &= ~(0x2000 | FLAG_ROT_Y)
+            playanim(0, WELDER_ATTACKED)
+            playanim(1, WELDER_ATTACKED)
+            playanim(2, WELDER_ATTACKED)
+            playanim(3, WELDER_ATTACKED)
+            playanim(4, WELDER_ATTACKED)
+            playanim(5, WELDER_ATTACKED)
+            playanim(6, WELDER_ATTACKED)
+            playanim(7, WELDER_ATTACKED)
+            if (health == 0) {
+                spawn(9, 10, 1, 0, getins(SetParticleColor), 0)
+                sendevent(EventCombo, player, h)
+                EnemyDieClearFlags()
+                playframe()
+                return
+            }
+            playanim(0, WELDER_RECOVER_2)
+            playanim(1, WELDER_RECOVER_2)
+            playanim(2, WELDER_RECOVER_2)
+            playanim(3, WELDER_RECOVER_2)
+            playanim(3, WELDER_RECOVER_2)
+            playanim(4, WELDER_RECOVER_2)
+            playanim(5, WELDER_RECOVER_2)
+        }
+        changestate(Welder)
+    }
+    trans {
+        roty += 60deg
+    }
+}
+
+sub SetParticleColor() {
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x28, 0x83, 0x52)
+    }
+    else if (r == 1) {
+        SetColor1(0xE1, 0xD6, 0xBC)
+    }
+    else if (r == 2) {
+        SetColor1(0x80, 0x13, 0x00)
+    }
+}
+
+state Spark { // 3
+    stateflag 0x80080
+    statusc 0x22
+    __transargs
+    code(vertex) {
+        getvert(vtrans, creator, vertex)
+        SetRot(0deg)
+        zindex = 24
+        sounddecay(6.4s)
+        SoundPitchDefault()
+        soundplay([WSpSA], 0.15V)
+        while (creator -> tpc && !(creator -> stateflag & 0x2)) {
+            playanim(0, WELDER_SPARK)
+        }
+        tpc = 0
+        playnull(1.7s)
+    }
+    trans {
+        getvert(vtrans, creator, vertex)
+        var scale = 0.2S + rand(0.75S)
+        scalex = scale
+        scaley = scale
+        roty = rand(360deg)
+        if (!rand(4)) {
+            spawn(9, 0, 1, -1.0)
+        }
+    }
+}

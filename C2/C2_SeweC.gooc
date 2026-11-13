@@ -1,0 +1,384 @@
+#gool SeweC 12 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 2 -r pal "C2\C2_SeweC.gooc" "C2\Out\C2_SeweC.nsentry"
+
+#anim BARREL            [Ba1aV] 1 1
+#anim DOOR              [Do1aV] 12 1
+#anim EEL               [Ee1aV] 25 1
+#anim EEL_ELECTRIFIED   [Ee2aV] 25 1
+#anim FAN_MOTOR         [Fa1aV] 1 1
+#anim FAN_BLADE_1       [Fa2aV] 1 1
+#anim FAN_BLADE_2       [Fa2aV] 1 1
+#anim FAN_BLADE_3       [Fa3aV] 1 1
+#anim FAN_BLADE_4       [Fa5aV] 1 1
+
+#spawn S_DOOR           Door_Init
+#spawn S_FAN            Fan
+#spawn S_FAN_BREAK      Fan
+#spawn S_FAN_BLADE      Fan_Blade
+#spawn S_4              __s_4
+#spawn S_5              __s_5
+#spawn S_6              __s_6
+#spawn S_7              __s_7
+#spawn S_EEL            Electric_Eel
+#spawn S_BARREL         Barrel_Init
+
+var DoorLastPlayerSide, TargetFanBladeCount, BarrelPivot, BarrelArc, BarrelCycleLength,
+    BarrelCycleOffset, BarrelAngle, BarrelRadius, BarrelZindex1, BarrelZindex2, BarrelZindex3
+
+state Door_Init { // 0
+    statusc 0x22
+    code(yaw) {
+        roty = yaw
+        zindex = fieldval(ENTITY_FIELD_ZINDEX)
+        setanim(DOOR, 0)
+        changestate(Door_Close)
+    }
+}
+
+state Door_Close { // 1
+    statusc 0x22
+    code() {
+        statusb = 0
+        sounddecay(6.4s)
+        SoundPitchDefault(0.23)
+        soundplay([ADoSA], 0.4V)
+        if (v0 != DoorLastPlayerSide) {
+            playframe(0)
+        }
+        animframe -= spd(-25.0)
+        do {
+            playframe(animframe + spd(-25.0))
+        } while (animframe + spd(-25.0) >= 0)
+        if (animframe < 0) {
+            animframe = 0
+        }
+        sleep()
+    }
+    trans {
+        v0 = abs(degdist(atan2(player -> trans), GAMEDIR + 180deg)) < 90deg
+        changestateif(Door_Open, distance(player, DIST_NO_Y) <= 4.0m || v0)
+    }
+}
+
+state Door_Open { // 2
+    statusc 0x22
+    code() {
+        sounddecay(6.4s)
+        SoundPitchDefault(0.23)
+        soundplay([ADoSA], 0.4V)
+        if (v0) {
+            playframe(11.0)
+        }
+        playframes(DOOR, animframe, 11.0)
+        statusb = FLAG_INVISIBLE
+        sleep()
+    }
+    trans {
+        v0 = abs(degdist(atan2(player -> trans), GAMEDIR + 180deg)) < 90deg
+        changestateif(Door_Close, distance(player, DIST_NO_Y) >= 4.1m && !v0)
+        DoorLastPlayerSide = v0
+    }
+}
+
+state Fan { // 3
+    code(yaw, cyclelen, cycleoffs) {
+        cyclelen = cyclelen * 1s / 1.2s
+        cycleoffs = cycleoffs * 1s / 1.2s
+        if (spawn == S_FAN_BREAK) {
+            SetScale(0.8333S)
+            if (yaw == 0deg) {
+                settrans(SendHitEvent)
+            }
+        }
+        TargetFanBladeCount = 3.0
+        v0 = 360deg / (TargetFanBladeCount >> 8)
+        roty = yaw
+        rotz = roty + 90deg
+        health = 0
+
+        do (var index = 0) {
+            spawn(SeweC, S_FAN_BLADE, 1, rotz, index)
+            rotz += v0
+            index += 1.0
+        } while (index < TargetFanBladeCount)
+
+        rotz = roty + 90deg
+
+        if (spawn == S_FAN_BREAK) {
+            save (x, y, z, yaw, rotx, roty, rotz, vecx, vecy, vecz) {
+                SetRot(0deg, yaw, 0deg)
+                SetVec(x, y, z)
+                vectransf(vvec, vtrans, 2m, 0, 0)
+                spawn(13, 2, 1, yaw, 4s, 0, 0, 3m) // ScrbC 2
+                creator = objectspawned
+            }
+        }
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_SIDES
+        while (child) {
+            rotx = (time(cyclelen, cycleoffs) << 12) / cyclelen
+            playanim(0, FAN_MOTOR)
+        }
+        changestate(Fan_Kill)
+    }
+    event(e, a) {
+        accevif (e == EventFling && frametime - statetime >= 1s && interrupter) {
+            sendevent(Event14, child, interrupter)
+            if (eventaccepted) {
+                statetime = frametime
+            }
+        }
+        accevif (e == Event26) {
+            sendevent(Event12, creator)
+        }
+    }
+}
+
+sub SendHitEvent() {
+    sendeventif(Event24, player, abs(z - player -> z) < 0.4m && distance(player) < 6m && !(player -> statusa & FLAG_GROUNDLAND) && health == 3.0, 100.0)
+}
+
+state Fan_Blade { // 4
+    stateflag 0x2000001
+    statusc 0
+    __transargs
+    code(roll, index) {
+        parent -> health += 1.0
+        zindex = creator -> zindex
+        rotz = creator -> rotz
+        roty = creator -> roty
+        if (var r = rand(2); r == 0) {
+            if (creator -> spawn == S_FAN) {
+                setanim(FAN_BLADE_1)
+            }
+            else {
+                setanim(FAN_BLADE_3)
+            }
+        }
+        else if (r == 1) {
+            if (creator -> spawn == S_FAN) {
+                setanim(FAN_BLADE_2)
+            }
+            else {
+                setanim(FAN_BLADE_4)
+            }
+        }
+        if (creator -> spawn == S_FAN) {
+            if (index == 0) {
+                soundpitch(2.903)
+                sounddecay(6.4s)
+                soundplay([FSlSA], 0.4V)
+            }
+        }
+        else {
+            if (index == 0) {
+                sounddecay(6.8s)
+                soundpitch(4.563)
+                soundplay([FSlSA], 0.3V)
+            }
+            else if (index == 1.0) {
+                sounddelay(0.25s)
+                sounddecay(6.8s)
+                soundpitch(4.563)
+                soundplay([FSlSA], 0.3V)
+            }
+            else if (index == 2.0) {
+                sounddelay(0.55s)
+                sounddecay(6.8s)
+                soundpitch(4.563)
+                soundplay([FSlSA], 0.3V)
+            }
+        }
+        sleepframe(0)
+    }
+    event(e, a) {
+        if (e == Event14 && animseq) {
+            interrupter = a[0]
+            sendevent(Event12, interrupter, 0)
+            accevcstate(Fan_Blade_Break)
+        }
+        accevcstate(Fan_Blade_Break, e == EventHitInvincible)
+    }
+    trans {
+        rotx = creator -> rotx + roll
+        if (abs(z - player -> z) < 4m) {
+            getvert(vvec, self, 0)
+            v0 = pointclip(vec, player)
+            getvert(vvec, self, 1.0)
+            v0 += pointclip(vec, player)
+            sendeventif(Event24, player, v0, 100.0)
+        }
+    }
+}
+
+state Fan_Kill { // 5
+    stateflag 0x21
+    statusc 0x22
+    code() {
+        sendevent(Event12, creator, 0)
+        KillEntity()
+    }
+}
+
+state Fan_Blade_Break { // 6
+    stateflag 0x23
+    statusc 0x22
+    code() {
+        parent -> health -= 1.0
+    }
+}
+
+state Barrel_Init { // 7
+    statusc 0x12
+    code(angle, radius, pivot, arc, cyclelen, cycleoffs, zindex1, zindex2, zindex3) {
+        BarrelAngle = angle
+        BarrelRadius = radius
+        BarrelPivot = pivot
+        BarrelArc = arc
+        BarrelCycleLength = cyclelen * 1s / 1.2s
+        BarrelCycleOffset = cycleoffs * 1s / 1.2s
+        BarrelZindex1 = zindex1
+        BarrelZindex2 = zindex2
+        BarrelZindex3 = zindex3
+        SetVec(x, y, z)
+        troty = 0deg
+        density = 0.15m
+        statusb = FLAG_ROT_INWARDS | FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        changestate(Barrel)
+    }
+}
+
+state Barrel { // 8
+    stateflag 0x5
+    statusc 0
+    code() {
+        sleepanim(0, BARREL)
+    }
+    event(e, a) {
+        accevcstate(Barrel_Explode, e == EventHitInvincible
+            || e == EventHit
+            || e == EventSpinHit
+            || e == EventSlideHit
+            || e == EventJumpedOn
+            || e == EventSlamHit)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            v0 = (BarrelArc * 45deg) / BarrelCycleLength
+        }
+        var cycletime = time(BarrelCycleLength, BarrelCycleOffset)
+        field_61 = (cycletime * v0) >> 8
+        if (field_61 == 0 || cycletime == (BarrelCycleLength >> 1)) {
+            soundpitch(1.45)
+            soundplay([BRlaA], 0.3V)
+        }
+        if (field_61 >= BarrelArc) {
+            trotx = (BarrelPivot + BarrelArc) - sin(field_61 - BarrelArc, BarrelArc)
+        }
+        else {
+            trotx = BarrelPivot + sin(field_61, BarrelArc)
+        }
+        if (trotx >= 180deg) {
+            zindex = BarrelZindex1 + (BarrelZindex2 * (trotx - 180deg)) / (BarrelRadius >> 1)
+        }
+        else {
+            zindex = BarrelZindex1 + (BarrelZindex3 * (180deg - trotx)) / (BarrelRadius >> 1)
+        }
+        trotz = BarrelAngle + 90deg
+        vectransf2(vvec, vtrans, 0, 0, BarrelRadius)
+        rotx = -(((trotx * (BarrelRadius + 1m)) >> 8) / 25deg)
+        roty = trotz
+        rotz = trotz
+        sendevent(Event63, collider, 100.0)
+        changestateif(Barrel_Explode, eventaccepted)
+    }
+}
+
+state Barrel_Explode { // 9
+    stateflag 0x2
+    statusc 0
+    code() {
+        KillEntity()
+        SoundPitchDefault(0.23)
+        sounddecay(7.7s)
+        soundplay([tnt0A], 1V)
+        soundsetup(0, voice, 5)
+        spawn(9, 4, 1, getins(SetParticleColor), 0)
+        playnull()
+    }
+}
+
+sub SetParticleColor() {
+    if (var r = rand(5); r == 0) {
+        SetColor1(0x4B, 0x4B, 0x00)
+    }
+    else if (r == 1) {
+        SetColor1(0x00, 0x4B, 0x00)
+    }
+    else if (r == 2) {
+        SetColor1(0x19, 0x2F, 0x06)
+    }
+    else if (r == 3) {
+        SetColor1(0x4B, 0x33, 0x00)
+    }
+    else if (r == 4) {
+        SetColor1(0x00, 0x4B, 0x2C)
+    }
+    SetScale(2.5S)
+}
+
+state Electric_Eel { // 10
+    statusc 0x12
+    __transargs
+    code(cyclelen, cycleoffs, shocklen) {
+        SetZindexField(24)
+        spawn(9, 42, 1, 0, 0x333)
+        spawn(9, 42, 1, 1.0, 0x333)
+        statusb = FLAG_ROT_Y
+        trotx = 180deg
+        animframe = 0
+        do {
+            animframe = (animframe + 1.0) % 25.0
+            playframe()
+        } while (1)
+    }
+    event(e, a) {
+        accevif (e == EventTriggered) {
+            cycleoffs = cyclelen - time(cyclelen)
+        }
+        accevif (e == Event26) {
+            GLOBAL_136 = 0
+        }
+    }
+    trans {
+        setanim(EEL)
+        vecx = CAMTRANSX
+        vecy = CAMTRANSY
+        vecz = CAMTRANSZ
+        unless (abs(degdist(atan2(self, vecx), CAMROTY)) < 90deg) {
+            return
+        }
+        troty = atan2(player -> trans)
+        GLOBAL_136 = 0
+        var cycletime = time((cyclelen * 1s / 1.2s), (cycleoffs * 1s / 1.2s))
+        var shock = 0
+        if (cycletime >= 0 && cycletime <= 7) {
+            shock = cycletime
+            var flash = shock * 7 / 7
+            unless ((flash >> 1) & 1) {
+                GLOBAL_136 = 0x8080
+                setanim(EEL_ELECTRIFIED)
+                soundpitch(3.263)
+                soundplay([EelaA], 1V)
+            }
+        }
+        else if (cycletime >= 7 && cycletime <= shocklen + 7) {
+            shock = cycletime - 7
+            var flash = shock * 7 / (shocklen + 7) - 7
+            setanim(EEL_ELECTRIFIED)
+            GLOBAL_136 = 0x8080
+            sendeventif(EventShock2, player, player -> statusa & 0x800000 && GLOBAL_119 & 0x2 && !(player -> stateflag & 0x20) && !player -> invincible, 100.0)
+        }
+    }
+}

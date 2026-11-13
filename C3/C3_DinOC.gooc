@@ -1,0 +1,313 @@
+#gool DinoC 18 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_DinOC.gooc" "C3\Out\C3_DinOC.nsentry"
+
+#anim EGG_1       [De1cV] [De1cG] 26 0 2
+#anim EGG_2       [De2cV] [De1cG] 10 1 2
+#anim EGG_HATCH_1 [De3cV] [De2cG] 14 1 2
+#anim EGG_HATCH_2 [De4cV] [De3cG] 24 1 2
+
+#anim DINO_1 [Dc1cV] [Dc1cG] 19 1 2
+#anim DINO_2 [Dc2cV] [Dc1cG] 10 1 2
+#anim DINO_3 [Dc3cV] [Dc1cG] 10 1 2
+#anim DINO_4 [Dc4cV] [Dc1cG] 10 1 2
+#anim DINO_5 [Dc5cV] [Dc1cG] 05 1 2
+#anim DINO_6 [Dc6cV] [Dc1cG] 05 1 2
+#anim DINO_7 [Dc7cV] [Dc1cG] 20 1 2
+#anim DINO_8 [Dc8cV] [Dc1cG] 46 1 2
+#anim DINO_9 [Dc9cV] [Dc1cG] 23 1 2
+
+#spawn S_EGG        Egg
+#spawn S_HATCH      Dino_Hatch
+#spawn S_RUN_AWAY   Dino_Run_Away
+#spawn S_BLOCKER    Dino_Blocker
+#spawn S_IDLE       Dino_Idle
+
+var CanMount
+
+state Dino_Idle { // 0
+    stateflag 0x4004081
+    statusc 0x1000000
+    event => sub DinoEventIdle
+    trans => sub DinoTransIdle
+    code() {
+        var0 = rand(3s)
+        playanim(0, DINO_2)
+        WaitFrame(0, DINO_2, var0)
+        if (!rand(2)) {
+            scalex = -scalex
+        }
+        playframes(DINO_2, 1.0, 9.0)
+        soundpitch(3.263)
+        soundplay([De4cA], 1V)
+        do {
+            changestateifn(Dino_Idle_1, rand(2))
+            var0 = rand(8)
+            playanim(0, DINO_3)
+            WaitFrame(0, DINO_3, var0)
+            playframes(DINO_3, 1.0, 9.0)
+            var0 = rand(8)
+            playanim(0, DINO_4)
+            WaitFrame(0, DINO_4, var0)
+            playframes(DINO_4, 1.0, 9.0)
+        } while (1)
+    }
+}
+
+sub DinoEventIdle(e, a) {
+    if (e == EventJumpedOn || e == EventSlamHit) {
+        if (interrupter == player && CanMount) {
+            sendevent(Event58, player)
+            rejevcstate(Dino_Mounted, eventaccepted)
+        }
+    }
+}
+
+sub DinoTransIdle() {
+    changestateif(Kill, player -> stateflag \ 0x10800)
+}
+
+state Dino_Idle_1 { // 1
+    stateflag 0x4004081
+    statusc 0x1000000
+    event => state Dino_Idle
+    trans => state Dino_Idle
+    code() {
+        do {
+            var0 = rand(5)
+            playanim(0, DINO_5)
+            WaitFrame(0, DINO_5, var0)
+            soundpitch(3.263)
+            soundplay([De5cA], 0.7V)
+            playframes(DINO_5, 1.0, 4.0)
+            var0 = rand(5)
+            WaitFrame(4, DINO_5, var0)
+            changestateifn(Dino_Idle_2, rand(3))
+            soundpitch(3.263)
+            soundplay([De5cA], 0.7V)
+            playframesback(DINO_5, 3.0, 0.0)
+        } while (1)
+    }
+}
+
+state Dino_Idle_2 { // 2
+    stateflag 0x4004081
+    statusc 0x1000000
+    event => state Dino_Idle
+    trans => state Dino_Idle
+    code() {
+        do {
+            var0 = rand(5)
+            playanim(0, DINO_6)
+            WaitFrame(0, DINO_6, var0)
+            soundpitch(3.263)
+            soundplay([De5cA], 0.7V)
+            playframes(DINO_6, 1.0, 4.0)
+            var0 = rand(5)
+            WaitFrame(4, DINO_6, var0)
+            changestateifn(Dino_Idle_3, rand(3))
+            soundpitch(3.263)
+            soundplay([De5cA], 0.7V)
+            playframesback(DINO_6, 3.0, 0.0)
+        } while (1)
+    }
+}
+
+state Dino_Idle_3 { // 3
+    stateflag 0x4004081
+    statusc 0x1000000
+    event => state Dino_Idle
+    trans => state Dino_Idle
+    code() {
+        soundpitch(3.263)
+        soundplay([De6cA], 1V)
+        playframes(DINO_7, 0.0, 19.0)
+        do {
+            var0 = (1 + rand(4)) << 8
+            do (var loops = 0) {
+                playframes(DINO_8, 0.0, 33.0)
+            } while ({ loops += 1.0 }; loops < var0)
+        } while (rand(3))
+        soundpitch(3.263)
+        soundplay([De7cA], 1V)
+        playframes(DINO_8, 33.0, 45.0)
+        changestate(Dino_Idle)
+    }
+}
+
+state Egg { // 4
+    stateflag 0x4000081
+    statusc 0x0
+    code(link) {
+        if (entitygetstate(2) || ((link && entitygetstate(link, 2)) || GLOBAL_173)) {
+            entitysetstate(1)
+            spawn = S_HATCH
+            changestate(Dino_Hatch, 0)
+        }
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        zindex = 24
+        do {
+            var0 = rand(3s)
+            field_61 = 0
+            playanim(0, EGG_1)
+            do (var start = frametime) {
+                if (!rand(60)) {
+                    do (var shake = frametime) {
+                        rotx = loopseek(field_61, 10deg, spd(60deg)) - 5deg
+                        playanim(0, EGG_1)
+                    } while (frametime - shake < 50)
+                    while (rotx) {
+                        rotx = seek(rotx, 0deg, 1deg)
+                        playanim(0, EGG_1)
+                    }
+                }
+                playanim(0, EGG_1)
+            } while (frametime - start < var0)
+            playframes(EGG_1, 0.0, 25.0)
+            rotz = rand(360deg)
+        } while (1)
+    }
+    event(e, a) {
+        if ((e == EventJumpedOn || e == EventSlamHit) && interrupter == player) {
+            if (ZONEFLAGS & 0x800) {
+                player -> speed = 5m
+                player -> troty = -90deg
+                player -> velx = -5m
+            }
+            else {
+                player -> speed = 10m
+                player -> troty = 0deg
+                player -> velz = 10m
+            }
+            if (e == EventSlamHit) {
+                sendevent(Event21, interrupter, 20m)
+                rejevcstate(Egg_Break, eventaccepted)
+            }
+        }
+        accevcstate(Egg_Break, e == EventSpinHit || e == EventJumpedOn || e == EventHit)
+    }
+    trans {
+        changestateif(Egg_Hide, (player -> stateflag & -0x10000000) == -0x50000000)
+    }
+}
+
+state Egg_Hide { // 5
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        statusb = 0
+        sleepnull()
+    }
+}
+
+state Egg_Break { // 6
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        entitysetstate(1)
+        soundpitch(4.0)
+        soundplay([De1cA], 1V)
+        soundpitch(2.18)
+        soundplay([De2cA], 1V)
+        playframes(EGG_HATCH_1, 0.0, 13.0)
+        statusb = 0
+        spawn(DinoC, S_HATCH, 1, 0)
+        playframes(EGG_HATCH_2, 0.0, 23.0)
+        sleep()
+    }
+}
+
+state Dino_Hatch { // 7
+    stateflag 0x4004081
+    statusc 0x1000000
+    code(mode) {
+        vfx = parent -> vfx
+        if (creator == player) {
+            creator = 0
+            movetolist(3.0, self)
+        }
+        if (mode && mode != -1) {
+            changestate(Dino_Run_Away)
+        }
+        else {
+            troty = roty
+            CanMount = true
+        }
+        zindex = 32
+        trotx = 360deg
+        statusb = FLAG_ROT_Y | FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        setevent(DinoEventIdle)
+        playframes(DINO_1, 0.0, 18.0)
+        changestate(Dino_Idle)
+    }
+}
+
+state Dino_Mounted { // 8
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        movetolist(3.0, self)
+        if (entity) {
+            entitysetspawn(self -> id, 0)
+        }
+        else if (creator) {
+            entitysetspawn(creator -> id, 0)
+        }
+        statusb = 0
+        playnull(21)
+    }
+}
+
+state Dino_Blocker { // 9
+    stateflag 0x1
+    statusc 0x1000000
+    code(scx, scy, scz) {
+        SetScale(scx, scy, scz)
+        sleepnull()
+    }
+    trans {
+        if (player -> stateflag & 0x2000000, player -> z < z) {
+            player -> z = z
+            sendeventif(Event58, player, player -> speed && abs(degdist(180deg, player -> troty)) < 90deg)
+        }
+    }
+}
+
+sub DinoBlockPlayerX() { // S-369
+    if (player -> stateflag & 0x2000000, player -> x < x) {
+        player -> x = x
+    }
+}
+
+sub DinoBlockPlayerZ() { // S-375
+    if (player -> stateflag & 0x2000000, player -> z < z) {
+        player -> z = z
+    }
+}
+
+state Dino_Run_Away { // 10
+    stateflag 0x1
+    statusc 0x1000000
+    code() {
+        statusb = FLAG_ROT_Y | FLAG_PHYSICS_ENGINE
+        vecx = CAMTRANSX
+        vecz = CAMTRANSZ
+        troty = atan2(self, vecx)
+        trotx = 720deg
+        speed = 0
+        do {
+            setvel(seek(speed, 9m, spd(9m)))
+            if (animseq != getanim(DINO_9)) {
+                setanim(DINO_9, -1.0)
+            }
+            playframe((animframe + 1.0) % 23.0)
+        } until (frametime - statetime >= 3s)
+    }
+}
+
+state Kill { // 11
+    stateflag 0x20
+    statusc 0x0
+    code() {}
+}

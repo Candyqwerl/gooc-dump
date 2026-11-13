@@ -1,0 +1,586 @@
+#gool MnVOC 39 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C3_FruiC.gooh"
+//gooc -c 3 -r pal "C3\C3_MnVOC.gooc" "C3\Out\C3_MnVOC.nsentry"
+
+#anim VASE_IDLE           [VaIiV] [Va1iG] 01 1 2
+#anim VASE_OCCUPIED_1     [VaSiV] [Va1iG] 24 1 2
+#anim VASE_OCCUPIED_2     [VaJiV] [Va1iG] 25 1 2
+#anim MONKEY_THROW_1      [MTSiV] [Va2iG] 24 1 2
+#anim MONKEY_THROW_2      [MTEiV] [Va2iG] 18 1 2
+#anim MONKEY_TAUNT_1      [MVSiV] [Va2iG] 22 1 2
+#anim MONKEY_TAUNT_2      [MVLiV] [Va2iG] 08 1 2
+#anim MONKEY_TAUNT_3      [MVEiV] [Va2iG] 08 1 2
+#anim VASE_1              [VThiV] [Va3iG] 41 1 2
+#anim VASE_2              [VVSiV] [Va3iG] 22 1 2
+#anim VASE_3              [VVLiV] [Va3iG] 08 1 2
+#anim VASE_4              [VVEiV] [Va3iG] 08 1 2
+#anim VASE_BREAK          [VExiV] [Va4iG] 17 1 2
+#anim ANIM_065            [MSSiV] [Va5iG] 17 1 2
+#anim MONKEY_COWER_1      [MSLiV] [Va5iG] 03 1 2
+#anim MONKEY_COWER_2      [MSTiV] [Va5iG] 03 1 2
+#anim MONKEY_COWER_3      [MSBiV] [Va5iG] 03 1 2
+#anim MONKEY_SQUASH_1     [MQLiV] [Va5iG] 06 1 2
+#anim MONKEY_SQUASH_2     [MQOiV] [Va5iG] 11 1 2
+#anim CLAY_BOMB           [MoPiV] [MoPiG] 07 1 2
+
+#sprite PARTICLE[Cr20T]
+#tex 0x8296A0 0 1 2 9 800 32 32 32
+#tex 0xA0A000 0 1 2 9 800 32 32 32
+
+#spawn S_MONKEY_VASE             Monkey_Vase_Init
+#spawn S_VASE                    Vase
+#spawn S_BOMB                    Bomb_Init
+#spawn S_PARTICLE_BALLISTIC      Particle_Ballistic
+#spawn S_PARTICLE_FALL           Particle_Fall
+
+var VaseGroupStartID, VaseGroupCount, MinThrowDistance, MaxThrowDistance, VaseVar5, FruitRemaning
+
+state Monkey_Vase_Init { // 0
+    statusc 0
+    code(group_start_id, group_count, min_throw_dist, max_throw_dist) {
+        VaseGroupStartID = group_start_id
+        VaseGroupCount = group_count
+        MinThrowDistance = min_throw_dist
+        MaxThrowDistance = max_throw_dist
+        FruitRemaning = 10
+        zindex = 26
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        playanim(0, VASE_IDLE)
+        CheckVaseOccupancy()
+        if (entitygetstate(2)) {
+            changestate(Monkey_Check_Attack)
+        }
+        else {
+            changestate(Vase_Unoccupied)
+        }
+    }
+}
+
+sub CheckVaseOccupancy() { // S-15
+    var candidate_id = VaseGroupStartID
+    var vases_remaining = VaseGroupCount
+    var occupied_count = 0
+    var eligible_count = 0
+    while (vases_remaining > 0) {
+        interrupter = objectget(candidate_id)
+        if (interrupter && entitygetstate(interrupter -> id, 1)) {
+            eligible_count += 1
+            if (entitygetstate(interrupter -> id, 2)) {
+                occupied_count += 1
+            }
+        }
+        vases_remaining -= 1
+        candidate_id += 1.0
+    }
+    if (occupied_count > 1) {
+        if (entitygetstate(2)) {
+            entitysetstate(0)
+            occupied_count -= 1
+        }
+        candidate_id = VaseGroupStartID
+        while (occupied_count > 1) {
+            interrupter = objectget(candidate_id)
+            if (interrupter && entitygetstate(interrupter -> id, 1)) {
+                if (entitygetstate(interrupter -> id, 2)) {
+                    entitysetstate(interrupter -> id, 0)
+                    occupied_count -= 1
+                }
+            }
+            candidate_id += 1.0
+        }
+    }
+    if (occupied_count == 0) {
+        if (VaseGroupCount <= 0 || eligible_count == VaseGroupCount) {
+            entitysetstate(1)
+        }
+        else if (!rand(VaseGroupCount)) {
+            entitysetstate(1)
+        }
+    }
+}
+
+sub TryTransferMonkey() { // S-79
+    var candidate_id = VaseGroupStartID
+    var vases_remaining = VaseGroupCount
+    var eligible_count = 0
+    while (vases_remaining > 0) {
+        interrupter = objectget(candidate_id)
+        if (interrupter && (interrupter != self && entitygetstate(interrupter -> id, 1))) {
+            eligible_count += 1
+        }
+        vases_remaining -= 1
+        candidate_id += 1.0
+    }
+    if (eligible_count) {
+        v0 = rand(eligible_count)
+        candidate_id = VaseGroupStartID
+        do {
+            interrupter = objectget(candidate_id)
+            if (interrupter && (interrupter != self && entitygetstate(interrupter -> id, 1))) {
+                if (!v0) {
+                    entitysetstate(interrupter -> id, 1)
+                    break
+                }
+                v0 -= 1
+            }
+            candidate_id += 1.0
+        } while (1)
+        entitysetstate(0)
+        v0 = 0
+    }
+    else {
+        v0 = 1
+    }
+}
+
+state Vase_Unoccupied { // 1
+    statusc 0
+    code() {
+        sleepanim(0, VASE_IDLE)
+    }
+    event(e, a) {
+        accevcstate(Vase_Broken, e == EventSpinHit 
+            || e == EventHitInvincible || e == EventFling
+            || e == EventSlideHit || e == EventJumpedOn
+            || e == EventSlamHit || e == EventHit)
+    }
+    trans {
+        changestateif(Monkey_Check_Attack, entitygetstate(2))
+    }
+}
+
+state Vase_Broken { // 2
+    statusc 0
+    code() {
+        if (entitygetstate(2)) {
+            TryTransferMonkey()
+            changestateif(Monkey_Exposed, v0)
+        }
+        KillEntity()
+        statusb = 0
+        soundpitch((14.4 + rand(3.2)) * 0.16 >> 8)
+        soundplay([Va5iA], 1V)
+        playframes(VASE_BREAK, 0.0, 16.0)
+    }
+}
+
+state Monkey_Exposed { // 3
+    statusc 0
+    code() {
+        KillEntity()
+        soundpitch((14.4 + rand(3.2)) * 0.16 >> 8)
+        soundplay([Va5iA], 1V)
+        spawn(MnVOC, S_VASE, 1, 1)
+        soundpitch(2.54)
+        soundplay([Va2iA], 1V)
+        soundsetup(0, voice, 5)
+        roty = CAMROTY + (10deg - rand(20deg))
+        playframes(ANIM_065, 0.0, 16.0)
+        changestate(Monkey_Cower)
+    }
+}
+
+state Monkey_Cower { // 4
+    stateflag 0x5004081
+    statusc 0x80012
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | 0x400000
+        do (var loops_remaining = 0) {
+            loops_remaining = rand(8) + 4
+            while (loops_remaining) {
+                playanim(0, MONKEY_COWER_1)
+                playanim(1, MONKEY_COWER_1)
+                playanim(2, MONKEY_COWER_1)
+                loops_remaining -= 1
+            }
+            playanim(0, MONKEY_COWER_2)
+            playanim(1, MONKEY_COWER_2)
+            playanim(2, MONKEY_COWER_2)
+            loops_remaining = rand(8) + 4
+            while (loops_remaining) {
+                playanim(0, MONKEY_COWER_3)
+                playanim(1, MONKEY_COWER_3)
+                playanim(2, MONKEY_COWER_3)
+                loops_remaining -= 1
+            }
+            playframesback(MONKEY_COWER_2, 2.0, 0.0)
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Monkey_Jumped_On, e == EventHit)
+    }
+    trans {
+        changestateif(Monkey_Jumped_On, collider && statusa & 0x4000)
+    }
+}
+
+state Monkey_Jumped_On { // 5
+    stateflag 0x4004081
+    statusc 0x80012
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | 0x400000
+        if (rand(3)) {
+            soundpitch((14.4 + rand(3.2)) * 0.16 >> 8)
+            soundplay([Va3iA], 1V)
+        }
+        else {
+            soundpitch(2.54)
+            soundplay([Va2iA], 1V)
+            soundsetup(0, voice, 5)
+        }
+        if (FruitRemaning > 0) {
+            FruitRemaning -= 1
+            spawn2(FruiC, FruiC_S_FRUIT_AUTO, 1, 96.0, 0)
+        }
+        playanim(0, MONKEY_SQUASH_1)
+        playanim(1, MONKEY_SQUASH_1)
+        playanim(2, MONKEY_SQUASH_1)
+        playanim(3, MONKEY_SQUASH_1)
+        playanim(3, MONKEY_SQUASH_1)
+        playanim(4, MONKEY_SQUASH_1)
+        statetime = frametime
+        settrans(CheckPlayerOnMonkey)
+        sleep()
+    }
+}
+
+sub CheckPlayerOnMonkey() { // S-226
+    if (collider && statusa & 0x4000) {
+        statetime = frametime
+    }
+    else {
+        changestateif(Monkey_Recover, frametime - statetime >= 0.1s)
+    }
+}
+
+state Monkey_Recover { // 6
+    stateflag 0x4004081
+    statusc 0x80012
+    code() {
+        playframes(MONKEY_SQUASH_2, 0.0, 10.0)
+        changestate(Monkey_Cower)
+    }
+    trans {
+        changestateif(Monkey_Jumped_On, collider && statusa & 0x4000)
+    }
+}
+
+state Monkey_Check_Attack { // 7
+    statusc 0
+    code() {
+        v0 = distance(player, DIST_NO_Y)
+        changestateif(Monkey_Throw, v0 >= MinThrowDistance && v0 <= MaxThrowDistance && (!(player -> stateflag \ 0x20) && !player -> invincible) && z < CAMTRANSZ - 3m)
+        changestate(Vase_Shake)
+    }
+}
+
+state Monkey_Throw { // 8
+    statusc 0
+    code() {
+        SoundPitchDefault(0.18)
+        soundplay([Va3iA], 1V)
+        playframes(MONKEY_THROW_1, 0.0, 23.0)
+        vecy = player -> field_63
+        if (vecy < y - 8m) {
+            vecy = y
+        }
+        spawn(MnVOC, S_BOMB, 1, player -> x, player -> y + 0.3m, player -> z, vecy)
+        playframes(MONKEY_THROW_2, 0.0, 17.0)
+        roty = 0deg
+        changestateif(Monkey_Taunt, player -> stateflag \ 0x8000000)
+        TryTransferMonkey()
+        changestate(Vase_Unoccupied)
+    }
+    trans {
+        once {
+            roty = atan2(player -> trans)
+            spawn(MnVOC, S_VASE, 1, 0)
+            setanim(MONKEY_THROW_1, 0)
+            setevent(MonkeyThrowEvent)
+        }
+        roty = degseek(roty, atan2(player -> trans), 360deg)
+    }
+}
+
+sub MonkeyThrowEvent(e, a) {
+    accevcstate(Monkey_Throw_Interrupted, e == EventSpinHit 
+        || e == EventHitInvincible || e == EventFling 
+        || e == EventSlideHit || e == EventJumpedOn
+        || e == EventSlamHit || e == EventHit
+    )
+}
+
+state Monkey_Throw_Interrupted { // 9
+    statusc 0
+    code() {
+        cascadeevent(Event14, self, 0)
+        changestate(Vase_Broken)
+    }
+}
+
+state Vase_Shake { // 10
+    statusc 0
+    code() {
+        SoundPitchDefault(0.18)
+        soundplay([Va4iA], 1V)
+        if (rand(2)) {
+            playframes(VASE_OCCUPIED_1, 0.0, 23.0)
+        }
+        else {
+            playframes(VASE_OCCUPIED_2, 0.0, 24.0)
+        }
+        changestate(Vase_Wait)
+    }
+    event(e, a) {
+        accevcstate(Vase_Broken, e == EventSpinHit 
+            || e == EventHitInvincible || e == EventFling 
+            || e == EventSlideHit || e == EventJumpedOn
+            || e == EventSlamHit || e == EventHit
+        )
+    }
+    trans {
+        v0 = distance(player, DIST_NO_Y)
+        changestateif(Monkey_Throw, v0 >= MinThrowDistance && v0 <= MaxThrowDistance && (!(player -> stateflag \ 0x20) && !player -> invincible) && z < CAMTRANSZ - 3m)
+    }
+}
+
+state Vase_Wait { // 11
+    statusc 0
+    code() {
+        var wait_duration = 0
+        wait_duration = rand(1s) + 1
+        do {
+            changestateif(Monkey_Taunt, player -> stateflag \ 0x8000000)
+            if (frametime - statetime >= wait_duration) {
+                break
+            }
+            playanim(0, VASE_IDLE)
+        } while (1)
+        TryTransferMonkey()
+        changestate(Vase_Unoccupied)
+    }
+    event(e, a) {
+        accevcstate(Vase_Broken, e == EventSpinHit 
+            || e == EventHitInvincible || e == EventFling
+            || e == EventSlideHit || e == EventJumpedOn
+            || e == EventSlamHit || e == EventHit
+        )
+    }
+    trans {
+        v0 = distance(player, DIST_NO_Y)
+        changestateif(Monkey_Throw, v0 >= MinThrowDistance && v0 <= MaxThrowDistance && (!(player -> stateflag \ 0x20) && !player -> invincible) && z < CAMTRANSZ - 3m)
+    }
+}
+
+state Monkey_Taunt { // 12
+    statusc 0
+    code() {
+        spawn(MnVOC, S_VASE, 1, 2)
+        roty = atan2(player -> trans)
+        SoundPitchDefault(0.18)
+        soundplay([Va3iA], 1V)
+        playframes(MONKEY_TAUNT_1, 0.0, 21.0)
+        soundpitch(2.54)
+        soundplay([Va2iA], 1V)
+        do (var loops = 0) {
+            playanim(0, MONKEY_TAUNT_2)
+            playanim(1, MONKEY_TAUNT_2)
+            playanim(2, MONKEY_TAUNT_2)
+            playanim(2, MONKEY_TAUNT_2)
+            playanim(3, MONKEY_TAUNT_2)
+            playanim(4, MONKEY_TAUNT_2)
+            playanim(5, MONKEY_TAUNT_2)
+            playanim(6, MONKEY_TAUNT_2)
+        } while ({ loops += 1.0 }; loops < 5.0)
+        playanim(0, MONKEY_TAUNT_3)
+        playanim(1, MONKEY_TAUNT_3)
+        playanim(2, MONKEY_TAUNT_3)
+        playanim(3, MONKEY_TAUNT_3)
+        playanim(4, MONKEY_TAUNT_3)
+        playanim(4, MONKEY_TAUNT_3)
+        playanim(5, MONKEY_TAUNT_3)
+        playanim(6, MONKEY_TAUNT_3)
+        sleep()
+    }
+}
+
+expr VASE_MODE_THROW = 0
+expr VASE_MODE_BREAK = 1
+expr VASE_MODE_CELEBRATE = 2
+
+state Vase { // 13
+    statusc 0
+    code(mode) {
+        zindex = creator -> zindex
+        roty = 0deg
+        if (mode == VASE_MODE_THROW) {
+            statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL
+            playframes(VASE_1, 0.0, 40.0)
+            playframe()
+        }
+        else if (mode == VASE_MODE_BREAK) {
+            statusb = 0
+            playframes(VASE_BREAK, 0.0, 16.0)
+        }
+        else if (mode == 2) {
+            statusb = 0
+            playframes(VASE_2, 0.0, 21.0)
+            do (var loops = VASE_MODE_CELEBRATE) {
+                playanim(0, VASE_3)
+                playanim(1, VASE_3)
+                playanim(2, VASE_3)
+                playanim(2, VASE_3)
+                playanim(3, VASE_3)
+                playanim(4, VASE_3)
+                playanim(5, VASE_3)
+                playanim(6, VASE_3)
+            } while ({ loops += 1.0 }; loops < 5.0)
+            playanim(0, VASE_4)
+            playanim(1, VASE_4)
+            playanim(2, VASE_4)
+            playanim(3, VASE_4)
+            playanim(4, VASE_4)
+            playanim(4, VASE_4)
+            playanim(5, VASE_4)
+            playanim(6, VASE_4)
+            sleep()
+        }
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event14)
+    }
+}
+
+state Bomb_Init { // 14
+    statusc 0x32
+    code(target_x, target_y, target_z, ground) {
+        soundpitch(3.263)
+        soundplay([Va1iA], 0.7V)
+        groundy = ground
+        zindex = creator -> zindex
+        getvert(vtrans, creator, 0)
+        vely = -(((y - groundy) * 25 / 12) - 14.4m)
+        velx = (target_x - x) / 0.5s
+        velz = (target_z - z) / 0.5s
+        statusb = FLAG_COLLIDABLE
+        changestate(Bomb_Fly)
+    }
+}
+
+state Bomb_Fly { // 15
+    statusc 0x32
+    code() {
+        do {
+            playanim(0, CLAY_BOMB)
+            playanim(1, CLAY_BOMB)
+            playanim(2, CLAY_BOMB)
+            playanim(3, CLAY_BOMB)
+            playanim(4, CLAY_BOMB)
+            playanim(4, CLAY_BOMB)
+            playanim(5, CLAY_BOMB)
+        } while (1)
+    }
+    trans {
+        sendevent(EventHit, collider, 100.0)
+        if (eventaccepted) {
+            SoundPitchDefault(0.23)
+            soundsetup(0, self, 5)
+            soundplay([tnt0A], 0.6V)
+            changestate(Kill)
+        }
+        x += velx
+        y = y + vely / 1s
+        z += velz
+        changestateif(Bomb_Explode, y <= groundy)
+        vely = spd(vely, -60m)
+    }
+}
+
+state Bomb_Explode { // 16
+    statusc 0x32
+    code() {
+        SoundPitchDefault(0.23)
+        soundsetup(0, self, 5)
+        soundplay([tnt0A], 0.6V)
+        do (var particles = 0) {
+            spawn(MnVOC, S_PARTICLE_BALLISTIC, 1, -1.0, groundy, rand(360deg), 3m)
+        } while ({ particles += 1.0 }; particles < 5.0)
+        WaitChildNull()
+    }
+}
+
+state Monkey_Fling { // 17
+    stateflag 0x30
+    statusc 0x32
+    code(h) {
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir(0x80000)
+        EnemyFlingSetVel(2m)
+        EnemyFlingWaitScale()
+    } 
+    trans {
+        EnemyFlingTrans(2m, EventFling)
+    }
+}
+
+state Particle_Ballistic { // 18
+    stateflag 0x10
+    code(vertex, ground, yaw, yvel) {
+        if (vertex != -1.0) {
+            getvert(vtrans, creator, vertex)
+        }
+        groundy = ground
+        SetRot(0deg)
+        zindex = 30
+        SetScale(0.1S + rand(0.05S), scalex, 1S)
+        troty = yaw
+        setvel(rand(yvel))
+        if (yvel) {
+            vely = 8m + rand(2m)
+        }
+        statusb = FLAG_SOLID_GROUND | FLAG_PHYSICS_ENGINE | FLAG_GRAVITY
+        setanim(PARTICLE)
+        if (!rand(2)) {
+            animframe = 0.0
+        }
+        else {
+            animframe = 1.0
+        }
+        do {
+            playframe()
+        } until (STATUS_GROUNDLAND && vely < 0)
+    }
+}
+
+state Particle_Fall { // 19
+    stateflag 0x10
+    code(vertex, ground) {
+        if (vertex != -1.0) {
+            getvert(vtrans, creator, vertex)
+        }
+        groundy = ground
+        SetRot(0deg)
+        zindex = 30
+        SetScale(0.1S + rand(0.05S), scalex, 1S)
+        statusb = FLAG_PHYSICS_ENGINE
+        setanim(PARTICLE)
+        if (!rand(2)) {
+            animframe = 0.0
+        }
+        else {
+            animframe = 1.0
+        }
+        do {
+            vely = spd(vely, -20m)
+            playframe()
+        } until (y <= groundy)
+    }
+}
+
+state Kill { // 20
+    statusc 0
+    code() {}
+}
+

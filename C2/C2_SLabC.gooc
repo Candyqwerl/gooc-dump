@@ -1,0 +1,195 @@
+#gool SLabC 42 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 2 -r pal "C2\C2_SLabC.gooc" "C2\Out\C2_SLabC.nsentry"
+
+#anim SPACE_ASS_WAIT            [SL1iV] 60 1
+#anim SPACE_ASS_KNOCKBACK       [SL2iV] 45 1
+#anim SPACE_ASS_DEATH_1         [SL3iV] 15 1
+#anim SPACE_ASS_DEATH_2         [SL4iV] 15 1
+#anim SPACE_ASS_FIRE_DEATH_1    [SL5iV] 15 1
+#anim SPACE_ASS_FIRE_DEATH_2    [SL6iV] 15 1
+#anim SPACE_FIRE                [SF1iV] 30 1
+
+#spawn S_SPACE_ASS   Space_Ass_Init
+#spawn S_1           __s_1
+#spawn S_SPACE_FIRE  Space_Fire
+
+var StartZ, SparkTimer, NextSparkTime, Electrified, SparkParticle, InFireRange
+
+sub SpaceObjectTrans() {
+    if (frametime - GLOBAL_3 >= 2 || z > GLOBAL_11) {
+        statusb &= ~FLAG_INVISIBLE
+    }
+    else {
+        statusb |= FLAG_INVISIBLE
+    }
+}
+
+state Space_Ass_Init { // 0
+    statusc 0
+    code(zoff) {
+        spawn(SLabC, S_SPACE_FIRE, 1)
+        creator = objectspawned
+        zindex = 48
+        statusb = FLAG_ROT_Y | FLAG_COLLIDABLE | FLAG_SOLID_SIDES | FLAG_NO_CAMERA_CLIP
+        density = 0.1m
+        Electrified = false
+        StartZ = z
+        z += zoff
+        if (zoff < 15m) {
+            InFireRange = true
+        }
+        else {
+            InFireRange = false
+        }
+        SetColor1(0xFF, 0xFF, 0xFF)
+        moda = 0
+        SparkParticle = -1
+        changestate(Space_Ass)
+    }
+}
+
+state Space_Ass { // 1
+    statusc 0
+    code() {
+        NextSparkTime = frametime
+        sleepframes(SPACE_ASS_WAIT, 0.0, 59.0)
+    }
+    event(e, a) {
+        if (Electrified) {
+            accevcstate(Space_Ass_Knockback, e == EventHitInvincible)
+        }
+        else {
+            accevcstate(Space_Ass_Knockback, e == EventSpinHit || e == EventHitInvincible || e == EventFling)
+        }
+    }
+    trans {
+        SpaceObjectTrans()
+        if (!(statusb \ FLAG_INVISIBLE)) {
+            if (player -> z < z) {
+                NextSparkTime = frametime
+            }
+            if (FRAMETIME < 1.2s) {
+                spawn(9, 19, 1, 2.0 + (time(2) << 8), 0, 0, 0)
+            }
+            x = seek(x, player -> x, spd(5m))
+            y = seek(y, player -> y - 1m, spd(5m))
+            if (frametime - SparkTimer >= 0.65s) {
+                Electrified = false
+            }
+            if (frametime >= NextSparkTime && !Electrified) {
+                Electrified = true
+                SparkTimer = frametime
+                NextSparkTime = frametime + 3.6s
+                spawn(9, 24, 1, 0)
+                spawn(9, 24, 1, 1.0)
+                SparkParticle = objectspawned
+            }
+            if (Electrified) {
+                sendevent(EventShock2, collider, 0)
+                if (!rand(5)) {
+                    moda = 0
+                }
+                else {
+                    moda = 8.0
+                }
+            }
+            else {
+                moda = 0
+            }
+        }
+    }
+}
+
+state Space_Ass_Knockback { // 2
+    stateflag 0x3
+    statusc 0
+    code() {
+        playframes(SPACE_ASS_KNOCKBACK, 0.0, 44.0)
+        Electrified = false
+        moda = 0
+        changestate(Space_Ass_Repositioned)
+    }
+    trans {
+        x = seek(x, player -> x, spd(5m))
+        y = seek(y, player -> y - 1m, spd(5m))
+        getvert(vvec, self, 1.0)
+        changestateif(Space_Ass_Death, vecz < StartZ)
+    }
+}
+
+state Space_Ass_Repositioned { // 3
+    stateflag 0x3
+    statusc 0
+    code() {
+        Electrified = false
+        moda = 0
+        z -= 10m
+        changestate(Space_Ass)
+    }
+    trans {
+        x = seek(x, player -> x, spd(5m))
+        y = seek(y, player -> y - 1m, spd(5m))
+        sendeventif(EventShock, collider, !(player -> stateflag & 0x20) && !player -> invincible, 100.0)
+    }
+}
+
+state Space_Ass_Death { // 4
+    stateflag 0x3
+    statusc 0
+    code() {
+        KillEntity()
+        vfx = (vfx & 0xFF00FFFF) | 0x20000
+        SetColor1(0x0, 0x0, 0x0)
+        moda = 0
+        sendevent(Event14, creator, 0)
+        soundpitch((15.2 + rand(0.8)) * 0.205 >> 8)
+        soundplay([ASciA], 0.3V + rand(0.2V))
+        soundpitch((14.4 + rand(3.2)) * 0.25 >> 8)
+        soundplay([FFiTA], 1V)
+        if (InFireRange) {
+            playframes(SPACE_ASS_FIRE_DEATH_1, 0.0, 14.0)
+            playframes(SPACE_ASS_FIRE_DEATH_2, 0.0, 14.0)
+        }
+        else {
+            playframes(SPACE_ASS_DEATH_1, 0.0, 14.0)
+            playframes(SPACE_ASS_DEATH_2, 0.0, 14.0)
+        }
+    }
+    trans {
+        moda = seek(moda, 16.0, 0xB6)
+    }
+}
+
+state Space_Fire { // 5
+    statusc 0
+    code() {
+        if (player -> z < z) {
+            KillEntity()
+            return
+        }
+        zindex = 50
+        statusb = FLAG_NO_CAMERA_CLIP | FLAG_COLLIDABLE 
+        sleepframes(SPACE_FIRE, 0.0, 29.0)
+    }
+    event(e, a) {
+        accevcstate(Space_Fire_Kill, e == Event14)
+    }
+    trans {
+        SpaceObjectTrans()
+        sendeventif(EventBurn, collider, !(statusb & FLAG_INVISIBLE), 100.0)
+    }
+}
+
+state Space_Fire_Kill { // 6
+    statusc 0
+    code() {
+        statusb = FLAG_NO_CAMERA_CLIP
+        SetColor1(0x0, 0x0, 0x0)
+        playframe(animframe, 0.6s)
+    }
+    trans {
+        moda = seek(moda, 16.0, 0x111)
+    }
+}

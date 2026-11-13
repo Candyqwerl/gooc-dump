@@ -1,0 +1,534 @@
+#gool CknOC 12 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_CknOC.gooc" "C3\Out\C3_CknOC.nsentry"
+
+#anim CHICKEN_PECK_1   [Cp1bV] [Cp1bG] 06 1 2
+#anim CHICKEN_PECK_2   [Cp2bV] [Cp1bG] 06 1 2
+#anim CHICKEN_STARTLED [CTabV] [CTabG] 06 1 2
+#anim CHICKEN_RUN      [ChibV] [ChibG] 28 1 2
+#anim CHICKEN_SETTLE   [CRDbV] [CRDbG] 17 1 2
+#anim CHICKEN_FEATHER  [Sg1bV] [Sg1bG] 01 1 2
+
+#spawn S_CHICKEN  Chicken_Init
+#spawn S_FEATHER  Chicken_Feather
+
+var FollowGround, GroundSettlePending, EscapeTargetX, EscapeTargetZ, PlayerDistance, RunSpeed, RetargetCountdown, PathX0,
+    PathX1, PathX2, PathX3, PathZ0, PathZ1, PathZ2, PathZ3,
+    MaxTrackOffset, PeckDelay, HasBeenStartled, EscapeAngle, CluckCountdown
+
+state Chicken_Init {
+    statusc 0
+    code(limit, ground) {
+        MaxTrackOffset = limit
+        FollowGround = ground
+        zindex = 26
+        calcpath(0.0, vvec)
+        PathX0 = vecx
+        PathZ0 = vecz
+        calcpath(1.0, vvec)
+        PathX1 = vecx
+        PathZ1 = vecz
+        calcpath(2.0, vvec)
+        PathX2 = vecx
+        PathZ2 = vecz
+        calcpath(3.0 - 1, vvec)
+        PathX3 = vecx
+        PathZ3 = vecz
+        HasBeenStartled = false
+        changestate(Chicken_Idle)
+    }
+}
+
+state Chicken_Idle {
+    statusc 0
+    code => sub ChickenIdleAnimCycle
+    trans => sub ChickenIdleTrans
+    event(e, a) {
+        accevcstate(Chicken_Die, (e == EventHit || e == EventFling) && interrupter != player)
+    }
+}
+
+sub ChickenChooseEscapeTarget() {
+    var v1, v2, v3, v4, v5, v6, v7
+    RetargetCountdown = 12
+    v4 = PlayerDistance
+    if (v4 > 3.5m) {
+        v4 = 3.5m
+    }
+    RunSpeed = (((3.5m - v4) >> 8) * 112.0) / 5.47 + 0.2m
+    EscapeAngle = atan(x - player -> x, z - player -> z)
+    EscapeTargetZ = ((cos(EscapeAngle) * 3.125) >> 4) + z
+    EscapeTargetX = ((sin(EscapeAngle) * 3.125) >> 4) + x
+    ChickenCheckTargetWithinTrackLimit()
+    if (var0) {
+        return
+    }
+    v1 = EscapeAngle
+    v3 = (120deg * (v4 >> 8)) / 5.47 + (rand(20deg) * -1 + 10deg)
+    if (rand(2)) {
+        v3 = -v3
+    }
+    EscapeAngle = v1 + v3
+    EscapeTargetZ = ((cos(EscapeAngle) * 3.125) >> 4) + z
+    EscapeTargetX = ((sin(EscapeAngle) * 3.125) >> 4) + x
+    ChickenCheckTargetWithinTrackLimit()
+    if (!var0) {
+        v3 = -v3
+        EscapeAngle = v1 + v3
+        EscapeTargetZ = ((cos(EscapeAngle) * 3.125) >> 4) + z
+        EscapeTargetX = ((sin(EscapeAngle) * 3.125) >> 4) + x
+        ChickenCheckTargetWithinTrackLimit()
+    }
+    if (var0) {
+        v7 = EscapeAngle
+        v5 = EscapeTargetX
+        v6 = EscapeTargetZ
+        EscapeAngle = v1 + (v3 >> 1)
+        EscapeTargetZ = ((cos(EscapeAngle) * 3.125) >> 4) + z
+        EscapeTargetX = ((sin(EscapeAngle) * 3.125) >> 4) + x
+        ChickenCheckTargetWithinTrackLimit()
+        if (var0) {
+            return
+        }
+        EscapeAngle = v7
+        EscapeTargetX = v5
+        EscapeTargetZ = v6
+        return
+    }
+    v1 = 0
+    v2 = 0
+    v3 = 0
+    v4 = 0
+    v5 = 0
+    v6 = 0
+    v7 = 0
+    {
+        var corner, v9, v10, v11, v12, v13, v14
+        if (z >= PathZ1) {
+            v4 = PathZ1
+            v1 = PathX0
+            v2 = PathZ0
+            v3 = PathX1
+        }
+        else if (z >= PathZ2) {
+            v2 = PathZ1
+            v4 = PathZ2
+            v1 = PathX1
+            v3 = PathX2
+        }
+        else {
+            v2 = PathZ2
+            v1 = PathX2
+            v3 = PathX3
+            v4 = PathZ3
+        }
+        v6 = (v3 + v1) >> 1
+        v7 = (v4 + v2) >> 1
+        if (z >= v7) {
+            if (x >= v6) {
+                if (abs(player -> x - (v1 - MaxTrackOffset)) + abs(player -> z - v2) >= abs(player -> x - (v1 + MaxTrackOffset)) + abs(player -> z - v4)) {
+                    v5 = 0
+                }
+                else {
+                    v5 = 2
+                }
+            }
+            else {
+                if (abs(player -> x - (v3 - MaxTrackOffset)) + abs(player -> z - v4) >= abs(player -> x - (v1 + MaxTrackOffset)) + abs(player -> z - v2)) {
+                    v5 = 1
+                }
+                else {
+                    v5 = 3
+                }
+            }
+        }
+        else {
+            if (x >= v6) {
+                if (abs(player -> x - (v3 - MaxTrackOffset)) + abs(player -> z - v4) >= abs(player -> x - (v1 + MaxTrackOffset)) + abs(player -> z - v2)) {
+                    v5 = 1
+                }
+                else {
+                    v5 = 3
+                }
+            }
+            else {
+                if (abs(player -> x - (v1 - MaxTrackOffset)) + abs(player -> z - v2) >= abs(player -> x - (v1 + MaxTrackOffset)) + abs(player -> z - v4)) {
+                    v5 = 0
+                }
+                else {
+                    v5 = 2
+                }
+            }
+        }
+        corner = v5
+        {
+            var v15
+            if (corner == 0) {
+                EscapeTargetZ = v2
+                EscapeTargetX = v1 - MaxTrackOffset
+            }
+            else if (corner == 1) {
+                EscapeTargetZ = v4
+                EscapeTargetX = v3 - MaxTrackOffset
+            }
+            else if (corner == 2) {
+                EscapeTargetZ = v4
+                EscapeTargetX = v3 + MaxTrackOffset
+            }
+            else if (corner == 3) {
+                EscapeTargetZ = v2
+                EscapeTargetX = v1 + MaxTrackOffset
+            }
+        }
+        EscapeAngle = atan(EscapeTargetX - x, EscapeTargetZ - z)
+        RetargetCountdown = 25
+        EscapeTargetX = (EscapeTargetX + x) >> 1
+        EscapeTargetZ = (EscapeTargetZ + z) >> 1
+    }
+}
+
+sub ChickenCheckTargetWithinTrackLimit() {
+    var0 = 0
+    if (EscapeTargetZ > PathZ0 || EscapeTargetZ < PathZ3) {
+        return
+    }
+    var seg_x1, seg_z1, seg_x2, seg_z2
+    if (EscapeTargetZ >= PathZ1) {
+        seg_z2 = PathZ1
+        seg_x1 = PathX0
+        seg_z1 = PathZ0
+        seg_x2 = PathX1
+    }
+    else if (EscapeTargetZ >= PathZ2) {
+        seg_z1 = PathZ1
+        seg_z2 = PathZ2
+        seg_x1 = PathX1
+        seg_x2 = PathX2
+    }
+    else {
+        seg_z1 = PathZ2
+        seg_x1 = PathX2
+        seg_x2 = PathX3
+        seg_z2 = PathZ3
+    }
+    seg_x1 = (((((EscapeTargetZ - seg_z1) >> 8) * ((seg_x2 - seg_x1) >> 8)) / ((seg_z2 - seg_z1) >> 8)) << 8) + seg_x1
+    if (EscapeTargetX > seg_x1 + MaxTrackOffset || EscapeTargetX < seg_x1 - MaxTrackOffset) {
+        return
+    }
+    var0 = 1
+}
+
+sub ChickenIdleAnimCycle() {
+    setanim(CHICKEN_PECK_1, 0)
+    PeckDelay = rand(20)
+    CluckCountdown = rand(12)
+    do {
+        while (PeckDelay) {
+            PeckDelay -= 1
+            CluckCountdown -= 1
+            if (CluckCountdown <= 0) {
+                CluckCountdown = rand(5) + 2
+                SoundPitchDefault(0.25)
+                sounddecay(3.2s)
+                soundplay([ChCbA], 0.4V)
+            }
+        }
+        playanim(0, CHICKEN_PECK_1)
+        playanim(1, CHICKEN_PECK_1)
+        playanim(2, CHICKEN_PECK_1)
+        playanim(3, CHICKEN_PECK_1)
+        playanim(3, CHICKEN_PECK_1)
+        playanim(4, CHICKEN_PECK_1)
+        do {
+            playanim(0, CHICKEN_PECK_2)
+            playanim(1, CHICKEN_PECK_2)
+            playanim(2, CHICKEN_PECK_2)
+            playanim(3, CHICKEN_PECK_2)
+            playanim(3, CHICKEN_PECK_2)
+            playanim(4, CHICKEN_PECK_2)
+            playframesback(CHICKEN_PECK_2, 3.0, 0.0)
+            if (!rand(3)) {
+                break
+            }
+        } while (1)
+        playframesback(CHICKEN_PECK_1, 5.0, 0.0)
+        PeckDelay = rand(37)
+    } while (1)
+}
+
+sub ChickenIdleTrans() __trans {
+    once {
+        GroundSettlePending = FollowGround
+    }
+    if (HasBeenStartled) {
+        var0 = 3.5m
+    }
+    else { 
+        var0 = 5.5m
+    }
+    if (distance(player, DIST_EXACT | DIST_NO_Y) <= var0) {
+        if (HasBeenStartled) {
+            changestate(Chicken_Run)
+        }
+        else {
+            HasBeenStartled = 1
+            changestate(Chicken_Startled)
+        }
+    }
+    if (GroundSettlePending) {
+        var0 = y
+        y += 1m
+        projectzoneshadow(null)
+        if (eventaccepted && abs(vecy - var0) <= 3m) {
+            y = ((vecy - var0) >> 2) + var0
+        }
+        else {
+            y = var0
+        }
+        if (abs(y - var0) <= 0.1m) {
+            GroundSettlePending = 0
+        }
+    }
+    roty = degseek(roty, troty, 600deg)
+}
+
+state Chicken_Startled {
+    statusc 0
+    code() {
+        SoundPitchDefault(0.25)
+        sounddecay(3.2s)
+        soundplay([ChRbA], 0.5V)
+        playanim(0, CHICKEN_STARTLED)
+        playanim(1, CHICKEN_STARTLED)
+        playanim(2, CHICKEN_STARTLED)
+        playanim(3, CHICKEN_STARTLED)
+        playanim(3, CHICKEN_STARTLED)
+        playanim(4, CHICKEN_STARTLED)
+        changestate(Chicken_Run)
+    }
+    trans {
+        changestateif(Chicken_Run, distance(player, DIST_EXACT | DIST_NO_Y) <= 3.5m)
+        roty = degseek(roty, troty, 600deg)
+    }
+}
+
+state Chicken_Run {
+    statusc 0
+    code() {
+        RetargetCountdown = -1
+        settrans(ChickenRunTrans)
+        ChickenRunTrans()
+        CluckCountdown = rand(2)
+        setanim(CHICKEN_RUN)
+        do {
+            setanim(CHICKEN_RUN, -1.0)
+            do {
+                animframe += 1.0
+                CluckCountdown -= 1
+                if (CluckCountdown <= 0) {
+                    CluckCountdown = rand(4) + 2
+                    SoundPitchDefault(0.25)
+                    sounddecay(3.2s)
+                    soundplay([ChCbA], 0.5V)
+                }
+                playframe()
+            } while (animframe + 1.0 <= 27.0)
+        } while (1)
+    }
+}
+
+sub ChickenRunTrans() {
+    if (RetargetCountdown > 0) {
+        RetargetCountdown -= 1
+    }
+    else {
+        PlayerDistance = distance(player, DIST_EXACT | DIST_NO_Y)
+        if (RetargetCountdown < 0 || PlayerDistance <= 3.5m) {
+            ChickenChooseEscapeTarget()
+        }
+    }
+    velx = EscapeTargetX - x
+    velz = EscapeTargetZ - z
+    vecx = velx
+    if (vecx < 0) {
+        vecx = -vecx
+    }
+    vecz = velz
+    if (vecz < 0) {
+        vecz = -vecz
+    }
+    if (vecx <= RunSpeed && vecz <= RunSpeed) {
+        x = EscapeTargetX
+        z = EscapeTargetZ
+        PlayerDistance = distance(player, DIST_EXACT | DIST_NO_Y)
+        if (PlayerDistance <= 3.5m) {
+            ChickenChooseEscapeTarget()
+            velx = EscapeTargetX - x
+            velz = EscapeTargetZ - z
+            vecx = velx
+            if (vecx < 0) {
+                vecx = -vecx
+            }
+            vecz = velz
+            if (vecz < 0) {
+                vecz = -vecz
+            }
+        }
+        else {
+            changestate(Chicken_Settle)
+        }
+    }
+    troty = atan(velx, velz)
+    {
+        var step_x = 0, step_z = 0
+        var0 = RunSpeed >> 8
+        step_z = (cos(troty) * var0) >> 4
+        if (step_z < 0) {
+            step_z = -step_z
+        }
+        step_x = (sin(troty) * var0) >> 4
+        if (step_x < 0) {
+            step_x = -step_x
+        }
+        if (vecx >= vecz) {
+            if (step_x < vecx) {
+                velz = (((step_x >> 8) * (velz >> 8)) / (vecx >> 8)) << 8
+                if (velx >= 0) {
+                    velx = step_x
+                }
+                else {
+                    velx = -step_x
+                }
+                vecx = step_x
+                vecz = velz
+                if (vecz < 0) {
+                    vecz = -vecz
+                }
+            }
+        }
+        else {
+            if (step_z < vecz) {
+                velx = (((step_z >> 8) * (velx >> 8)) / (vecz >> 8)) << 8
+                if (velz >= 0) {
+                    velz = step_z
+                }
+                else {
+                    velz = -step_z
+                }
+                vecx = velx
+                if (vecx < 0) {
+                    vecx = -vecx
+                }
+                vecz = step_z
+            }
+        }
+        x += velx
+        z += velz
+    }
+    if (FollowGround) {
+        var0 = y
+        y += 1m
+        projectzoneshadow(null)
+        if (eventaccepted && abs(vecy - var0) <= 3m) {
+            y = ((vecy - var0) >> 2) + var0
+        }
+        else {
+            y = var0
+        }
+    }
+    roty = degseek(roty, troty, 600deg)
+}
+
+state Chicken_Settle {
+    statusc 0
+    code() {
+        playframes(CHICKEN_SETTLE, 0.0, 16.0)
+        changestate(Chicken_Idle)
+    }
+    trans {
+        nofirst {
+            changestateif(Chicken_Run, distance(player, DIST_EXACT | DIST_NO_Y) <= 3.5m)
+            if (FollowGround) {
+                var0 = y
+                y += 1m
+                projectzoneshadow(null)
+                if (eventaccepted && abs(vecy - var0) <= 3m) {
+                    y = ((vecy - var0) >> 2) + var0
+                }
+                else {
+                    y = var0
+                }
+                if (abs(y - var0) <= 0.1m) {
+                    GroundSettlePending = 0
+                }
+            }
+        }
+        roty = degseek(roty, troty, 600deg)
+    }
+}
+
+state Chicken_Die {
+    stateflag 0x23
+    statusc 0x32
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        SoundPitchDefault(0.25)
+        sounddecay(8.4s)
+        soundsetup(7, self, 8)
+        soundplay([ChRbA], 1V)
+        soundsetup(0, voice, 5)
+        spawn(CknOC, S_FEATHER, 10)
+        playframe()
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        WaitChildNull()
+    }
+}
+
+sub SetParticleColor() {
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x05, 0xBD, 0xBE)
+    }
+    else if (r == 1) {
+        SetColor1(0x0D, 0x4C, 0x4C)
+    }
+    else if (r == 2) {
+        SetColor1(0xE7, 0x85, 0x81)
+    }
+}
+
+state Chicken_Feather {
+    stateflag 0x40
+    statusc 0x22
+    code() {
+        SetScale(1S)
+        zindex = 40
+        x += randi(-0.8m, 0.8m)
+        z += randi(-0.8m, 0.8m)
+        y += 1.5m + rand(1m)
+        rotx = 0deg
+        roty = rand(360deg)
+        rotz += 90deg
+        trotx = randi(-100deg, 100deg)
+        velx = randi(-1.1m, 1.1m)
+        vely = -0.6m + rand(0.8m)
+        velz = randi(-1.1m, 1.1m)
+        while (scaley > 0S) {
+            playanim(0, CHICKEN_FEATHER)
+        }
+    }
+    trans {
+        nofirst {
+            rotx = sin(loopseek(trotx, 190deg, spd(180deg)), 190deg - spd(180deg)) - 130deg
+            if (y < parent -> y + 0.2m) {
+                scalex = seek(scalex, 0S, spd(2S))
+                scaley = seek(scaley, 0S, spd(2S))
+                scalez = seek(scalez, 0S, spd(2S))
+            }
+        }
+    }
+}
+

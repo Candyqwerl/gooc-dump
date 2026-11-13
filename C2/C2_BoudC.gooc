@@ -1,0 +1,674 @@
+#gool BoudC 41 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 2 -r pal "C2\C2_BoudC.gooc" "C2\Out\C2_BoudC.nsentry"
+
+#anim BOULDER        [Bo1lV] 1 1
+#anim BEAR_RUN       [Pa1nV] 33 1
+#anim BEAR_SLIDE     [Pa2nV] 15 1
+#anim BEAR_LAUGH     [Pa3nV] 23 1
+#anim BEAR_FALL      [Pa4nV] 33 1
+#anim BEAR_BODY      [PabnV] 1 1
+#anim BEAR_HEAD      [PahnV] 51 1
+
+#spawn S_BOULDER     Boulder_Init
+#spawn S_1           __s_1
+#spawn S_BEAR        Boulder_Init
+#spawn S_BEAR_BODY   Bear_Body
+
+array Script0 = { 2, 1, 1, 23040, 2, 0, 1, 26880, 5, 330240, 4, 1638400, 1, 28887, 4, 1638400, 1, 30617, 4, 1638400, 1, 31539, 5, 391680, 1, 25599974 }
+array Script1 = { 2, 1, 1, 30208, 2, 0, 1, 32819, 5, 330240, 4, 1638400, 1, 34012, 4, 1638400, 1, 35328, 5, 391680, 1, 25599974 }
+
+var BoulderBounceYOff, BoulderVar2, BoulderScript, ScriptPointer, NextScriptPathprog, BoulderWobble, BoulderVoice, BoulderHasVoice, ChaseStartFrame,
+    PathSpeed, PathEndDecel, ImpactMode, TargetChaseGap, RubberbandRange, BoulderVar15, Rubberband, ChaserPathprog,
+    ChaserLastZ, ChaserPathlen, BearRot, PathprogDelta, BearSlideDecel, BoulderCanBounce, CollateralRadius, BoulderAccel, BoulderDecel
+
+expr BoulderBaseY = 2.55m + 1
+
+state Boulder_Init { // 0
+    code(speed, script, decel, impact) {
+        PathSpeed = (speed * 0.95) >> 8
+        PathEndDecel = decel
+        ImpactMode = impact
+        BoulderAccel = 3s
+        BoulderDecel = 1s
+        Rubberband = 0
+        BoulderCanBounce = 1
+        CollateralRadius = 3.825m
+        PathprogDelta = 0
+        if (script == 1) {
+            BoulderScript = Script0
+        }
+        else if (script == 2) {
+            BoulderScript = Script1
+        }
+        else {
+            BoulderScript = 0
+        }
+        pathprog = 0
+        if (BoulderScript) {
+            ScriptPointer = 0
+            NextScriptPathprog = -1.0
+            ScriptDriver()
+        }
+        changestate(Chaser_Wait)
+    }
+}
+
+sub ScriptDriver() {
+    while (var command, argument; pathprog >= NextScriptPathprog) {
+        command = BoulderScript[ScriptPointer]
+        ScriptPointer += 1.0
+        argument = BoulderScript[ScriptPointer]
+        ScriptPointer += 1.0
+        if (command == 1) {
+            NextScriptPathprog = argument
+        }
+        else if (command == 2) {
+            BoulderCanBounce = argument
+        }
+        else if (command == 4) {
+            v0 = argument
+            BoulderBounce()
+        }
+        else if (command == 5) {
+            CollateralRadius = argument
+        }
+    }
+}
+
+inline sub BearFootstep(d, f, r) {
+    if (animseq == getanim(BEAR_RUN) && animframe == f) {
+        sounddecay(d)
+        soundpitch((r + rand(3.2)) * 0.18 >> 8)
+        soundplay([BFSnA], 1.28V)
+    }
+}
+
+sub SoundBearFootstep() {
+    if (!rand(3s)) {
+        sounddecay(10.22s)
+        soundpitch((11.2 + rand(6.4)) * 46 >> 8)
+        soundplay([BG2nA], 1.28V)
+    }
+    BearFootstep(0.65s, 5.0, 14.4)
+    BearFootstep(0s, 6.0, 12.8)
+    BearFootstep(0.65s, 8.0, 11.2)
+    BearFootstep(0s, 9.0, 9.6)
+    BearFootstep(0.65s, 21.0, 14.4)
+    BearFootstep(0s, 22.0, 12.8)
+    BearFootstep(0.65s, 25.0, 11.2)
+    BearFootstep(0s, 26.0, 9.6)
+}
+
+sub BoulderBounce() {
+    unless (BoulderHasVoice) {
+        voice = BoulderVoice
+        soundfadet(0.2s, voice)
+        soundfadev(0.2V, voice, 2)
+        BoulderHasVoice = 1
+    }
+    vely += var0
+}
+
+state Chaser_Wait { // 1
+    code() {
+        ChaserPathlen = pathlen
+        if (spawn == S_BEAR) {
+            ChaserPathlen -= 4.0
+        }
+        TargetChaseGap = 6m
+        RubberbandRange = 6m
+        Rubberband = 0
+        BoulderVoice = -1
+        BoulderBounceYOff = 0
+        BoulderVar2 = 0.5m
+        if (spawn == S_BOULDER) {
+            trotx = 150deg
+        }
+        else if (spawn == S_BEAR) {
+            trotx = 20deg
+            yzapproach = 10deg
+        }
+        BoulderWobble = randi(-10deg, 10deg)
+        pathprog = 0
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        zindex = -50
+        calcpath(ChaserPathlen >> 1)
+        if (player -> z > z || entitygetstate(2)) {
+            entitysetstate(1)
+            if (spawn == S_BOULDER) {
+                zindex = -130
+            }
+            pathprog = ChaserPathlen - 1
+            calcpath(pathprog)
+            y += BoulderBounceYOff + BoulderBaseY
+            changestateif(Kill, ImpactMode)
+            changestate(Chaser_Impact, 0, 1)
+        }
+        calcpath(0)
+        y += BoulderBounceYOff + BoulderBaseY
+        ChaserLastZ = z
+        if (spawn == S_BOULDER) {
+            sleepanim(0, BOULDER)
+        }
+        else if (spawn == S_BEAR) {
+            sleepanim(0, BEAR_RUN)
+        }
+    }
+    trans {
+        nofirst {
+            statusb = FLAG_NO_CAMERA_CLIP
+            changestateif(Chaser_Chase, player -> z > z + 6m && player -> z < z + 50m)
+        }
+    }
+}
+
+inline sub PlayBearFrame() {
+    if (animseq != getanim(BEAR_RUN)) {
+        setanim(BEAR_RUN, -1.0)
+    }
+    playframe((animframe + 1.0) % 33.0)
+    SoundBearFootstep()
+}
+
+inline sub SoundBearSlide_1() {
+    sounddecay(10.22s)
+    soundpitch((4.8 + rand(3.2)) * 0.203 >> 8)
+    soundplay([Sld0A], 2V)
+}
+
+inline sub SoundBearSlide_2(delay) {
+    sounddelay(delay)
+    sounddecay(10.22s)
+    soundpitch((8.0 + rand(3.2)) * 0.203 >> 8)
+    soundplay([Sld0A], 2V)
+}
+
+inline sub SoundChaserImpact() {
+    soundpitch(3.625)
+    sounddecay(7.7s)
+    soundsetup(0, self, 9)
+    soundplay([SlmeA], 2V)
+}
+
+state Chaser_Chase { // 2
+    stateflag 0x81
+    code() {
+        if (spawn == S_BEAR) {
+            sounddecay(10.22s)
+            SoundPitchDefault(0.18)
+            soundplay([BG2nA], 1.28V)
+
+            sounddelay(0.3s)
+            sounddecay(10.22s)
+            SoundPitchDefault(0.18)
+            soundplay([BG2nA], 1.28V)
+        }
+        if (spawn == S_BOULDER) { sleepanim(0, BOULDER) }
+        do { PlayBearFrame() } until (pathprog >= ChaserPathlen - 7.0)
+        do { PlayBearFrame() } until (animseq == getanim(BEAR_RUN) && animframe == 9.0 || animseq == getanim(BEAR_RUN) && animframe == 26.0)
+        SoundBearSlide_1()
+        SoundBearSlide_2(0.5s)
+        setanim(BEAR_SLIDE, -1.0)
+        do {
+            animframe += 1.0
+            BearRot = spd(BearRot, -20)
+            playframe(animframe)
+        } while (animframe + 1.0 <= 14.0)
+
+        BearRot = 0deg
+        sleepanim(14, BEAR_SLIDE)
+    }
+    event(e, a) {
+        accevif (e == EventRespawn || e == EventDespawn) {
+            if (self == GLOBAL_126) {
+                GLOBAL_126 = 0
+            }
+            if (spawn == S_BOULDER && BoulderVoice > 0) {
+                voice = BoulderVoice
+                soundfadet(0.1s, voice)
+                soundfadev(0V, voice, 3)
+                soundsetup(0, voice, 5)
+                BoulderVoice = -1
+            }
+        }
+        accevcstate(Chaser_Stop, e == EventTriggered)
+    }
+    trans {
+        once {
+            GLOBAL_126 = self
+            interrupter = player -> creator
+            sendevent(EventHit, interrupter, 100.0)
+            sendevent(EventHit, interrupter, 100.0)
+            if (SECTIONDEATHCOUNT >= 7.0) {
+                if (spawn == S_BEAR) {
+                    PathSpeed = 3.3s * PathSpeed / 4s
+                    BoulderAccel = 6s
+                    BoulderDecel = 5s
+                }
+                else {
+                    PathSpeed = 3.2s * PathSpeed / 4s
+                }
+            }
+            BoulderVoice = -1
+            BoulderHasVoice = 0
+            if (spawn == S_BOULDER) {
+                soundpitch(3.625)
+                sounddecay(5.8s)
+                soundplay([SlieA], 0.4V)
+
+                soundpitch(3.625)
+                sounddelay(0.4s)
+                sounddecay(10.2s)
+                soundplay([RmbeA], 2V)
+                BoulderVoice = voice
+            }
+            statusb = FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | FLAG_GRAVITY | FLAG_SOLID_ALL | FLAG_NO_CAMERA_CLIP
+            if (spawn == S_BEAR) {
+                statusb |= 0x2800
+            }
+            if (spawn == S_BEAR) {
+                statusc |= 0x400
+                BearRot = 22.5deg
+            }
+            ChaseStartFrame = frametime
+            ChaserPathprog = pathprog
+            ChaserLastZ = z
+        }
+        unless (STATUS_FIRSTFRAME) {
+            if (player -> stateflag & 0x20 && player -> player != self) {
+                if (spawn == S_BEAR) {
+                    changestate(Bear_Laugh)
+                }
+                else {
+                    changestate(Chaser_Stop)
+                }
+            }
+        }
+        if (collider) {
+            collider -> invincible = 0
+            collider -> invincibletime = frametime
+        }
+        if ((collider || z > player -> z) && !(!collider && ImpactMode && player -> y - y > BoulderBaseY && pathprog >= ChaserPathlen - 17.0)) {
+            if (spawn == S_BOULDER) {
+                if (ImpactMode && pathprog >= ChaserPathlen - 17.0) {
+                    sendevent(Event38, player, self)
+                    if (eventaccepted) {
+                        statusb &= ~(FLAG_COLLIDABLE | FLAG_SOLID_ALL)
+                        if (SHAKEY == 0) {
+                            SHAKEY = 10.0
+                        }
+                    }
+                }
+                else {
+                    sendevent(Event37, player, self)
+                    if (eventaccepted) {
+                        statusb &= ~(FLAG_COLLIDABLE | FLAG_SOLID_ALL)
+                        if (SHAKEY == 0) {
+                            SHAKEY = 10.0
+                        }
+                        y += 8m
+                    }
+                }
+            }
+            else if (spawn == S_BEAR) {
+                sendevent(Event38, player, self)
+                if (eventaccepted) {
+                    statusb &= ~(FLAG_COLLIDABLE | FLAG_SOLID_ALL)
+                    if (SHAKEY == 0) {
+                        SHAKEY = 10.0
+                    }
+                    y += 8m
+                }
+            }
+        }
+        interrupter = getvalideventobj(EventHit, 0b11000)
+        if (interrupter) {
+            sendeventif(EventHit, interrupter, distance(interrupter, 0) < CollateralRadius, 100.0)
+        }
+        else {
+            eventaccepted = false
+        }
+        BoulderBounceYOff = spd(BoulderBounceYOff, vely)
+        if (BoulderBounceYOff < 0) {
+            BoulderBounceYOff = 0
+            if (vely < -3m) {
+                if (spawn == S_BOULDER) {
+                    SoundPitchDefault(0.23)
+                    soundplay([BmpeA], (abs(vely) >> 13) * 0.64)
+                    soundsetup(0, voice, 5)
+                }
+                if (BoulderHasVoice) {
+                    voice = BoulderVoice
+                    soundfadet(0.1s, voice)
+                    soundfadev(0.6V, voice, 2)
+                    BoulderHasVoice = 0
+                }
+            }
+            vely = -vely >> 1
+        }
+        if (BoulderScript) {
+            ScriptDriver()
+        }
+        if (spawn == S_BOULDER) {
+            if (BoulderCanBounce && BoulderBounceYOff <= 0 && pathprog < ChaserPathlen - 5.0 && !rand(3s)) {
+                var0 = 10m
+                BoulderBounce()
+            }
+        }
+        if (pathprog >= ChaserPathlen - 1) {
+            entitysetstate(1)
+            changestateif(Bear_Fall, ImpactMode && spawn == S_BEAR)
+            if (spawn == S_BOULDER) {
+                zindex = -130
+            }
+            changestate(Chaser_Stop)
+        }
+        if (spawn == S_BEAR) {
+            var0 = 7.5m
+        }
+        else {
+            var0 = 3.5m
+        }
+        if (z > CAMTRANSZ - var0 && (ImpactMode == 0 || player -> y - y <= BoulderBaseY || pathprog < ChaserPathlen - 17.0)) {
+            unless (player -> stateflag & 0x20) {
+                sendevent(Event38, player, self)
+                if (eventaccepted) {
+                    statusb &= ~(FLAG_COLLIDABLE | FLAG_SOLID_ALL)
+                }
+            }
+            if (spawn == S_BEAR) {
+                changestate(Bear_Laugh)
+            }
+            else {
+                changestate(Chaser_Stop)
+            }
+        }
+        {
+            var elapsed = 0
+            var player_dist = 0
+            var s5 = 0
+            var rubberband_target = 0
+            player_dist = player -> z - z
+            if (player_dist < 0) {
+                player_dist = 0
+            }
+            s5 = ChaserPathlen - pathprog
+            var0 = ChaserPathlen >> 1
+            if (s5 <= var0) {
+                var0 = (s5 - var0) * PathEndDecel / var0
+            }
+            else {
+                var0 = 0
+            }
+            var0 += TargetChaseGap
+            if (var0 < 0) {
+                var0 = 0
+            }
+            s5 = player_dist - var0
+            if (s5 >= 0) {
+                if (s5 > RubberbandRange) {
+                    s5 = RubberbandRange
+                }
+                rubberband_target = (s5 >> 8 << 12) / (RubberbandRange >> 8)
+            }
+            else {
+                rubberband_target = -((s5 >> 8) * -16.0 / (var0 >> 8))
+            }
+            Rubberband = seek(Rubberband, rubberband_target, 0.78s)
+            if (Rubberband >= 0) {
+                s5 = Rubberband * BoulderAccel >> 12
+            }
+            else {
+                s5 = Rubberband * BoulderDecel >> 12
+            }
+            elapsed = frametime - ChaseStartFrame
+            elapsed += s5
+            if (elapsed < 0s) {
+                elapsed = 0s
+            }
+            if (elapsed > 120s) {
+                elapsed = 120s
+            }
+            var0 = (elapsed << 8) / 1s
+            pathprog = var0 * PathSpeed >> 8
+            pathprog = pathprog + ChaserPathprog >> 1
+            if (pathprog >= ChaserPathlen) {
+                pathprog = ChaserPathlen - 1
+            }
+            PathprogDelta = pathprog - ChaserPathprog
+            ChaserPathprog = pathprog
+        }
+        ChaserLastZ = z
+        if (spawn == S_BOULDER) {
+            calcpath(pathprog)
+            y += BoulderBounceYOff + BoulderBaseY
+            troty = troty + loopseek(BoulderWobble, 20deg, 1deg) - 10deg
+            rotz = troty
+            rotx = spd(rotx, 360deg)
+        }
+        else if (spawn == S_BEAR) {
+            var0 = roty
+            calcpath(pathprog)
+            y += BoulderBounceYOff + BoulderBaseY
+            troty = roty
+            roty = var0
+            var0 = degdist(troty, atan2(player -> trans))
+            if (var0 > 30deg) {
+                var0 = 30deg
+            }
+            if (var0 < -30deg) {
+                var0 = -30deg
+            }
+            var0 = var0 * BearRot >> 8
+            troty += var0
+        }
+    }
+}
+
+state Bear_Laugh { // 3
+    stateflag 0x21
+    code() {
+        statusb = FLAG_ROT_Y | FLAG_COLLIDABLE | FLAG_SOLID_ALL | FLAG_NO_CAMERA_CLIP
+        if (spawn == S_BEAR) {
+            statusb |= 0x2800
+        }
+        GLOBAL_126 = 0
+        zindex = -70
+        do { PlayBearFrame() } until (animseq == getanim(BEAR_RUN) && animframe == 9.0 || animseq == getanim(BEAR_RUN) && animframe == 26.0)
+        SoundBearSlide_1()
+        SoundBearSlide_2(0.5s)
+        playframes(BEAR_LAUGH, 0.0, 19.0)
+        do (var laughs = 0) {
+            if (laughs < 4.0) {
+                sounddecay(10.22s)
+                soundpitch(0x252)
+                soundplay([BG2nA], 1.28V)
+                soundfadet(0.3s, voice)
+                soundsetup(0.5V, voice, 3)
+            }
+            else if (laughs == 4.0) {
+                sounddecay(10.22s)
+                soundpitch(2.03)
+                soundplay([BG2nA], 1.28V)
+            }
+            playanim(20, BEAR_LAUGH)
+            playanim(21, BEAR_LAUGH)
+            playanim(21, BEAR_LAUGH)
+            playanim(22, BEAR_LAUGH)
+            playanim(21, BEAR_LAUGH)
+            playanim(21, BEAR_LAUGH)
+            playanim(20, BEAR_LAUGH)
+            playanim(19, BEAR_LAUGH)
+            laughs += 1.0
+        } while (1)
+    }
+    trans {
+        once {
+            vecz = z - ChaserLastZ
+            if (vecz < 1) {
+                vecz = 1
+            }
+            if (PathprogDelta < 0) {
+                PathprogDelta = 0
+            }
+            BearSlideDecel = (PathprogDelta << 14) / vecz
+        }
+        vecz = (CAMTRANSZ - 3.5m) - z
+        var0 = (player -> z - 4.5m) - z
+        if (var0 < vecz) {
+            vecz = var0
+        }
+        if (vecz < 0) {
+            vecz = 0
+        }
+        vecz >>= 2
+        var0 = (BearSlideDecel * vecz) >> 14
+        if (var0 < PathprogDelta) {
+            PathprogDelta = var0
+        }
+        if (!PathprogDelta) {
+            statusb &= ~0x2800
+        }
+        pathprog += PathprogDelta
+        if (pathprog >= ChaserPathlen) {
+            pathprog = ChaserPathlen - 1
+        }
+        save (roty, rotz) {
+            calcpath(pathprog)
+        }
+        y += BoulderBounceYOff + BoulderBaseY
+    }
+}
+
+state Bear_Fall { // 4
+    stateflag 0x21
+    code() {
+        if (ImpactMode == 2) {
+            SoundBearSlide_1()
+            SoundBearSlide_2(0.3s)
+
+            sounddecay(10.22s)
+            SoundPitchDefault(0.18)
+            soundplay([BG2nA], 1.28V)
+
+            sounddelay(0.5s)
+            sounddecay(10.22s)
+            soundpitch((11.2 + rand(6.4)) * 0.18 >> 8)
+            soundplay([BG2nA], 1.28V)
+
+            playframes(BEAR_FALL, 0.0, 32.0)
+        }
+        statusb = 0
+        GLOBAL_126 = 0
+        playnull(1.25s)
+        if (BoulderVoice > 0) {
+            voice = BoulderVoice
+            soundfadet(0.1s, voice)
+            soundfadev(0V, voice, 3)
+            BoulderVoice = -1
+        }
+        if (spawn == S_BEAR) {
+            SoundChaserImpact()
+        }
+        else {
+            SoundChaserImpact()
+        }
+        if (SHAKEY == 0) {
+            SHAKEY = 5.0
+        }
+        sleepnull()
+    }
+}
+
+state Chaser_Stop { // 5
+    stateflag 0x21
+    event => state Chaser_Chase
+    code() {
+        if (BoulderVoice > 0) {
+            voice = BoulderVoice
+            soundfadet(0.1s, voice)
+            soundsetup(0, voice, 3, 0)
+            BoulderVoice = -1
+        }
+        if (spawn == S_BEAR) {
+            SoundChaserImpact()
+        }
+        else {
+            SoundChaserImpact()
+        }
+        if (SHAKEY == 0) {
+            SHAKEY = 10.0
+        }
+        if (player -> stateflag & 0x20) {
+            var0 = 0
+        }
+        else {
+            var0 = 1
+        }
+        if (spawn == S_BEAR) {
+            changestate(Chaser_Impact, var0, var0)
+        }
+        else {
+            changestate(Chaser_Impact, 0, var0)
+        }
+    }
+}
+
+state Chaser_Impact { // 6
+    stateflag 0x21
+    __transargs
+    event => state Chaser_Chase
+    code(impact, block) {
+        if (ImpactMode) {
+            block = false
+        }
+        if (spawn == S_BOULDER) {
+            GLOBAL_126 = 0
+            statusb = FLAG_ROT_Y | FLAG_COLLIDABLE | FLAG_SOLID_ALL | FLAG_NO_CAMERA_CLIP
+            sleepanim(0, BOULDER)
+        }
+        else if (spawn == S_BEAR) {
+            spawn(BoudC, S_BEAR_BODY, 1)
+            zindex = 25
+            if (impact) {
+                playframes(BEAR_HEAD, 0.0, 50.0)
+            }
+            GLOBAL_126 = 0
+            if (block) {
+                statusb = FLAG_ROT_Y | FLAG_NO_CAMERA_CLIP
+            }
+            else {
+                statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | FLAG_NO_CAMERA_CLIP
+            }
+            sleepanim(50, BEAR_HEAD)
+        }
+    }
+    trans {
+        if (block) {
+            var0 = z
+            if (spawn == S_BEAR) {
+                var0 += 6.9m
+            }
+            else {
+                var0 += 2.3m + 1
+            }
+            if (player -> z < var0 && (var0 - player -> z) < 8m) {
+                player -> z = var0
+            }
+        }
+    }
+}
+
+state Bear_Body { // 7
+    code() {
+        zindex = -150
+        sleepanim(0, BEAR_BODY)
+    }
+}
+
+state Kill { // 8
+    statusc 0
+    code() {}
+}

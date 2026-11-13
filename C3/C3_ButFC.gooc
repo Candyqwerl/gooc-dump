@@ -1,0 +1,158 @@
+#gool ButFC 95 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_ButFC.gooc" "C3\Out\C3_ButFC.nsentry"
+
+#iflev bt
+#anim BUTTERFLY_ORANGE   [Bf1bV] [Bf1bG] 08 0 2
+#anim BUTTERFLY_BLUE     [Bf2bV] [Bf2bG] 08 0 2
+#anim BUTTERFLY          [Bf1bV] [Bf1bG] 08 0 2
+#anim SWALLUP_IDLE       [sw1bV] [sw1bG] 14 1 2
+#anim SWALLUP_FLY_START  [sw2bV] [sw1bG] 05 1 2
+#anim SWALLUP_FLY        [sw3bV] [sw1bG] 17 1 2
+#else
+#anim BUTTERFLY_ORANGE   [Bf1lV] [Bf1lG] 08 0 2
+#anim BUTTERFLY_BLUE     [Bf2lV] [Bf2lG] 08 0 2
+#anim BUTTERFLY          [Bf1lV] [Bf1lG] 08 0 2
+#anim SWALLUP_IDLE       [sw1lV] [sw1lG] 14 1 2
+#anim SWALLUP_FLY_START  [sw2lV] [sw1lG] 05 1 2
+#anim SWALLUP_FLY        [sw3lV] [sw1lG] 17 1 2
+#endif
+
+#spawn S_BUTTERFLY_1   Butterfly_Init
+#spawn S_BUTTERFLY_2   Butterfly_Init
+#spawn S_BUTTERFLY_3   Butterfly_Init
+#spawn S_3             __s_3
+#spawn S_SWALLUP       Swallup_Idle
+#spawn S_5             __s_5
+#spawn S_BUTTERFLY_4   Butterfly_Init
+
+var mem1, mem2, mem3
+  
+state Butterfly_Init { // 0
+    code() {
+        zindex = 50
+        trotx = 720deg
+        yzapproach = 56
+        if (spawn == S_BUTTERFLY_1 || spawn == S_BUTTERFLY_4) {
+            if (var r = rand(3); r == 0) {
+                setanim(BUTTERFLY_ORANGE)
+            }
+            else if (r == 1) {
+                setanim(BUTTERFLY_BLUE)
+            }
+            else if (r == 2) {
+                setanim(BUTTERFLY)
+            }
+        }
+        else if (spawn == S_BUTTERFLY_2) {
+            setanim(BUTTERFLY_BLUE)
+        }
+        else {
+            setanim(BUTTERFLY)
+        }
+        changestate(Butterfly_Fly)
+    }
+}
+
+state Butterfly_Fly { // 1
+    code() {
+        SetVel(0m)
+        do {
+            playframe(0)
+            playframe(3.0)
+            playframe(7.0)
+            playframe(3.0)
+        } while (1)
+    }
+    trans {
+        unless (STATUS_FIRSTFRAME) {
+            calcpath(loopseek(pathprog, pathlen - 0.98, 5))
+            velx += randi(-72.0, 72.0)
+            x += velx
+            vely += randi(-36.0, 36.0)
+            y += vely
+            velz += randi(-72.0, 72.0)
+            z += velz
+            changestateif(Butterfly, STATUS_PATH_END)
+        }
+    }
+}
+
+state Butterfly { // 2
+    code() {
+        while (velx || vely || velz) {
+            playframe(0)
+            playframe(3.0)
+            playframe(7.0)
+            playframe(3.0)
+        }
+        do (var start = frametime) {
+            playframe(0, 3)
+            playframe(1.0, 3)
+            playframe(2.0, 3)
+            playframe(3.0, 12)
+            playframe(2.0, 3)
+            playframe(1.0, 3)
+            playframe(0, 9)
+        } while (frametime - start < 7.2s)
+        changestate(Butterfly_Fly)
+    }
+    trans {
+        calcpath(pathprog, vvec)
+        velx = seek(velx, 0, 32.0)
+        x = velx + vecx
+        vely = seek(vely, 0, 32.0)
+        y = vely + vecy
+        velz = seek(velz, 0, 32.0)
+        z = velz + vecz
+    }
+}
+
+state Swallup_Idle { // 3
+    code(dist) {
+        zindex = 32
+        SetScale(2S)
+        roty = rand(360deg)
+        do {
+            playframes(SWALLUP_IDLE, 0.0, 13.0)
+            changestateif(Swallup_Fly, distance(player, DIST_NO_Y) < dist)
+            if (!!rand(4)) {
+                do (var loops = 0) {
+                    playanim(0, SWALLUP_IDLE)
+                    playanim(0, SWALLUP_IDLE)
+                    playanim(0, SWALLUP_IDLE)
+                    playanim(0, SWALLUP_IDLE)
+                } while ({ loops += 1.0 }; loops < 7.0)
+            }
+        } while (1)
+    }
+}
+
+state Swallup_Fly { // 4
+    code() {
+        SoundPitchDefault(40)
+        soundplay([BCFuA], 0.8V)
+        statusb = FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN
+        playanim(0, SWALLUP_FLY_START)
+        playanim(1, SWALLUP_FLY_START)
+        playanim(2, SWALLUP_FLY_START)
+        playanim(3, SWALLUP_FLY_START)
+        playanim(4, SWALLUP_FLY_START)
+        trotx = 180deg
+        sleepframes(SWALLUP_FLY, 0.0, 16.0)
+    }
+    trans {
+        pathprog = spd(pathprog, 24.0)
+        changestateif(Sleep, pathprog >= pathlen)
+        calcpath(pathprog)
+    }
+}
+
+state Sleep { // 5
+    stateflag 0x20
+    statusc 0
+    code() {
+        sleepnull()
+    }
+}

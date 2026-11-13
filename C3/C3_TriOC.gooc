@@ -1,0 +1,761 @@
+#gool TriOC 17 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_TriOC.gooc" "C3\Out\C3_TriOC.nsentry"
+
+#anim TRICERATOPS_RUN            [TctcV] [TctcG] 18 1 2
+#anim TRICERATOPS_STOP           [TS1cV] [TctcG] 21 1 2
+#anim TRICERATOPS_IDLE_1         [TS2cV] [TctcG] 25 1 2
+#anim TRICERATOPS_IDLE_2         [TS3cV] [TctcG] 51 1 2
+#anim TRICERATOPS_IDLE_ENTER     [TS4cV] [TctcG] 04 1 2
+#anim TRICERATOPS_IDLE_LOOP      [TS5cV] [TctcG] 33 1 2
+#anim TRICERATOPS_VICTORY_JUMP   [TS6cV] [TctcG] 24 1 2
+#anim TRICERATOPS_VICTORY_BOUNCE [TS7cV] [TctcG] 21 1 2
+
+#anim BONE_FENCE                 [TB1cV] [TBIcG] 01 1 2
+#anim BONE_FENCE_BREAK           [TB2cV] [TBEcG] 46 1 2
+
+#spawn S_TRICERATOPS  Triceratops_Init
+#spawn S_1            __s_1
+#spawn S_FENCE        Bone_Fence
+
+var IntroAlpha, ChasePhase, PathEnd, SegmentStartZ, SegmentEndIndex, SegmentEndZ, TriggerDistance, BaseMinSpeed, BaseMaxSpeed
+var BaseFollowGap, AdjustedMinSpeed, AdjustedMaxSpeed, BoneFenceOBJ, NextRoarTime
+
+expr ChaseMinSpeed      = field_61
+expr ChaseMaxSpeed      = groundvel
+expr ChaseFollowGap     = groundtime
+expr IdleFlags          = field_62
+expr AdjustedFollowGap  = field_60
+expr AdjustmentLimit    = field_63
+expr SegmentStartIndex  = invincibletime
+expr PauseProgress      = stalltime
+
+state Triceratops_Init { // 0
+    stateflag 0x1
+    statusc 0x0
+    code(minspd, maxspd, gap, resume, fence, lead, end, flags, adjmin, adjmax, adjgap, limit) {
+        vfx = (vfx & 0xFFFF00FF) | 0x1E00
+        ChaseMinSpeed = minspd
+        ChaseMaxSpeed = maxspd
+        ChaseFollowGap = gap
+        BoneFenceOBJ = fence
+        TriggerDistance = lead
+        IdleFlags = flags
+        BaseMinSpeed = minspd
+        BaseMaxSpeed = maxspd
+        BaseFollowGap = gap
+        AdjustedMinSpeed = adjmin
+        AdjustedMaxSpeed = adjmax
+        AdjustedFollowGap = adjgap
+        AdjustmentLimit = limit
+        PathEnd = end
+        if (!PathEnd) {
+            PathEnd = pathlen - 1
+        }
+        speed = 0
+        trotx = 40deg
+        yzapproach = 20deg
+        zindex = 24
+        GLOBAL_126 = self
+        GLOBAL_82 = GLOBAL_146 >> 8
+        if (player -> stateflag & 0x2000 && player -> z > z && resume) {
+            ChasePhase = 1
+            pathprog = resume
+            PauseProgress = PathEnd + 10.0
+        }
+        else {
+            ChasePhase = 0
+            pathprog = 0
+            if (resume) {
+                PauseProgress = resume
+            }
+            else {
+                PauseProgress = PathEnd + 10.0
+            }
+        }
+        SegmentStartIndex = pathprog >> 8
+        calcpath(SegmentStartIndex << 8, vvec)
+        SegmentStartZ = vecz
+        SegmentEndIndex = SegmentStartIndex + 1
+        pathprog = SegmentEndIndex << 8
+        if (pathprog > PathEnd) {
+            pathprog = PathEnd
+        }
+        calcpath(pathprog, vvec)
+        SegmentEndZ = vecz
+        calcpath(pathprog)
+        if (player -> z > z + 40m) {
+            KillEntity()
+            GLOBAL_126 = 0
+            changestate(Kill)
+        }
+        else if (ChasePhase == 1) {
+            changestate(Triceratops_StartChase)
+        }
+        else {
+            changestate(Triceratops_WaitForPlayer)
+        }
+    }
+}
+
+sub CheckPlayerContact(hurt) { // S-75
+    if (DEBUG && buttonhold(PAD_TRIANGLE)) {
+        KillEntity()
+        GLOBAL_126 = 0
+        changestate(Kill)
+    }
+    if (distance(player, DIST_NO_Y) <= 4.145m && player -> y - y > -1m) {
+        if (hurt) {
+            sendevent(Event37, player, 100.0)
+            if (eventaccepted) {
+                changestateif(Triceratops_Celebrate, stateflag & 0x40)
+            }
+        }
+        else {
+            var angle = atan2(player -> trans)
+            player -> x = (x + (sin(angle) * 6.475)) >> 4
+            player -> z = (z + (cos(angle) * 6.475)) >> 4     
+        }
+    }
+    broadcastevent(EventHit, 4, 100.0)
+    if (player -> z < z + 0.5m) {
+        if (hurt) {
+            sendevent(Event37, player, 100.0)
+            if (eventaccepted) {
+                changestateif(Triceratops_Celebrate, stateflag & 0x40)
+            }
+        }
+        else {
+            player -> z = z + 0.5m
+        }
+    }
+}
+
+sub TriceratopsFindPathProgress() { // S-130
+    var target
+    save (statusb) {
+        target = vecz
+        while (target > SegmentEndZ) {
+            SegmentStartIndex = SegmentEndIndex
+            SegmentStartZ = SegmentEndZ
+            SegmentEndIndex = SegmentStartIndex + 1
+            if (SegmentStartIndex << 8 > PathEnd) {
+                break
+            }
+            statusb = 0
+            pathprog = SegmentEndIndex << 8
+            if (pathprog > PathEnd) {
+                pathprog = PathEnd
+            }
+            calcpath(pathprog, vvec)
+            SegmentEndZ = vecz
+        }
+        if (SegmentStartIndex << 8 > PathEnd) {
+            pathprog = PathEnd
+        }
+        else {
+            vecz = SegmentEndZ - SegmentStartZ
+            if (vecz) {
+                pathprog = (SegmentStartIndex << 8) + ((target - SegmentStartZ) << 8) / vecz
+            }
+            else {
+                pathprog = SegmentStartIndex << 8
+            }
+        }
+    }
+}
+
+state Triceratops_WaitForPlayer { // 1
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        statusb = FLAG_NO_CAMERA_CLIP
+        sleepnull()
+    }
+    trans {
+        if (DEBUG && buttonhold(PAD_TRIANGLE)) {
+            KillEntity()
+            GLOBAL_126 = 0
+            changestate(Kill)
+        }
+        if (DEBUG && buttonpress(PAD_CIRCLE)) {
+            GLOBAL_146 += 1.0
+            if (GLOBAL_146 >> 8 > AdjustmentLimit) {
+                GLOBAL_146 = 0
+            }
+            GLOBAL_82 = GLOBAL_146 >> 8
+            debugfunc(1)
+        }
+        changestateif(Triceratops_StartChase, player -> z > z + TriggerDistance && player -> y - y <= 5m)
+    }
+}
+
+state Triceratops_StartChase { // 2
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_NO_CAMERA_CLIP
+        if (ChasePhase == 1) {
+            IntroAlpha = 0
+            changestate(Triceratops_PauseChase)
+        }
+        else {
+            if (BoneFenceOBJ) {
+                interrupter = objectget(BoneFenceOBJ << 8)
+                sendevent(EventTriggered, interrupter)
+            }
+            IntroAlpha = 16.0
+            changestate(Triceratops_Chase)
+        }
+    }
+}
+
+state Triceratops_Chase { // 3
+    stateflag 0x41
+    statusc 0x0
+    code() {
+        ChaseMinSpeed = BaseMinSpeed
+        ChaseMaxSpeed = BaseMaxSpeed
+        ChaseFollowGap = BaseFollowGap
+        zindex = 24
+        CheckItemPool(LEVEL >> 8, SAVEDCRYSTALPOOL1, SAVEDCRYSTALPOOL2)
+        if (!misc, GLOBAL_146) {
+            var0 = GLOBAL_146 >> 8
+            if (var0 > AdjustmentLimit) {
+                var0 = AdjustmentLimit
+            }
+            ChaseMinSpeed += ((AdjustedMinSpeed - ChaseMinSpeed) * var0) / AdjustmentLimit
+            ChaseMaxSpeed += ((AdjustedMaxSpeed - ChaseMaxSpeed) * var0) / AdjustmentLimit
+            ChaseFollowGap += ((AdjustedFollowGap - ChaseFollowGap) * var0) / AdjustmentLimit
+        }
+        statusb = FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | 0x800 | 0x2000 | FLAG_NO_CAMERA_CLIP
+        ChasePhase = 3
+        NextRoarTime = frametime
+        settrans(TriceratopsChaseTrans)
+        TriceratopsChaseTrans()
+        if (animseq == getanim(TRICERATOPS_RUN)) {
+            if (animseq != getanim(TRICERATOPS_RUN)) {
+                setanim(TRICERATOPS_RUN, -1.0)
+            }
+            while (animframe < 17.0) {
+                if (animframe == 0) {
+                    soundsetup(7, self, 8)
+                    soundpitch((15.2 + rand(1.6)) * 52 >> 8)
+                    soundplay([TS2cA], 0.7V)
+                }
+                if (animframe == 5.0) {
+                    soundsetup(7, self, 8)
+                    soundpitch((10.4 + rand(1.6)) * 52 >> 8)
+                    soundplay([TS2cA], 0.7V)
+                }
+                playframe(animframe + 1.0)
+            }
+        }
+        do {
+            soundpitch(3.263)
+            soundsetup(7, self, 8)
+            soundplay([TS2cA], 1V)
+
+            soundpitch(3.263)
+            sounddelay(0.2s)
+            soundsetup(7, self, 8)
+            soundplay([TS2cA], 1V)
+            playframes(TRICERATOPS_RUN, 0.0, 17.0)
+        } while (1)
+    }
+}
+
+sub TriceratopsChaseTrans() { // S-328
+    if (IntroAlpha) {
+        IntroAlpha = seek(IntroAlpha, 0, 0.515)
+        moda = IntroAlpha
+    }
+    if (!player -> health, player -> stateflag & 0x20) {
+        changestate(Triceratops_Stopped)
+    }
+    vecz = player -> z - ChaseFollowGap
+    var0 = vecz - z
+    var0 >>= 4
+    vecy = spd(ChaseMaxSpeed)
+    if (var0 > vecy) {
+        var0 = vecy
+    }
+    vecy = spd(ChaseMinSpeed)
+    if (var0 < vecy) {
+        var0 = vecy
+    }
+    vecz = z + var0
+    TriceratopsFindPathProgress()
+    speed = z
+    calcpath(pathprog)
+    speed = z - speed
+    var0 = degdist(troty, atan2(player -> trans))
+    if (var0 > 1.335) {
+        var0 = 1.335
+    }
+    if (var0 < -1.335) {
+        var0 = -1.335
+    }
+    troty += var0
+    changestateif(Triceratops_PathEnd, pathprog >= PathEnd)
+    changestateif(Triceratops_PauseChase, pathprog >= PauseProgress)
+    CheckPlayerContact(1)
+    if (frametime >= NextRoarTime) {
+        NextRoarTime = frametime + (rand(3s) + 0.3s)
+        soundsetup(8, self, 8)
+        SoundPitchDefault(40)
+        soundplay([TS3cA], 1V)
+    }
+}
+
+state Triceratops_Celebrate { // 4
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        statusb = FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | 0x800 | 0x2000 | FLAG_NO_CAMERA_CLIP
+        if (!SHAKEY) {
+            SHAKEY = 5.0
+        }
+        settrans(TriceratopsCelebrateTrans)
+        TriceratopsCelebrateTrans()
+        soundsetup(8, self, 8)
+        SoundPitchDefault(40)
+        soundplay([TS3cA], 1V)
+        setanim(TRICERATOPS_VICTORY_JUMP, -1.0)
+        do {
+            animframe += 1.0
+            if (animframe == 2.0 || animframe == 5.0) {
+                soundpitch(3.263)
+                soundsetup(7, self, 8)
+                soundplay([TS2cA], 1V)
+            }
+            playframe()
+        } while (animframe + 1.0 <= 23.0)
+        do {
+            setanim(TRICERATOPS_VICTORY_BOUNCE, -1.0)
+            do {
+                animframe += 1.0
+                if (animframe == 8.0) {
+                    soundpitch(2.54)
+                    soundsetup(7, self, 8)
+                    soundplay([TS1cA], 1V)
+                    if (!SHAKEY) {
+                        SHAKEY = 10.0
+                    }
+                }
+                playframe()
+            } while (animframe + 1.0 <= 20.0)
+        } while (1)
+    }
+}
+
+sub TriceratopsCelebrateTrans() { // S-442
+    vecz = player -> z - 1m
+    var0 = vecz - z
+    var0 >>= 4
+    vecy = spd(ChaseMaxSpeed)
+    if (var0 > vecy) {
+        var0 = vecy
+    }
+    vecz = z + var0
+    TriceratopsFindPathProgress()
+    speed = z
+    save (troty) {
+        calcpath(pathprog)
+    }
+    speed = z - speed
+    if (animseq == getanim(TRICERATOPS_VICTORY_BOUNCE) && animframe == 8.0) {
+        vecx = CAMTRANSX
+        vecz = CAMTRANSZ
+        vecy = atan2(self, vecx)
+        var0 = degdist(vecy, troty)
+        if (var0 >= 0) {
+            var0 = -45deg
+        }
+        else {
+            var0 = 45deg
+        }
+        troty = vecy + var0
+    }
+    CheckPlayerContact(1)
+}
+
+state Triceratops_PauseChase { // 5
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_NO_CAMERA_CLIP
+        PauseProgress = PathEnd + 10.0
+        changestate(Triceratops_WaitToResume)
+    }
+}
+
+state Triceratops_WaitToResume { // 6
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        ChasePhase = 2
+        zindex = 5
+        if (animseq == getanim(TRICERATOPS_RUN)) {
+            if (animseq != getanim(TRICERATOPS_RUN)) {
+                setanim(TRICERATOPS_RUN, -1.0)
+            }
+            while (animframe < 17.0) {
+                if (animframe == 0 || animframe == 5.0) {
+                    soundpitch(3.263)
+                    soundsetup(7, self, 8)
+                    soundplay([TS2cA], 1V)
+                }
+                playframe(animframe + 1.0)
+            }
+            soundpitch(3.263)
+            soundsetup(7, self, 8)
+            soundplay([TS2cA], 1V)
+            soundpitch(3.263)
+            sounddelay(0.2s)
+            soundsetup(7, self, 8)
+            soundplay([TS2cA], 1V)
+            playframes(TRICERATOPS_STOP, 0.0, 20.0)
+        }
+        var mode, previous, loops
+        mode = -1
+        previous = 1
+        do {
+            if (mode >= 0) {
+                mode = rand(4)
+            }
+            else {
+                mode = 0
+            }
+            if (mode == previous) {
+                mode = (mode + 1) & 3
+            }
+            if (IdleFlags & 1) {
+                mode = 1
+            }
+            if (var temp = mode; temp == 0) {
+                soundsetup(8, self, 8)
+                SoundPitchDefault(40)
+                soundplay([TS3cA], 0.9V)
+                playanim(0, TRICERATOPS_IDLE_ENTER)
+                playanim(1, TRICERATOPS_IDLE_ENTER)
+                playanim(2, TRICERATOPS_IDLE_ENTER)
+                playanim(2, TRICERATOPS_IDLE_ENTER)
+                loops = 3
+                while (loops > 0) {
+                    soundsetup(8, self, 8)
+                    SoundPitchDefault(40)
+                    sounddelay(1.3s)
+                    soundplay([TS3cA], 0.8V)
+                    playframes(TRICERATOPS_IDLE_LOOP, 0.0, 32.0)
+                    loops -= 1
+                }
+                playframesback(TRICERATOPS_IDLE_ENTER, 3.0, 0.0)
+            }
+            else if (temp == 1) {
+                soundsetup(8, self, 8)
+                SoundPitchDefault(40)
+                soundplay([TS3cA], 1V)
+                playframes(TRICERATOPS_IDLE_1, 0.0, 24.0)
+            }
+            else if (temp == 2) {
+                if (rand(2)) {
+                    soundsetup(8, self, 8)
+                    SoundPitchDefault(40)
+                    sounddelay(0.3s)
+                    soundplay([TS3cA], 0.9V)
+                    playframes(TRICERATOPS_IDLE_2, 0.0, 50.0)
+                }
+                else {
+                    soundsetup(8, self, 8)
+                    SoundPitchDefault(40)
+                    sounddelay(0.9s)
+                    soundplay([TS3cA], 0.9V)
+                    playframesback(TRICERATOPS_IDLE_2, 50.0, 0.0)
+                }
+            }
+            else if (temp == 3) {
+                if (rand(2)) {
+                    soundsetup(8, self, 8)
+                    SoundPitchDefault(40)
+                    sounddelay(0.3s)
+                    soundplay([TS3cA], 0.9V)
+                    playframes(TRICERATOPS_IDLE_2, 0.0, 50.0)
+
+                    soundsetup(8, self, 8)
+                    SoundPitchDefault(40)
+                    sounddelay(0.9s)
+                    soundplay([TS3cA], 0.9V)
+                    playframesback(TRICERATOPS_IDLE_2, 50.0, 0.0)
+                }
+                else {
+                    soundsetup(8, self, 8)
+                    SoundPitchDefault(40)
+                    sounddelay(0.9s)
+                    soundplay([TS3cA], 1V)
+                    playframesback(TRICERATOPS_IDLE_2, 50.0, 0.0)
+                    
+                    soundsetup(8, self, 8)
+                    SoundPitchDefault(40)
+                    sounddelay(0.3s)
+                    soundplay([TS3cA], 1V)
+                    playframes(TRICERATOPS_IDLE_2, 0.0, 50.0)
+                }
+            }
+            previous = mode
+        } while (1)
+    }
+    trans {
+        if (DEBUG, buttonpress(PAD_CIRCLE)) {
+            GLOBAL_146 += 1.0
+            if (GLOBAL_146 >> 8 > AdjustmentLimit) {
+                GLOBAL_146 = 0
+            }
+            GLOBAL_82 = GLOBAL_146 >> 8
+            debugfunc(1)
+        }
+        CheckPlayerContact(0)
+        if (player -> z > z + 18m && ChasePhase != 1) {
+            soundpitch(2.54)
+            soundsetup(7, self, 8)
+            soundplay([TS1cA], 0.64V)
+            if (!SHAKEY) {
+                SHAKEY = 2.0
+            }
+            changestate(Triceratops_Chase)
+        }
+    }
+}
+
+state Triceratops_PathEnd { // 7
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        GLOBAL_126 = 0
+        changestate(Triceratops_Stopped)
+    }
+}
+
+state Triceratops_Stopped { // 8
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        zindex = 5
+        statusb = FLAG_COLLIDABLE | FLAG_NO_CAMERA_CLIP
+        soundsetup(7, self, 8)
+        SoundPitchDefault(40)
+        soundplay([TS3cA], 1V)
+        if (animseq == getanim(TRICERATOPS_RUN)) {
+            if (animseq != getanim(TRICERATOPS_RUN)) {
+                setanim(TRICERATOPS_RUN, -1.0)
+            }
+            while (animframe < 17.0) {
+                if (animframe == 0 || animframe == 5.0) {
+                    soundpitch(3.263)
+                    soundsetup(7, self, 8)
+                    soundplay([TS2cA], 1V)
+                }
+                playframe(animframe + 1.0)
+            }
+            soundpitch(3.263)
+            soundsetup(7, self, 8)
+            soundplay([TS2cA], 1V)
+            soundpitch(3.263)
+            sounddelay(0.2s)
+            soundsetup(7, self, 8)
+            soundplay([TS2cA], 1V)
+            playframes(TRICERATOPS_STOP, 0.0, 20.0)
+        }
+        var mode, previous, loops
+        mode = -1
+        previous = 1
+        do {
+            if (mode >= 0) {
+                mode = rand(4)
+            }
+            else {
+                mode = 0
+            }
+            if (mode == previous) {
+                mode = (mode + 1) & 3
+            }
+            if (IdleFlags & 1) {
+                mode = 1
+            }
+            if (var temp = mode; temp == 0) {
+                soundsetup(8, self, 8)
+                SoundPitchDefault(40)
+                soundplay([TS3cA], 0.9V)
+                playanim(0, TRICERATOPS_IDLE_ENTER)
+                playanim(1, TRICERATOPS_IDLE_ENTER)
+                playanim(2, TRICERATOPS_IDLE_ENTER)
+                playanim(2, TRICERATOPS_IDLE_ENTER)
+                loops = 3
+                while (loops > 0) {
+                    soundsetup(8, self, 8)
+                    SoundPitchDefault(40)
+                    sounddelay(1.3s)
+                    soundplay([TS3cA], 0.8V)
+                    playframes(TRICERATOPS_IDLE_LOOP, 0.0, 32.0)
+                    loops -= 1
+                }
+                playframesback(TRICERATOPS_IDLE_ENTER, 3.0, 0.0)
+            }
+            else if (temp == 1) {
+                soundsetup(8, self, 8)
+                SoundPitchDefault(40)
+                soundplay([TS3cA], 1V)
+                playframes(TRICERATOPS_IDLE_1, 0.0, 24.0)
+            }
+            else if (temp == 2) {
+                if (rand(2)) {
+                    soundsetup(8, self, 8)
+                    SoundPitchDefault(40)
+                    sounddelay(0.3s)
+                    soundplay([TS3cA], 0.9V)
+                    playframes(TRICERATOPS_IDLE_2, 0.0, 50.0)
+                }
+                else {
+                    soundsetup(8, self, 8)
+                    SoundPitchDefault(40)
+                    sounddelay(0.9s)
+                    soundplay([TS3cA], 0.9V)
+                    playframesback(TRICERATOPS_IDLE_2, 50.0, 0.0)
+                }
+            }
+            else if (temp == 3) {
+                if (rand(2)) {
+                    soundsetup(8, self, 8)
+                    SoundPitchDefault(40)
+                    sounddelay(0.3s)
+                    soundplay([TS3cA], 0.9V)
+                    playframes(TRICERATOPS_IDLE_2, 0.0, 50.0)
+
+                    soundsetup(8, self, 8)
+                    SoundPitchDefault(40)
+                    sounddelay(0.9s)
+                    soundplay([TS3cA], 0.9V)
+                    playframesback(TRICERATOPS_IDLE_2, 50.0, 0.0)
+                }
+                else {
+                    soundsetup(8, self, 8)
+                    SoundPitchDefault(40)
+                    sounddelay(0.9s)
+                    soundplay([TS3cA], 1V)
+                    playframesback(TRICERATOPS_IDLE_2, 50.0, 0.0)
+                    
+                    soundsetup(8, self, 8)
+                    SoundPitchDefault(40)
+                    sounddelay(0.3s)
+                    soundplay([TS3cA], 1V)
+                    playframes(TRICERATOPS_IDLE_2, 0.0, 50.0)
+                }
+            }
+            previous = mode
+        } while (1)
+    }
+    trans {
+        CheckPlayerContact(0)
+    }
+}
+
+state Bone_Fence { // 9
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL  
+        SetZindexField(26)
+        sleepanim(0, BONE_FENCE)
+    }
+    event(e, a) {
+        accevcstate(Bone_Fence_Break, e == EventTriggered)
+        if (interrupter == player) {
+            rejevret(e == EventJumpedOn || e == EventSlamHit || e == EventSlideHit || e == EventSpinHit)
+        }
+    }
+}
+
+state Bone_Fence_Break { // 10
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        statusb = 0
+        if (!SHAKEY) {
+            SHAKEY = 10.0
+        }
+        KillEntity()
+        zindex = 200
+        soundpitch(2.54)
+        soundsetup(7, self, 8)
+        soundplay([TS1cA], 1V)
+        playframes(BONE_FENCE_BREAK, 0.0, 45.0)
+    }
+}
+
+state Triceratops_Die { // 11
+    stateflag 0x23
+    statusc 0x32
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        playframe()
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        playframe()
+    }
+}
+
+sub SetParticleColor() { // S-1027
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x05, 0xBD, 0xBE)
+    }
+    else if (r == 1) {
+        SetColor1(0x0D, 0x4C, 0x4C)
+    }
+    else if (r == 2) {
+        SetColor1(0xE7, 0x85, 0x81)
+    }
+}
+
+state Triceratops_Flung { // 12
+    stateflag 0x30
+    statusc 0x32
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        SoundEnemyFling()
+        EnemyFlingSetDir(0x80000)
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    }
+    trans {
+        unless (STATUS_FIRSTFRAME) {
+            interrupter = getvalideventobj(EventFling, 0b11000)
+            if (interrupter) {
+                sendeventif(EventFling, interrupter, distance(interrupter) < 2m, 0)
+            }
+            else {
+                eventaccepted = false
+            }
+            unless (ZONEFLAGS & 0x800) {
+                vecy = y - 1m
+                do {
+                    y = vecy + 1m
+                    projectzoneshadow(var0)
+                } until (!eventaccepted || y >= vecy + 1m)
+            }
+            scalex -= 1.0S / 30
+            scaley -= 1.0S / 30
+            scalez -= 1.0S / 30
+            EnemyFlingAccel()
+        }
+    }
+}
+
+state Kill { // 13
+    stateflag 0x1
+    statusc 0x0
+    code() {}
+}

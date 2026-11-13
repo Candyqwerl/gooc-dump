@@ -1,0 +1,153 @@
+#gool DraFC 46 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C2_ShadC.gooh"
+//gooc -c 2 -r pal "C2\C2_DraFC.gooc" "C2\Out\C2_DraFC.nsentry"
+
+#anim DRAGONFLY       [Dr1cV] 27 1
+#sprite LIGHT         [Nj3cT]
+#tex 0xA0A0A0 1 3 0 4 0 64 64 64
+
+#spawn S_DRAGONFLY    Dragonfly_Init
+#spawn S_LIGHT        Light
+
+event EventHit           => state Dragonfly_Squash
+event EventHitInvincible => state Dragonfly_Squash
+event EventSlamHit       => state Dragonfly_Squash
+
+var CycleLength, HalfCycle, CycleOffset, HalfPathLength, XOffset, ShadowSpawned, ShadowRetryTimer
+
+state Dragonfly_Init { // 0
+    code(cyclelen, cycleoff, xoff, local) {
+        soundpitch(4.352)
+        soundplay([JRocA], 0.07V)
+        CycleLength = cyclelen * 1s / 1.2s
+        HalfCycle = CycleLength >> 1
+        CycleOffset = cycleoff * 1s / 1.2s
+        XOffset = xoff
+        if (local) {
+            var0 = time(CycleLength, CycleOffset)
+            CycleOffset = (CycleOffset + (CycleOffset - var0)) % CycleLength
+        }
+        HalfPathLength = pathlen >> 1
+        SetZindexField(24)
+        trotx = 180deg
+        y += 0.8m
+        x += XOffset
+        groundy = y
+        vely = 0
+        statusb = FLAG_ROT_Y | FLAG_COLLIDABLE | FLAG_HAS_SHADOW | 0x100000
+        ShadowSpawned = 0
+        SetScale(0.64S)
+        spawn(DraFC, S_LIGHT, 1)
+        projectzoneshadow(var0)
+        if (eventaccepted) {
+            spawn(ShadC, ShadC_S_NIGHT_SHADOW_GROUND, 1, vecy, 1.3S, 0)
+            ShadowSpawned = 1
+        }
+        else {
+            ShadowRetryTimer = rand(12)
+        }
+        changestate(Dragonfly)
+    }
+}
+
+state Dragonfly { // 1
+    statusc 0
+    code() {
+        sleepframes(DRAGONFLY, 0.0, 26.0)
+    }
+    event(e, a) {
+        accevcstate(Dragonfly_Squash, e == EventFling || e == EventSlamHit || e == EventHitInvincible || e == EventHit)
+    }
+    trans {
+        if (!ShadowSpawned) {
+            ShadowRetryTimer -= 1
+            if (ShadowRetryTimer < 0) {
+                ShadowRetryTimer = 12
+                projectzoneshadow(var0)
+                if (eventaccepted) {
+                    spawn(ShadC, ShadC_S_NIGHT_SHADOW_GROUND, 1, vecy, 1.3S, 0)
+                    ShadowSpawned = 1
+                }
+            }
+        }
+        troty = atan2(player -> trans)
+        if (pathlen > 1.0) {
+            pathprog = time(CycleLength, CycleOffset)
+            if (pathprog >= HalfCycle) {
+                pathprog = CycleLength - pathprog
+            }
+            pathprog = pathprog * pathlen / HalfCycle
+            if (pathprog >= pathlen) {
+                pathprog = pathlen - 1
+            }
+            calcpath(pathprog)
+            groundy = y + 1.25m
+            y = groundy
+            x += XOffset
+        }
+        y = groundy + sin(loopseek(vely, 0.5m, 4.0), 0.49m)
+        sendevent(EventHit, collider, 100.0)
+    }
+}
+
+
+state Dragonfly_Squash { // 2
+    stateflag 0x21
+    statusc 0x32
+    code(h) {
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        playframe()
+    }
+}
+
+sub SetParticleColor() {
+    if (var r = rand(3); r == 0) {
+        SetColor1(0xAA, 0x00, 0x00)
+    }
+    else if (r == 1) {
+        SetColor1(0xFF, 0xC8, 0x7F)
+    }
+    else if (r == 2) {
+        SetColor1(0xE6, 0x78, 0x3C)
+    }
+}
+
+state Light { // 3
+    statusc 0x12
+    code() {
+        SetScale(1.4S)
+        zindex = creator -> zindex + 22
+        do (var pitch, yaw, v3, yawdist, pitchdist) {
+            var dz, dx, negyaw, flatdist
+            getvert(vvec, parent, 1.0)
+            getvert(vtrans, parent, 0.0)
+            dx = vecx - x
+            vecx = dx
+            vecy -= y
+            dz = vecz - z
+            vecz = dz
+
+            yaw = atan(dx, dz)
+            negyaw = -yaw
+            yaw &= 0xFFF
+            flatdist = (((dz >> 8) * cos(negyaw)) >> 4) - (((dx >> 8) * sin(negyaw)) >> 4)
+            pitch = atan(vecy, flatdist) & 0xFFF
+            v3 = 0
+
+            yawdist = abs(((yaw << 20) - (CAMROTY << 20)) >> 20)
+            pitchdist = abs(((pitch << 20) - (CAMROTX << 20)) >> 20)
+            if (yawdist < 90deg && pitchdist < 90deg) {
+                moda = 16.0 - ((cos(yawdist) * cos(pitchdist)) >> 12)
+                playanim(0, LIGHT)
+            }
+            else {
+                playnull()
+            }
+        } while (1)
+    }
+}

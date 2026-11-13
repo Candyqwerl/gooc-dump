@@ -1,0 +1,514 @@
+#gool ArGOC 61 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_ArGOC.gooc" "C3\Out\C3_ArGOC.nsentry"
+
+#anim GUARD_KNIFE_1   [Gu1mV] [GuamG] 25 1 2
+#anim GUARD_KNIFE_2   [Gu2mV] [GuamG] 11 1 2
+#anim GUARD_WALK      [Gu3mV] [GuamG] 25 1 2
+#anim GUARD_KNIFE_3   [Gu4mV] [GuamG] 12 1 2
+#anim GUARD_LAUGH_1   [Gu5mV] [GuamG] 35 1 2
+#anim GUARD_LAUGH_2   [Gu6mV] [GuamG] 09 1 2
+
+#anim GUARD_SHADOW_1  [GS1mV] [GS1mG] 25 0 2
+#anim GUARD_SHADOW_2  [GS2mV] [GS1mG] 11 0 2
+#anim GUARD_SHADOW_3  [GS3mV] [GS1mG] 25 1 2
+#anim GUARD_SHADOW_4  [GS4mV] [GS1mG] 12 1 2
+#anim GUARD_SHADOW_5  [GS5mV] [GS1mG] 35 1 2
+#anim GUARD_SHADOW_6  [GS6mV] [GS1mG] 09 1 2
+
+#spawn S_GUARD          Guard_Init
+#spawn S_GUARD_SHADOW   Guard_Shadow_Init
+
+event Event19 => sub KillVoice
+event Event26 => sub KillVoice
+
+var CycleLength, WalkBackDuration, KnifeSwingDuration, FrameOffset, CycleOffset, MaxTrackOffset, TrackOffset, TrackAxis, ShadowAnim, KnifeVoice
+
+state Guard_Init { // 0
+    statusc 0
+    code(cyclelen, frameoffs, cycleoffs, limit, axis, flip) {
+        WalkBackDuration = cyclelen * 1s
+        KnifeSwingDuration = cyclelen * 1s
+        CycleLength = WalkBackDuration + (KnifeSwingDuration + 0.95s)
+        MaxTrackOffset = limit
+        TrackAxis = axis
+        if (flip) {
+            scalex = -abs(scalex)
+        }
+        FrameOffset = (frameoffs * CycleLength) >> 8
+        if (FrameOffset < 0) {
+            FrameOffset = 0
+        } 
+        if (FrameOffset >= CycleLength) {
+            FrameOffset = CycleLength - 1
+        }
+        CycleOffset = (cycleoffs * CycleLength) >> 8
+        if (CycleOffset < 0) {
+            CycleOffset = 0
+        }
+        if (CycleOffset >= CycleLength) {
+            CycleOffset = CycleLength - 1
+        }
+        {
+            var returning
+            pathprog = time(CycleLength, CycleOffset)
+            pathprog = pathprog * (pathlen << 1) / CycleLength
+            if (pathprog >= pathlen) {
+                returning = 1
+                pathprog = ((pathlen << 1) - 1) - pathprog
+            }
+            statusb = FLAG_TRACK_PATH_SIGN
+            calcpath(pathprog)
+            if (returning) {
+                troty = (troty + 180deg) % 360deg
+            }
+            roty = troty
+        }
+        TrackOffset = 0
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_SIDES
+        zindex = 24
+        unless (LEVEL == LEVEL_HighTime) {
+            spawn(ArGOC, S_GUARD_SHADOW, 1)
+        }
+        changestate(Guard_Knife_Windup)
+    }
+}
+
+sub SoundGuardFootstep() {
+    if (animseq == getanim(GUARD_KNIFE_1) && animframe == 7.0
+        || animseq == getanim(GUARD_KNIFE_2) && animframe == 6.0
+        || animseq == getanim(GUARD_WALK) && animframe == 19.0) {
+            soundpitch(3.263)
+            sounddecay(3.2s)
+            soundplay([fs20A], 0.6V)
+        }
+    if (animseq == getanim(GUARD_KNIFE_1) && animframe == 19.0
+        || animseq == getanim(GUARD_WALK) && animframe == 8.0
+        || animseq == getanim(GUARD_KNIFE_3) && animframe == 6.0) {
+            soundpitch(3.446)
+            sounddecay(3.2s)
+            soundplay([fs20A], 0.6V)
+        }
+}
+
+state Guard_Knife_Windup { // 1
+    statusc 0
+    code() {
+        soundpitch(4.715)
+        soundcount(0xFFFF)
+        sounddecay(10s)
+        sounddelay(.1s)
+        soundplay([GS1mA], 1V)
+        KnifeVoice = voice
+        onstateexit(FadeKnifeVoice)
+        setanim(GUARD_KNIFE_3)
+        do {
+            SoundGuardFootstep()
+            playframe()
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Guard_Squash, e == EventJumpedOn || e == EventSlamHit || e == EventHit || e == EventFling)
+        accevcstate(Guard_Fling, e == EventSpinHit || e == EventSlideHit || e == EventHitInvincible)
+    }
+    trans {
+        var cycletime = 0
+        animframe = time(CycleLength, FrameOffset)
+        if (animframe >= 12) {
+            hpc = 0
+            changestate(Guard_Knife_Swing)
+        }
+        animframe <<= 8
+        cycletime = time(CycleLength, CycleOffset)
+        {
+            var returning, path_x, path_z, delta
+            pathprog = cycletime * (pathlen << 1) / CycleLength
+            if (pathprog >= pathlen) {
+                returning = 1
+                pathprog = ((pathlen << 1) - 1) - pathprog
+            }
+            calcpath(pathprog, vvec)
+            path_x = vecx
+            path_z = vecz
+            if (returning) {
+                troty = (troty + 180deg) % 360deg
+            }
+            if (TrackAxis == 0) {
+                delta = player -> z - path_z
+            }
+            else {
+                delta = player -> x - path_x
+            }
+            if (delta > MaxTrackOffset) {
+                delta = MaxTrackOffset
+            }
+            if (delta < -MaxTrackOffset) {
+                delta = -MaxTrackOffset
+            }
+            delta -= TrackOffset
+            if (delta > 27.2) {
+                delta = 27.2
+            }
+            if (delta < -27.2) {
+                delta = -27.2
+            }
+            TrackOffset += delta
+            if (TrackAxis == 0) {
+                vecz += TrackOffset
+            }
+            else {
+                vecx += TrackOffset
+            }
+            troty = atan2(self, vecx)
+            x = x + (vecx - x >> 1)
+            y = vecy
+            z = z + (vecz - z >> 1)
+            var0 = degdist(roty, troty) >> 2
+            if (var0 > 14.35deg) {
+                var0 = 14.35deg
+            }
+            if (var0 < -14.35deg) {
+                var0 = -14.35deg
+            }
+            roty = (roty + var0) % 360deg
+        }
+        sendeventif(Event32, player, collider, atan2(player -> trans), 6m)
+    }
+}
+
+state Guard_Knife_Swing { // 2
+    statusc 0
+    code() {
+        onstateexit(FadeKnifeVoice)
+        do {
+            SoundGuardFootstep()
+            playframe()
+        } while (1)
+    }
+    event(e, a) {
+        if (interrupter == player) {
+            rejevret(e == EventJumpedOn || e == EventSlamHit || e == EventSlideHit || e == EventSpinHit)
+        }
+        accevcstate(Guard_Squash, e == EventHit || e == EventFling)
+        accevcstate(Guard_Fling, e == EventHitInvincible)
+    }
+    trans {
+        once {
+            setanim(GUARD_KNIFE_1)
+        }
+        var cycletime
+        animframe = time(CycleLength, FrameOffset)
+        animframe -= 12
+        changestateif(Guard_Knife_Windup, animframe < 0)
+        changestateif(Guard_Knife_Stop, animframe >= KnifeSwingDuration)
+        animframe = (animframe % 25) << 8
+        cycletime = time(CycleLength, CycleOffset)
+        {
+            var returning, path_x, path_z, delta
+            pathprog = cycletime * (pathlen << 1) / CycleLength
+            if (pathprog >= pathlen) {
+                returning = 1
+                pathprog = ((pathlen << 1) - 1) - pathprog
+            }
+            calcpath(pathprog, vvec)
+            path_x = vecx
+            path_z = vecz
+            if (returning) {
+                troty = (troty + 180deg) % 360deg
+            }
+            if (TrackAxis == 0) {
+                delta = player -> z - path_z
+            }
+            else {
+                delta = player -> x - path_x
+            }
+            if (delta > MaxTrackOffset) {
+                delta = MaxTrackOffset
+            }
+            if (delta < -MaxTrackOffset) {
+                delta = -MaxTrackOffset
+            }
+            delta -= TrackOffset
+            if (delta > 27.2) {
+                delta = 27.2
+            }
+            if (delta < -27.2) {
+                delta = -27.2
+            }
+            TrackOffset += delta
+            if (TrackAxis == 0) {
+                vecz += TrackOffset
+            }
+            else {
+                vecx += TrackOffset
+            }
+            troty = atan2(self, vecx)
+            x = x + (vecx - x >> 1)
+            y = vecy
+            z = z + (vecz - z >> 1)
+            var0 = degdist(roty, troty) >> 2
+            if (var0 > 14.35deg) {
+                var0 = 14.35deg
+            }
+            if (var0 < -14.35deg) {
+                var0 = -14.35deg
+            }
+            roty = (roty + var0) % 360deg
+        }
+        sendevent(Event24, collider, 100.0)
+        changestateif(Guard_Kill_Player, player -> stateflag & 0x8000000 && distance(player, DIST_NO_Y) < 10m)
+    }
+}
+
+sub FadeKnifeVoice() {
+    voice = KnifeVoice
+    soundfadet(0.5s, voice)
+    soundfadev(0V, voice, 3)
+
+}
+
+state Guard_Knife_Stop { // 3
+    statusc 0
+    code() {
+        setanim(GUARD_KNIFE_2)
+        do {
+            SoundGuardFootstep()
+            playframe()
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Guard_Squash, e == EventJumpedOn || e == EventSlamHit || e == EventHit || e == EventFling)
+        accevcstate(Guard_Fling, e == EventSpinHit || e == EventSlideHit || e == EventHitInvincible)
+    }
+    trans {
+        var cycletime
+        animframe = time(CycleLength, FrameOffset)
+        animframe -= (12 + KnifeSwingDuration)
+        changestateif(Guard_Knife_Swing, animframe < 0)
+        changestateif(Guard_Walk_Back, animframe >= 11)
+        animframe <<= 8
+        cycletime = time(CycleLength, CycleOffset)
+        {
+            var returning, path_x, path_z, delta
+            pathprog = cycletime * (pathlen << 1) / CycleLength
+            if (pathprog >= pathlen) {
+                returning = 1
+                pathprog = ((pathlen << 1) - 1) - pathprog
+            }
+            calcpath(pathprog, vvec)
+            path_x = vecx
+            path_z = vecz
+            if (returning) {
+                troty = (troty + 180deg) % 360deg
+            }
+            if (TrackAxis == 0) {
+                vecz += TrackOffset
+            }
+            else {
+                vecx += TrackOffset
+            }
+            troty = atan2(self, vecx)
+            x = x + (vecx - x >> 1)
+            y = vecy
+            z = z + (vecz - z >> 1)
+            var0 = degdist(roty, troty) >> 2
+            if (var0 > 14.35deg) {
+                var0 = 14.35deg
+            }
+            if (var0 < -14.35deg) {
+                var0 = -14.35deg
+            }
+            roty = (roty + var0) % 360deg
+        }
+        sendeventif(Event32, player, collider, atan2(player -> trans), 6m)
+    }
+}
+
+state Guard_Walk_Back { // 4
+    statusc 0
+    code() {
+        setanim(GUARD_WALK)
+        do {
+            SoundGuardFootstep()
+            playframe()
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Guard_Squash, e == EventJumpedOn || e == EventSlamHit || e == EventHit || e == EventFling)
+        accevcstate(Guard_Fling, e == EventSpinHit || e == EventSlideHit || e == EventHitInvincible)
+    }
+    trans {
+        var cycletime
+        animframe = time(CycleLength, FrameOffset)
+        animframe -= 12 + (KnifeSwingDuration + 11)
+        changestateif(Guard_Knife_Stop, animframe < 0)
+        animframe = (animframe % 25) << 8
+        cycletime = time(CycleLength, CycleOffset)
+        {
+            var returning, path_x, path_z, delta
+            pathprog = cycletime * (pathlen << 1) / CycleLength
+            if (pathprog >= pathlen) {
+                returning = 1
+                pathprog = ((pathlen << 1) - 1) - pathprog
+            }
+            calcpath(pathprog, vvec)
+            path_x = vecx
+            path_z = vecz
+            if (returning) {
+                troty = (troty + 180deg) % 360deg
+            }
+            if (TrackAxis == 0) {
+                vecz += TrackOffset
+            }
+            else {
+                vecx += TrackOffset
+            }
+            troty = atan2(self, vecx)
+            x = x + (vecx - x >> 1)
+            y = vecy
+            z = z + (vecz - z >> 1)
+            var0 = degdist(roty, troty) >> 2
+            if (var0 > 14.35deg) {
+                var0 = 14.35deg
+            }
+            if (var0 < -14.35deg) {
+                var0 = -14.35deg
+            }
+            roty = (roty + var0) % 360deg
+        }
+        sendeventif(Event32, player, collider, atan2(player -> trans), 6m)
+    }
+}
+
+state Guard_Kill_Player { // 5
+    statusc 0
+    code() {
+        if (animseq == getanim(GUARD_KNIFE_1)) {
+            if (animframe >= 0 && animframe <= 11.0) {
+                animframe -= 1.0
+                do {
+                    playframe(animframe + 1.0)
+                } while (animframe + 1.0 <= 12.0)
+            }
+            else if (animframe == 12.0) {
+                playframes4(GUARD_KNIFE_1, -1.0, 24.0)
+                playframes(0.0, 12.0)
+            }
+        }
+        playframes(GUARD_LAUGH_1, 0.0, 34.0)
+        sleepframes(GUARD_LAUGH_2, 0.0, 8.0)
+    }
+}
+
+state Guard_Shadow_Init { // 6
+    statusc 0
+    code() {
+        zindex = creator -> zindex
+        zindex -= 14
+        if (parent -> scalex < 0S) {
+            scalex = -abs(scalex)
+        }
+        ShadowAnim = 0
+        setanim(GUARD_SHADOW_1)
+        changestate(Guard_Shadow)
+    }
+}
+
+state Guard_Shadow { // 7
+    statusc 0
+    code() {
+        do {
+            x = creator -> x
+            y = creator -> y
+            z = creator -> z
+            rotx = creator -> rotx
+            roty = creator -> roty
+            rotz = creator -> rotz
+            animframe = creator -> animframe
+            if (ShadowAnim != creator -> animseq) {
+                ShadowAnim = creator -> animseq
+                if (creator -> animseq == getanim(GUARD_KNIFE_1)) {
+                    setanim(GUARD_SHADOW_1)
+                }
+                else if (creator -> animseq == getanim(GUARD_KNIFE_2)) {
+                    setanim(GUARD_SHADOW_2)
+                }
+                else if (creator -> animseq == getanim(GUARD_WALK)) {
+                    setanim(GUARD_SHADOW_3)
+                }
+                else if (creator -> animseq == getanim(GUARD_KNIFE_3)) {
+                    setanim(GUARD_SHADOW_4)
+                }
+                else if (creator -> animseq == getanim(GUARD_LAUGH_1)) {
+                    setanim(GUARD_SHADOW_5)
+                }
+                else if (creator -> animseq == getanim(GUARD_LAUGH_2)) {
+                    setanim(GUARD_SHADOW_6)
+                }
+            }
+            if (creator -> animseq == getanim(GUARD_KNIFE_1) || creator -> animseq == getanim(GUARD_KNIFE_2)) {
+                playframe()
+            }
+            else {
+                playframe((animframe >> 9) << 9)
+            }
+        } while (1)
+    }
+}
+
+state Guard_Fling { // 8
+    stateflag 0x30
+    statusc 0x32
+    code(h) {
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir(0x80000)
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    }
+    event(e, a) {
+        accevcstate(Guard_Squash, e == EventHitInvincible)
+    }
+    trans {
+        EnemyFlingTrans(2m, EventFling)
+    }
+}
+
+state Guard_Squash { // 9
+    stateflag 0x23
+    statusc 0x32
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        playframe()
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        playframe()
+    }
+}
+
+sub SetParticleColor() {
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x05, 0xBD, 0xBE)
+    }
+    else if (r == 1) {
+        SetColor1(0x0D, 0x4C, 0x4C)
+    }
+    else if (r == 2) {
+        SetColor1(0xE7, 0x85, 0x81)
+    }
+}
+
+state Kill { // 10
+    statusc 0
+    code() {}
+}
+
+sub KillVoice() {
+    voice = -1
+    soundfadet(0.3s, voice)
+    soundfadev(0, voice, 3)
+    voice = -1
+    soundsetup(0, voice, 5)
+}

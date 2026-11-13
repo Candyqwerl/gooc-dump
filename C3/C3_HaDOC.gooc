@@ -1,0 +1,51 @@
+#gool HaDOC 45 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_HaDOC.gooc" "C3\Out\C3_HaDOC.nsentry"
+
+#anim HARD_PATH_DOOR[HPDiV] [HPDiG] 25 1 2
+
+#spawn S_DOOR  Door_Init
+
+state Door_Init {
+    stateflag 0x4004081
+    statusc 0x80012
+    code(){
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_SIDES | FLAG_NO_CAMERA_CLIP
+        zindex = 24
+        z -= 1.5m
+        changestateif(Door_Sleep, player -> z + 2.0m < z)
+        changestate(Door_Wait)
+    }
+}
+
+state Door_Wait{
+    stateflag 0x4004081
+    statusc 0x80012
+    code(){
+        setanim(HARD_PATH_DOOR)
+        sleepframe(24.0)
+    }
+    trans {
+        changestateif(Door_Open, distance(player, DIST_NO_Y) <= 10.0m && SAVEDGEMPOOL2 \ 0x10000000)
+    }
+}
+
+state Door_Open {
+    stateflag 0x4004081
+    statusc 0x80012
+    code(){
+        playframesback(HARD_PATH_DOOR, 24.0, 0.0)
+        SoundPitchDefault()
+        soundplay([CsmsA], 0.75V)
+        changestate(Door_Sleep)
+    }
+}
+
+state Door_Sleep {
+    stateflag 0x4004081
+    statusc 0x80012
+    code(){
+        sleepanim(0, HARD_PATH_DOOR)
+    }
+}

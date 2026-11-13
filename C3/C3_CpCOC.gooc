@@ -1,0 +1,199 @@
+#gool CpCOC 62 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_CpCOC.gooc" "C3\Out\C3_CpCOC.nsentry"
+
+#iflev k
+#anim COP_CAR_HIGH [Cp1kV] [Cp1kG] 39 1 2
+#anim COP_CAR_LOW  [Cp2kV] [Cp2kG] 39 1 2
+#eliflev lw
+#anim COP_CAR_HIGH [Cp1lV] [Cp1lG] 39 1 2
+#anim COP_CAR_LOW  [Cp2lV] [Cp2lG] 39 1 2
+#else
+#anim COP_CAR_HIGH [Cp1BV] [Cp1BG] 39 1 2
+#anim COP_CAR_LOW  [Cp2BV] [Cp2BG] 39 1 2
+
+#spawn S_COPCAR CopCar_Init
+
+var RockAngle, RockVelocity, TurnVelocity, PlayerDistance, HalfCycleTime, CycleLength, CycleOffset, MovementMode
+
+state CopCar_Init {
+    statusc 0
+    code(a, yaw, mirror, cyclelen, cycleoffs, start) {
+        roty = yaw
+        rotz = yaw + 90deg
+        if (mirror) {
+            scalex = -abs(scalex)
+        }
+        MovementMode = 0
+        if (entity) {
+            if (LEVEL == LEVEL_Area51) {
+                vfx = (vfx & 0xFFFF00FF) | 0x600
+                MovementMode = 2
+            }
+            else {
+                MovementMode = 1
+            }
+            HalfCycleTime = (cyclelen * 1s / 1.2s) >> 1
+            CycleLength = HalfCycleTime << 1
+            CycleOffset = (cycleoffs * CycleLength) >> 8
+            if (CycleOffset < 0) {
+                CycleOffset = 0
+            }
+            if (CycleOffset >= CycleLength) {
+                CycleOffset = CycleLength - 1
+            }
+            if (start) {
+                var0 = time(CycleLength)
+                CycleOffset -= var0
+                if (CycleOffset < 0) {
+                    CycleOffset += CycleLength
+                }
+            }
+        }
+        zindex = 24
+        setanim(COP_CAR_LOW, 0)
+        soundpitch(4.0)
+        soundcount(0xFFFF)
+        soundplay([Cp1kA], 0.8V)
+        if (distance(player, DIST_NO_Y) >= 40m) {
+            changestate(CopCar_Distant)
+        }
+        else {
+            changestate(CopCar_Active)
+        }
+    }
+}
+
+state CopCar_Distant {
+    statusc 0
+    code() {
+        if (MovementMode == 1) {
+            settrans(CopPatrol)
+            CopPatrol()
+        }
+        else if (MovementMode == 2) {
+            settrans(CopDrive)
+            CopDrive()
+        }
+        rotx = 0deg
+        setanim(COP_CAR_LOW)
+        animframe -= 1.0
+        do {
+            animframe += 1.0
+            changestateif(CopCar_Active, distance(player, DIST_NO_Y) < 40m)
+            playframe()
+        } while (animframe + 1.0 <= 38.0)
+        do {
+            setanim(COP_CAR_LOW, -1.0)
+            do {
+                animframe += 1.0
+                changestateif(CopCar_Active, distance(player, DIST_NO_Y) < 40m)
+                playframe()
+            } while (animframe + 1.0 <= 38.0)
+        } while (1)
+    }
+}
+
+sub CopPatrol() {
+    var phase
+    phase = time(CycleLength, CycleOffset)
+    if (phase >= HalfCycleTime) {
+        phase -= HalfCycleTime
+        pathprog = (pathlen - 1) - ((phase * pathlen) / HalfCycleTime)
+    }
+    else {
+        pathprog = (phase * pathlen) / HalfCycleTime
+    }
+    calcpath(pathprog)
+}
+
+sub CopDrive() {
+    if (distance(player, DIST_NO_Y) < 100m) {
+        pathprog = seek(pathprog, pathlen - 1.0, pathlen / HalfCycleTime)
+        calcpath(pathprog)
+        if (pathprog == pathlen - 1.0) {
+            MovementMode = 0
+        }
+    }
+}
+
+state CopCar_Active {
+    statusc 0
+    code() {
+        playframes(COP_CAR_HIGH, animframe, 38.0)
+        sleepframes(COP_CAR_HIGH, 0.0, 38.0)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            RockAngle = 0
+            RockVelocity = 0
+            TurnVelocity = 0
+            rotx = 0
+        }
+        if (MovementMode == 1) {
+            CopPatrol()
+        }
+        else if (MovementMode == 2) {
+            CopDrive()
+        }
+        PlayerDistance = distance(player, DIST_NO_Y)
+        changestateif(CopCar_Distant, PlayerDistance >= 40m)
+        if (PlayerDistance <= 6m) {
+            vecz = atan2(player -> trans)
+            var0 = player -> speed
+            var player_angle = abs(degdist(roty, atan2(player -> trans)))
+            var hit_radius
+            if (player_angle < 30deg || player_angle > 150deg) {
+                hit_radius = 2.8m
+            }
+            else {
+                hit_radius = 1.7m
+            }
+            if (distance(x, player, DIST_EXACT | DIST_NO_Y) < hit_radius && player -> y < y + 2m && y - 2m < player -> y) {
+                sendevent(Event27, player, hit_radius, 0)
+            }
+            if (eventaccepted) {
+                if (var0 > 12m) {
+                    var0 = 12m
+                }
+                if (var0 > 1m) {
+                    if (var0 >= 4m) {
+                        soundpitch(5.442)
+                        soundplay([Cp2kA], 1V)
+                    }
+                    MovementMode = 0
+                    RockVelocity += (var0 * 31) / 12m
+                    vecy = (var0 * 0x51) / 12m
+                    vecz = ((vecz << 20) - (rotz << 20)) >> 20
+                    if (((vecz < 0) && (vecz >= -90deg)) || (vecz > 90deg)) {
+                        vecy = -vecy
+                    }
+                    TurnVelocity += vecy
+                }
+            }
+        }
+        if (RockVelocity || RockAngle) {
+            var old_pitch = RockAngle
+            RockAngle += RockVelocity - (RockAngle / 12)
+            RockVelocity -= old_pitch / 12
+            if (old_pitch >= 0) {
+                if (RockAngle <= 0) {
+                    RockVelocity += -(RockVelocity >> 1)
+                }
+            }
+            else {
+                if (RockAngle >= 0) {
+                    RockVelocity += -(RockVelocity >> 1)
+                }
+            }
+            rotz = roty + TurnVelocity + 90deg
+            roty += TurnVelocity
+            TurnVelocity = TurnVelocity >> 1
+            if (abs(TurnVelocity) < 2) {
+                TurnVelocity = 0
+            }
+        }
+        rotx = RockAngle
+    }
+}

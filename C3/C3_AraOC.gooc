@@ -1,0 +1,217 @@
+#gool AraOC 54 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal -l y "C3\C3_AraOC.gooc" "C3\Out\C3_AraOC.nsentry"
+
+#iflev m
+#anim BOUNCE_TARP_1   [Ta1mV] [Ta1mG] 16 0 2
+#anim BOUNCE_TARP_2   [Ta1mV] [Ta2mG] 16 0 2
+#anim BOUNCE_TARP_3   [Ta1mV] [Ta3mG] 16 0 2
+#anim BOUNCE_TARP_4   [Ta1mV] [Ta4mG] 16 0 2
+#anim BOUNCE_TARP_5   [Ta1mV] [Ta5mG] 16 0 2
+#anim BOUNCE_TARP_6   [Ta1mV] [Ta6mG] 16 0 2
+#anim BOUNCE_TARP_7   [Ta1mV] [Ta7mG] 16 0 2
+#anim BOUNCE_TARP_8   [Ta1mV] [Ta8mG] 16 0 2
+#anim BOUNCE_TARP_9   [Ta1mV] [Ta9mG] 16 0 2
+#anim BOUNCE_TARP_10  [Ta1mV] [TaamG] 16 0 2
+#anim BOUNCE_TARP_11  [Ta1mV] [TabmG] 16 0 2
+#anim BOUNCE_TARP_12  [Ta1mV] [TacmG] 16 0 2
+#anim BOUNCE_TARP_13  [Ta1mV] [TadmG] 16 0 2
+#anim BOUNCE_TARP_14  [Ta1mV] [TaemG] 16 0 2
+#anim BOUNCE_TARP_15  [Ta1mV] [TafmG] 16 0 2
+#anim BOUNCE_TARP_16  [Ta1mV] [TagmG] 16 0 2
+#else
+#anim BOUNCE_TARP_1   [TN1mV] [TN1mG] 16 0 2
+#anim BOUNCE_TARP_2   [TN1mV] [TN2mG] 16 0 2
+#anim BOUNCE_TARP_3   [TN1mV] [TN3mG] 16 0 2
+#anim BOUNCE_TARP_4   [TN1mV] [TN4mG] 16 0 2
+#anim BOUNCE_TARP_5   [TN1mV] [TN5mG] 16 0 2
+#anim BOUNCE_TARP_6   [TN1mV] [TN6mG] 16 0 2
+#anim BOUNCE_TARP_7   [TN1mV] [TN7mG] 16 0 2
+#anim BOUNCE_TARP_8   [TN1mV] [TN8mG] 16 0 2
+#anim BOUNCE_TARP_9   [TN1mV] [TN9mG] 16 0 2
+#anim BOUNCE_TARP_10  [TN1mV] [TNamG] 16 0 2
+#anim BOUNCE_TARP_11  [TN1mV] [TNbmG] 16 0 2
+#anim BOUNCE_TARP_12  [TN1mV] [TNcmG] 16 0 2
+#anim BOUNCE_TARP_13  [TN1mV] [TNdmG] 16 0 2
+#anim BOUNCE_TARP_14  [TN1mV] [TNemG] 16 0 2
+#anim BOUNCE_TARP_15  [TN1mV] [TNfmG] 16 0 2
+#anim BOUNCE_TARP_16  [TN1mV] [TNgmG] 16 0 2
+#endif
+
+#iflev m
+#anim BALCONY         [BalmV] [BalmG] 1 1 2
+#anim PLATFORM_1      [PlamV] [PlamG] 1 1 2
+#anim PLATFORM_2      [PlayV] [PlayG] 1 1 2
+#anim SKY             [Sk1mV] [Sk1mG] 1 1 2
+#eliflev y
+#anim BALCONY         [BalmV] [BalmG] 1 1 2
+#anim PLATFORM_1      [PlaqV] [PlaqG] 1 1 2
+#anim PLATFORM_2      [PlayV] [PlayG] 1 1 2
+#anim SKY             [Sk1qV] [Sk1qG] 1 1 2
+#else
+#anim BALCONY         [BalqV] [BalqG] 1 1 2
+#anim PLATFORM_1      [PlaqV] [PlaqG] 1 1 2
+#anim PLATFORM_2      [PlayV] [PlayG] 1 1 2
+#anim SKY             [Sk1qV] [Sk1qG] 1 1 2
+#endif
+
+#spawn S_BOUNCE_TARP     Bounce_Tarp_Init
+#spawn S_SKY             Sky
+#spawn S_BALCONY         Balcony
+#spawn S_PLATFORM_FIRE   Platform
+#spawn S_HANG_BOOST      Hang_Boost
+#spawn S_PLATFORM        Platform
+
+var BouncePropulsion, BounceCooldown
+
+state Sky { // 0
+    stateflag 0x10001
+    statusc 0
+    code() {
+        if (LEVEL != LEVEL_HangEmHigh) {
+            settrans(SkyRotate)
+        }
+        statusb = FLAG_NO_CAMERA_CLIP
+        SetScale(0.1S)
+        zindex = -4000
+        sleepanim(0, SKY)
+    }
+    trans {
+        x = CAMTRANSX
+        y = CAMTRANSY
+        z = CAMTRANSZ
+    }
+}
+
+sub SkyRotate() {
+    x = CAMTRANSX
+    y = CAMTRANSY
+    z = CAMTRANSZ
+    roty = spd(roty, 8deg)
+}
+
+state Bounce_Tarp_Init { // 1
+    statusc 0
+    code(yaw, propulsion) {
+        roty = yaw
+        BouncePropulsion = propulsion
+        statusb = FLAG_SOLID_FULL
+        zindex = 24
+        BounceCooldown = frametime
+        changestate(Bounce_Tarp)
+    }
+}
+
+state Bounce_Tarp { // 2
+    stateflag 0x4081
+    statusc 0x80012
+    code() {
+        sleepanim(0, BOUNCE_TARP_1)
+    }
+    event(e, a) {
+        if (player -> y > y - 0.25m && interrupter == player && (e == EventJumpedOn || e == EventSlamHit)) {
+            BounceCooldown = frametime + 1
+            sendevent(Event21, interrupter, BouncePropulsion)
+            rejevcstate(Bounce_Tarp_Bounce)
+        }
+        rejevret(e == EventJumpedOn
+            || e == EventSlamHit
+            || e == EventSlideHit
+            || e == EventSpinHit
+            || e == EventHit
+            || e == EventHitInvincible
+            || e == EventFling
+        )
+    }
+    trans {
+        if (collider && player -> y > y - 0.25m
+            && !(player -> stateflag & 0x80000)
+            && !(player -> stateflag & 0x10)
+            && !(player -> stateflag & 0x800)) {
+                sendevent(Event21, collider, BouncePropulsion)
+                if (eventaccepted) {
+                    BounceCooldown = frametime + 1
+                    changestate(Bounce_Tarp_Bounce)
+                }
+            }
+    }
+}
+
+state Bounce_Tarp_Bounce { // 3
+    stateflag 0x4081
+    statusc 0x80012
+    event => state Bounce_Tarp
+    code() {
+        soundpitch((14.4 + rand(3.2)) * 0.295 >> 8)
+        sounddecay(6.4s)
+        soundplay([BT1mA], 0.4V)
+        playanim(1, BOUNCE_TARP_2)
+        playanim(2, BOUNCE_TARP_3)
+        playanim(3, BOUNCE_TARP_4)
+        playanim(4, BOUNCE_TARP_5)
+        playanim(5, BOUNCE_TARP_6)
+        playanim(6, BOUNCE_TARP_7)
+        playanim(7, BOUNCE_TARP_8)
+        playanim(8, BOUNCE_TARP_9)
+        playanim(9, BOUNCE_TARP_10)
+        playanim(10, BOUNCE_TARP_11)
+        playanim(11, BOUNCE_TARP_12)
+        playanim(12, BOUNCE_TARP_13)
+        playanim(13, BOUNCE_TARP_14)
+        playanim(14, BOUNCE_TARP_15)
+        playanim(15, BOUNCE_TARP_16)
+        changestate(Bounce_Tarp)
+    }
+    trans {
+        if (collider && player -> y > y - 0.25m
+            && !(player -> stateflag & 0x80000)
+            && !(player -> stateflag & 0x10)
+            && !(player -> stateflag & 0x800)) {
+                sendevent(Event21, interrupter, BouncePropulsion)
+                if (eventaccepted) {
+                    BounceCooldown = frametime + 1
+                    changestateif(Bounce_Tarp_Bounce, frametime - statetime >= 0.25s)
+                }
+            }
+    }
+}
+
+state Balcony { // 4
+    code(yaw) {
+        roty = yaw
+        statusb = 0
+        SetZindexField(26)
+        sleepanim(0, BALCONY)
+    }
+}
+
+state Platform { // 5
+    stateflag 0x201
+    code(yaw) {
+        roty = yaw
+        statusb = 0
+        SetZindexField(26)
+        if (spawn == S_PLATFORM_FIRE) {
+            sleepanim(0, PLATFORM_1)
+        }
+        else {
+            sleepanim(0, PLATFORM_2)
+        }
+    }
+}
+
+state Hang_Boost { // 6
+    stateflag 0x800201
+    code(sx, sy, sz, a) {
+        SetScale(sx, sy, sz)
+        y += 3m
+        statusb = FLAG_COLLIDABLE
+        sleepnull()
+    }
+    trans {
+        if (collider && collider -> stateflag & 0x8) {
+            collider -> vely = spd(collider -> vely, 10m)
+        }
+    }
+}

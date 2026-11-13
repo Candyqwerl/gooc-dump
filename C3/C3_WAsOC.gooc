@@ -1,0 +1,459 @@
+#gool WAsOC 25 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_WAsOC.gooc" "C3\Out\C3_WAsOC.nsentry"
+
+#anim WIZARD_CLOTHED_STEP_1  [WA0fV]  [WA1fG] 04 1 2
+#anim WIZARD_CLOTHED_STEP_2  [WA1fV]  [WA1fG] 15 1 2
+#anim WIZARD_CLOTHED_CAST    [WA2fV]  [WA4fG] 26 1 2
+#anim WIZARD_CLOTHED_JUMP    [WA3fV]  [WA1fG] 08 1 2
+#anim WIZARD_CLOTHED_LAUGH   [WA4fV]  [WA1fG] 33 1 2
+
+#anim WIZARD_NAKED_STEP_1   [Wa0fV] [WA2fG] 04 1 2
+#anim WIZARD_NAKED_STEP_2   [Wa1fV] [WA2fG] 15 1 2
+#anim WIZARD_NAKED_CAST     [Wa2fV] [WA5fG] 26 1 2
+#anim WIZARD_NAKED_JUMP     [Wa3fV] [WA2fG] 08 1 2
+#anim WIZARD_NAKED_LAUGH    [Wa4fV] [WA2fG] 33 1 2
+
+#anim WIZARD_ATTACKED       [Wa5fV] [WA2fG] 23 1 2
+
+#anim WIZARD_HAT   [Wh0fV] [WA3fG] 25 1 2
+#anim WIZARD_BEARD [Wh1fV] [WA6fG] 25 1 2
+
+#sprite ORB [Md4bT]
+#tex 0x808080 0 3 2 14 800 32 32 32
+#tex 0x808080 0 3 2 14 832 96 32 32
+#tex 0x808080 0 3 2 14 832 64 32 32
+#tex 0x808080 0 3 2 14 832 32 32 32
+#tex 0x808080 0 3 2 14 864 96 32 32
+#tex 0x808080 0 3 2 14 864 64 32 32
+#tex 0x808080 0 3 2 14 864 32 32 32
+#tex 0x808080 0 3 2 14 896 96 32 32
+
+#sprite ORB_PARTICLE [Md4bT]
+#tex 0x808080 0 3 2 14 992 96 16 16
+
+#spawn S_WISE_ASS      Wizard_Init
+#spawn S_ORB           Orb_Spawn
+#spawn S_ORB_PARTICLE  Orb_Particle
+#spawn S_BEARD         Wizard_Beard
+
+var ProjectileRange, CasterDistance, Collisions
+
+state Wizard_Init { // 0
+    statusc 0
+    code(range) {
+        zindex = 32
+        trotx = 360deg
+        ProjectileRange = range
+        if (entitygetstate(2)) {
+            health = 1.0
+        }
+        else {
+            health = 2.0
+        }
+        changestate(Wizard_Wait)
+    }
+}
+
+state Wizard_Wait { // 1
+    statusc 0
+    event => sub WizardEvents
+    code() {
+        statusb = FLAG_ROT_Y | FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        do {
+            troty = atan2(player -> trans)
+            PlayWizardTurnFrame()
+        } while (1)
+    }
+    trans {
+        changestateif(Wizard_Laugh, player -> stateflag & 0x8000000)
+        changestateif(Wizard_Cast_Spell, distance(player, DIST_NO_Y) < 20m && !(abs(degdist(atan2(player -> trans), GAMEDIR + 180deg)) < 90deg) && (!(player -> stateflag & 0x20) && !player -> invincible))
+        sendevent(EventHit, collider, 100.0)
+    }
+}
+
+state Wizard_Cast_Spell { // 2
+    stateflag 0x41
+    statusc 0
+    event => sub WizardEvents
+    trans => sub WizardCastTrans
+    code() {
+        statusb = FLAG_ROT_Y | FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        spawn(WAsOC, S_ORB, 1, 0, ProjectileRange)
+        if (health == 2.0) {
+            playframes(WIZARD_CLOTHED_CAST, 0.0, 25.0)
+        }
+        else {
+            stateflag &= ~0x4000
+            playframes(WIZARD_NAKED_CAST, 0.0, 25.0)
+        }
+        changestate(Wizard_Cast_Recovery)
+    }
+}
+
+sub WizardEvents(e, a) {
+    if (e == EventJumpedOn || e == EventSlamHit || e == EventSpinHit || e == EventSlideHit || e == EventHit || e == EventFling || e == EventHitInvincible) {
+        health -= 1.0
+        accevcstate(Wizard_Attacked, (e == EventHit || e == EventJumpedOn || e == EventSpinHit || e == EventSlideHit) && health > 0)
+        accevcstate(Wizard_Die)
+    }
+}
+
+sub WizardCastTrans() {
+    var0 = atan2(player -> trans)
+    changestateif(Wizard_Wait, distance(player, DIST_NO_Y) > 20m || abs(degdist(var0, GAMEDIR + 180deg)) < 90deg || !(!(player -> stateflag & 0x20) && !player -> invincible))
+    sendevent(EventHit, collider, 100.0)
+    if (frametime - statetime >= 0.65s) {
+        troty = var0
+    }
+}
+
+sub PlayWizardTurnFrame() { // S-113
+    if (health == 2.0) {
+        if (animseq != getanim(WIZARD_CLOTHED_STEP_2)) {
+            setanim(WIZARD_CLOTHED_STEP_2, 0)
+        }
+    }
+    else if (animseq != getanim(WIZARD_NAKED_STEP_2)) {
+        setanim(WIZARD_NAKED_STEP_2, 0)
+    }
+    var0 = degdist(roty, troty)
+    if (!var0) {
+        playframe()
+    }
+    else if (var0 > 0) {
+        playframe((animframe + 14.0) % 15.0)
+    }
+    else {
+        playframe((animframe + 1.0) % 15.0)
+    }
+}
+
+state Wizard_Cast_Recovery { // 3
+    stateflag 0x104041
+    statusc 0
+    event => sub WizardEvents
+    code() {
+        if (health == 2.0) {
+            playanim(0, WIZARD_CLOTHED_JUMP)
+            playanim(1, WIZARD_CLOTHED_JUMP)
+            playanim(2, WIZARD_CLOTHED_JUMP)
+            playanim(2, WIZARD_CLOTHED_JUMP)
+            playanim(3, WIZARD_CLOTHED_JUMP)
+            playanim(4, WIZARD_CLOTHED_JUMP)
+            playanim(5, WIZARD_CLOTHED_JUMP)
+            playanim(6, WIZARD_CLOTHED_JUMP)
+            playanim(0, WIZARD_CLOTHED_STEP_1)
+            playanim(1, WIZARD_CLOTHED_STEP_1)
+            playanim(2, WIZARD_CLOTHED_STEP_1)
+            playanim(2, WIZARD_CLOTHED_STEP_1)
+            var0 = 1.4s
+        }
+        else {
+            stateflag &= ~0x4000
+            playanim(0, WIZARD_NAKED_JUMP)
+            playanim(1, WIZARD_NAKED_JUMP)
+            playanim(2, WIZARD_NAKED_JUMP)
+            playanim(2, WIZARD_NAKED_JUMP)
+            playanim(3, WIZARD_NAKED_JUMP)
+            playanim(4, WIZARD_NAKED_JUMP)
+            playanim(5, WIZARD_NAKED_JUMP)
+            playanim(6, WIZARD_NAKED_JUMP)
+            playanim(0, WIZARD_NAKED_STEP_1)
+            playanim(1, WIZARD_NAKED_STEP_1)
+            playanim(2, WIZARD_NAKED_STEP_1)
+            playanim(2, WIZARD_NAKED_STEP_1)
+            var0 = 1s
+        }
+        do {
+            troty = atan2(player -> trans)
+            PlayWizardTurnFrame()
+        } until (frametime - statetime >= var0)
+        changestate(Wizard_Cast_Spell)
+    }
+    trans {
+        sendevent(EventHit, collider, 100.0)
+    }
+}
+
+state Wizard_Attacked { // 4
+    stateflag 0x40A3
+    statusc 0x12
+    code(h) {
+        entitysetstate(1)
+        save (troty) {
+            EnemyFlingSetDir(0x80000)
+            setvel(3m)
+            statusb |= FLAG_PHYSICS_ENGINE
+        }
+        soundpitch(3.263)
+        soundplay([WA2fA], 1V)
+        soundpitch(3.263)
+        soundplay([WA5fA], 1V)
+        spawn(WAsOC, S_BEARD, 1)
+        playframes(WIZARD_ATTACKED, 0.0, 14.0)
+        statusb &= ~FLAG_PHYSICS_ENGINE
+        setevent(WizardEvents)
+        stateflag &= ~0x4080
+        playframe(animframe, 10)
+        playframes(13.0, 22.0)
+        changestate(Wizard_Cast_Spell)
+    }
+    event(e, a) {
+        if ((e == EventSpinHit || e == EventSlideHit) && interrupter == player && player -> statusb & 0x80) {
+            soundpitch(3.263)
+            soundplay([!sp0A], 1V)
+            save (velx, vely, velz, troty) {
+                troty = atan2(player -> trans)
+                interrupter -> speed = 6m
+                interrupter -> troty = atan2(player -> trans)
+                setvel(6m)
+                interrupter -> velx = velx
+                interrupter -> vely = vely
+                interrupter -> velz = velz
+                interrupter -> statusb &= ~0x80
+            }
+        }
+    }
+}
+
+state Wizard_Laugh { // 5
+    stateflag 0x3
+    statusc 0x12
+    code() {
+        statusb = 0
+        if (health == 2.0) {
+            setanim(WIZARD_CLOTHED_LAUGH)
+        }
+        else {
+            setanim(WIZARD_NAKED_LAUGH)
+        }
+        playframes(0.0, 8.0)
+        do (var laugh_loops = 0) { playframes(8.0, 16.0) } while ({ laugh_loops += 1.0 }; laugh_loops < 2.0)
+        playframes(17.0, 32.0)
+        while (player -> stateflag & 0x8000000) {
+            playframe()
+        }
+        changestate(Wizard_Wait)
+    }
+}
+
+state Wizard_Die { // 6
+    stateflag 0x23
+    statusc 0
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        statusb = 0
+        soundpitch(3.263)
+        soundplay([WA2fA], 1V)
+        soundpitch(3.263)
+        soundplay([WA5fA], 1V)
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        playframes(WIZARD_HAT, 0.0, 24.0)
+        sleep()
+    }
+}
+
+sub SetParticleColor() { // S-349
+    if (var r = rand(3); r == 0) {
+        SetColor1(0xFF, 0xC8, 0x80)
+    }
+    else if (r == 1) {
+        SetColor1(0x80, 0x80, 0x80)
+    }
+    else if (r == 2) {
+        SetColor1(0xFF, 0x40, 0x80)
+    }
+}
+
+inline sub PlayOrbFrames() {
+    if (animseq != getanim(ORB)) {
+        setanim(ORB, -1.0)
+    }
+    playframe((animframe + 1.0) % 8.0, 2)
+}
+
+state Orb_Spawn { // 7
+    stateflag 0x41
+    statusc 0
+    __transargs
+    code(vertex, range) {
+        ProjectileRange = range
+        zindex = 40
+        SetRot(0deg)
+        do {
+            PlayOrbFrames()
+        } until (parent -> stateflag & 0x100000 || frametime - statetime >= 1s)
+        Collisions = 0
+        changestate(Orb_Track)
+    }
+    trans { 
+        once {
+            moda = 16.0
+            soundpitch(2.54)
+            soundplay([WA1fA], 0.7V)
+        }
+        moda = seek(moda, 0, 0.64)
+        getvert(vtrans, creator, vertex)
+        var vx = !rand(2) ? 0.5m + rand(1m) : -(0.5m + rand(1m))
+        var vy = !rand(2) ? 0.5m + rand(1m) : -(0.5m + rand(1m))
+        var vz = !rand(2) ? 0.5m + rand(1m) : -(0.5m + rand(1m))
+        spawn(WAsOC, S_ORB_PARTICLE, 1, vertex, vx, vy, vz)
+        scalex = 1.3S + rand(0.2S)
+        scaley = 1.3S + rand(0.2S)
+        rotz = spd(rotz, 180deg)
+        changestateif(Kill, creator -> stateflag & 0x2 || !(creator -> stateflag & 0x40))
+    }
+}
+
+state Orb_Track { // 8
+    stateflag 0x41
+    statusc 0
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_PHYSICS_ENGINE | 0x1000
+        trotz = 6m
+        soundpitch(4.353)
+        soundsetup(6, self, 8)
+        soundplay([WA3fA], 0.7V)
+        do {
+            PlayOrbFrames()
+        } until (frametime - statetime >= 3s || CasterDistance > ProjectileRange)
+        changestate(Orb_Explode, 0)
+    }
+    event(e, a) {
+        accevcstate(Orb_Explode, e == EventHit)
+        if (e == EventSpinHit || e == EventSlideHit) {
+            a[0] = 0
+            accevcstate(Orb_Explode)
+        }
+    }
+    trans {
+        OrbTrans()
+        troty = atan2(player -> trans)
+        if (!speed || (CasterDistance + 1m) <= distance(player -> trans, parent, 0)) {
+            save (vecy) {
+                setvel(8m, vvec)
+                velx = (velx + vecx) >> 1
+                velz = (velz + vecz) >> 1
+            }
+        }
+        else {
+            settrans(OrbTrans)
+        }
+    }
+}
+
+sub OrbTrans() { // S-491
+    changestateif(Kill, creator -> stateflag & 0x2)
+    rotz = spd(rotz, 180deg)
+    CasterDistance = distance(parent, DIST_NO_Y | DIST_EXACT)
+    scalex = 1.3S + rand(0.2S)
+    scaley = 1.3S + rand(0.2S)
+    if (FRAMETIME < 34) {
+        var vx = !rand(2) ? 0.5m + rand(1m) : -(0.5m + rand(1m))
+        var vy = !rand(2) ? 0.5m + rand(1m) : -(0.5m + rand(1m))
+        var vz = !rand(2) ? 0.5m + rand(1m) : -(0.5m + rand(1m))
+        spawn(WAsOC, S_ORB_PARTICLE, 1, -1.0, vx, vy, vz)
+    }
+    sendevent(EventHit, collider, 100.0)
+    changestateif(Orb_Explode, eventaccepted, 1.0)
+    projectzoneshadow(null)
+    field_61 = eventaccepted
+    if (field_61) {
+        if (vecy > y && (field_61 & 0x1) && (field_61 & 15) != 3 && Collisions >= 3.0) {
+            changestate(Orb_Explode, 0)
+        }
+        if ((field_61 & 15) == 3) {
+            Collisions = 0
+        }
+        else {
+            Collisions += 1.0
+        }
+        y = (vecy + (0.2m + y)) >> 1
+    }
+}
+
+state Orb_Explode { // 9
+    stateflag 0x21
+    statusc 0x1000000
+    code(impact) {
+        if (impact) {
+            soundpitch(2.177)
+            soundplay([WA4fA], 0.8V)
+            soundsetup(0, voice, 5)
+            spawn(9, 4, 1, getins(SetExplosionColor), 1)
+        }
+        else {
+            soundpitch(2.177)
+            soundplay([WA4fA], 0.6V)
+            soundsetup(0, voice, 5)
+            do (var count = 0) {
+                var vx = !rand(2) ? 1m + rand(1m) : -(1m + rand(1m))
+                var vy = !rand(2) ? 1m + rand(1m) : -(1m + rand(1m))
+                var vz = !rand(2) ? 1m + rand(1m) : -(1m + rand(1m))
+                spawn(WAsOC, S_ORB_PARTICLE, 1, -1.0, vx, vy, vz)
+            } while ({ count += 1.0 }; count < 16.0)
+
+            do (var f = 0) {
+                scalex = (scalex * 1.4) >> 8
+                scaley = (scaley * 1.4) >> 8
+                moda = ((f + 1.0) >> 8) * 5.278
+                playframe()
+            } while ({ f += 1.0 }; f < 3.0)
+        }
+        WaitChildNull()
+    }
+}
+
+sub SetExplosionColor() { // S-634
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x80, 0x00, 0xFF)
+    }
+    else if (r == 1) {
+        SetColor1(0xFF, 0x00, 0xDC)
+    }
+    else if (r == 2) {
+        SetColor1(0xFF, 0xFF, 0x80)
+    }
+}
+
+state Orb_Particle { // 10
+    stateflag 0x20000
+    statusc 0
+    code(vertex, vx, vy, vz) {
+        movetolist(3.0, self)
+        SetVel(vx, vy, vz)
+        SetScale(0.2S)
+        statusb = FLAG_PHYSICS_ENGINE
+        if (vertex != -1.0) {
+            getvert(vtrans, creator, vertex)
+        }
+        zindex = 40
+        SetRot(0deg, 0deg, rand(360deg))
+        playanim(0, ORB_PARTICLE, 13)
+        settrans(OrbFadeBrightness)
+        playanim(0, ORB_PARTICLE, 4)
+    }
+}
+
+sub OrbFadeBrightness() { // S-674
+    moda = seek(moda, 16.0, 3.2)
+}
+
+state Wizard_Beard { // 11
+    stateflag 0
+    statusc 0
+    code() {
+        zindex = 24
+        playframes(WIZARD_BEARD, 0.0, 24.0)
+        sleep()
+    }
+}
+
+state Kill { // 12
+    stateflag 0x20
+    statusc 0
+    code() {}
+}

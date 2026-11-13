@@ -1,0 +1,352 @@
+#gool WavOC 69 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_WavOC.gooc" "C3\Out\C3_WavOC.nsentry"
+
+#anim WAVE_PUSHER  [Pu1oV] [Pu1oG] 13 1 2
+#anim WAVE_CRANK   [Cr1oV] [Cr1oG] 01 1 2
+#anim WAVE_GATE    [wg1oV] [wg1oG] 99 1 2
+#anim QUAD_GHOST   [QG1oV] [QG1oG] 01 1 2
+#anim QUAD_IRON    [QI1oV] [QI1oG] 01 1 2
+
+#spawn S_WAVE_PUSHER    Wave_Pusher_Init
+#spawn S_CRANK          Wave_Crank_Init
+#spawn S_WAVE_GATE      Wave_Gate
+#spawn S_QUAD_IRON      Quad_Iron
+#spawn S_QUAD_GHOST     Quad_Ghost
+
+var CycleLength, CycleOffset, ResetTime
+
+state Wave_Pusher_Init {
+    statusc 0x80002
+    code(cyclelen, cycleoff, yaw, reset) {
+        zindex = 32
+        roty = yaw
+        CycleLength = cyclelen * 1s / 1.2s
+        CycleOffset = cycleoff * 1s / 1.2s
+        ResetTime = reset
+        if (roty % 90deg) {
+            scalez = 22.625
+        }
+        var offs = (CycleOffset << 8) / CycleLength
+        CycleLength = CycleLength * 1s / 1.2s
+        CycleLength += 1
+        CycleLength &= 0xFFFE
+        CycleOffset = CycleLength * offs >> 8
+        setanim(WAVE_PUSHER)
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        changestate(Wave_Pusher)
+    }
+}
+
+state Wave_Pusher {
+    statusc 0x80002
+    code() {
+        sleepframe(0)
+    }
+    trans {
+        nofirst {
+            changestateifn(Wave_Pusher_Push, time(CycleLength, CycleOffset))
+        }
+    }
+}
+
+state Wave_Pusher_Push {
+    statusc 0x80002
+    code() {
+        if (roty == 0deg) {
+            settrans(PushColliderPosX)
+        }
+        if (roty == 180deg) {
+            settrans(PushColliderNegX)
+        }
+        if (roty == -45deg) {
+            settrans(PushColliderPosXZ)
+        }
+        if (roty == 135deg) {
+            settrans(PushColliderNegXZ)
+        }
+        while (player -> stateflag \ 0x8000000) {
+            playframe()
+        }
+        animframe = 0
+        sounddecay(2.58s)
+        soundpitch(3.6 + rand(0.8))
+        soundplay([sx2wA], 1V)
+        animframe = -1.0
+        do {
+            animframe += 1.0
+            if (player -> stateflag \ 0x8000000) {
+                goto exit
+            }
+            playframe()
+        } while (animframe + 1.0 <= 12.0)
+        soundfadet(2, voice)
+        soundfadev(0, voice, 3)
+        tpc = 0
+        WaitFrame(ResetTime)
+        exit:
+        tpc = 0
+        if (animframe) {
+            sounddecay(2.6s)
+            soundpitch(3.6 + rand(0.8))
+            soundplay([sr2wA], 0.8V)
+        }
+        playframesback(animframe, 0.0)
+        soundfadet(2, voice)
+        soundfadev(0, voice, 3)
+        changestate(Wave_Pusher)
+    }
+}
+
+sub PushColliderPosX() {
+    getvert(vvec, self, 0)
+    if (collider && !(statusa & 0x4000) && abs(z - player -> z) < 1m && abs(player -> x - vecx) < 2m && collider -> x < vecx) {
+        collider -> x = vecx
+    }
+}
+
+sub PushColliderNegX() {
+    getvert(vvec, self, 0)
+    if (collider && !(statusa & 0x4000) && abs(z - player -> z) < 1m && abs(player -> x - vecx) < 2m && collider -> x > vecx) {
+        collider -> x = vecx
+    }
+}
+
+sub PushColliderPosXZ() {
+    getvert(vvec, self, 0)
+    if (collider && (!(statusa & 0x4000) && abs((x - player -> x) - (z - player -> z)) < 1m && distance(vec, player, DIST_NO_Y) < 2m)) {
+        if (collider -> x < vecx) {
+            collider -> x = vecx
+        }
+        if (collider -> z < vecz) {
+            collider -> z = vecz
+        }
+    }
+}
+
+sub PushColliderNegXZ() {
+    getvert(vvec, self, 0)
+    if (collider && (!(statusa & 0x4000) && abs((x - player -> x) - (z - player -> z)) < 1m && distance(vec, player, DIST_NO_Y) < 2m)) {
+        if (collider -> x > vecx) {
+            collider -> x = vecx
+        }
+        if (collider -> z > vecz) {
+            collider -> z = vecz
+        }
+    }
+}
+
+state Wave_Crank_Init {
+    statusc 0x80002
+    code(obj, reset, unused) {
+        movetolist(5.0, self)
+        zindex = 32
+        ResetTime = reset * 1s / 1.2s
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        until (creator) {
+            creator = objectget(obj)
+            if (!creator) {
+                playnull()
+            }
+        }
+        playanim(0, WAVE_CRANK)
+        playanim(0, WAVE_CRANK)
+        stalltime = 0
+        changestate(Wave_Crank)
+    }
+}
+
+state Wave_Crank {
+    stateflag 0x4000081
+    statusc 0x80002
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        sleepanim(0, WAVE_CRANK)
+    }
+    event(e, a) {
+        accevcstate(Wave_Crank_Spin, e == EventSpinHit)
+    }
+    trans {
+        once {
+            troty = 0deg
+        }
+        if (frametime - statetime >= 0.1s) {
+            if (troty < 120deg) {
+                troty = 0deg
+            }
+            troty = (troty * 20.3deg) >> 8
+        }
+        changestateif(Wave_Crank_Wait, creator -> animframe == 0 && troty >= 0deg, ResetTime)
+        changestateif(Wave_Crank_Wait, !(creator -> stateflag \ 0x4) && troty <= 0deg, 7)
+        changestateif(Wave_Crank_Wait, player -> z > z + 5m && !(creator -> stateflag \ 0x4), 0)
+        changestateif(Wave_Crank_Reset, CAMTRANSZ < creator -> z - 4.5m || player -> z < creator -> z - 1.5m)
+        v0 = spd(0, troty)
+        roty += v0
+        sendevent(Event75, creator, -v0)
+        if (troty == 0deg && stalltime) {
+            soundfadet(1s, stalltime)
+            soundfadev(0V, stalltime, 3)
+        }
+    }
+}
+
+state Wave_Crank_Wait {
+    statusc 0x80002
+    __transargs
+    code(reset) {
+        if (troty == 0 && stalltime) {
+            soundfadet(1s, stalltime)
+            soundfadev(0V, stalltime, 3)
+        }
+        sleepanim(0, WAVE_CRANK)
+    }
+    event(e, a) {
+        accevcstate(Wave_Crank_Reset, e == Event21)
+    }
+    trans {
+        once {
+            troty = 0deg
+        }
+        if (frametime - statetime >= reset || player -> z > z + 5m && !(creator -> stateflag \ 0x4)) {
+            troty = spd(troty, -13000deg)
+            if (troty < -16000deg) {
+                troty = -16000deg
+            }
+            v0 = spd(0deg, troty)
+            roty += v0
+            sendeventif(Event75, creator, v0, -v0)
+            if (creator -> stateflag \ 0x4) {
+                if (!SHAKEY) {
+                    SHAKEY = troty / -6deg
+                }
+                changestate(Wave_Crank)
+            }
+        }
+        changestateif(Wave_Crank_Reset, CAMTRANSZ < creator -> z - 4.5m || player -> z < creator -> z - 1.5m)
+    }
+}
+
+state Wave_Crank_Reset {
+    statusc 0x80002
+    code() {
+        sleepanim(0, WAVE_CRANK)
+    }
+    trans {
+        once {
+            troty = 0deg
+        }
+        troty = spd(troty, 10000deg)
+        if (troty > 24000deg) {
+            troty = 24000deg
+        }
+        v0 = spd(0, troty)
+        sendeventif(Event75, creator, v0, -v0)
+        changestateif(Wave_Crank, (!(player -> stateflag \ 0x20) && !player -> invincible) && CAMTRANSZ > creator -> z - 4.5m && player -> z > creator -> z - 1.5m)
+        changestateif(Wave_Crank_Wait, player -> z > z + 5m && !(creator -> stateflag \ 0x4), 0)
+    }
+}
+
+state Wave_Crank_Spin {
+    statusc 0x80002
+    code() {
+        soundpitch(4.0)
+        sounddecay(8.5s)
+        soundplay([Cr1oA], 1V)
+        stalltime = voice
+        sleepanim(0, WAVE_CRANK)
+    }
+    trans {
+        once {
+            troty = 0deg
+        }
+        troty = spd(troty, 5000deg)
+        if (troty > 24000deg) {
+            troty = 24000deg
+        }
+        v0 = spd(0, troty)
+        roty = spd(roty, 1000deg)
+        sendeventif(Event75, creator, v0, -v0)
+        changestateifn(Wave_Crank_Wait, creator -> animframe, ResetTime)
+        changestateif(Wave_Crank_Wait, player -> z > z + 5m && !(creator -> stateflag \ 0x4), 0)
+    }
+}
+
+state Wave_Gate {
+    statusc 0x80002
+    code() {
+        creator = 0
+        zindex = 32
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_SIDES | FLAG_SOLID_BOTTOM
+        setanim(WAVE_GATE, 98.0)
+        if (CAMTRANSZ < z + 1.5m) {
+            animframe = 0
+        }
+        sleep()
+    }
+    event(e, a) {
+        accevif (e == Event75) {
+            creator = interrupter
+            v0 = a[0]
+            animframe += v0
+            stateflag &= ~4
+            if (animframe < 0) {
+                animframe = 0
+            }
+            else if (animframe >= 98.0) {
+                animframe = 98.0
+                stateflag |= 4
+            }
+        }
+    }
+    trans {
+        if (collider) {
+            if ((v0 > 0 || stateflag \ 0x4) && abs(z - player -> z) < 1.4m) {
+                sendevent(EventCrush, player, 100.0)
+                sendeventif(Event21, creator, eventaccepted, 0)
+            }
+        }
+        if (v0 > 0 && field_61 == 0) {
+            soundpitch(1.63)
+            soundsetup(7, self, 8)
+            soundplay([Sm1iA], 1V)
+        }
+        field_61 = animframe
+    }
+}
+
+state Quad_Iron {
+    statusc 0x80002
+    code() {
+        entitysetstate(1)
+        zindex = 32
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        sleepanim(0, QUAD_IRON)
+    }
+}
+
+state Quad_Ghost {
+    statusc 0x80002
+    code() {
+        zindex = 32
+        changestateif(Quad_Iron, entitygetstate(2))
+        sleepanim(0, QUAD_GHOST)
+    }
+    event(e, a) {
+        accevcstate(Quad_Iron, e == EventTriggered)
+    }
+}
+
+state Sleep {
+    stateflag 0x20
+    statusc 0
+    code() {
+        sleep()
+    }
+}
+
+state Kill {
+    stateflag 0x20
+    statusc 0
+    code() {}
+}

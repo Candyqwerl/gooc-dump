@@ -1,0 +1,3748 @@
+#gool CHeOC 36 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 2 -r pal "C2\C2_CHeOC.gooc" "C2\Out\C2_CHeOC.nsentry"
+
+#anim PROJECTOR_ROBOT_1[Psr2V] 8 0
+#anim PROJECTOR_ROBOT_2[PsR2V] 8 0
+
+#anim CORTEX_HEAD_0   [C0_2V] 18 1
+#anim CORTEX_HEAD_1   [C002V] 255 1
+#anim CORTEX_HEAD_2   [C012V] 255 1
+#anim CORTEX_HEAD_3   [C022V] 192 1
+
+#anim CORTEX_HEAD_4   [C1_2V] 18 1
+#anim CORTEX_HEAD_5   [C102V] 255 1
+#anim CORTEX_HEAD_6   [C112V] 255 1
+#anim CORTEX_HEAD_7   [C122V] 247 1
+
+#anim CORTEX_HEAD_8   [C2_2V] 18 1
+#anim CORTEX_HEAD_9   [C202V] 255 1
+#anim CORTEX_HEAD_10  [C212V] 44 1
+
+#anim CORTEX_HEAD_11  [C3_2V] 18 1
+#anim CORTEX_HEAD_12  [C302V] 255 1
+#anim CORTEX_HEAD_13  [C312V] 255 1
+#anim CORTEX_HEAD_14  [C322V] 15 1
+
+#anim CORTEX_HEAD_15  [C4_2V] 18 1
+#anim CORTEX_HEAD_16  [C402V] 255 1
+#anim CORTEX_HEAD_17  [C412V] 255 1
+#anim CORTEX_HEAD_18  [C422V] 255 1
+#anim CORTEX_HEAD_19  [C432V] 255 1
+#anim CORTEX_HEAD_20  [C442V] 91 1
+
+#anim CORTEX_HEAD_21  [C5_2V] 18 1
+#anim CORTEX_HEAD_22  [C502V] 255 1
+#anim CORTEX_HEAD_23  [C512V] 173 1
+
+#anim CORTEX_HEAD_24  [C6_2V] 18 1
+#anim CORTEX_HEAD_25  [C602V] 255 1
+#anim CORTEX_HEAD_26  [C612V] 96 1
+
+#anim CORTEX_HEAD_27  [C7_2V] 18 1
+#anim CORTEX_HEAD_28  [C702V] 255 1
+#anim CORTEX_HEAD_29  [C712V] 255 1
+#anim CORTEX_HEAD_30  [C722V] 48 1
+
+#anim CORTEX_HEAD_31  [C8_2V] 18 1
+#anim CORTEX_HEAD_32  [C802V] 255 1
+#anim CORTEX_HEAD_33  [C812V] 255 1
+#anim CORTEX_HEAD_34  [C822V] 255 1
+#anim CORTEX_HEAD_35  [C832V] 23 1
+
+#anim CORTEX_HEAD_36  [C9_2V] 18 1
+#anim CORTEX_HEAD_37  [C902V] 255 1
+#anim CORTEX_HEAD_38  [C912V] 255 1
+#anim CORTEX_HEAD_39  [C922V] 255 1
+#anim CORTEX_HEAD_40  [C932V] 255 1
+#anim CORTEX_HEAD_41  [C942V] 255 1
+#anim CORTEX_HEAD_42  [C952V] 170 1
+
+#anim CORTEX_HEAD_43  [Ca_2V] 18 1
+#anim CORTEX_HEAD_44  [Ca02V] 204 1
+
+#anim CORTEX_HEAD_45  [Cb_2V] 18 1
+#anim CORTEX_HEAD_46  [Cb02V] 255 1
+#anim CORTEX_HEAD_47  [Cb12V] 144 1
+
+#anim CORTEX_HEAD_48  [Cc_2V] 18 1
+#anim CORTEX_HEAD_49  [Cc02V] 255 1
+#anim CORTEX_HEAD_50  [Cc12V] 255 1
+#anim CORTEX_HEAD_51  [Cc22V] 72 1
+  
+#anim CORTEX_HEAD_52  [Cd_2V] 18 1
+#anim CORTEX_HEAD_53  [Cd02V] 255 1
+#anim CORTEX_HEAD_54  [Cd12V] 45 1
+
+#anim BRIO_HEAD_0     [B0_2V] 18 1
+#anim BRIO_HEAD_1     [B002V] 255 1
+#anim BRIO_HEAD_2     [B012V] 255 1
+#anim BRIO_HEAD_3     [B022V] 255 1
+#anim BRIO_HEAD_4     [B032V] 255 1
+#anim BRIO_HEAD_5     [B042V] 255 1
+#anim BRIO_HEAD_6     [B052V] 72 1
+
+#anim BRIO_HEAD_7     [B1_2V] 18 1
+#anim BRIO_HEAD_8     [B102V] 255 1
+#anim BRIO_HEAD_9     [B112V] 255 1
+#anim BRIO_HEAD_10    [B122V] 255 1
+#anim BRIO_HEAD_11    [B132V] 21 1
+
+#anim SIS_HEAD_0      [S702V] 154 1
+#anim SIS_HEAD_1      [S602V] 255 1
+#anim SIS_HEAD_2      [S612V] 141 1
+#anim SIS_HEAD_3      [S2_2V] 18 1
+#anim SIS_HEAD_4      [S202V] 255 1
+#anim SIS_HEAD_5      [S212V] 75 1
+#anim SIS_HEAD_6      [S3_2V] 18 1
+#anim SIS_HEAD_7      [S302V] 258 1
+#anim SIS_HEAD_8      [S4_2V] 18 1
+#anim SIS_HEAD_9      [S402V] 255 1
+#anim SIS_HEAD_10     [S412V] 226 5
+#anim SIS_HEAD_11     [S5_2V] 18 1
+#anim SIS_HEAD_12     [S502V] 233 1
+
+#sprite WARP_PORTAL_SWIRL[Car1T]
+#tex 0x808080 1 3 0 1 0 64 64 64
+
+#anim WARP_PORTAL_BG     [Wg1lV] 1 1
+#anim WARP_LIFT          [We1lV] 1 1
+#anim WARP_LIFT_BARRIER  [Wr1lV] 1 1
+#anim SECRET_DOOR_1      [Sd1lV] 1 1
+#anim SECRET_DOOR_2      [Sd2lV] 1 1
+#anim SECRET_DOOR_3      [Sd3lV] 1 1
+#anim SECRET_DOOR_4      [Sd4lV] 1 1
+#anim SECRET_DOOR_5      [Sd5lV] 1 1
+#anim WARP_PARTICLES     [Wp1lV] 121 1
+
+#sprite LIGHT[Cr20T]
+#tex 0xFFFFFF 0 0 5 0 928 32 32 32
+
+#sprite GLOW[WrpfT]
+#tex 0x808080 1 3 0 1 0 64 64 64
+
+#anim CRYSTAL[Cry1V] 1 0
+
+#spawn S_CUTSCENE           Cutscene_Init
+#spawn S_1                  __s_1
+#spawn S_PROJECTOR          Projector_Robot
+#spawn S_MONTY_HALL         Monty_Hall_Init
+#spawn S_CUTSCENE_DIMMER    Cutscene_Room_Dimmer
+#spawn S_PROJECTOR_LIGHT    Projector_Robot_Light
+#spawn S_PORTAL_FX          Portal_FX_Init
+#spawn S_PORTAL_SWIRL       Portal_Swirl_Init
+#spawn S_WARP_LIFT          WarpLift_Init
+#spawn S_WARP_LIFT_BARRIER  Warp_Lift_Barrier
+#spawn S_PORTAL_BG          Portal_Background_Init
+#spawn S_11                 __s_11
+#spawn S_PORTAL_PARTICLES   Portal_Particles_Init
+#spawn S_13                 __s_13
+#spawn S_14                 __s_14
+#spawn S_CUTSCENE_EXTRAS    Cutscene_Extras
+#spawn S_SECRET_DOOR        Secret_Door_Init
+#spawn S_ANTENNA_GLOW       Antenna_Glow
+
+array WarpDoorTable0 = { 0x1800, 0x11F800, 0x1F00, 0x11F800, 0x1900, 0x125C00, 0xE00, 0x11F800, 0x1E00, 0xD4800 }
+array WarpDoorTable1 = { 0x2300, 0x11F800, 0x1B00, 0x11F800, 0x1D00, 0xFA000, 0x2000, 0x11F800, 0x1100, 0xD4800 }
+array WarpDoorTable2 = { 0x1700, 0x11F800, 0x1600, 0x11F800, 0x2200, 0xFA000, 0xA00, 0x11F800, 0x2100, 0xD4800 }
+array WarpDoorTable3 = { 0x2400, 0x151800, 0xF00, 0x12C000, 0x1300, 0x15E000, 0x1500, 0x151800, 0xD00, 0x106800 }
+array WarpDoorTable4 = { 0x2600, 0x11F800, 0x1A00, 0x11F800, 0xC00, 0xFA000, 0x1200, 0x11F800, 0x1000, 0xD4800 }
+array WarpDoorTable5 = { 0x2700, 0x12A400, 0x2500, 0x12A400, 0x1600, 0x12A400, 0xE00, 0x12A400, 0x2000, 0x12A400 }
+
+array PortalTable0 = { 0x2D2, 0x2A800, 0x516, 0x32000, 0x800, 0xC800, 0xAAA, 0x3E800, 0xD55, 0x19000 }
+array PortalTable1 = { 0x2A7, 0x2D000, 0x550, 0x3E800, 0x800, 0xC800, 0xAAA, 0x20800, 0xD55, 0x39800 }
+array PortalTable2 = { 0x2AC, 0x2D000, 0x55C, 0x3ABFF, 0x800, 0x3E800, 0xAAA, 0x4B000, 0xD59, 0x39800 }
+array PortalTable3 = { 0x2A7, 0x57800, 0x550, 0x3E800, 0x800, 0x57800, 0xAAA, 0x57800, 0xD55, 0x39800 }
+array PortalTable4 = { 0x2AA, 0x2D000, 0x554, 0x48800, 0x800, 0x2D000, 0xAAA, 0x48800, 0xD57, 0x32000 }
+array PortalTable5 = { 0x2AA, 0x37000, 0x555, 0x3E800, 0x800, 0x3E800, 0xAAA, 0x3E800, 0xD55, 0x39800 }
+
+array PortalSlotTable = { 0x80, -0x100, -0x100, 0x2F1, 0x000, -0x100, 0x566, 0x100, 0x000, 0x7FD, 0x200, 0x100, 0xAA7, 0x300, 0x200, 0xE49, 0x400, 0x300, 0x1000, -0x100, 0x400 }
+array SecretDoorUnlockMasks = { 4, 2, 1, 16, 8 }
+
+expr OBJ_WARP_LIFT = 14.0
+
+var WarpVar1, WarpVar2, WarpVar3, FloorIndex, WarpVar5, WarpVar6, WarpVar7, WarpVar8, WarpVar9, WarpVar10, WarpVar11,
+    WarpVar12, WarpVar13, WarpVar14, WarpVar15, WarpVar16, WarpVar17, WarpVar18, WarpVar19, WarpVar20, WarpRoomTable, WarpVar22
+
+expr PlayerAngle                   = WarpVar1
+expr PlayerDistance                = WarpVar2
+expr FacingTarget                  = WarpVar3
+expr CameraTarget                  = WarpVar5
+expr IdleTimer                     = WarpVar6
+expr CameraTargetChanged           = WarpVar7
+expr CutsceneOBJ                   = WarpVar8
+expr PortalFXOBJ                   = WarpVar9
+expr ProjectorOBJ                  = WarpVar10
+expr RoomDimmerOBJ                 = WarpVar11
+expr LoadSaveOBJ                   = WarpVar12
+expr CheatStep                     = WarpVar13
+expr UnlockCheatStep               = WarpVar14
+expr CutsceneCheatStep             = WarpVar15
+expr WarpCutsceneIndex             = WarpVar16
+expr ActiveAntennaCount            = WarpVar17
+expr PlayerWasWarping              = WarpVar18
+expr DebugCutsceneIndex            = WarpVar19
+expr WarpLiftOBJ                   = WarpVar20
+expr DoorTable                     = WarpRoomTable
+expr PlayerHasMoved                = WarpVar22
+expr CutsceneFlags                 = WarpVar7
+
+expr DistortionLevel               = WarpVar6
+expr TargetDistortionLevel         = WarpVar7
+expr FloorY                        = WarpVar8
+expr ScanOffset                    = WarpVar9
+expr ScanVelocity                  = WarpVar10
+expr TargetFlicker                 = WarpVar11
+expr Flicker                       = WarpVar13
+expr Visibility                    = WarpVar14
+expr TargetVisibility              = WarpVar15
+expr HologramCutsceneIndex         = WarpVar16
+
+expr ProjectorOrbitRadius          = WarpVar6
+expr ProjectorTargetOrbitRadius    = WarpVar7
+expr ProjectorNextRadiusChange     = WarpVar8
+expr ProjectorAnimFrame            = WarpVar9
+expr ProjectorTargetAnimFrame      = WarpVar10
+expr ProjectorNextAnimChange       = WarpVar11
+expr ProjectorAnimAlternation      = WarpVar13
+expr ProjectorOrbitYawSpeed        = WarpVar14
+expr ProjectorTargetOrbitPitch     = WarpVar15
+
+expr PortalAYaw                    = WarpVar1
+expr PortalBYaw                    = WarpVar2
+expr PortalAY                      = WarpVar3
+expr PortalBY                      = WarpVar6
+expr PortalAIndex                  = WarpVar7
+expr PortalBIndex                  = WarpVar8
+expr PortalAlpha                   = WarpVar11
+expr PortalTargetAlpha             = WarpVar12
+expr PortalVIDOLoaded              = WarpVar13
+expr PortalASwirlOffset            = WarpVar14
+expr PortalBSwirlOffset            = WarpVar15
+expr PortalAYawSin                 = WarpVar16
+expr PortalAYawCos                 = WarpVar17
+expr PortalBYawSin                 = WarpVar18
+expr PortalBYawCos                 = WarpVar19
+expr PortalFloorY                  = WarpVar20
+expr PortalTable                   = WarpRoomTable
+
+expr PortalFXYaw                   = WarpVar1
+expr PortalFXUseSlotA              = WarpVar9
+expr PortalFXAlpha                 = WarpVar11
+expr PortalFXYawSin                = WarpVar16
+expr PortalFXYawCos                = WarpVar17
+
+expr PortalFXDoorIndex             = WarpVar7
+expr PortalSwirlIndex              = WarpVar10
+expr PortalSwirlOffset             = WarpVar14
+
+expr SecretDoorBaseY               = WarpVar1
+expr SecretDoorBobOffset           = WarpVar2
+expr SecretDoorWaveOffset          = WarpVar3
+expr SecretDoorBobVelocity         = WarpVar6
+expr SecretDoorNextBobTime         = WarpVar7
+expr SecretDoorAntennaActive       = WarpVar17
+
+
+expr LiftStartPathProg             = WarpVar1
+expr LiftTargetPathProg            = WarpVar2
+expr LiftBarrierFloor              = WarpVar3
+expr LiftMoveDirection             = WarpVar7
+expr LiftRotationSpeed             = WarpVar8
+expr LiftCarryRestoreStep          = WarpVar9
+expr LiftAllowedDirections         = WarpVar10
+
+expr TargetFade                    = WarpVar11
+expr AntennaGlowEndTime            = WarpVar1
+
+state Monty_Hall_Init { // 0
+    code(floor) {
+        FloorIndex = floor
+        GLOBAL_131 = 0
+        CheatStep = 0
+        UnlockCheatStep = 0
+        CutsceneCheatStep = 0
+        PlayerHasMoved = 1
+        CameraTarget = 0
+        FacingTarget = 0
+        PlayerWasWarping = 0
+        WarpCutsceneIndex = 0
+        DebugCutsceneIndex = 1
+        RoomDimmerOBJ = 0
+        ProjectorOBJ = 0
+        WarpLiftOBJ = objectget(OBJ_WARP_LIFT)
+        if (FloorIndex == 0) {
+            DoorTable = WarpDoorTable0
+        }
+        else if (FloorIndex == 1) {
+            DoorTable = WarpDoorTable1
+        }
+        else if (FloorIndex == 2) {
+            DoorTable = WarpDoorTable2
+        }
+        else if (FloorIndex == 3) {
+            DoorTable = WarpDoorTable3
+        }
+        else if (FloorIndex == 4) {
+            DoorTable = WarpDoorTable4
+        }
+        else {
+            DoorTable = WarpDoorTable5
+        }
+
+        if (FloorIndex == 5) {
+            CutsceneOBJ = 0
+            ActiveAntennaCount = 0
+            if ((GLOBAL_150 & 4) || (GLOBAL_21 & 1)) {
+                spawn(CHeOC, S_SECRET_DOOR, 1, 1)
+            }
+            if ((GLOBAL_150 & 2) || (GLOBAL_21 & 1)) {
+                spawn(CHeOC, S_SECRET_DOOR, 1, 2)
+            }
+            if ((GLOBAL_150 & 1) || (GLOBAL_21 & 1)) {
+                spawn(CHeOC, S_SECRET_DOOR, 1, 3)
+            }
+            if ((GLOBAL_150 & 16) || (GLOBAL_21 & 1)) {
+                spawn(CHeOC, S_SECRET_DOOR, 1, 4)
+            }
+            if ((GLOBAL_150 & 8) || (GLOBAL_21 & 1)) {
+                spawn(CHeOC, S_SECRET_DOOR, 1, 5)
+            }
+        }
+        else {
+            spawn(CHeOC, S_CUTSCENE, 1)
+            CutsceneOBJ = objectspawned
+        }
+        spawn(CHeOC, S_PORTAL_FX, 1)
+        PortalFXOBJ = objectspawned
+        changestate(WarpRoom_Idle)
+    }
+}
+
+sub UpdateFacingTarget() {
+    PlayerAngle = atan(-player -> x, -player -> z) & 0xFFF
+    FacingTarget = 0
+    if (PlayerAngle < 20.05deg || PlayerAngle >= 340deg) {
+        FacingTarget = 1
+    }
+    else if (PlayerAngle >= 160deg) {
+        if (PlayerAngle < 200.05deg) {
+            FacingTarget = 4
+        }
+        else if (PlayerAngle >= 220deg && PlayerAngle < 260.1deg) {
+            FacingTarget = 5
+        }
+        else if (PlayerAngle >= 280deg && PlayerAngle < 320.05deg) {
+            FacingTarget = 6
+        }
+    }
+    else {
+        if (PlayerAngle >= 40deg && PlayerAngle < 80.1deg) {
+            FacingTarget = 2
+        }
+        else if (PlayerAngle >= 100deg && PlayerAngle < 140.05deg) {
+            FacingTarget = 3
+        }
+    }
+    PlayerDistance = distance(player, DIST_NO_Y)
+}
+
+sub ApplyCameraFocusTarget() {
+    var s3 = 0, s4 = 1, zoom = -1
+    var s6 = 0, ticks = 22, yaw = 0
+    if (var target = var0; target == 1) {
+        ticks = 0
+        yaw = 0deg
+        zoom = 7m
+    }
+    else if (target == 2) {
+        yaw = 60deg
+    }
+    else if (target == 3) {
+        yaw = 120deg
+    }
+    else if (target == 4) {
+        yaw = 180deg
+    }
+    else if (target == 5) {
+        yaw = 240deg
+    }
+    else if (target == 6) {
+        yaw = 300deg
+    }
+    ins72(0x500, s6)
+    ins72(0x600, s3)
+}
+
+sub CapturePlayerPosition() {
+    rotx = player -> x
+    roty = player -> y
+    rotz = player -> z
+}
+
+sub FilterCameraTarget() {
+    if (var0 < 1) {
+        var0 = 0
+    }
+    else if (var0 == 1) {
+        if (PlayerDistance < 4.5m) {
+            var0 = 0
+        }
+    }
+    else if (PlayerDistance < 2.5m) {
+        var0 = 0
+    }
+}
+
+sub ResolveFacingDoorLevel() {
+    var0 -= 2
+    if (var0 >= 0) {
+        var level = -1
+        var min_dist = 80m
+        var pointer = 0
+        var unlock_masks = 0
+        var unlock_mask = 0
+        if (var0 < 5) {
+            unlock_masks = SecretDoorUnlockMasks
+            unlock_mask = unlock_masks[var0 << 8]
+        }
+        pointer = (var0 << 1) << 8
+        level = WarpRoomTable[pointer]
+        min_dist = WarpRoomTable[pointer + 1.0]
+        if (PlayerDistance < min_dist || (FloorIndex == 5 && !(GLOBAL_21 & 1) && !(GLOBAL_150 & unlock_mask))) {
+            level = -1
+        }
+        var0 = level
+    }
+    else {
+        var0 = -1
+    }
+}
+
+sub SetCutsceneIndex() {
+    WarpCutsceneIndex = 0
+    if (FloorIndex != 5) {
+        var gems, crystals
+        misc = 0
+        CountPoolBits(SAVEDGEMPOOL1)
+        CountPoolBits(SAVEDGEMPOOL2)
+        gems = misc
+        misc = 0
+        CountPoolBits(SAVEDCRYSTALPOOL1)
+        CountPoolBits(SAVEDCRYSTALPOOL2)
+        crystals = misc
+        if (!(2 & PREVBOXCOUNT)) {
+            WarpCutsceneIndex = 1
+        }
+        else if (!(4 & PREVBOXCOUNT)) {
+            if (crystals >= 1) {
+                WarpCutsceneIndex = 2
+            }
+            else {
+                if (!(0x4000 & PREVBOXCOUNT)) {
+                    WarpCutsceneIndex = 14
+                }
+                else if (!(0x8000 & PREVBOXCOUNT)) {
+                    WarpCutsceneIndex = 15
+                }
+                else if (!(0x10000 & PREVBOXCOUNT)) {
+                    WarpCutsceneIndex = 16
+                }
+            }
+        }
+        else if (!(8 & PREVBOXCOUNT) && crystals >= 3) {
+            WarpCutsceneIndex = 3
+        }
+        else if (!(16 & PREVBOXCOUNT) && crystals >= 5) {
+            WarpCutsceneIndex = 4
+        }
+        else if (!(32 & PREVBOXCOUNT) && 64 & GLOBAL_27) {
+            WarpCutsceneIndex = 5
+        }
+        else if (!(64 & PREVBOXCOUNT) && crystals >= 10) {
+            WarpCutsceneIndex = 6
+        }
+        else if (!(0x80 & PREVBOXCOUNT) && 0x100 & GLOBAL_27) {
+            WarpCutsceneIndex = 7
+        }
+        else if (!(0x100 & PREVBOXCOUNT) && crystals >= 12) {
+            WarpCutsceneIndex = 8
+        }
+        else if (!(0x200 & PREVBOXCOUNT) && crystals >= 15) {
+            WarpCutsceneIndex = 9
+        }
+        else if (!(0x400 & PREVBOXCOUNT) && crystals >= 17) {
+            WarpCutsceneIndex = 10
+        }
+        else if (!(0x800 & PREVBOXCOUNT) && crystals >= 20) {
+            WarpCutsceneIndex = 11
+        }
+        else if (!(0x1000 & PREVBOXCOUNT) && 0x200 & GLOBAL_27) {
+            WarpCutsceneIndex = 12
+        }
+        else if (!(0x80 & GLOBAL_27) && !(0x2000 & PREVBOXCOUNT) && crystals >= 25) {
+            WarpCutsceneIndex = 13
+        }
+        else if (!(0x20000 & PREVBOXCOUNT) && gems >= 1) {
+            WarpCutsceneIndex = 17
+        }
+        else if (!(0x40000 & PREVBOXCOUNT) && gems >= 42 && (0x80 & GLOBAL_27)) {
+            WarpCutsceneIndex = 18
+        }
+        if (WarpCutsceneIndex) {
+            PREVBOXCOUNT += 1 << WarpCutsceneIndex
+        }
+    }
+}
+
+sub DebugCheats() {
+    if (DEBUG) {
+        if (dirpress(PAD_N) || dirpress(PAD_S) || dirpress(PAD_W) || dirpress(PAD_E) || buttonpress(0x9FF)) {
+            if (var step = CheatStep; step == 0) {
+                if (dirpress(PAD_E)) {
+                    CheatStep += 1.0
+                }
+                else {
+                    CheatStep = 0
+                }
+            }
+            else if (step == 1.0) {
+                if (dirpress(PAD_S)) {
+                    CheatStep += 1.0
+                }
+                else {
+                    CheatStep = 0
+                }
+            }
+            else if (step == 2.0) {
+                if (dirpress(PAD_S)) {
+                    CheatStep += 1.0
+                }
+                else {
+                    CheatStep = 0
+                }
+            }
+            else if (step == 3.0) {
+                if (dirpress(PAD_W)) {
+                    CheatStep += 1.0
+                }
+                else {
+                    CheatStep = 0
+                }
+            }
+            else if (step == 4.0) {
+                if (dirpress(PAD_S)) {
+                    CheatStep += 1.0
+                }
+                else {
+                    CheatStep = 0
+                }
+            }
+            else if (step == 5.0) {
+                if (buttonpress(PAD_CIRCLE)) {
+                    CheatStep += 1.0
+                }
+                else {
+                    CheatStep = 0
+                }
+            }
+            else if (step == 6.0) {
+                if (buttonpress(PAD_TRIANGLE)) {
+                    CheatStep += 1.0
+                }
+                else {
+                    CheatStep = 0
+                }
+            }
+            else if (step == 7.0) {
+                if (buttonpress(PAD_CIRCLE)) {
+                    soundpitch(3.625)
+                    soundsetup(0, 11)
+                    sounddecay(9.6s)
+                    soundplay([1up0A], 0.5V)
+                    GLOBAL_21 = 0
+                    SAVEDGEMPOOL1 = 0
+                    SAVEDGEMPOOL2 = 0
+                    CheatStep = 0
+                }
+                else {
+                    CheatStep = 0
+                }
+            }
+        }
+
+        if (dirpress(PAD_N) || dirpress(PAD_S) || dirpress(PAD_W) || dirpress(PAD_E) || buttonpress(0x9FF)) {
+            if (var step = UnlockCheatStep; step == 0) {
+                if (dirpress(PAD_E)) {
+                    UnlockCheatStep += 1.0
+                }
+                else {
+                    UnlockCheatStep = 0
+                }
+            }
+            else if (step == 1.0) {
+                if (dirpress(PAD_S)) {
+                    UnlockCheatStep += 1.0
+                }
+                else {
+                    UnlockCheatStep = 0
+                }
+            }
+            else if (step == 2.0) {
+                if (dirpress(PAD_S)) {
+                    UnlockCheatStep += 1.0
+                }
+                else {
+                    UnlockCheatStep = 0
+                }
+            }
+            else if (step == 3.0) {
+                if (dirpress(PAD_W)) {
+                    UnlockCheatStep += 1.0
+                }
+                else {
+                    UnlockCheatStep = 0
+                }
+            }
+            else if (step == 4.0) {
+                if (dirpress(PAD_S)) {
+                    UnlockCheatStep += 1.0
+                }
+                else {
+                    UnlockCheatStep = 0
+                }
+            }
+            else if (step == 5.0) {
+                if (buttonpress(PAD_CIRCLE)) {
+                    UnlockCheatStep += 1.0
+                }
+                else {
+                    UnlockCheatStep = 0
+                }
+            }
+            else if (step == 6.0) {
+                if (buttonpress(PAD_SQUARE)) {
+                    UnlockCheatStep += 1.0
+                }
+                else {
+                    UnlockCheatStep = 0
+                }
+            }
+            else if (step == 7.0) {
+                if (buttonpress(PAD_TRIANGLE)) {
+                    soundpitch(3.625)
+                    soundsetup(0, 11)
+                    sounddecay(9.6s)
+                    soundplay([1up0A], 0.5V)
+                    GLOBAL_21 ^= 1
+                    SAVEDGEMPOOL2 |= 0x7C000000
+                    UnlockCheatStep = 0
+                }
+                else {
+                    UnlockCheatStep = 0
+                }
+            }
+        }
+
+        if (dirpress(PAD_N) || dirpress(PAD_S) || dirpress(PAD_W) || dirpress(PAD_E) || buttonpress(0x9FF)) {
+            if (var step = CutsceneCheatStep; step == 0) {
+                if (dirpress(PAD_E)) {
+                    CutsceneCheatStep += 1.0
+                }
+                else {
+                    CutsceneCheatStep = 0
+                }
+            }
+            else if (step == 1.0) {
+                if (dirpress(PAD_S)) {
+                    CutsceneCheatStep += 1.0
+                }
+                else {
+                    CutsceneCheatStep = 0
+                }
+            }
+            else if (step == 2.0) {
+                if (dirpress(PAD_S)) {
+                    CutsceneCheatStep += 1.0
+                }
+                else {
+                    CutsceneCheatStep = 0
+                }
+            }
+            else if (step == 3.0) {
+                if (dirpress(PAD_W)) {
+                    CutsceneCheatStep += 1.0
+                }
+                else {
+                    CutsceneCheatStep = 0
+                }
+            }
+            else if (step == 4.0) {
+                if (buttonpress(PAD_X)) {
+                    CutsceneCheatStep += 1.0
+                }
+                else {
+                    CutsceneCheatStep = 0
+                }
+            }
+            else if (step == 5.0) {
+                if (buttonpress(PAD_CIRCLE)) {
+                    CutsceneCheatStep += 1.0
+                }
+                else {
+                    CutsceneCheatStep = 0
+                }
+            }
+            else if (step == 6.0) {
+                if (buttonpress(PAD_CIRCLE)) {
+                    soundpitch(3.625)
+                    soundsetup(0, 11)
+                    sounddecay(9.6s)
+                    soundplay([1up0A], 0.5V)
+                    GLOBAL_21 ^= 2
+                    CutsceneCheatStep = 0
+                }
+                else {
+                    CutsceneCheatStep = 0
+                }
+            }
+        }
+    }
+}
+
+state WarpRoom_Idle { // 1
+    statusc 0
+    code() {
+        sleepnull()
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            IdleTimer = 0
+            CameraTargetChanged = 0
+            CapturePlayerPosition()
+        }
+        DebugCheats()
+        UpdateFacingTarget()
+        if (player -> stateflag & 0x8000) {
+            PlayerWasWarping = 1
+            player -> troty = CAMROTY
+            player -> roty = CAMROTY
+        }
+        else if (PlayerWasWarping) {
+            PlayerWasWarping = 0
+            if (FacingTarget == 1) {
+                CameraTarget = FacingTarget
+                changestate(LoadSave_Triggered, 1)
+            }
+            else {
+                SetCutsceneIndex()
+                changestateif(Cutscene_Triggered, getfield(self, offsetof(WarpCutsceneIndex)))
+            }
+        }
+        misc = GLOBAL_21 & 2
+        if (misc) {
+            misc = buttonhold(PAD_E)
+            if (misc) {
+                misc = FloorIndex != 5
+            }
+        }
+        if (misc) {
+            WarpCutsceneIndex = DebugCutsceneIndex
+            DebugCutsceneIndex += 1
+            if (DebugCutsceneIndex > 18) {
+                DebugCutsceneIndex = 1
+            }
+            changestate(Cutscene_Triggered)
+        }
+        var0 = FacingTarget
+        ResolveFacingDoorLevel()
+        changestateif(WarpDoor_LoadLevel, var0 >= 0)
+        var0 = FacingTarget
+        FilterCameraTarget()
+        if (CameraTarget != var0) {
+            CameraTarget = var0
+            CameraTargetChanged = 1
+        }
+        IdleTimer += 1.0
+        if (player -> x != rotx) {
+            IdleTimer = 0
+            PlayerHasMoved = 1
+        }
+        if (player -> y != roty) {
+            IdleTimer = 0
+            PlayerHasMoved = 1
+        }
+        if (player -> z != rotz) {
+            IdleTimer = 0
+            PlayerHasMoved = 1
+        }
+        if (!CameraTarget) {
+            IdleTimer = 0
+        }
+        if (!PlayerHasMoved) {
+            IdleTimer = 0
+        }
+        CapturePlayerPosition()
+        if (CameraTargetChanged) {
+            var0 = 0xF00
+        }
+        else {
+            var0 = 0x2F00
+        }
+        if (!(player -> stateflag & 0x8000) && IdleTimer >= var0) {
+            if (CameraTarget == 1) {
+                changestate(LoadSave_Triggered, 0)
+            }
+            else {
+                changestate(WarpRoom_CameraFocus)
+            }
+        }
+    }
+}
+
+state WarpRoom_CameraFocus { // 2
+    statusc 0
+    code() {
+        sleepnull()
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            var0 = CameraTarget
+            ApplyCameraFocusTarget()
+            CapturePlayerPosition()
+        }
+        DebugCheats()
+        UpdateFacingTarget()
+        var0 = FacingTarget
+        ResolveFacingDoorLevel()
+        changestateif(WarpDoor_LoadLevel, var0 >= 0)
+        var0 = 0
+        if (player -> x != rotx) {
+            var0 = 1
+        }
+        if (player -> y != roty) {
+            var0 = 1
+        }
+        if (player -> z != rotz) {
+            var0 = 1
+        }
+        CapturePlayerPosition()
+        if (CameraTarget != FacingTarget || var0) {
+            var s3 = 0
+            var s4 = 0
+            var s5 = -1
+            ins72(0x600, s3)
+            changestate(WarpRoom_Idle)
+        }
+    }
+}
+
+state WarpDoor_LoadLevel { // 3
+    statusc 0
+    code() {
+        var level = var0
+        if (FloorIndex == 5) {
+            if (level == LEVEL_SnowGo || level == LEVEL_AirCrash || level == LEVEL_RoadToRuin) {
+                GLOBAL_131 = 1
+            }
+        }
+        preloadlevel(level)
+        sendevent(EventWarpIn, player, CAMROTY + 180deg)
+        if (level == LEVEL_TurtleWoods) {
+            loadfile([Ju1bT])
+            loadfile([Ju2bT])
+        }
+        else if (level == LEVEL_SnowGo || level == LEVEL_SnowBiz || level == LEVEL_ColdHardCrash) {
+            loadfile([Sn1eT])
+            loadfile([Sn4eT])
+        }
+        else if (level == LEVEL_HangEight || level == LEVEL_AirCrash || level == LEVEL_PlantFood) {
+            loadfile([Ri1pT])
+            loadfile([Ri3pT])
+        }
+        else if (level == LEVEL_ThePits) {
+            loadfile([Ju1bT])
+            loadfile([Ju2bT])
+        }
+        else if (level == LEVEL_CrashDash || level == LEVEL_CrashCrush || level == LEVEL_Unbearable || level == LEVEL_DigginIt || level == LEVEL_BeeHaving) {
+            loadfile([Al1lT])
+            loadfile([Al3lT])
+        }
+        else if (level == LEVEL_RoadToRuin || level == LEVEL_Ruination) {
+            loadfile([Ns1fT])
+            loadfile([Ns2fT])
+        }
+        else if (level == LEVEL_BearIt || level == LEVEL_BearDown || level == LEVEL_TotallyBear) {
+            loadfile([Sn1tT])
+            loadfile([Sn2tT])
+        }
+        else if (level == LEVEL_TheEelDeal || level == LEVEL_SewerOrLater || level == LEVEL_HanginOut) {
+            loadfile([Se1aT])
+            loadfile([Se2aT])
+        }
+        else if (level == LEVEL_PistonItAway || level == LEVEL_SpacedOut) {
+            loadfile([Dy1gT])
+            loadfile([Dy2gT])
+        }
+        else if (level == LEVEL_RockIt || level == LEVEL_PackAttack) {
+            loadfile([Sp2iT])
+            loadfile([Sp3iT])
+        }
+        else if (level == LEVEL_NightFight || level == LEVEL_TotallyFly) {
+            loadfile([Nj1cT])
+            loadfile([Nj2cT])
+        }
+        playnull(1s)
+        GAMEFLAGS |= 0x800000
+        FadeToBlack()
+        WaitFadeNull()
+        CURRENTLEVEL = level
+        loadlevel(level)
+    }
+}
+
+state WarpLift_Load_Boss { // 4
+    statusc 0
+    code() {
+        var level = var0
+        GAMEFLAGS |= 0x800000
+        FadeToBlack()
+        WaitFadeNull()
+        loadlevel(level)
+    }
+}
+
+state LoadSave_Triggered { // 5
+    statusc 0
+    code(auto) {
+        var0 = CameraTarget
+        ApplyCameraFocusTarget()
+        sendevent(Event34, player, 0)
+        WarpCutsceneIndex = 1
+        spawn(17, 1, 1, auto) // CardC-1
+        LoadSaveOBJ = objectspawned
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(LoadSave_End, e == Event14)
+    }
+}
+
+state LoadSave_End { // 6
+    statusc 0
+    code() {
+        var s3, s4
+        var s5 = -1
+        ins72(0x600, s3)
+        sendevent(Event21, player, 0)
+        PlayerHasMoved = 0
+        changestate(WarpRoom_Idle)
+    }
+}
+
+state Cutscene_Triggered { // 7
+    statusc 0
+    code() {
+        sendevent(Event76, player, 0)
+        player -> troty = atan2(player, x)
+        CutsceneFlags += 4
+        playnull()
+        if (PortalFXOBJ) {
+            interrupter = PortalFXOBJ
+            sendevent(Event14, interrupter, self)
+            PortalFXOBJ = 0
+            ProjectorOBJ = 0
+        }
+        playnull(0.85s)
+        spawn(CHeOC, S_CUTSCENE_DIMMER, 1)
+        RoomDimmerOBJ = objectspawned
+        interrupter = WarpLiftOBJ
+        sendevent(EventTriggered, interrupter, self)
+        CutsceneFlags += 16
+        playnull(0.58s)
+        vecx = 10deg
+        vecy = 153.8deg
+        ins72(0x700, vecx)
+        CutsceneFlags += 2
+        spawn(CHeOC, S_PROJECTOR, 1, 30deg)
+        ProjectorOBJ = objectspawned
+        playnull(0.4s)
+        CutsceneFlags += 32
+        playnull(0.85s)
+        CutsceneFlags ^= 32
+        interrupter = CutsceneOBJ
+        sendevent(EventTriggered, interrupter, self)
+        CutsceneFlags += 8
+        playnull()
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Cutscene_End, e == Event14)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            GLOBAL_54 = 0
+            GLOBAL_120 = 0
+            GLOBAL_55 = 0
+            CutsceneFlags = 0
+            RoomDimmerOBJ = 0
+            PlayerDistance = distance(player, DIST_NO_Y)
+            var0 = 1350.0 / (PlayerDistance >> 8)
+            rotx = player -> x * var0 >> 8
+            rotz = player -> z * var0 >> 8
+        }
+        if (CutsceneFlags & 0x20) {
+            player -> x += (rotx - player -> x) >> 3
+            player -> z += (rotz - player -> z) >> 3
+        }
+        if (frametime - statetime >= 0.5s && buttonpress(PAD_TRIANGLE)) {
+            if (CutsceneFlags & 8) {
+                interrupter = CutsceneOBJ
+                sendevent(Event14, interrupter, self)
+                changestate(Cutscene_End)
+            }
+            interrupter = WarpLiftOBJ
+            changestateif(Cutscene_End, interrupter -> stateflag & 0x4000000)
+        }
+    }
+}
+
+state Cutscene_End { // 8
+    statusc 0
+    code() {
+        if (ProjectorOBJ) {
+            interrupter = ProjectorOBJ
+            sendevent(Event14, interrupter, self)
+            ProjectorOBJ = 0
+        }
+        if (RoomDimmerOBJ) {
+            interrupter = RoomDimmerOBJ
+            sendevent(Event14, interrupter, self)
+            RoomDimmerOBJ = 0
+        }
+        if (CutsceneFlags & 2) {
+            ins72(0x800, 0x100)
+            until (frametime - statetime >= 0.8s) {
+                playnull()
+            }
+        }
+        sendeventif(Event21, player, CutsceneFlags & 4, 0)
+        until (frametime - statetime >= 1s) {
+            playnull()
+        }
+        if (!PortalFXOBJ) {
+            spawn(CHeOC, S_PORTAL_FX, 1)
+            PortalFXOBJ = objectspawned
+        }
+        if (CutsceneFlags & 16) {
+            interrupter = objectget(OBJ_WARP_LIFT)
+            sendevent(Event14, interrupter, self)
+        }
+        changestate(WarpRoom_Idle)
+    }
+}
+
+state Cutscene_Init { // 9
+    code() {
+        FloorIndex = (player -> y + 40m) / 100m
+        if (FloorIndex < 0) {
+            FloorIndex = 0
+        }
+        if (FloorIndex >= 6) {
+            FloorIndex = 5
+        }
+        DistortionLevel = 0
+        ScanOffset = 0
+        ScanVelocity = 0
+        Flicker = 0
+        TargetFlicker = 0
+        vecy = 1
+        Visibility = 0.5
+        TargetVisibility = 0.5
+        statusb = 0x80000000 | 0x100000
+        FloorY = FloorIndex * 100m
+        y -= 0.5m
+        SetScale(0.9S)
+        changestate(Cutscene_Sleep)
+    }
+}
+
+state Cutscene_Sleep { // 10
+    code() {
+        do (var0 = 0) {
+            if (var0) {
+                break
+            }
+            playnull()
+        } while (1)
+        changestate(Cutscene_Play)
+    }
+    event(e, a) {
+        accevif (e == EventTriggered) {
+            var0 = 1
+        }
+        accevcstate(Cutscene_Sleep, e == Event14)
+    }
+}
+
+inline sub PlayCutsceneIntro(setup, model, clip) {
+    do {
+        animframe += 1.0
+        if (field_63) {
+            DeloadAnim(setup, model)
+            DeloadAnim(clip, model)
+            goto exit
+        }
+        playframe()
+    } while (animframe + 1.0 <= 17.0)
+}
+
+inline sub PlayCutsceneSegment(prev, model, next, anim, start, end) {
+    LoadAnim(next, model)
+    setanim(anim)
+    do {
+        if (field_63) {
+            DeloadAnim(prev, model)
+            DeloadAnim(next, model)
+            goto exit
+        }
+        animframe = (creator -> pathprog - start) << 8
+        if (animframe > end) {
+            break
+        }
+        else {
+            playframe()
+        }
+    } while (1)
+    animframe = end
+    DeloadAnim(prev, model)
+}
+
+state Cutscene_Play { // 11
+    code() {
+        HologramCutsceneIndex = parent -> WarpCutsceneIndex
+        if (HologramCutsceneIndex == 1) {
+            save (MUSVOL, GLOBAL_74) {
+                GLOBAL_74 = 0
+                MUSVOL = 0
+                field_61 = 0
+                loadfile([CrtxT])
+                LoadAnim([C0_2V], [Co12G])
+                spawn2(9, 44, 1, [C002O], [C012O], [C022O], [C032O], [C042O], [C052O], 6.0, 1000s, 8.0)
+                creator = objectspawned
+                LoadAnim([C002V], [Co12G])
+                playnull()
+                until (isloaded([Co12G]) && isloaded([C002V]) && isloaded([C002O]) && isloaded([Co12G]) && isloaded([C0_2V])) {
+                    playnull()
+                }
+                sendevent(EventTriggered, creator)
+                TargetVisibility = 1.0
+                setanim(CORTEX_HEAD_0, -1.0)
+                PlayCutsceneIntro([C0_2V], [Co12G], [C002V])
+                while (creator -> pathprog < 17) {
+                    playframe()
+                }
+                field_62 = 0
+                DeloadAnim([C0_2V], [Co12G])
+                PlayCutsceneSegment([C002V], [Co12G], [C012V], CORTEX_HEAD_1, 17, 254.0)
+                LoadAnim([C022V], [Co12G])
+                setanim(CORTEX_HEAD_2)
+                do {
+                    if (field_63) {
+                        DeloadAnim([C012V], [Co12G])
+                        DeloadAnim([C022V], [Co12G])
+                        goto exit
+                    }
+                    animframe = (creator -> pathprog - 0x110) << 8
+                    if (creator -> pathprog - 17 >= 0x1F4 && field_62 < 1) {
+                        field_62 = 1
+                        spawn(CHeOC, S_CUTSCENE_EXTRAS, 1, 3, creator, 0x1F4)
+                    }
+                    if (animframe > 254.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 254.0
+                DeloadAnim([C012V], [Co12G])
+                setanim(CORTEX_HEAD_3)
+                do {
+                    if (field_63) {
+                        DeloadAnim([C022V], [Co12G])
+                        goto exit
+                    }
+                    animframe = (creator -> pathprog - 0x20F) << 8
+                    if (animframe > 191.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 191.0
+                DeloadAnim([C022V], [Co12G])
+                exit :
+                cascadeevent(Event12, self)
+                deloadfile([CrtxT])
+            }
+        }
+        if (HologramCutsceneIndex == 2) {
+            save (MUSVOL, GLOBAL_74) {
+                GLOBAL_74 = 0
+                MUSVOL = 0
+                field_61 = 0
+                loadfile([CrtxT])
+                LoadAnim([C1_2V], [Co12G])
+                spawn2(9, 44, 1, [C102O], [C112O], [C122O], [C132O], [C142O], [C152O], [C162O], 7.0, 1000s, 8.0)
+                creator = objectspawned
+                LoadAnim([C102V], [Co12G])
+                playnull()
+                until (isloaded([Co12G]) && isloaded([C102V]) && isloaded([C102O]) && isloaded([Co12G]) && isloaded([C1_2V])) {
+                    playnull()
+                }
+                sendevent(EventTriggered, creator)
+                TargetVisibility = 1.0
+                setanim(CORTEX_HEAD_4, -1.0)
+                PlayCutsceneIntro([C1_2V], [Co12G], [C102V])
+                while (creator -> pathprog < 17) {
+                    playframe()
+                }
+                field_62 = 0
+                DeloadAnim([C1_2V], [Co12G])
+                LoadAnim([C112V], [Co12G])
+                setanim(CORTEX_HEAD_5)
+                do {
+                    if (field_63) {
+                        DeloadAnim([C102V], [Co12G])
+                        DeloadAnim([C112V], [Co12G])
+                        goto exit
+                    }
+                    animframe = creator -> pathprog - 17 << 8
+                    if (animframe > 254.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 254.0
+                DeloadAnim([C102V], [Co12G])
+                PlayCutsceneSegment([C112V], [Co12G], [C122V], CORTEX_HEAD_6, 0x110, 254.0)
+                setanim(CORTEX_HEAD_7)
+                do {
+                    if (field_63) {
+                        DeloadAnim([C122V], [Co12G])
+                        goto exit
+                    }
+                    animframe = (creator -> pathprog - 0x20F) << 8
+                    if (creator -> pathprog - 17 >= 0x221 && field_62 < 1) {
+                        field_62 = 1
+                        TargetDistortionLevel = 28
+                    }
+                    else if (creator -> pathprog - 17 >= 0x22E && field_62 < 2) {
+                        field_62 = 2
+                        TargetVisibility = 0
+                    }
+                    else if (creator -> pathprog - 17 >= 0x232 && field_62 < 3) {
+                        field_62 = 3
+                        TargetDistortionLevel = 28
+                    }
+                    else if (creator -> pathprog - 17 >= 0x236 && field_62 < 4) {
+                        field_62 = 4
+                        spawn(CHeOC, S_CUTSCENE_EXTRAS, 1, 2, creator, 0x26C)
+                    }
+                    else if (creator -> pathprog - 17 >= 0x25B && field_62 < 5) {
+                        field_62 = 5
+                        TargetDistortionLevel = 28
+                    }
+                    else if (creator -> pathprog - 17 >= 0x2A4 && field_62 < 6) {
+                        field_62 = 6
+                        TargetDistortionLevel = 28
+                    }
+                    else if (creator -> pathprog - 17 >= 0x2BD && field_62 < 7) {
+                        field_62 = 7
+                        TargetDistortionLevel = 28
+                    }
+                    else if (creator -> pathprog - 17 >= 0x2D6 && field_62 < 8) {
+                        field_62 = 8
+                        TargetDistortionLevel = 28
+                    }
+                    if (animframe > 246.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 246.0
+                DeloadAnim([C122V], [Co12G])
+                exit :
+                cascadeevent(Event12, self)
+                deloadfile([CrtxT])
+            }
+        }
+        if (HologramCutsceneIndex == 3) {
+            save (MUSVOL, GLOBAL_74) {
+                GLOBAL_74 = 0
+                MUSVOL = 0
+                field_61 = 0
+                loadfile([CrtxT])
+                LoadAnim([C2_2V], [Co12G])
+                spawn2(9, 44, 1, [C202O], [C212O], [C222O], 3.0, 1000s, 8.0)
+                creator = objectspawned
+                LoadAnim([C202V], [Co12G])
+                playnull()
+                until (isloaded([Co12G]) && isloaded([C202V]) && isloaded([C202O]) && isloaded([Co12G]) && isloaded([C2_2V])) {
+                    playnull()
+                }
+                sendevent(EventTriggered, creator)
+                TargetVisibility = 1.0
+                setanim(CORTEX_HEAD_8, -1.0)
+                PlayCutsceneIntro([C2_2V], [Co12G], [C202V])
+                while (creator -> pathprog < 17) {
+                    playframe()
+                }
+                field_62 = 0
+                DeloadAnim([C2_2V], [Co12G])
+                LoadAnim([C212V], [Co12G])
+                setanim(CORTEX_HEAD_9)
+                do {
+                    if (field_63) {
+                        DeloadAnim([C202V], [Co12G])
+                        DeloadAnim([C212V], [Co12G])
+                        goto exit
+                    }
+                    animframe = creator -> pathprog - 17 << 8
+                    if (animframe > 254.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 254.0
+                DeloadAnim([C202V], [Co12G])
+                setanim(CORTEX_HEAD_10)
+                do {
+                    if (field_63) {
+                        DeloadAnim([C212V], [Co12G])
+                        goto exit
+                    }
+                    animframe = (creator -> pathprog - 0x110) << 8
+                    if (animframe > 43.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 43.0
+                DeloadAnim([C212V], [Co12G])
+                exit :
+                cascadeevent(Event12, self)
+                deloadfile([CrtxT])
+            }
+        }
+        if (HologramCutsceneIndex == 4) {
+            save (MUSVOL, GLOBAL_74) {
+                GLOBAL_74 = 0
+                MUSVOL = 0
+                field_61 = 0
+                loadfile([CrtxT])
+                LoadAnim([C3_2V], [Co12G])
+                spawn2(9, 44, 1, [C302O], [C312O], [C322O], [C332O], [C342O], 5.0, 1000s, 8.0)
+                creator = objectspawned
+                LoadAnim([C302V], [Co12G])
+                playnull()
+                until (isloaded([Co12G]) && isloaded([C302V]) && isloaded([C302O]) && isloaded([Co12G]) && isloaded([C3_2V])) {
+                    playnull()
+                }
+                sendevent(EventTriggered, creator)
+                TargetVisibility = 1.0
+                setanim(CORTEX_HEAD_11, -1.0)
+                PlayCutsceneIntro([C3_2V], [Co12G], [C302V])
+                while (creator -> pathprog < 17) {
+                    playframe()
+                }
+                field_62 = 0
+                DeloadAnim([C3_2V], [Co12G])
+                LoadAnim([C312V], [Co12G])
+                setanim(CORTEX_HEAD_12)
+                do {
+                    if (field_63) {
+                        DeloadAnim([C302V], [Co12G])
+                        DeloadAnim([C312V], [Co12G])
+                        goto exit
+                    }
+                    animframe = creator -> pathprog - 17 << 8
+                    if (animframe > 254.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 254.0
+                DeloadAnim([C302V], [Co12G])
+                LoadAnim([C322V], [Co12G])
+                setanim(CORTEX_HEAD_13)
+                do {
+                    if (field_63) {
+                        DeloadAnim([C312V], [Co12G])
+                        DeloadAnim([C322V], [Co12G])
+                        goto exit
+                    }
+                    animframe = (creator -> pathprog - 0x110) << 8
+                    if (animframe > 254.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 254.0
+                DeloadAnim([C312V], [Co12G])
+                setanim(CORTEX_HEAD_14)
+                do {
+                    if (field_63) {
+                        DeloadAnim([C322V], [Co12G])
+                        goto exit
+                    }
+                    animframe = (creator -> pathprog - 0x20F) << 8
+                    if (animframe > 14.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 14.0
+                DeloadAnim([C322V], [Co12G])
+                exit :
+                cascadeevent(Event12, self)
+                deloadfile([CrtxT])
+            }
+        }
+        if (HologramCutsceneIndex == 5) {
+            save (MUSVOL, GLOBAL_74) {
+                GLOBAL_74 = 0
+                MUSVOL = 0
+                field_61 = 0
+                loadfile([CrtxT])
+                LoadAnim([C4_2V], [Co12G])
+                spawn2(9, 44, 1, [C402O], [C412O], [C422O], [C432O], [C442O], [C452O], [C462O], [C472O], [C482O], 9.0, 1000s, 8.0)
+                creator = objectspawned
+                LoadAnim([C402V], [Co12G])
+                playnull()
+                until (isloaded([Co12G]) && isloaded([C402V]) && isloaded([C402O]) && isloaded([Co12G]) && isloaded([C4_2V])) {
+                    playnull()
+                }
+                sendevent(EventTriggered, creator)
+                TargetVisibility = 1.0
+                setanim(CORTEX_HEAD_15, -1.0)
+                PlayCutsceneIntro([C4_2V], [Co12G], [C402V])
+                while (creator -> pathprog < 17) {
+                    playframe()
+                }
+                field_62 = 0
+                DeloadAnim([C4_2V], [Co12G])
+                LoadAnim([C412V], [Co12G])
+                setanim(CORTEX_HEAD_16)
+                do {
+                    if (field_63) {
+                        DeloadAnim([C402V], [Co12G])
+                        DeloadAnim([C412V], [Co12G])
+                        goto exit
+                    }
+                    animframe = creator -> pathprog - 17 << 8
+                    if (animframe > 254.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 254.0
+                DeloadAnim([C402V], [Co12G])
+                PlayCutsceneSegment([C412V], [Co12G], [C422V], CORTEX_HEAD_17, 0x110, 254.0)
+                setanim(CORTEX_HEAD_18)
+                do {
+                    if (field_63) {
+                        DeloadAnim([C422V], [Co12G])
+                        goto exit
+                    }
+                    animframe = (creator -> pathprog - 0x20F) << 8
+                    if (creator -> pathprog - 17 >= 0x279 && field_62 < 1) {
+                        field_62 = 1
+                        TargetDistortionLevel = 28
+                    }
+                    else if (creator -> pathprog - 17 >= 0x28A && field_62 < 2) {
+                        field_62 = 2
+                        TargetVisibility = 0
+                    }
+                    else if (creator -> pathprog - 17 >= 0x29A && field_62 < 3) {
+                        field_62 = 3
+                        spawn(CHeOC, S_CUTSCENE_EXTRAS, 1, 1, creator, 0x2DD)
+                    }
+                    else if (creator -> pathprog - 17 >= 0x2C4 && field_62 < 4) {
+                        field_62 = 4
+                        TargetDistortionLevel = 28
+                    }
+                    if (animframe > 254.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 254.0
+                DeloadAnim([C422V], [Co12G])
+                animseq = 0
+                do {
+                    if (field_63) {
+                        goto exit
+                    }
+                    animframe = (creator -> pathprog - 0x30E) << 8
+                    if (animframe > 254.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 254.0
+                animseq = 0
+                do {
+                    if (field_63) {
+                        goto exit
+                    }
+                    animframe = (creator -> pathprog - 0x40D) << 8
+                    if (animframe > 90.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 90.0
+                exit :
+                cascadeevent(Event12, self)
+                deloadfile([CrtxT])
+            }
+        }
+        if (HologramCutsceneIndex == 6) {
+            save (MUSVOL, GLOBAL_74) {
+                GLOBAL_74 = 0
+                MUSVOL = 0
+                field_61 = 0
+                loadfile([CrtxT])
+                LoadAnim([C5_2V], [Co12G])
+                spawn2(9, 44, 1, [C502O], [C512O], [C522O], [C532O], 4.0, 1000s, 8.0)
+                creator = objectspawned
+                LoadAnim([C502V], [Co12G])
+                playnull()
+                until (isloaded([Co12G]) && isloaded([C502V]) && isloaded([C502O]) && isloaded([Co12G]) && isloaded([C5_2V])) {
+                    playnull()
+                }
+                sendevent(EventTriggered, creator)
+                TargetVisibility = 1.0
+                setanim(CORTEX_HEAD_21, -1.0)
+                PlayCutsceneIntro([C5_2V], [Co12G], [C502V])
+                while (creator -> pathprog < 17) {
+                    playframe()
+                }
+                field_62 = 0
+                DeloadAnim([C5_2V], [Co12G])
+                LoadAnim([C512V], [Co12G])
+                setanim(CORTEX_HEAD_22)
+                do {
+                    if (field_63) {
+                        DeloadAnim([C502V], [Co12G])
+                        DeloadAnim([C512V], [Co12G])
+                        goto exit
+                    }
+                    animframe = creator -> pathprog - 17 << 8
+                    if (animframe > 254.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 254.0
+                DeloadAnim([C502V], [Co12G])
+                setanim(CORTEX_HEAD_23)
+                do {
+                    if (field_63) {
+                        DeloadAnim([C512V], [Co12G])
+                        goto exit
+                    }
+                    animframe = (creator -> pathprog - 0x110) << 8
+                    if (animframe > 172.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 172.0
+                DeloadAnim([C512V], [Co12G])
+                exit :
+                cascadeevent(Event12, self)
+                deloadfile([CrtxT])
+            }
+        }
+        if (HologramCutsceneIndex == 7) {
+            save (MUSVOL, GLOBAL_74) {
+                GLOBAL_74 = 0
+                MUSVOL = 0
+                field_61 = 0
+                loadfile([CrtxT])
+                LoadAnim([C6_2V], [Co12G])
+                spawn2(9, 44, 1, [C602O], [C612O], [C622O], 3.0, 1000s, 8.0)
+                creator = objectspawned
+                LoadAnim([C602V], [Co12G])
+                playnull()
+                until (isloaded([Co12G]) && isloaded([C602V]) && isloaded([C602O]) && isloaded([Co12G]) && isloaded([C6_2V])) {
+                    playnull()
+                }
+                sendevent(EventTriggered, creator)
+                TargetVisibility = 1.0
+                setanim(CORTEX_HEAD_24, -1.0)
+                PlayCutsceneIntro([C6_2V], [Co12G], [C602V])
+                while (creator -> pathprog < 17) {
+                    playframe()
+                }
+                field_62 = 0
+                DeloadAnim([C6_2V], [Co12G])
+                LoadAnim([C612V], [Co12G])
+                setanim(CORTEX_HEAD_25)
+                do {
+                    if (field_63) {
+                        DeloadAnim([C602V], [Co12G])
+                        DeloadAnim([C612V], [Co12G])
+                        goto exit
+                    }
+                    animframe = creator -> pathprog - 17 << 8
+                    if (animframe > 254.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 254.0
+                DeloadAnim([C602V], [Co12G])
+                setanim(CORTEX_HEAD_26)
+                do {
+                    if (field_63) {
+                        DeloadAnim([C612V], [Co12G])
+                        goto exit
+                    }
+                    animframe = (creator -> pathprog - 0x110) << 8
+                    if (animframe > 95.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 95.0
+                DeloadAnim([C612V], [Co12G])
+                exit :
+                cascadeevent(Event12, self)
+                deloadfile([CrtxT])
+            }
+        }
+        if (HologramCutsceneIndex == 9) {
+            save (MUSVOL, GLOBAL_74) {
+                GLOBAL_74 = 0
+                MUSVOL = 0
+                field_61 = 0
+                loadfile([CrtxT])
+                LoadAnim([C7_2V], [Co12G])
+                spawn2(9, 44, 1, [C702O], [C712O], [C722O], [C732O], [C742O], 5.0, 1000s, 8.0)
+                creator = objectspawned
+                LoadAnim([C702V], [Co12G])
+                playnull()
+                until (isloaded([Co12G]) && isloaded([C702V]) && isloaded([C702O]) && isloaded([Co12G]) && isloaded([C7_2V])) {
+                    playnull()
+                }
+                sendevent(EventTriggered, creator)
+                TargetVisibility = 1.0
+                setanim(CORTEX_HEAD_27, -1.0)
+                PlayCutsceneIntro([C7_2V], [Co12G], [C702V])
+                    
+                while (creator -> pathprog < 17) {
+                    playframe()
+                }
+                field_62 = 0
+                DeloadAnim([C7_2V], [Co12G])
+                LoadAnim([C712V], [Co12G])
+                setanim(CORTEX_HEAD_28)
+                do {
+                    if (field_63) {
+                        DeloadAnim([C702V], [Co12G])
+                        DeloadAnim([C712V], [Co12G])
+                        goto exit
+                    }
+                    animframe = creator -> pathprog - 17 << 8
+                    if (animframe > 254.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 254.0
+                DeloadAnim([C702V], [Co12G])
+                loadfile([C722V])
+                loadfile([Co12G])
+                setanim(CORTEX_HEAD_29)
+                do {
+                    if (field_63) {
+                        DeloadAnim([C712V], [Co12G])
+                        DeloadAnim([C722V], [Co12G])
+                        goto exit
+                    }
+                    animframe = (creator -> pathprog - 0x110) << 8
+                    if (animframe > 254.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 254.0
+                DeloadAnim([C712V], [Co12G])
+                setanim(CORTEX_HEAD_30)
+                do {
+                    if (field_63) {
+                        DeloadAnim([C722V], [Co12G])
+                        goto exit
+                    }
+                    animframe = (creator -> pathprog - 0x20F) << 8
+                    if (animframe > 47.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 47.0
+                DeloadAnim([C722V], [Co12G])
+                exit :
+                cascadeevent(Event12, self)
+                deloadfile([CrtxT])
+            }
+        }
+        if (HologramCutsceneIndex == 11) {
+            save (MUSVOL, GLOBAL_74) {
+                GLOBAL_74 = 0
+                MUSVOL = 0
+                field_61 = 0
+                loadfile([CrtxT])
+                LoadAnim([C8_2V], [Co12G])
+                spawn2(9, 44, 1, [C802O], [C812O], [C822O], [C832O], [C842O], [C852O], [C862O], 7.0, 1000s, 8.0)
+                creator = objectspawned
+                LoadAnim([C802V], [Co12G])
+                playnull()
+                until (isloaded([Co12G]) && isloaded([C802V]) && isloaded([C802O]) && isloaded([Co12G]) && isloaded([C8_2V])) {
+                    playnull()
+                }
+                sendevent(EventTriggered, creator)
+                TargetVisibility = 1.0
+                setanim(CORTEX_HEAD_31, -1.0)
+                PlayCutsceneIntro([C8_2V], [Co12G], [C802V])
+                while (creator -> pathprog < 17) {
+                    playframe()
+                }
+                field_62 = 0
+                DeloadAnim([C8_2V], [Co12G])
+                LoadAnim([C812V], [Co12G])
+                setanim(CORTEX_HEAD_32)
+                do {
+                    if (field_63) {
+                        DeloadAnim([C802V], [Co12G])
+                        DeloadAnim([C812V], [Co12G])
+                        goto exit
+                    }
+                    animframe = creator -> pathprog - 17 << 8
+                    if (animframe > 254.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 254.0
+                DeloadAnim([C802V], [Co12G])
+                loadfile([C822V])
+                loadfile([Co12G])
+                setanim(CORTEX_HEAD_33)
+                do {
+                    if (field_63) {
+                        DeloadAnim([C812V], [Co12G])
+                        DeloadAnim([C822V], [Co12G])
+                        goto exit
+                    }
+                    animframe = (creator -> pathprog - 0x110) << 8
+                    if (animframe > 254.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 254.0
+                DeloadAnim([C812V], [Co12G])
+                PlayCutsceneSegment([C822V], [Co12G], [C832V], CORTEX_HEAD_34, 0x20F, 254.0)
+                    
+                setanim(CORTEX_HEAD_35)
+                do {
+                    if (field_63) {
+                        DeloadAnim([C832V], [Co12G])
+                        goto exit
+                    }
+                    animframe = (creator -> pathprog - 0x30E) << 8
+                    if (animframe > 22.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 22.0
+                DeloadAnim([C832V], [Co12G])
+                exit :
+                cascadeevent(Event12, self)
+                deloadfile([CrtxT])
+            }
+        }
+        if (HologramCutsceneIndex == 13) {
+            save (MUSVOL, GLOBAL_74) {
+                GLOBAL_74 = 0
+                MUSVOL = 0
+                field_61 = 0
+                loadfile([CrtxT])
+                LoadAnim([C9_2V], [Co12G])
+                spawn2(9, 44, 1, [C902O], [C912O], [C922O], [C932O], [C942O], [C952O], [C962O], [C972O], [C982O], [C992O], [C9a2O], [C9b2O], 12.0, 1000s, 8.0)
+                creator = objectspawned
+                LoadAnim([C902V], [Co12G])
+                playnull()
+                until (isloaded([Co12G]) && isloaded([C902V]) && isloaded([C902O]) && isloaded([Co12G]) && isloaded([C9_2V])) {
+                    playnull()
+                }
+                sendevent(EventTriggered, creator)
+                TargetVisibility = 1.0
+                setanim(CORTEX_HEAD_36, -1.0)
+                PlayCutsceneIntro([C9_2V], [Co12G], [C902V])
+                while (creator -> pathprog < 17) {
+                    playframe()
+                }
+                field_62 = 0
+                DeloadAnim([C9_2V], [Co12G])
+                PlayCutsceneSegment([C902V], [Co12G], [C912V], CORTEX_HEAD_37, 17, 254.0)
+                    
+                LoadAnim([C922V], [Co12G])
+                setanim(CORTEX_HEAD_38)
+                do {
+                    if (field_63) {
+                        DeloadAnim([C912V], [Co12G])
+                        DeloadAnim([C922V], [Co12G])
+                        goto exit
+                    }
+                    animframe = (creator -> pathprog - 0x110) << 8
+                    if (creator -> pathprog - 17 >= 0x1DB && field_62 < 1) {
+                        field_62 = 1
+                        TargetDistortionLevel = 28
+                    }
+                    else if (creator -> pathprog - 17 >= 0x1F4 && field_62 < 2) {
+                        field_62 = 2
+                        TargetVisibility = 0
+                    }
+                    if (animframe > 254.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 254.0
+                DeloadAnim([C912V], [Co12G])
+                setanim(CORTEX_HEAD_39)
+                do {
+                    if (field_63) {
+                        DeloadAnim([C922V], [Co12G])
+                        goto exit
+                    }
+                    animframe = (creator -> pathprog - 0x20F) << 8
+                    if (creator -> pathprog - 17 >= 0x20D && field_62 < 3) {
+                        field_62 = 3
+                        spawn(CHeOC, S_CUTSCENE_EXTRAS, 1, 0, creator, 0x249)
+                    }
+                    else if (creator -> pathprog - 17 >= 0x236 && field_62 < 4) {
+                        field_62 = 4
+                        TargetDistortionLevel = 28
+                    }
+                    if (animframe > 254.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 254.0
+                DeloadAnim([C922V], [Co12G])
+                LoadAnim([C942V], [Co12G])
+                animseq = 0
+                do {
+                    if (field_63) {
+                        DeloadAnim([C942V], [Co12G])
+                        goto exit
+                    }
+                    animframe = (creator -> pathprog - 0x30E) << 8
+                    if (creator -> pathprog - 17 >= 0x3CB && field_62 < 5) {
+                        field_62 = 5
+                        TargetDistortionLevel = 28
+                    }
+                    else if (creator -> pathprog - 17 >= 0x3F0 && field_62 < 6) {
+                        field_62 = 6
+                        TargetDistortionLevel = 28
+                    }
+                    if (animframe > 254.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 254.0
+                LoadAnim([C952V], [Co12G])
+                setanim(CORTEX_HEAD_41)
+                do {
+                    if (field_63) {
+                        DeloadAnim([C942V], [Co12G])
+                        DeloadAnim([C952V], [Co12G])
+                        goto exit
+                    }
+                    animframe = (creator -> pathprog - 0x40D) << 8
+                    if (creator -> pathprog - 17 >= 0x43B && field_62 < 7) {
+                        field_62 = 7
+                        TargetDistortionLevel = 28
+                    }
+                    else if (creator -> pathprog - 17 >= 0x43D && field_62 < 8) {
+                        field_62 = 8
+                        TargetVisibility = 1.0
+                    }
+                    if (animframe > 254.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 254.0
+                DeloadAnim([C942V], [Co12G])
+                setanim(CORTEX_HEAD_42)
+                do {
+                    if (field_63) {
+                        DeloadAnim([C952V], [Co12G])
+                        goto exit
+                    }
+                    animframe = (creator -> pathprog - 0x50C) << 8
+                    if (animframe > 169.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 169.0
+                DeloadAnim([C952V], [Co12G])
+                exit :
+                cascadeevent(Event12, self)
+                deloadfile([CrtxT])
+            }
+        }
+        if (HologramCutsceneIndex == 14) {
+            save (MUSVOL, GLOBAL_74) {
+                GLOBAL_74 = 0
+                MUSVOL = 0
+                field_61 = 0
+                loadfile([CrtxT])
+                LoadAnim([Ca_2V], [Co12G])
+                spawn2(9, 44, 1, [Ca02O], [Ca12O], 2.0, 1000s, 8.0)
+                creator = objectspawned
+                LoadAnim([Ca02V], [Co12G])
+                playnull()
+                until (isloaded([Co12G]) && isloaded([Ca02V]) && isloaded([Ca02O]) && isloaded([Co12G]) && isloaded([Ca_2V])) {
+                    playnull()
+                }
+                sendevent(EventTriggered, creator)
+                TargetVisibility = 1.0
+                setanim(CORTEX_HEAD_43, -1.0)
+                PlayCutsceneIntro([Ca_2V], [Co12G], [Ca02V])
+                while (creator -> pathprog < 17) {
+                    playframe()
+                }
+                field_62 = 0
+                DeloadAnim([Ca_2V], [Co12G])
+                setanim(CORTEX_HEAD_44)
+                do {
+                    if (field_63) {
+                        DeloadAnim([Ca02V], [Co12G])
+                        goto exit
+                    }
+                    animframe = creator -> pathprog - 17 << 8
+                    if (animframe > 203.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 203.0
+                DeloadAnim([Ca02V], [Co12G])
+                exit :
+                cascadeevent(Event12, self)
+                deloadfile([CrtxT])
+            }
+        }
+        if (HologramCutsceneIndex == 15) {
+            save (MUSVOL, GLOBAL_74) {
+                GLOBAL_74 = 0
+                MUSVOL = 0
+                field_61 = 0
+                loadfile([CrtxT])
+                LoadAnim([Cb_2V], [Co12G])
+                spawn2(9, 44, 1, [Cb02O], [Cb12O], [Cb22O], [Cb32O], 4.0, 1000s, 8.0)
+                creator = objectspawned
+                LoadAnim([Cb02V], [Co12G])
+                playnull()
+                until (isloaded([Co12G]) && isloaded([Cb02V]) && isloaded([Cb02O]) && isloaded([Co12G]) && isloaded([Cb_2V])) {
+                    playnull()
+                }
+                sendevent(EventTriggered, creator)
+                TargetVisibility = 1.0
+                setanim(CORTEX_HEAD_45, -1.0)
+                PlayCutsceneIntro([Cb_2V], [Co12G], [Cb02V])
+                while (creator -> pathprog < 17) {
+                    playframe()
+                }
+                field_62 = 0
+                DeloadAnim([Cb_2V], [Co12G])
+                LoadAnim([Cb12V], [Co12G])
+                setanim(CORTEX_HEAD_46)
+                do {
+                    if (field_63) {
+                        DeloadAnim([Cb02V], [Co12G])
+                        DeloadAnim([Cb12V], [Co12G])
+                        goto exit
+                    }
+                    animframe = creator -> pathprog - 17 << 8
+                    if (creator -> pathprog - 17 >= 0xF1 && field_62 < 1) {
+                        field_62 = 1
+                        spawn(CHeOC, S_CUTSCENE_EXTRAS, 1, 3, creator, 0xF1)
+                    }
+                    if (animframe > 254.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 254.0
+                DeloadAnim([Cb02V], [Co12G])
+                setanim(CORTEX_HEAD_47)
+                do {
+                    if (field_63) {
+                        DeloadAnim([Cb12V], [Co12G])
+                        goto exit
+                    }
+                    animframe = creator -> pathprog - 0x110 << 8
+                    if (animframe > 143.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 143.0
+                DeloadAnim([Cb12V], [Co12G])
+                exit :
+                cascadeevent(Event12, self)
+                deloadfile([CrtxT])
+            }
+        }
+        if (HologramCutsceneIndex == 16) {
+            save (MUSVOL, GLOBAL_74) {
+                GLOBAL_74 = 0
+                MUSVOL = 0
+                field_61 = 0
+                loadfile([CrtxT])
+                LoadAnim([Cc_2V], [Co12G])
+                spawn2(9, 44, 1, [Cc02O], [Cc12O], [Cc22O], [Cc32O], [Cc42O], 5.0, 1000s, 8.0)
+                creator = objectspawned
+                LoadAnim([Cc02V], [Co12G])
+                playnull()
+                until (isloaded([Co12G]) && isloaded([Cc02V]) && isloaded([Cc02O]) && isloaded([Co12G]) && isloaded([Cc_2V])) {
+                    playnull()
+                }
+                sendevent(EventTriggered, creator)
+                TargetVisibility = 1.0
+                setanim(CORTEX_HEAD_48, -1.0)
+                PlayCutsceneIntro([Cc_2V], [Co12G], [Cc02V])
+                while (creator -> pathprog < 17) {
+                    playframe()
+                }
+                field_62 = 0
+                DeloadAnim([Cc_2V], [Co12G])
+                LoadAnim([Cc12V], [Co12G])
+                setanim(CORTEX_HEAD_49)
+                do {
+                    if (field_63) {
+                        DeloadAnim([Cc02V], [Co12G])
+                        DeloadAnim([Cc12V], [Co12G])
+                        goto exit
+                    }
+                    animframe = creator -> pathprog - 17 << 8
+                    if (animframe > 254.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 254.0
+                DeloadAnim([Cc02V], [Co12G])
+                PlayCutsceneSegment([Cc12V], [Co12G], [Cc22V], CORTEX_HEAD_50, 0x110, 254.0)
+                setanim(CORTEX_HEAD_51)
+                do {
+                    if (field_63) {
+                        DeloadAnim([Cc22V], [Co12G])
+                        goto exit
+                    }
+                    animframe = creator -> pathprog - 0x20F << 8
+                    if (animframe > 71.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 71.0
+                DeloadAnim([Cc22V], [Co12G])
+                exit :
+                cascadeevent(Event12, self)
+                deloadfile([CrtxT])
+            }
+        }
+        if (HologramCutsceneIndex == 12) {
+            save (MUSVOL, GLOBAL_74) {
+                GLOBAL_74 = 0
+                MUSVOL = 0
+                field_61 = 0
+                loadfile([CrtxT])
+                LoadAnim([Cd_2V], [Co12G])
+                spawn2(9, 44, 1, [Cd02O], [Cd12O], [Cd22O], 3.0, 1000s, 8.0)
+                creator = objectspawned
+                LoadAnim([Cd02V], [Co12G])
+                playnull()
+                until (isloaded([Co12G]) && isloaded([Cd02V]) && isloaded([Cd02O]) && isloaded([Co12G]) && isloaded([Cd_2V])) {
+                    playnull()
+                }
+                sendevent(EventTriggered, creator)
+                TargetVisibility = 1.0
+                setanim(CORTEX_HEAD_52, -1.0)
+                PlayCutsceneIntro([Cd_2V], [Co12G], [Cd02V])
+                while (creator -> pathprog < 17) {
+                    playframe()
+                }
+                field_62 = 0
+                DeloadAnim([Cd_2V], [Co12G])
+                LoadAnim([Cd12V], [Co12G])
+                setanim(CORTEX_HEAD_53)
+                do {
+                    if (field_63) {
+                        DeloadAnim([Cd02V], [Co12G])
+                        DeloadAnim([Cd12V], [Co12G])
+                        goto exit
+                    }
+                    animframe = creator -> pathprog - 17 << 8
+                    if (animframe > 254.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 254.0
+                DeloadAnim([Cd02V], [Co12G])
+                setanim(CORTEX_HEAD_54)
+                do {
+                    if (field_63) {
+                        DeloadAnim([Cd12V], [Co12G])
+                        goto exit
+                    }
+                    animframe = creator -> pathprog - 0x110 << 8
+                    if (animframe > 44.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                    
+                animframe = 44.0
+                DeloadAnim([Cd12V], [Co12G])
+                exit :
+                cascadeevent(Event12, self)
+                deloadfile([CrtxT])
+            }
+        }
+        if (HologramCutsceneIndex == 17) {
+            save (MUSVOL, GLOBAL_74) {
+                GLOBAL_74 = 0
+                MUSVOL = 0
+                field_61 = 0
+                loadfile([CrtxT])
+                loadfile([BrioT])
+                LoadAnim([B0_2V], [Br12G])
+                spawn2(9, 44, 1, [B002O], [B012O], [B022O], [B032O], [B042O], [B052O], [B062O], [B072O], [B082O], [B092O], [B0a2O], 11.0, 1000s, 8.0)
+                creator = objectspawned
+                LoadAnim([B002V], [Br12G])
+                playnull()
+                until (isloaded([Br12G]) && isloaded([B002V]) && isloaded([B002O]) && isloaded([Br12G]) && isloaded([B0_2V])) {
+                    playnull()
+                }
+                sendevent(EventTriggered, creator)
+                TargetVisibility = 1.0
+                setanim(BRIO_HEAD_0, -1.0)
+                PlayCutsceneIntro([B0_2V], [Br12G], [B002V])
+                while (creator -> pathprog < 17) {
+                    playframe()
+                }
+                field_62 = 0
+                DeloadAnim([B0_2V], [Br12G])
+                LoadAnim([B012V], [Br12G])
+                setanim(BRIO_HEAD_1)
+                do {
+                    if (field_63) {
+                        DeloadAnim([B002V], [Br12G])
+                        DeloadAnim([B012V], [Br12G])
+                        goto exit
+                    }
+                    animframe = creator -> pathprog - 17 << 8
+                    if (animframe > 254.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 254.0
+                DeloadAnim([B002V], [Br12G])
+                PlayCutsceneSegment([B012V], [Br12G], [B022V], BRIO_HEAD_2, 0x110, 254.0)                    
+                PlayCutsceneSegment([B022V], [Br12G], [B032V], BRIO_HEAD_3, 0x20F, 254.0)
+                PlayCutsceneSegment([B032V], [Br12G], [B042V], BRIO_HEAD_4, 0x30E, 254.0)
+                PlayCutsceneSegment([B042V], [Br12G], [B052V], BRIO_HEAD_5, 0x40D, 254.0)
+                setanim(BRIO_HEAD_6)
+                do {
+                    if (field_63) {
+                        DeloadAnim([B052V], [Br12G])
+                        goto exit
+                    }
+                    animframe = creator -> pathprog - 0x50C << 8
+                    if (animframe > 71.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)                    
+                animframe = 71.0
+                DeloadAnim([B052V], [Br12G])
+                exit :
+                cascadeevent(Event12, self)
+                deloadfile([CrtxT])
+                deloadfile([BrioT])
+            }
+        }
+        if (HologramCutsceneIndex == 18) {
+            save (MUSVOL, GLOBAL_74) {
+                GLOBAL_74 = 0
+                MUSVOL = 0
+                field_61 = 0
+                loadfile([CrtxT])
+                loadfile([BrioT])
+                LoadAnim([B1_2V], [Br12G])
+                spawn2(9, 44, 1, [B102O], [B112O], [B122O], [B132O], [B142O], [B152O], [B162O], 7.0, 1000s, 8.0)
+                creator = objectspawned
+                LoadAnim([B102V], [Br12G])
+                playnull()
+                until (isloaded([Br12G]) && isloaded([B102V]) && isloaded([B102O]) && isloaded([Br12G]) && isloaded([B1_2V])) {
+                    playnull()
+                }
+                sendevent(EventTriggered, creator)
+                TargetVisibility = 1.0
+                setanim(BRIO_HEAD_7, -1.0)
+                PlayCutsceneIntro([B1_2V], [Br12G], [B102V])
+                while (creator -> pathprog < 17) {
+                    playframe()
+                }
+                field_62 = 0
+                DeloadAnim([B1_2V], [Br12G])
+                LoadAnim([B112V], [Br12G])
+                setanim(BRIO_HEAD_8)
+                do {
+                    if (field_63) {
+                        DeloadAnim([B102V], [Br12G])
+                        DeloadAnim([B112V], [Br12G])
+                        goto exit
+                    }
+                    animframe = creator -> pathprog - 17 << 8
+                    if (animframe > 254.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                    
+                animframe = 254.0
+                DeloadAnim([B102V], [Br12G])
+                PlayCutsceneSegment([B112V], [Br12G], [B122V], BRIO_HEAD_9, 0x110, 254.0)
+                PlayCutsceneSegment([B122V], [Br12G], [B132V], BRIO_HEAD_10, 0x20F, 254.0)
+                setanim(BRIO_HEAD_11)
+                do {
+                    if (field_63) {
+                        DeloadAnim([B132V], [Br12G])
+                        goto exit
+                    }
+                    animframe = creator -> pathprog - 0x30E << 8
+                    if (animframe > 20.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 20.0
+                DeloadAnim([B132V], [Br12G])
+                exit :
+                cascadeevent(Event12, self)
+                deloadfile([CrtxT])
+                deloadfile([BrioT])
+            }
+        }
+        if (HologramCutsceneIndex == 8) {
+            save (MUSVOL, GLOBAL_74) {
+                GLOBAL_74 = 0
+                MUSVOL = 0
+                field_61 = 0
+                loadfile([CrtxT])
+                loadfile([Sis1T])
+                LoadAnim([S2_2V], [Si12G])
+                spawn2(9, 44, 1, [S2_2O], [S202O], [S212O], 3.0, 1000s, 8.0)
+                creator = objectspawned
+                LoadAnim([S202V], [Si12G])
+                playnull()
+                until (isloaded([Si12G]) && isloaded([S202V]) && isloaded([S2_2O]) && isloaded([Si12G]) && isloaded([S2_2V])) {
+                    playnull()
+                }
+                sendevent(EventTriggered, creator)
+                TargetVisibility = 1.0
+                setanim(SIS_HEAD_3, -1.0)
+                PlayCutsceneIntro([S2_2V], [Si12G], [S202V])
+                while (creator -> pathprog < 17) {
+                    playframe()
+                }
+                field_62 = 0
+                DeloadAnim([S2_2V], [Si12G])
+                LoadAnim([S212V], [Si12G])
+                setanim(SIS_HEAD_4)
+                do {
+                    if (field_63) {
+                        DeloadAnim([S202V], [Si12G])
+                        DeloadAnim([S212V], [Si12G])
+                        goto exit
+                    }
+                    animframe = creator -> pathprog - 17 << 8
+                    if (animframe > 254.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 254.0
+                DeloadAnim([S202V], [Si12G])
+                setanim(SIS_HEAD_5)
+                do {
+                    if (field_63) {
+                        DeloadAnim([S212V], [Si12G])
+                        goto exit
+                    }
+                    animframe = creator -> pathprog - 0x110 << 8
+                    if (animframe > 74.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 74.0
+                DeloadAnim([S212V], [Si12G])
+                exit :
+                cascadeevent(Event12, self)
+                deloadfile([CrtxT])
+                deloadfile([Sis1T])
+            }
+        }
+        if (HologramCutsceneIndex == 10) {
+            save (MUSVOL, GLOBAL_74) {
+                GLOBAL_74 = 0
+                MUSVOL = 0
+                field_61 = 0
+                loadfile([CrtxT])
+                loadfile([Sis1T])
+                LoadAnim([S3_2V], [Si12G])
+                spawn2(9, 44, 1, [S3_2O], [S302O], [S312O], 3.0, 1000s, 8.0)
+                creator = objectspawned
+                LoadAnim([S302V], [Si12G])
+                playnull()
+                until (isloaded([Si12G]) && isloaded([S302V]) && isloaded([S3_2O]) && isloaded([Si12G]) && isloaded([S3_2V])) {
+                    playnull()
+                }
+                sendevent(EventTriggered, creator)
+                TargetVisibility = 1.0
+                setanim(SIS_HEAD_6, -1.0)
+                PlayCutsceneIntro([S3_2V], [Si12G], [S302V])
+                while (creator -> pathprog < 17) {
+                    playframe()
+                }
+                field_62 = 0
+                DeloadAnim([S3_2V], [Si12G])
+                setanim(SIS_HEAD_7)
+                do {
+                    if (field_63) {
+                        DeloadAnim([S302V], [Si12G])
+                        goto exit
+                    }
+                    animframe = creator -> pathprog - 17 << 8
+                    if (animframe > 257.0) {
+                        break
+                    }
+                    else {
+                        playframe()
+                    }
+                } while (1)
+                animframe = 257.0
+                DeloadAnim([S302V], [Si12G])
+                exit :
+                cascadeevent(Event12, self)
+                deloadfile([CrtxT])
+                deloadfile([Sis1T])
+            }
+        }
+        TargetVisibility = 0x80
+        do {
+            if (Visibility <= 0x80) {
+                break
+            }
+            playframe()
+        } while (1)
+        sendevent(Event14, parent)
+        playnull()
+        playnull()
+        changestate(Cutscene_Sleep)
+    }
+    event(e, a) {
+        accevif (e == Event14) {
+            TargetVisibility = 0x80
+            field_63 = true
+        }
+    }
+    trans {
+        once {
+            field_63 = 0
+        }
+        roty = atan2(player -> trans)
+        vfx = (vfx & 0xFFFF00FF) | 0x800
+        Visibility = seek(Visibility, TargetVisibility, 10)
+        UpdateHologramFX()
+    }
+}
+
+sub UpdateHologramFX() {
+    if (!DistortionLevel) {
+        if (!rand(30)) {
+            ScanVelocity <<= 1
+            TargetDistortionLevel = (3 + rand(5)) << 2
+            DistortionLevel += 1
+        }
+    }
+    else if (DistortionLevel == TargetDistortionLevel) {
+        if (!rand(40)) {
+            TargetDistortionLevel = 0
+            DistortionLevel -= 1
+            if (ScanVelocity > 0x2710) {
+                ScanVelocity >>= 1
+            }
+        }
+    }
+    else {
+        DistortionLevel = seek(DistortionLevel, TargetDistortionLevel, 1)
+    }
+
+    if (!rand(60)) {
+        if (!rand(2)) {
+            ScanVelocity = 0x1047 + rand(0x411B)
+        }
+        else {
+            ScanVelocity = -(0x1047 + rand(0x411B))
+        }
+    }
+    if (!ScanOffset) {
+        if (!rand(2)) {
+            vecy = -vecy
+            ScanOffset = 0x57E3F
+        }
+    }
+    stalltime = (DistortionLevel & -4) | (GAMETICK & 3)
+    if (ScanOffset + ScanVelocity >= 0x57E40 || ScanOffset + ScanVelocity < 0) {
+        vecy = -vecy
+    }
+    ScanOffset = (ScanOffset + (ScanVelocity + 0x57E40)) % 0x57E40
+    vecx = (0x2BF20 + ScanOffset) + FloorY
+    if (!rand(15)) {
+        TargetFlicker = rand(0x333)
+    }
+    Flicker = seek(Flicker, TargetFlicker, 0xCC)
+    var0 = Flicker + (time(0.1s) * 0x199)
+    var0 = 16.0 - var0
+    var0 = var0 * Visibility >> 8
+    moda = 16.0 - var0
+}
+
+
+state Projector_Robot { // 12
+    code(yawspd) {
+        soundpitch(16.0)
+        soundplay([PSt2A], 0.06V)
+        ProjectorOrbitYawSpeed = yawspd
+        var0 = atan(-player -> x, -player -> z) % 360deg
+        troty = (var0 - 45deg) % 360deg
+        trotx = -90.1deg
+        ProjectorTargetOrbitPitch = -22deg
+        spawn(37, 0, 1) // LenFC-0
+        GLOBAL_54 = 0
+        GLOBAL_120 = 0
+        spawn(CHeOC, S_PROJECTOR_LIGHT, 1, 1)
+        spawn(CHeOC, S_PROJECTOR_LIGHT, 1, 2)
+        zindex = 24
+        statusb = 0
+        troty = 0
+        trotz = 0
+        ProjectorOrbitRadius = 2.7m
+        ProjectorTargetOrbitRadius = 2.7m
+        ProjectorNextRadiusChange = frametime + rand(4s) + 0.5s
+        ProjectorAnimFrame = 0
+        ProjectorTargetAnimFrame = 0
+        ProjectorAnimAlternation = 0
+        ProjectorNextAnimChange = frametime + rand(4s) + 2s
+        SetVec(x, y, z)
+        do {
+            if (frametime >= ProjectorNextAnimChange) {
+                ProjectorNextAnimChange = frametime + rand(4s) + 2s
+                if (trotx != -90deg) {
+                    if (!rand(4)) {
+                        sounddecay(2.58s)
+                        soundpitch((13.12 + rand(5.28)) * 0.36 >> 8)
+                        soundplay([sv16A], 0.2V + rand(0.03V))
+                    }
+                    else {
+                        sounddecay(2.58s)
+                        soundpitch((13.12 + rand(5.28)) * 0.36 >> 8)
+                        soundplay([sv26A], 0.2V + rand(0.03V))
+                    }
+                }
+                if (ProjectorAnimFrame == 0) {
+                    ProjectorTargetAnimFrame = 7.0
+                }
+                else {
+                    ProjectorTargetAnimFrame = ((ProjectorOrbitRadius - 2.7m) * 6 / 2.5m) << 8
+                }
+            }
+            ProjectorAnimFrame = seek(ProjectorAnimFrame, ProjectorTargetAnimFrame, 1.0)
+            if (trotx == -90deg) {
+                break
+            }
+            playframe(ProjectorAnimFrame)
+            if (ProjectorAnimAlternation & 1) {
+                setanim(PROJECTOR_ROBOT_1)
+            }
+            else {
+                setanim(PROJECTOR_ROBOT_2)
+            }
+            ProjectorAnimAlternation += 1
+        } while (1)
+    }
+    event(e, a) {
+        if (e == Event14) {
+            ProjectorTargetOrbitPitch = -90deg
+        }
+    }
+    trans {
+        unless (STATUS_FIRSTFRAME) {
+            if (creator) {
+                vecx = creator -> x
+                vecy = creator -> y
+                vecz = creator -> z
+            }
+            if (frametime >= ProjectorNextRadiusChange) {
+                ProjectorNextRadiusChange = (frametime + rand(3s)) + 0.5s
+                if (trotx != -22deg) {
+                    ProjectorTargetOrbitRadius = 5.2m
+                }
+                else {
+                    ProjectorTargetOrbitRadius = 2.7m + rand(2.5m)
+                }
+            }
+            ProjectorOrbitRadius = seek(ProjectorOrbitRadius, ProjectorTargetOrbitRadius, 360deg)
+            var0 = ProjectorTargetOrbitPitch - trotx
+            if (var0 > 0) {
+                var0 = var0 >> 3
+                if (!var0) { var0 = 1 }
+                if (var0 > 8) { var0 = 8 }
+            }
+            else if (var0 < 0) {
+                var0 = var0 >> 3
+                if (!var0) { var0 = -1 }
+                if (var0 < -8) { var0 = -8 }
+            }
+            trotx += var0
+            troty = spd(troty, ProjectorOrbitYawSpeed)
+            trotz = troty
+            vectransf2(vvec, vtrans, ProjectorOrbitRadius, 0, 0)
+            UpdateProjectorAngle()
+            sendevent(EventHit, collider, 100.0)
+        }
+    }
+}
+
+sub UpdateProjectorAngle() {
+    save (vecx, vecy, vecz) {
+        vecx = creator -> x
+        vecy = creator -> y
+        vecz = creator -> z
+        roty = spd(roty, 360deg)
+        rotx = degseek(rotx, atan2_3d(self, vecx) + 90deg, 90deg)
+        rotz = degseek(rotz, atan2(creator -> trans), 180deg)
+    }
+}
+
+state Cutscene_Room_Dimmer { // 13
+    code() {
+        while (rotx) {
+            playnull()
+        }
+        ins72(0x100, 0x100)
+    }
+    event(e, a) {
+        accevif (e == Event14) {
+            roty = 0deg
+        }
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            rotx = 0deg
+            roty = 22.5deg
+            ins72(0x100, 0x200)
+            GLOBAL_50 = 0xFFFFFF
+            GLOBAL_51 = 0xFFFFFF
+        }
+        if (rotx != roty) {
+            var0 = roty - rotx
+            if (var0 < -16) {
+                var0 = -16
+            }
+            else if (var0 > 16) {
+                var0 = 16
+            }
+            rotx += var0
+            GLOBAL_50 = (0xFF + ((-0x9B * rotx) >> 8)) | (((0xFF + ((-0xB9 * rotx) >> 8)) << 8) | ((0xFF + ((-0xD7 * rotx) >> 8)) << 16))
+            GLOBAL_51 = (0xFF + ((0 * rotx) >> 8)) | (((0xFF + ((0 * rotx) >> 8)) << 8) | ((0xFF + ((0 * rotx) >> 8)) << 16))
+        }
+    }
+}
+
+state Projector_Robot_Light { // 14
+    __transargs
+    code(mode) {
+        sleepnull()
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            scalex = mode
+            if (scalex == 1) {
+                GLOBAL_54 = self
+                GLOBAL_55 = 2.0
+            }
+            else {
+                GLOBAL_120 = self
+            }
+        }
+        if (scalex == 1) {
+            x = creator -> x
+            y = creator -> y
+            z = creator -> z
+            vecx = creator -> vecx
+            vecy = creator -> vecy
+            vecz = creator -> vecz
+            trotx = -creator -> trotx
+            troty = creator -> troty + 180deg
+            trotz = troty
+            vectransf2(vvec, vtrans, 8m, 0, 0)
+        }
+        else if (scalex == 2) {
+            x = creator -> x
+            y = creator -> y
+            z = creator -> z
+        }
+    }
+}
+
+state Portal_FX_Init { // 15
+    code() {
+        PortalVIDOLoaded = 0
+        PortalAlpha = 0
+        PortalTargetAlpha = 0
+        FloorIndex = creator -> FloorIndex
+        PortalAIndex = -1.0
+        PortalBIndex = -1.0
+        GLOBAL_137 = 0
+        if (FloorIndex == 0) {
+            PortalTable = PortalTable0
+        }
+        else if (FloorIndex == 1) {
+            PortalTable = PortalTable1
+        }
+        else if (FloorIndex == 2) {
+            PortalTable = PortalTable2
+        }
+        else if (FloorIndex == 3) {
+            PortalTable = PortalTable3
+        }
+        else if (FloorIndex == 4) {
+            PortalTable = PortalTable4
+        }
+        else {
+            PortalTable = PortalTable5
+        }
+        changestate(Portal_FX_Load_VIDO)
+    }
+}
+
+sub DeloadPortalVIDO() {
+    if (GLOBAL_126) {
+        ins75(GLOBAL_126, null)
+        GLOBAL_126 = 0
+    }
+    if (PortalVIDOLoaded) {
+        PortalVIDOLoaded = false
+        deloadfile([Car1T])
+        deloadfile([wdr0D])
+    }
+}
+
+state Portal_FX_Load_VIDO { // 16
+    code() {
+        if (!PortalVIDOLoaded) {
+            do { playnull() } until (getpayload(&[Car1T]) <= getfreepages())
+            loadfile([Car1T])
+            loadfile([wdr0D])
+            PortalVIDOLoaded = 1
+        }
+        until (isloaded([Car1T]) && isloaded([wdr0D])) { playnull() }
+        if (!GLOBAL_126) {
+            GLOBAL_126 = ins74([wdr0D], null)
+        }
+        PortalTargetAlpha = 1.0
+        changestate(Portal_FX_Active)
+    }
+    event(e, a) {
+        if (e == Event41 || e == Event26) {
+            DeloadPortalVIDO()
+        }
+        accevcstate(Portal_FX_Kill, e == Event14)
+    }
+}
+
+state Portal_FX_Active { // 17
+    code() {
+        spawn(CHeOC, S_PORTAL_BG, 1, 1)
+        spawn(CHeOC, S_PORTAL_BG, 1, 0)
+
+        do (var index = 0) {
+            spawn(CHeOC, S_PORTAL_SWIRL, 1, index, 1)
+            spawn(CHeOC, S_PORTAL_SWIRL, 1, index, 0) 
+        } while ({ index += 1.0 }; index < 5.0)
+
+        if (FloorIndex != 5) {
+            spawn(CHeOC, S_PORTAL_PARTICLES, 1, 1)
+            spawn(CHeOC, S_PORTAL_PARTICLES, 1, 0)
+        }
+        do {
+            do (var i = 0) {
+                if (GLOBAL_126) {
+                    ins76(GLOBAL_126, i)
+                    ins77(0, misc, GLOBAL_126, WARP_PORTAL_SWIRL) // fucker
+                }
+                var0 = (GLOBAL_126[1.0] + 1.0) >> 1
+                vecx = i - var0
+                if (vecx < 0) {
+                    vecx = -vecx
+                }
+                var s5 = vecx / (var0 >> 8)
+                var s6 = 1.0 - s5
+                vecx = ((s5 * 0x9F) >> 8) + 0x60
+                vecy = ((s6 * 0x9F) >> 8) + 0x60
+                GLOBAL_136 = 0x6000 | (vecx << 16) | vecy
+                GLOBAL_137 = (16.0 * PortalAlpha) >> 8
+                playnull()
+            } while ({ i += 1.0 }; i < GLOBAL_126[1.0])
+        } while (1)
+    }
+    event(e, a) {
+        if (e == Event41 || e == Event26) {
+            DeloadPortalVIDO()
+        }
+        accevif (e == Event14) {
+            PortalTargetAlpha = 0
+        }
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            PortalFloorY = FloorIndex * 100m
+        }
+        PortalAIndex = -1.0
+        PortalBIndex = -1.0
+        var v1 = 0
+        do (var table = PortalSlotTable) {
+            if (CAMROTY < table[v1]) {
+                PortalAIndex = table[v1 + 1.0]
+                PortalBIndex = table[v1 + 2.0]
+                break
+            }
+            v1 += 3.0
+        } while (1)
+        if (FloorIndex == 5) {
+            var unlock_masks = SecretDoorUnlockMasks
+            if (PortalAIndex >= 0) {
+                var v3 = unlock_masks[PortalAIndex]
+                if (!(GLOBAL_150 & v3) && !(GLOBAL_21 & 1)) {
+                    PortalAIndex = -1
+                }
+            }
+            if (PortalBIndex >= 0) {
+                var v4 = unlock_masks[PortalBIndex]
+                if (!(GLOBAL_150 & v4) && !(GLOBAL_21 & 1)) {
+                    PortalBIndex = -1
+                }
+            }
+        }
+        if (PortalAIndex >= 0) {
+            v1 = PortalAIndex << 1
+            PortalAYaw = WarpRoomTable[v1]
+            PortalAY = WarpRoomTable[v1 + 1.0] + PortalFloorY
+            PortalAYawSin = sin(PortalAYaw)
+            PortalAYawCos = cos(PortalAYaw)
+            if (PortalAIndex & 1) {
+                var0 = 0
+            }
+            else {
+                var0 = 6
+            }
+            PortalASwirlOffset = (((time(0.5s, var0) << 8) / 12) * 4m) >> 8
+        }
+        else {
+            PortalAYaw = 0
+        }
+        if (PortalBIndex >= 0) {
+            v1 = PortalBIndex << 1
+            PortalBYaw = WarpRoomTable[v1]
+            PortalBY = WarpRoomTable[v1 + 1.0] + PortalFloorY
+            PortalBYawSin = sin(PortalBYaw)
+            PortalBYawCos = cos(PortalBYaw)
+            if (PortalBIndex & 1) {
+                var0 = 0
+            }
+            else {
+                var0 = 6
+            }
+            PortalBSwirlOffset = (((time(0.5s, var0) << 8) / 12) * 4m) >> 8
+        }
+        else {
+            PortalBYaw = 0
+        }
+        if (PortalAlpha != PortalTargetAlpha) {
+            PortalAlpha = seek(PortalAlpha, PortalTargetAlpha, 10)
+        }
+        changestateifn(Portal_FX_Kill, getfield(self, offsetof(PortalAlpha)))
+    }
+}
+
+state Portal_FX_Kill { // 18
+    code() {
+        DeloadPortalVIDO()
+        playnull()
+    }
+    event(e, a) {
+        if (e == Event41 || e == Event26) {
+            DeloadPortalVIDO()
+        }
+    }
+}
+
+state Portal_Swirl_Init { // 19
+    code(index, slot) {
+        PortalSwirlIndex = index
+        PortalFXUseSlotA = slot
+        FloorIndex = creator -> FloorIndex
+        vfx = (vfx & 0xFFFFFF00) | 0x3
+        if (index == 0.0) {
+            zindex = -400
+        }
+        else if (index == 1.0) {
+            zindex = -250
+        }
+        else if (index == 2.0) {
+            zindex = -100
+        }
+        else if (index == 3.0) {
+            zindex = 160
+        }
+        else if (index == 4.0) {
+            zindex = 220
+        }
+        if (FloorIndex == 1) {
+            zindex -= 30
+        }
+        changestate(Portal_Swirl)
+    }
+}
+
+state Portal_Swirl { // 20
+    code() {
+        do {
+            if (PortalFXYaw) {
+                playanim(0, WARP_PORTAL_SWIRL)
+            }
+            else {
+                playnull()
+            }
+        } while (1)
+    }
+    trans {
+        if (PortalFXUseSlotA) {
+            PortalFXAlpha = creator -> PortalAlpha
+            PortalFXYaw = creator -> PortalAYaw
+            PortalFXDoorIndex = creator -> PortalAIndex
+            PortalSwirlOffset = creator -> PortalASwirlOffset
+            PortalFXYawSin = creator -> PortalAYawSin
+            PortalFXYawCos = creator -> PortalAYawCos
+            y = parent -> PortalAY
+        }
+        else {
+            PortalFXAlpha = creator -> PortalAlpha
+            y = parent -> PortalBY
+            PortalFXYaw = parent -> PortalBYaw
+            PortalFXDoorIndex = parent -> PortalBIndex
+            PortalSwirlOffset = parent -> PortalBSwirlOffset
+            PortalFXYawSin = parent -> PortalBYawSin
+            PortalFXYawCos = parent -> PortalBYawCos
+        }
+        if (PortalFXYaw) {
+            var phase = PortalSwirlOffset + (4m * (PortalSwirlIndex >> 8))
+            var s4 = ((phase >> 8) << 8) / 0x1F40
+            var radius = -(phase + 7.5m) >> 8
+            moda = 16.0 - (((s4 << 4) * PortalFXAlpha) >> 8)
+            x = (radius * PortalFXYawSin) >> 4
+            z = (radius * PortalFXYawCos) >> 4
+            rotx = s4 << 2
+            roty = PortalFXYaw
+            rotz = (PortalFXYaw + 90deg) % 360deg
+            scalex = 6S - ((s4 * 5.5S) >> 8)
+            scaley = scalex
+            scalez = scalex
+            var0 = radius
+        }
+    }
+}
+
+state Portal_Background_Init { // 21
+    code(slot) {
+        FloorIndex = creator -> FloorIndex
+        PortalFXUseSlotA = slot
+        vfx = (vfx & 0xFFFFFF00) | 0x3
+        if (FloorIndex == 5) {
+            zindex = 200
+            SetScale(6S)
+        }
+        else {
+            zindex = 0
+        }
+        FloorIndex = creator -> FloorIndex
+        changestate(Portal_Background)
+    }
+}
+
+state Portal_Background { // 22
+    code() {
+        do {
+            if (PortalFXYaw) {
+                if (FloorIndex == 5) {
+                    playanim(0, GLOW)
+                }
+                else {
+                    playanim(0, WARP_PORTAL_BG)
+                }
+            }
+            else {
+                playnull()
+            }
+        } while (1)
+    }
+    trans {
+        if (PortalFXUseSlotA) {
+            PortalFXAlpha = creator -> PortalAlpha
+            PortalFXYaw = creator -> PortalAYaw
+            PortalFXYawSin = creator -> PortalAYawSin
+            PortalFXYawCos = creator -> PortalAYawCos
+            y = parent -> PortalAY
+        }
+        else {
+            PortalFXAlpha = creator -> PortalAlpha
+            PortalFXYaw = parent -> PortalBYaw
+            y = parent -> PortalBY
+            PortalFXYawSin = parent -> PortalBYawSin
+            PortalFXYawCos = parent -> PortalBYawCos
+        }
+        if (PortalFXYaw) {
+            var0 = -0x2AF8
+            x = (var0 * PortalFXYawSin) >> 4
+            z = (var0 * PortalFXYawCos) >> 4
+            rotx = spd(rotx, -90deg)
+            roty = PortalFXYaw
+            rotz = (PortalFXYaw + 90deg) % 360deg
+            moda = 16.0 - ((16.0 * PortalFXAlpha) >> 8)
+        }
+        else {
+            moda = 16.0
+        }
+    }
+}
+
+state Portal_Particles_Init { // 23
+    code(slot) {
+        PortalFXUseSlotA = slot
+        changestate(Portal_Particles)
+    }
+}
+
+state Portal_Particles { // 24
+    code() {
+        do (var frame = 0) {
+            if (PortalFXYaw) {
+                setanim(WARP_PARTICLES)
+                playframe(frame)
+            }
+            else {
+                playnull()
+            }
+            frame += 1.0
+            if (frame >= 120.0) {
+                frame = 0
+            }
+        } while (1)
+    }
+    trans {
+        if (PortalFXUseSlotA) {
+            PortalFXAlpha = creator -> PortalAlpha
+            PortalFXYaw = creator -> PortalAYaw
+            PortalFXYawSin = creator -> PortalAYawSin
+            PortalFXYawCos = creator -> PortalAYawCos
+            y = parent -> PortalAY
+        }
+        else {
+            PortalFXAlpha = creator -> PortalAlpha
+            PortalFXYaw = parent -> PortalBYaw
+            y = parent -> PortalBY
+            PortalFXYawSin = parent -> PortalBYawSin
+            PortalFXYawCos = parent -> PortalBYawCos
+        }
+        if (PortalFXYaw) {
+            var0 = -0x12C0
+            x = (var0 * PortalFXYawSin) >> 4
+            z = (var0 * PortalFXYawCos) >> 4
+            roty = PortalFXYaw
+            rotz = (PortalFXYaw + 90deg) % 360deg
+            rotx = spd(rotx, -30deg)
+            moda = 16.0 - ((0xCCD * PortalFXAlpha) >> 8)
+        }
+        else {
+            moda = 16.0
+        }
+    }
+}
+
+state Secret_Door_Init { // 25
+    code(index) {
+        zindex = -26
+        rotx = 0deg
+        rotz = 0deg
+        if (index == 1) {
+            setanim(SECRET_DOOR_1)
+            SetTrans(-4122.0, 200000.0, -2383.2)
+            roty = 60deg
+        }
+        else if (index == 2) {
+            setanim(SECRET_DOOR_2)
+            SetTrans(-4122.0, 200000.0, 2383.2)
+            roty = 120deg
+        }
+        else if (index == 3) {
+            setanim(SECRET_DOOR_3)
+            SetTrans(6.0, 200000.0, 4766.8)
+            roty = 90deg
+        }
+        else if (index == 4) {
+            setanim(SECRET_DOOR_4)
+            SetTrans(4134.0, 200000.0, 2383.2)
+            roty = 240deg
+        }
+        else if (index == 5) {
+            setanim(SECRET_DOOR_5)
+            SetTrans(4134.0, 200000.0, -2383.2)
+            roty = 300deg
+        }
+        SecretDoorBaseY = y
+        SecretDoorBobOffset = 0
+        SecretDoorBobVelocity = 0
+        SecretDoorWaveOffset = 0
+        SecretDoorNextBobTime = frametime + rand(4s)
+        SecretDoorAntennaActive = 0
+        changestate(Secret_Door_Active)
+    }
+}
+
+state Secret_Door_Active { // 26
+    code() {
+        sleepframe(0)
+    }
+    trans {
+        if (SecretDoorAntennaActive && !child) {
+            SecretDoorAntennaActive = 0
+            parent -> ActiveAntennaCount = parent -> ActiveAntennaCount - 1
+        }
+        if (frametime >= SecretDoorNextBobTime) {
+            SecretDoorBobVelocity += (rand(0.25m) + 0.25m) / 25
+            SecretDoorNextBobTime = frametime + rand(8s) + 4s
+            if (abs(degdist(CAMROTY, roty)) < 60.05deg && parent -> ActiveAntennaCount == 0) {
+                parent -> ActiveAntennaCount = parent -> ActiveAntennaCount + 1
+                SecretDoorAntennaActive = 1
+                spawn(CHeOC, S_ANTENNA_GLOW, 1, 0, 2s)
+                spawn(CHeOC, S_ANTENNA_GLOW, 1, 1.0, 2s)
+            }
+        }
+        var old_offs = SecretDoorBobOffset
+        if (SecretDoorBobOffset == 0 || SecretDoorBobVelocity) {
+            var next_vel = SecretDoorBobVelocity - (SecretDoorBobOffset / 25)
+            var next_offs = SecretDoorBobOffset + next_vel
+            SecretDoorBobOffset = next_offs
+            SecretDoorBobVelocity = next_vel
+            if (old_offs >= 0) {
+                if (next_offs < 1) {
+                    SecretDoorBobVelocity -= SecretDoorBobVelocity >> 2
+                }
+            }
+            else if (next_offs >= 0) {
+                SecretDoorBobVelocity -= SecretDoorBobVelocity >> 2
+            }
+        }
+        SecretDoorWaveOffset = (sin((frametime << 5) & 0xFFF) * 0.075m) >> 12
+        y = SecretDoorBaseY + SecretDoorBobOffset + SecretDoorWaveOffset
+    }
+}
+
+state Antenna_Glow { // 27
+    __transargs
+    code(vertex, t) {
+        do {
+            playanim(0, GLOW)
+            if (frametime > AntennaGlowEndTime) {
+                break
+            }
+        } while (1)
+        tpc = 0
+        do {
+            if (!child) {
+                break
+            }
+            playnull()
+        } while (1)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            vecy = parent -> roty
+            AntennaGlowEndTime = frametime + t
+            SetRot(0deg)
+        }
+        if (vertex != -1.0) {
+            getvert(vtrans, creator, vertex)
+        }
+        SetScale(rand(0.6S) + 0.4S)
+        if ((frametime & 15) < 1 && FRAMETIME < 36 && abs(degdist(CAMROTY, vecy)) < 60.05deg) {
+            spawn(9, 24, 1, vertex)
+        }
+    }
+}
+
+state WarpLift_Init { // 28
+    statusc 0x200002
+    code() {
+        FloorIndex = player -> y / 100m
+        if (FloorIndex < 0) {
+            FloorIndex = 0
+        }
+        if (FloorIndex >= 6) {
+            FloorIndex = 5
+        }
+        LiftBarrierFloor = FloorIndex
+        spawn(CHeOC, S_WARP_LIFT_BARRIER, 1)
+        pathprog = (FloorIndex * 90.0) + 9.0
+        calcpath(pathprog)
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | FLAG_CARRY_COLLIDER | 0x400000
+        changestate(WarpLift_Wait)
+    }
+}
+
+sub CheckPlayerOnLift() {
+    if (player -> speed == 0
+        && y - 0.1m < player -> y
+        && player -> y < y + 0.1m
+        && distance(player, DIST_EXACT | DIST_NO_Y) <= 0.5m
+        && ((player -> stateflag & 0x2000) || dirhold(PAD_NONE))) {
+            var0 = 1
+            stateflag |= 0x400000
+        }
+    else {
+        var0 = 0
+        stateflag &= ~0x400000
+    }
+}
+
+state WarpLift_Wait { // 29
+    statusc 0x200002
+    code() {
+        LiftBarrierFloor = FloorIndex
+        sleepanim(0, WARP_LIFT)
+    }
+    event(e, a) {
+        accevif (e == EventTriggered) {
+            LiftBarrierFloor = -1
+        }
+        accevif (e == Event14) {
+            LiftBarrierFloor = FloorIndex
+        }
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            zindex = 40
+        }
+        CheckPlayerOnLift()
+        if (!var0) {
+            statetime = frametime
+            return
+        }
+        if (player -> stateflag & 0x2000) {
+            var0 = 5
+        }
+        else {
+            var0 = 12
+        }
+        if (frametime - statetime >= var0) {
+            if (!(GLOBAL_21 & 1) && FloorIndex == 0) {
+                var crystals = 0
+                misc = 0
+                CountPoolBits(SAVEDCRYSTALPOOL1)
+                CountPoolBits(SAVEDCRYSTALPOOL2)
+                crystals = misc
+                if (crystals < 5) {
+                    statetime = frametime
+                    return
+                }
+            }
+            changestate(Warp_Lift_Ready)
+        }
+    }
+}
+
+state Warp_Lift_Ready { // 30
+    stateflag 0x400001
+    statusc 0x200002
+    code() {
+        LiftBarrierFloor = FloorIndex
+        sleepanim(0, WARP_LIFT)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            zindex = 40
+            LiftAllowedDirections = 0
+            if (FloorIndex < 5) {
+                misc = 0
+                CountPoolBits(SAVEDCRYSTALPOOL1)
+                CountPoolBits(SAVEDCRYSTALPOOL2)
+                if (GLOBAL_21 & 1 || misc >= ((FloorIndex + 1) * 5)) {
+                    LiftAllowedDirections += 1
+                }
+            }
+            if (FloorIndex) {
+                LiftAllowedDirections += 2
+            }
+            sendevent(Event77, player, LiftAllowedDirections)
+        }
+        if (buttonhold(PAD_X)) {
+            sendevent(EventBounce, player, 12.64912m)
+            changestate(WarpLift_Wait)
+        }
+        LiftMoveDirection = 0
+        if (dirhold(PAD_N)) {
+            if (LiftAllowedDirections & 1) {
+                LiftMoveDirection = 1
+                sendevent(Event77, player, 1)
+                changestate(WarpLift_Move)
+            }
+        }
+        else if (dirhold(PAD_S)) {
+            if (LiftAllowedDirections & 2) {
+                LiftMoveDirection = -1
+                sendevent(Event77, player, 2)
+                changestate(WarpLift_Move)
+            }
+        }
+    }
+}
+
+state WarpLift_Move { // 31
+    stateflag 0x400001
+    statusc 0x200002
+    code() {
+        LiftBarrierFloor = FloorIndex
+        soundpitch(0x6E4)
+        sounddecay(0xFF)
+        soundplay([ElL2A], 0.3V)
+        sleepanim(0, WARP_LIFT)
+    }
+    trans {
+        once {
+            LiftCarryRestoreStep = 0
+            LiftStartPathProg = (FloorIndex * 90.0) + 9.0
+            LiftTargetPathProg = LiftStartPathProg
+            if (LiftMoveDirection > 0) {
+                LiftTargetPathProg += 90.0
+            }
+            else {
+                LiftTargetPathProg -= 90.0
+            }
+
+            {
+                var next_floor = 0
+                if (LiftMoveDirection < 0) {
+                    next_floor = FloorIndex - 1
+                }
+                else {
+                    next_floor = FloorIndex + 1
+                }
+
+                if (next_floor == 0) {
+                    loadfile([Wrp1T])
+                    loadfile([WrpaT])
+                }
+                else if (next_floor == 1) {
+                    loadfile([Wrp2T])
+                    loadfile([WrpbT])
+                }
+                else if (next_floor == 2) {
+                    loadfile([Wrp3T])
+                    loadfile([WrpcT])
+                }
+                else if (next_floor == 3) {
+                    loadfile([Wrp4T])
+                    loadfile([WrpdT])
+                }
+                else if (next_floor == 4) {
+                    loadfile([Wrp5T])
+                    loadfile([WrpeT])
+                }
+            }
+            LiftRotationSpeed = 0
+        }
+        changestateif(WarpLift_Arrive, pathprog == LiftTargetPathProg && abs(degdist(player -> troty, CAMROTY)) <= 5deg)
+        var0 = pathprog - LiftStartPathProg
+        field_61 = (pathprog - 9.0) % 90.0
+        if (field_61 >= 6.0 && field_61 <= 25.0) {
+            statusb |= 0x40000000
+            field_61 -= 6.0
+            if (field_61 >= 12.0) {
+                field_61 = 12.0
+            }
+            zindex = ((60 * field_61) / 12.0) + 40
+        }
+        else {
+            zindex = 40
+            statusb &= ~0x40000000
+        }
+        if (LiftTargetPathProg > pathprog) {
+            pathprog += 61
+            if (pathprog > LiftTargetPathProg) {
+                pathprog = LiftTargetPathProg
+            }
+            if (var0 >= 17.0 && var0 <= 25.0) {
+                if (((!(GLOBAL_21 & 1) || buttonpress(PAD_TRIANGLE)) && !(DEBUG && buttonpress(PAD_R2))) || FloorIndex == 4) {
+                    if (FloorIndex == 0) {
+                        if (!(0x40 & GLOBAL_27) || buttonpress(PAD_TRIANGLE)) {
+                            CURRENTLEVEL = LEVEL_BossRipperRoo
+                            var0 = CURRENTLEVEL
+                            changestate(WarpLift_Load_Boss)
+                        }
+                    }
+                    else if (FloorIndex == 1) {
+                        if (!(0x100 & GLOBAL_27) || buttonpress(PAD_TRIANGLE)) {
+                            CURRENTLEVEL = LEVEL_BossKimodo
+                            var0 = CURRENTLEVEL
+                            changestate(WarpLift_Load_Boss)
+                        }
+                    }
+                    else if (FloorIndex == 2) {
+                        if (!(0x8 & GLOBAL_27) || buttonpress(PAD_TRIANGLE)) {
+                            CURRENTLEVEL = LEVEL_BossTazTiger
+                            var0 = CURRENTLEVEL
+                            changestate(WarpLift_Load_Boss)
+                        }
+                    }
+                    else if (FloorIndex == 3) {
+                        if (!(0x200 & GLOBAL_27) || buttonpress(PAD_TRIANGLE)) {
+                            CURRENTLEVEL = LEVEL_BossNGin
+                            var0 = CURRENTLEVEL
+                            changestate(WarpLift_Load_Boss)
+                        }
+                    }
+                    else if (FloorIndex == 4) {
+                        misc = 0
+                        CountPoolBits(SAVEDGEMPOOL1)
+                        CountPoolBits(SAVEDGEMPOOL2)
+                        var gems = misc
+                        if (!(0x80 & GLOBAL_27) || buttonpress(PAD_TRIANGLE)) {
+                            CURRENTLEVEL = LEVEL_BossCortex
+                            var0 = CURRENTLEVEL
+                            changestate(WarpLift_Load_Boss)
+                        }
+                        else if (gems >= 42) {
+                            var0 = LEVEL_GameWin
+                            changestate(WarpLift_Load_Boss)
+                        }
+                        else {
+                            var0 = LEVEL_GameEnd
+                            changestate(WarpLift_Load_Boss)
+                        }
+                    }
+                }
+                LiftCarryRestoreStep = 1
+                zindex = 40
+                ins72(0, 0x1000)
+                soundpitch(0x6E4)
+                sounddelay(1s)
+                sounddecay(0xFF)
+                soundplay([ElA2A], 0.3V)
+                pathprog = LiftStartPathProg + 79.0
+                if (pathprog >= pathlen) {
+                    pathprog = pathlen - 1
+                }
+                calcpath(pathprog)
+                player -> x = x
+                player -> z = z
+                player -> troty = (CAMROTY + 285deg) % 360deg
+                player -> roty = player -> troty
+                ins72(0x400, 0x100)
+                FloorIndex += 1
+                LiftBarrierFloor = FloorIndex
+            }
+        }
+        else {
+            pathprog -= 61
+            if (pathprog < LiftTargetPathProg) {
+                pathprog = LiftTargetPathProg
+            }
+            if (var0 >= -18.5 && var0 <= -9.5) {
+                LiftCarryRestoreStep = 1
+                ins72(0, 0x2000)
+                soundpitch(6.893)
+                sounddelay(1s)
+                sounddecay(10.22s)
+                soundplay([ElA2A], 0.3V)
+                pathprog = LiftStartPathProg - 78.1
+                calcpath(pathprog)
+                player -> x = x
+                player -> z = z
+                player -> troty = (CAMROTY + 230deg) % 360deg
+                ins72(0x400, 0x100)
+                FloorIndex -= 1
+                LiftBarrierFloor = FloorIndex
+            }
+        }
+        if (abs(LiftTargetPathProg - pathprog) < 10.0) {
+            LiftRotationSpeed -= 0.4deg
+            if (LiftRotationSpeed < 4.75deg) {
+                LiftRotationSpeed = 4.75deg
+            }
+        }
+        else {
+            LiftRotationSpeed += 0.38deg
+            if (LiftRotationSpeed > 16deg) {
+                LiftRotationSpeed = 16deg
+            }
+        }
+        roty += LiftRotationSpeed
+        calcpath(pathprog)
+        if (LiftCarryRestoreStep) {
+            if (LiftCarryRestoreStep == 1) {
+                statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | FLAG_HAS_SHADOW | 0x40000000
+            }
+            if (LiftCarryRestoreStep == 4) {
+                LiftCarryRestoreStep += 1
+                statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | FLAG_CARRY_COLLIDER | FLAG_HAS_SHADOW | 0x40000000
+            }
+            if (LiftCarryRestoreStep < 5) {
+                LiftCarryRestoreStep += 1
+                player -> y = y
+                statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | FLAG_CARRY_COLLIDER | 0x400000
+            }
+        }
+    }
+}
+
+state WarpLift_Arrive { // 32
+    statusc 0x200002
+    code() {
+        if (player -> stateflag & 0x2000) {
+            if (FloorIndex == 0) {
+                deloadfile([Wrp1T])
+                deloadfile([WrpaT])
+            }
+            else if (FloorIndex == 1) {
+                deloadfile([Wrp2T])
+                deloadfile([WrpbT])
+            }
+            else if (FloorIndex == 2) {
+                deloadfile([Wrp3T])
+                deloadfile([WrpcT])
+            }
+            else if (FloorIndex == 3) {
+                deloadfile([Wrp4T])
+                deloadfile([WrpdT])
+            }
+            else if (FloorIndex == 4) {
+                deloadfile([Wrp5T])
+                deloadfile([WrpeT])
+            }
+        }
+        changestate(WarpLift_Wait)
+    }
+}
+
+state Warp_Lift_Barrier { // 33
+    code() {
+        zindex = 200
+        x -= 8.0
+        do {
+            if (LiftBarrierFloor >= 0) {
+                playanim(0, WARP_LIFT_BARRIER)
+            }
+            else {
+                playnull()
+            }
+        } while (1)
+    }
+    trans {
+        LiftBarrierFloor = creator -> LiftBarrierFloor
+        FloorIndex = creator -> FloorIndex
+        if (LiftBarrierFloor >= 0) {
+            var yoffs, s4
+            yoffs = LiftBarrierFloor * 100m
+            y = yoffs - 8.0
+            roty = (CAMROTY / 30deg) * 30deg
+        }
+    }
+}
+
+state Cutscene_Extras { // 34
+    code(type, spawner, f) {
+        var0 = 0
+        statusb = 0x80000000 | 0x100000
+        vfx = (vfx & 0xFFFF00FF) | 0x800
+        TargetFade = 16.0
+        moda = TargetFade
+        creator = spawner
+        if (type == 0) {
+            if (getfreepages() < 2) {
+                goto exit
+            }
+            loadfile([Sis1T])
+            loadfile([S402V])
+            loadfile([Si12G])
+        }
+        else if (type == 1) {
+            if (getfreepages() < 2) {
+                goto exit
+            }
+            loadfile([Sis1T])
+            loadfile([S602V])
+            loadfile([Si12G])
+        }
+        else if (type == 2) {
+            if (getfreepages() < 1) {
+                goto exit
+            }
+            loadfile([Sis1T])
+            loadfile([S702V])
+            loadfile([Si12G])
+        }
+        until (v0 || creator -> pathprog >= f) {
+            playnull()
+        }
+        if (type == 0) {
+            TargetFade = 0
+            loadfile([S412V])
+            loadfile([Si12G])
+            setanim(SIS_HEAD_9)
+            do {
+                animframe = creator -> pathprog - f << 8
+                if (var0 || animframe > 254.0) {
+                    break
+                }
+                playframe()
+            } while (1)
+            deloadfile([S402V])
+            deloadfile([Si12G])
+            setanim(SIS_HEAD_10)
+            do {
+                animframe = creator -> pathprog - (f + 0xFF) << 8
+                if (var0 || animframe > 225.0) {
+                    break
+                }
+                if (animframe >= 215.0) {
+                    TargetFade = 16.0
+                }
+                playframe()
+            } while (1)
+            deloadfile([S412V])
+            deloadfile([Si12G])
+            deloadfile([Sis1T])
+        }
+        else if (type == 1) {
+            TargetFade = 0
+            loadfile([S612V])
+            loadfile([Si12G])
+            setanim(SIS_HEAD_1)
+            do {
+                animframe = creator -> pathprog - f << 8
+                if (var0 || animframe > 254.0) {
+                    break
+                }
+                playframe()
+            } while (1)
+            deloadfile([S602V])
+            deloadfile([Si12G])
+            setanim(SIS_HEAD_2)
+            do {
+                animframe = creator -> pathprog - (f + 0xFF) << 8
+                if (var0 || animframe > 140.0) {
+                    break
+                }
+                if (animframe >= 130.0) {
+                    TargetFade = 16.0
+                }
+                playframe()
+            } while (1)
+            deloadfile([S612V])
+            deloadfile([Si12G])
+            deloadfile([Sis1T])
+        }
+        else if (type == 2) {
+            TargetFade = 0
+            setanim(SIS_HEAD_0)
+            do {
+                animframe = creator -> pathprog - f << 8
+                if (var0 || animframe > 153.0) {
+                    break
+                }
+                playframe()
+            } while (1)
+            deloadfile([S602V])
+            deloadfile([Si12G])
+            deloadfile([Sis1T])
+        }
+        else if (type == 3) {
+            settrans(CrystalRotate)
+            SetScale(0S)
+            spawn(9, 47, 1, 0)
+            SetColor2(-0xCCC, -0x800, 0x000)
+            vfx = (vfx & 0xFFFFFF00) | 0xA
+            vfx = (vfx & 0xFF00FFFF) | 0x40000
+            moda = 4.0
+            TargetFade = moda
+            x = x + player -> x >> 1
+            z = z + player -> z >> 1
+            do (var start = frametime) {
+                scalex = seek(scalex, 0.5S, 0.04S)
+                scaley = seek(scaley, 0.5S, 0.04S)
+                scalez = seek(scalez, 0.5S, 0.04S)
+                playanim(0, CRYSTAL)
+            } while (frametime - start < 4s)
+            do (var start = frametime) {
+                scalex = seek(scalex, 0S, 0.04S)
+                scaley = seek(scaley, 0S, 0.04S)
+                scalez = seek(scalez, 0S, 0.04S)
+                playanim(0, CRYSTAL)
+            } while (frametime - start < 0.5s)
+        }
+        exit :
+    }
+    event(e, a) {
+        accevif (e == Event12) {
+            var0 = 1.0
+        }
+    }
+    trans {
+        roty = parent -> roty
+        stalltime = parent -> stalltime
+        vecy = parent -> vecy
+        vecx = parent -> vecx
+        moda = seek(moda, TargetFade, 1.925)
+    }
+}
+
+sub CrystalRotate() {
+    roty = spd(roty, 90deg)
+    if (child) {
+        child -> scalex = scalex
+        child -> scaley = scaley
+        child -> scalez = scalez
+    }
+}

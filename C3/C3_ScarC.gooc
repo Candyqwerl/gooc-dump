@@ -1,0 +1,235 @@
+#gool ScarC 71 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_ScarC.gooc" "C3\Out\C3_ScarC.nsentry"
+
+#anim SCARAB_CRAWL [Sc1mV] [Sc1mG] 13 1 2
+#anim SCARAB_FLY_1 [Sc2mV] [Sc2mG] 12 0 2
+#anim SCARAB_FLY_2 [Sc3mV] [Sc2mG] 13 0 2
+
+#spawn S_SCARAB  Scarab_Init
+
+event EventJumpedOn      => state Scarab_Squash
+event EventHit           => state Scarab_Squash
+event EventSpinHit       => state Scarab_Fling
+event EventHitInvincible => state Scarab_Squash
+event Event19            => sub KillVoice
+event Event26            => sub KillVoice
+event EventFling         => state Scarab_Fling
+event EventSlideHit      => state Scarab_Fling
+event EventSlamHit       => state Scarab_Squash
+
+var CycleOffset, CycleLength, TurnDuration, ScarabVar4, TrackOffset, TravelDuration, ScarabVar7, ScarabVar8, ScarabVar9, ScarabVoice
+
+state Scarab_Init { // 0
+    statusc 0x12
+    code(limit, cyclelen, cycleoffs, turndur) {
+        pathdist = limit
+        CycleLength = cyclelen * 1s / 1.2s
+        CycleOffset = cycleoffs * 1s / 1.2s
+        TurnDuration = turndur * 1s / 1.2s
+        TrackOffset = 0
+        density = 0.15m
+        zindex = 25
+        ScarabVar4 = 0
+        groundy = y
+        trotx = 360deg
+        statusb = FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | FLAG_SOLID_SIDES | 0x20000000
+        TravelDuration = (CycleLength - (TurnDuration << 1)) >> 1
+        ScarabVoice = 0
+        changestate(Scarab_Crawl)
+    }
+}
+
+state Scarab_Crawl { // 1
+    stateflag 0x5
+    statusc 0
+    code() {
+        if (ScarabVoice) {
+            voice = ScarabVoice
+            soundfadet(0.3s, voice)
+            soundfadev(0V, voice, 3)
+        }
+        do {
+            setanim(SCARAB_CRAWL, -1.0)
+            do {
+                animframe += 1.0
+                if (animframe == 4.0 || animframe == 11.0) {
+                    soundpitch(3.263)
+                    soundplay([Sc2oA], 0.6V)
+                }
+                if (animframe == 6.0 || animframe == 12.0) {
+                    soundpitch(2.286)
+                    soundplay([Sc2oA], 0.6V)
+                    if (GLOBAL_118 > y) {
+                        soundpitch(4.715)
+                        soundplay([Sc3oA], 0.6V)
+                    }
+                }
+                playframe()
+            } while (animframe + 1.0 <= 12.0)
+        } while (1)
+    }
+    trans {
+        changestateif(Scarab_Ascend, GLOBAL_118 > groundy + 0.5m)
+        ScarabPathTrack()
+    }
+}
+
+sub ScarabPathTrack() { // S-62
+    unless (STATUS_FIRSTFRAME) {
+        if (var cycletime = time(CycleLength, CycleOffset), phase = 0; cycletime >= 0 && cycletime <= TurnDuration) {
+            phase = cycletime
+            var yaw = troty + (phase * degdist(troty, troty + 180deg)) / TurnDuration
+            statusb &= ~(FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN)
+            roty = yaw
+        }
+        else if (cycletime >= TurnDuration && cycletime <= TurnDuration + TravelDuration) {
+            phase = cycletime - TurnDuration
+            var prog = (phase * (pathlen - 1.0)) / ((TurnDuration + TravelDuration) - TurnDuration)
+            statusb |= FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN
+            calcpath(prog)
+        }
+        else if (cycletime >= TurnDuration + TravelDuration && cycletime <= TurnDuration + (TurnDuration + TravelDuration)) {
+            phase = cycletime - (TurnDuration + TravelDuration)
+            var yaw = troty + (phase * degdist(troty, troty + 180deg)) / ((TurnDuration + (TurnDuration + TravelDuration)) - (TurnDuration + TravelDuration))
+            statusb &= ~(FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN)
+            roty = yaw
+        }
+        else if (cycletime >= TurnDuration + (TurnDuration + TravelDuration) && cycletime <= CycleLength) {
+            phase = cycletime - (TurnDuration + (TurnDuration + TravelDuration))
+            var prog = (pathlen - 1.0) + (phase * -(pathlen - 1.0)) / (CycleLength - (TurnDuration + (TurnDuration + TravelDuration)))
+            statusb |= FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN
+            calcpath(prog)
+            troty += 180deg
+        }
+        if (pathdist) {
+            var v1 = 0deg
+            var deg_to_player = 0deg
+            var pathrot = troty
+            save (troty, statusa, statusb, x, y, z, pathprog) {
+                statusb = FLAG_TRACK_PATH_SIGN | FLAG_PATH_CALCS
+                x = player -> x
+                y = player -> y
+                z = player -> z
+                calcpath(0)
+                v1 = troty
+                troty += 90deg
+                setvel(TrackOffset, vvel)
+            }
+            x += velx
+            z += velz
+            if (abs(TrackOffset - vecy) > 0.1m) {
+                deg_to_player = degdist(troty, atan2(player -> trans))
+                if (abs(deg_to_player) < 60deg) {
+                    if (deg_to_player < -45deg) {
+                        deg_to_player = -45deg
+                    }
+                    else if (deg_to_player > 45deg) {
+                        deg_to_player = 45deg
+                    }
+                    troty += deg_to_player
+                }
+            }
+            TrackOffset = seek(TrackOffset, vecy, spd(2m))
+            if (TrackOffset < -pathdist) {
+                troty = pathrot
+                TrackOffset = -pathdist
+            }
+            else if (TrackOffset > pathdist) {
+                TrackOffset = pathdist
+                troty = pathrot
+            }
+        }
+        sendevent(EventHit, collider, 100.0)
+    }
+}
+
+state Scarab_Ascend { // 2
+    stateflag 0x5
+    statusc 0
+    trans => sub ScarabPathTrack
+    code() {
+        soundpitch(4.0)
+        soundcount(0xFFFF)
+        sounddecay(8.4s + 1)
+        soundsetup(6, self, 8)
+        soundfadet(1s, self)
+        soundsetup(1V, self, 2, 0)
+        soundplay([Sc1oA], 0V)
+        ScarabVoice = voice
+        playframes(SCARAB_FLY_1, 0.0, 11.0)
+        changestate(Scarab_Fly)
+    }
+}
+
+state Scarab_Fly { // 3
+    stateflag 0x5
+    statusc 0
+    trans => sub ScarabPathTrack
+    code() {
+        do {
+            playframes(SCARAB_FLY_2, 0.0, 12.0)
+            playframesback(SCARAB_FLY_2, 11.0, 0.0)
+        } until (GLOBAL_118 < groundy + 0.5m)
+        changestate(Scarab_Decend)
+    }
+}
+
+state Scarab_Decend { // 4
+    stateflag 0x5
+    statusc 0
+    trans => sub ScarabPathTrack
+    code() {
+        playframesback(SCARAB_FLY_1, 11.0, 0.0)
+        changestate(Scarab_Crawl)
+    }
+}
+
+state Scarab_Fling { // 5
+    stateflag 0x30
+    statusc 0x32
+    code(h) {
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir(0x80000)
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    } 
+    trans {
+        EnemyFlingTrans(2m, EventFling)
+    }
+}
+
+state Scarab_Squash { // 6
+    stateflag 0x23
+    statusc 0x32
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        playframe()
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        playframe()
+    }
+}
+
+sub SetParticleColor() {
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x05, 0xBD, 0xBE)
+    }
+    else if (r == 1) {
+        SetColor1(0x0D, 0x4C, 0x4C)
+    }
+    else if (r == 2) {
+        SetColor1(0xE7, 0x85, 0x81)
+    }
+}
+
+sub KillVoice() {
+    voice = -1
+    soundfadet(1s, voice)
+    soundfadev(0V, voice, 3)
+    voice = -1
+    soundsetup(0, voice, 5)
+}

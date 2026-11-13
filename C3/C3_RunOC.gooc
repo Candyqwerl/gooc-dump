@@ -1,0 +1,145 @@
+#gool RunOC 31 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_RunOC.gooc" "C3\Out\C3_RunOC.nsentry"
+
+#anim RUNNER [Wa10V] [Wa10G] 33 1 2
+
+#spawn S_RUNNER   Runner_Init
+
+var TriggerDistance, RunnerPathStep
+
+state Runner_Init { // 0
+    stateflag 0x4004081
+    statusc 0x0
+    code(range, speed) {
+        TriggerDistance = range
+        RunnerPathStep = speed / 25
+        trotx = 40deg
+        pathprog = 0
+        statusb = FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | FLAG_SOLID_ALL 
+        calcpath(pathprog)
+        roty = troty
+        statusb = 0
+        scaley = 1.2S
+        zindex = 24
+        changestate(Runner_Wait)
+    }
+}
+
+state Runner_Wait { // 1
+    stateflag 0x4004081
+    statusc 0x0
+    code() {
+        sleepframes(RUNNER, 0.0, 32.0)
+    }
+    trans {
+        changestateif(Runner_Run, player -> z <= z + TriggerDistance)
+    }
+}
+
+state Runner_Run { // 2
+    stateflag 0x4004081
+    statusc 0x0
+    code() {
+        playframes4(RUNNER, -1.0, 32.0)
+        do {
+            soundpitch(4.0)
+            soundplay([fs2aA], 1V)
+            soundpitch(4.0)
+            sounddelay(5)
+            soundplay([fs2aA], 1V)
+            playframes(RUNNER, 0.0, 32.0)
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Runner_Squash, e == EventHitInvincible)
+    }
+    trans {
+        once {
+            statusb = FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | FLAG_SOLID_ALL | FLAG_NO_CAMERA_CLIP
+        }
+        sendevent(Event24, collider, 100.0)
+        if (eventaccepted) {
+            soundpitch(4.0)
+            soundplay([St3aA], 1V)
+        }
+        changestateif(Runner_Stop, eventaccepted || (z > player -> z + 2.5m))
+        pathprog += RunnerPathStep
+        if (pathprog >= pathlen) {
+            pathprog = pathlen - 1
+            calcpath(pathprog)
+            changestate(Runner_Fall)
+        }
+        calcpath(pathprog)
+    }
+}
+
+state Runner_Fall { // 3
+    stateflag 0x4004081
+    statusc 0x0
+    code() {
+        zindex >>= 1
+        playframes4(RUNNER, -1.0, 32.0)
+        sleepframes(RUNNER, 0.0, 32.0)
+    }
+    event(e, a) {
+        accevcstate(Runner_Squash, e == EventHitInvincible)
+    }
+    trans {
+        once {
+            statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | FLAG_NO_CAMERA_CLIP
+            groundy = y
+            vely = 0
+        }
+        sendevent(Event24, collider, 100.0)
+        vely -= 16.0
+        y += vely
+        if (groundy - y > 8m) {
+            KillEntity()
+            changestate(Kill)
+        }
+    }
+}
+
+state Runner_Stop { // 4
+    stateflag 0x4004081
+    statusc 0x0
+    code() {
+        playframes4(RUNNER, -1.0, 32.0)
+        sleepframes(RUNNER, 0.0, 32.0)
+    }
+}
+
+state Runner_Squash { // 5
+    stateflag 0x23
+    statusc 0x32
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        playframe()
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        playframe()
+    }
+}
+
+sub SetParticleColor() { // S-144
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x05, 0xBD, 0xBE)
+    }
+    else if (r == 1) {
+        SetColor1(0x0D, 0x4C, 0x4C)
+    }
+    else if (r == 2) {
+        SetColor1(0xE7, 0x85, 0x81)
+    }
+}
+
+state Kill { // 6
+    stateflag 0x1
+    statusc 0x0
+    code() {}
+}
+

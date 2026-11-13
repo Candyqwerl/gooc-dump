@@ -1,0 +1,97 @@
+#gool GrasC 13 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_GrasC.gooc" "C3\Out\C3_GrasC.nsentry"
+
+#anim GRASS        [Gr1cV] [Gr1cG] 53 1 2
+#anim GRASS_SQUASH [Gr2cV] [Gr1cG] 08 1 2
+#anim GRASS_BREAK  [Gr3cV] [Gr2cG] 11 0 2
+
+#spawn S_GRASS Grass_Init
+
+event EventHit           => state Grass_Break
+event EventSpinHit       => state Grass_Break
+event EventHitInvincible => state Grass_Break
+event EventSlamHit       => state Grass_Break
+
+state Grass_Init { // 1
+    code() {
+        setanim(GRASS, ((abs(x) / 50) & -1.0) % 53.0)
+        roty += randi(-30deg, 30deg)
+        statusb = FLAG_COLLIDABLE
+        zindex = 24
+        changestate(Grass)
+    }
+}
+
+state Grass { // 2
+    statusc 0
+    code() {
+        if (animseq != getanim(GRASS)) {
+            setanim(GRASS, -1.0)
+        }
+        do {
+            animframe = (animframe + 52.0) % 53.0
+            playframe()
+            changestateif(Grass_Squashed, collider)
+        } while (1)
+    }
+}
+
+state Grass_Squashed { // 3
+    statusc 0
+    code() {
+        soundpitch(3.263)
+        soundplay([Gr1cA], 1V)
+        playanim(0, GRASS_SQUASH)
+        do {
+            if (collider) {
+                playframe(seek(animframe, 7.0, 1.0))
+            } else {
+                playframe(seek(animframe, 0, 1.0))
+            }
+        } until (!animframe && !collider)
+        changestate(Grass)
+    }
+    trans {
+        if (collider) {
+            if (collider -> stateflag & 0x10) {
+                speed = 5.5m
+            }
+            else if (collider -> stateflag & 0x80000) {
+                speed = 7.5m
+            }
+            else if (collider -> invincible == 5) {
+                speed = 8m
+            }
+            else if (collider -> stateflag & 0x2000000) {
+                speed = 12m
+            }
+            else {
+                speed = 2m
+            }
+            if (speed < collider -> speed) {
+                collider -> speed = speed
+            }
+        }
+    }
+}
+
+state Grass_Break { // 4
+    stateflag 0x20
+    statusc 0x23
+    trans => state Grass_Squashed
+    code() {
+        KillEntity()
+        soundpitch(4.0)
+        sounddecay(7.2s)
+        soundplay([Gr2cA], 1V)
+        playframes(GRASS_BREAK, 0.0, 10.0)
+    }
+}
+
+state Kill { // 5
+    stateflag 0x20
+    statusc 0
+    code() {}
+}

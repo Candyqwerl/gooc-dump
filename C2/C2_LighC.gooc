@@ -1,0 +1,157 @@
+#gool LighC 60 9
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 2 -r pal "C2\C2_LighC.gooc" "C2\Out\C2_LighC.nsentry"
+
+#sprite LIGHT[Cr10T]
+#tex 0xFFFFFF 0 0 5 0 928 32 32 32
+
+#spawn S_RAIN       Rain
+#spawn S_LIGHTNING  Lightning
+
+array LightningFlashFast = { 
+    0xFFF, 0x000,
+    0xFFF, 0x000, 
+    0xFFF, 0xE65,
+    0xCCC, 0xB32,
+    0x999, 0x7FF,
+    0x666, 0x4CC,
+    0x333, 0x7FF,
+    0x666, 0x4CC,
+    0x333, 0x199,
+    -1
+}
+array LightningFlashSlow = {
+    0xFFF, 0x000, 
+    0xFFF, 0x000,
+    0xFFF, 0xF32, 
+    0xE65, 0xD98, 
+    0xCCC, 0xBFF, 
+    0xB32, 0xA65, 
+    0x999, 0x8CC, 
+    0x7FF, 0x732, 
+    0x666, 0x599,
+    0x4CC, 0x3FF,
+    0x333, 0x7FF,
+    0x732, 0x666,
+    0x599, 0x4CC,
+    0x3FF, 0x333,
+    0x266, 0x199,
+    0x0CC,
+    -1 
+}
+
+var FlashSequence, FlashSequenceIndex, ActiveLightningCount
+
+state Rain {
+    stateflag 0x40001
+    code(start, volume) {
+        vfx = (vfx & 0xFFFFFF00) | 0x6
+        soundpitch(3.625)
+        sounddecay(10.22s)
+        soundplay([ranfA], 0V)
+        stalltime = voice
+        if (!stalltime) {
+            return
+        }
+        settrans(FadeRainSoundIn)
+        if (!start) {
+            sleepnull()
+        }
+        statusb = FLAG_INVISIBLE
+        FlashSequence = 0
+        ActiveLightningCount = 0
+        do {
+            if (FlashSequence) {
+                GLOBAL_149 = FlashSequence[FlashSequenceIndex]
+                if (GLOBAL_149 == -1) {
+                    GLOBAL_149 = 0
+                    FlashSequence = 0
+                }
+                else {
+                    FlashSequenceIndex += 1.0
+                }
+            }
+            else {
+                GLOBAL_149 = 0
+                unless (rand(40)) {
+                    if (var r = rand(6); r == 0) {
+                        FlashSequence = LightningFlashFast
+                    }
+                    else if (r == 1) {
+                        FlashSequence = LightningFlashFast[2]
+                    }
+                    else if (r == 2) {
+                        FlashSequence = LightningFlashFast[4]
+                    }
+                    else if (r == 3) {
+                        FlashSequence = LightningFlashFast[9]
+                    }
+                    else if (r == 4) {
+                        FlashSequence = LightningFlashSlow
+                    }
+                    else if (r == 5) {
+                        FlashSequence = LightningFlashSlow[2]
+                    }
+                    FlashSequenceIndex = 0
+                    if (ActiveLightningCount < 4) {
+                        spawn(LighC, S_LIGHTNING, 1)
+                    }
+                }
+            }
+            playnull()
+        } while (1)
+    }
+}
+
+sub FadeRainSoundIn(start, volume) __trans {
+    if (GLOBAL_119 & 0x10) {
+        soundfadet(0.1s, stalltime)
+        soundsetup(GLOBAL_88 * volume, stalltime, 2, 0)
+        settrans(UpdateRainSound)
+    }
+}
+
+sub UpdateRainSound(start, volume) __trans {
+    if (GLOBAL_119 & 0x10) {
+        soundfadet(0.1s, stalltime)
+        soundsetup(GLOBAL_88 * volume, stalltime, 2, 0)
+    }
+    else {
+        soundfadet(0.5s, stalltime)
+        soundsetup(0, stalltime, 2, 0)
+        settrans(FadeRainSoundIn)
+    }
+}
+
+state Lightning {
+    stateflag 0x40001
+    code() {
+        vfx = (vfx & 0xFFFFFF00) | 0x6
+        statusb = FLAG_INVISIBLE
+        parent -> ActiveLightningCount += 1
+        if (var r = rand(3); r == 0) {
+            sounddecay(7.7s)
+            SoundPitchDefault(0.09)
+            sounddelay(0.05s + rand(0.5s))
+            soundplay([lt10A], 0.2V + rand(0.6V))
+        }
+        else if (r == 1) {
+            sounddecay(7.7s)
+            SoundPitchDefault(0.122)
+            sounddelay(0.05s + rand(0.5s))
+            soundplay([lt20A], 0.2V + rand(0.6V))
+        }
+        else if (r == 2) {
+            sounddecay(7.7s)
+            SoundPitchDefault(0.09)
+            sounddelay(0.05s + rand(0.5s))
+            soundplay([lt30A], 0.2V + rand(0.6V))
+        }
+        until (misc == -1) {
+            playnull()
+            soundcheck(voice)
+        }
+        parent -> ActiveLightningCount -= 1
+    }
+}

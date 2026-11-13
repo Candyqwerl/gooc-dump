@@ -1,0 +1,147 @@
+#gool BerOC 10 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C3_ShadC.gooh"
+//gooc -c 3 -r pal "C3\C3_BerOC.gooc" "C3\Out\C3_BerOC.nsentry"
+
+#anim BEAR_IDLE_1   [Ti1aV] [Ts1aG] 25 1 2
+#anim BEAR_IDLE_2   [Ti2aV] [Ts1aG] 43 1 2
+#anim BEAR_IDLE_3   [Ti3aV] [Ts1aG] 17 0 2
+#anim BEAR_READY_1  [Ti4aV] [Ts1aG] 09 1 2
+#anim BEAR_READY_2  [Ti6aV] [Ts1aG] 13 1 2
+#anim BEAR_SLAM     [Sd1aV] [Ti1aG] 100 1 2
+#anim BEAR_DEAD     [Sd2aV] [Ti1aG] 26 1 2
+
+#spawn S_BEAR       Bear_Spawn
+#spawn S_1          __s_1
+#spawn S_2          __s_2
+#spawn S_3          __s_3
+#spawn S_FINISH     Bear_Finish
+#spawn S_DEATH_1    Bear_Death_Slam
+#spawn S_BEAR_ALT   Bear_Spawn
+
+state Bear_Spawn { // 0
+    stateflag 0x1
+    statusc 0x2
+    event => state Bear_Ready
+    code() {
+        changestateifn(Sleep, id == 10.0 && !CHECKPOINTCOUNT && !(player -> stateflag & 0x2000000))
+        zindex = 32
+        trotx = 180deg
+        trotz = -49deg
+        roty = troty
+        groundy = y
+        statusb = FLAG_TRACK_PATH_SIGN | FLAG_GRAVITY | FLAG_PHYSICS_ENGINE | FLAG_SOLID_GROUND | 0x4000000
+        calcpath(0)
+        BearWait()
+    }
+    trans {
+        unless (STATUS_FIRSTFRAME || stateflag & 0x100000 || player -> stateflag & 0x2000) {
+            if ((distance(player) < 5m && player -> statusa & FLAG_GROUNDLAND) || abs(degdist(atan2(player -> trans), troty)) < 90deg || abs(z - player -> z) < 2m) {
+                sendevent(Event65, player, self)
+                if (eventaccepted) {
+                    stateflag |= 0x100000
+                }
+            }
+            changestateif(Sleep, DEBUG && buttonhold(PAD_TRIANGLE))
+        }
+        roty = degseek(roty, trotz, trotx)
+    }
+}
+
+sub BearWait() { // S-50
+    do {
+        playanim(1, BEAR_IDLE_1)
+        if (distance(player, DIST_NO_Y) < 10m) {
+            playframes(BEAR_IDLE_2, 0.0, 42.0)
+            do {
+                if (stateflag & 0x100000) {
+                    trotz = troty
+                }
+                else {
+                    trotz = randi(-40deg, 40deg)
+                }
+                soundpitch(4.0)
+                soundplay([Bs4aA], 0.2V)
+                playframes(BEAR_IDLE_3, 0.0, 13.0)
+                until (STATUS_GROUNDLAND) {
+                    playframe()
+                }
+                soundpitch(4.0)
+                soundplay([Bs5aA], 0.2V)
+                changestateif(Bear_Ready, troty == trotz)
+                playframes(14.0, 16.0)
+            } while (1)
+        }
+        soundpitch(4.0)
+        soundplay([Bs8aA], 0.5V)
+        playframes(1.0, 24.0)
+    } while (1)
+}
+
+state Bear_Ready { // 1
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        playframes(BEAR_READY_1, 0.0, 8.0)
+        sleepframes(BEAR_READY_2, 0.0, 12.0)
+    }
+    event(e, a) {
+        accevcstate(Sleep, e == EventTriggered)
+    }
+}
+
+state Bear_Finish { // 2
+    stateflag 0x1
+    statusc 0x2
+    code(yaw) {
+        movetolist(3.0, self)
+        roty += yaw
+        spawn(ShadC, ShadC_S_SHADOW_GROUND, 1, y, 1S, 0)
+        zindex = 32
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | 0x4000000
+        do {
+            soundpitch(4.0)
+            soundplay([Bs8aA], 0.5V)
+            playframes(BEAR_IDLE_1, 0.0, 24.0)
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event19)
+    }
+}
+
+state Bear_Death_Slam { // 3
+    stateflag 0x0
+    statusc 0x3C02
+    code() {
+        zindex = 32
+        playframes(BEAR_SLAM, 0.0, 62.0)
+        statusb = FLAG_GRAVITY | FLAG_PHYSICS_ENGINE | FLAG_SOLID_GROUND 
+        vely = -4m
+        until (STATUS_GROUNDLAND) {
+            playframe()
+        }
+        playframes(63.0, 99.0)
+        while (parent -> stateflag & 0x20) {
+            playframes(BEAR_DEAD, 0.0, 25.0)
+        }
+    }
+    trans {
+        groundy = parent -> y
+    }
+}
+
+state Kill { // 4
+    stateflag 0x21
+    statusc 0x2
+    code() {}
+}
+
+state Sleep { // 5
+    stateflag 0x21
+    statusc 0x2
+    code() {
+        sleepnull()
+    }
+}

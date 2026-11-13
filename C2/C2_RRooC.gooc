@@ -1,0 +1,914 @@
+#gool RRooC 19 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C2_BosBC.gooh"
+//gooc -c 2 -r pal "C2\C2_RRooC.gooc" "C2\Out\C2_RRooC.nsentry"
+
+#anim BOX_NITRO  [RN16V] 1 0
+#anim BOX_TNT_0  [RT06V] 1 0
+#anim BOX_TNT_1  [RT16V] 1 0
+#anim BOX_TNT_2  [RT26V] 1 0
+#anim BOX_TNT_3  [RT36V] 1 0
+#anim BOX_TNT_4  [RT46V] 1 0
+#anim BOX_TNT_5  [RT56V] 1 0
+#anim BOX_TNT_6  [RT66V] 1 0
+#anim BOX_TNT_7  [RT96V] 1 0
+     
+#anim ROO_INTRO_1  [Ro16V] 79 1
+#anim ROO_INTRO_2  [Ro26V] 79 1
+#anim ROO_INTRO_3  [Ro36V] 34 1
+#anim ROO_INTRO_4  [Ro66V] 21 0
+
+#anim ROO_HOP_TNT_1  [Ro76V] 27 0
+#anim ROO_HOP_TNT_2  [Ro86V] 12 0
+#anim ROO_HOP_TNT_3  [Ro96V] 12 0
+#anim ROO_HOP_TNT_4  [Roa6V] 12 0
+#anim ROO_HOP_TNT_5  [Rob6V] 12 0
+#anim ROO_HOP_TNT_6  [Roc6V] 12 0
+#anim ROO_HOP_TNT_7  [Rod6V] 12 0
+#anim ROO_HOP_TNT_8  [Roe6V] 12 0
+#anim ROO_HOP_TNT_9  [Rof6V] 12 0
+#anim ROO_HOP_TNT_A  [Rog6V] 12 0
+#anim ROO_HOP_TNT_B  [Roh6V] 12 0
+#anim ROO_HOP_TNT_C  [Roi6V] 12 0
+#anim ROO_HOP_TNT_D  [Roj6V] 14 0
+#anim ROO_HOP_TNT_E  [Rok6V] 16 0
+#anim ROO_HOP_WAIT_FOR_TNT [Rol6V] 44 0
+
+#anim ROO_HOP_NITRO_1  [Rom6V] 65 1
+#anim ROO_HOP_NITRO_2  [Ron6V] 13 0
+#anim ROO_HOP_NITRO_3  [Roo6V] 12 0
+#anim ROO_HOP_NITRO_4  [Rop6V] 12 0
+#anim ROO_HOP_NITRO_5  [Roq6V] 12 0
+#anim ROO_HOP_NITRO_6  [Ror6V] 12 0
+#anim ROO_HOP_NITRO_7  [Ros6V] 12 0
+#anim ROO_HOP_NITRO_8  [Rot6V] 12 0
+#anim ROO_HOP_NITRO_9  [Rou6V] 12 0
+#anim ROO_HOP_NITRO_A  [Rov6V] 12 0
+#anim ROO_HOP_NITRO_B  [Row6V] 12 0
+#anim ROO_HOP_NITRO_C  [Rox6V] 12 0
+#anim ROO_HOP_NITRO_D  [Roy6V] 12 0
+#anim ROO_HOP_NITRO_E  [Roz6V] 12 0
+#anim ROO_HOP_NITRO_F  [RoA6V] 12 0
+#anim ROO_HOP_NITRO_G  [RoB6V] 12 0
+#anim ROO_EXPLODE_NITRO  [RoC6V] 38 0
+
+#anim ROO_DAZED_1  [RoD6V] 83 1
+#anim ROO_DAZED_2  [RoE6V] 42 1
+#anim ROO_RECOVER  [RoF6V] 50 1
+#anim ROO_ATTACKED [RoG6V] 43 1
+#anim ROO_DEATH_1  [RoH6V] 39 1
+#anim ROO_DEATH_2  [RoI6V] 38 1
+
+#anim ROO_PHASE_TRANS    [RoJ6V] 15 1
+#anim ROO_HOP_TNT_START  [RoK6V] 12 1
+
+#spawn S_RIPPER_ROO         Roo_Intro
+#spawn S_NITRO              Box_Nitro
+#spawn S_TNT                Box_TNT
+#spawn S_NITRO_TRIGGER      Nitro_Trigger_Timer
+#spawn S_4                  __s_4
+
+var RooDamageTaken, RooCanTakeDamage, BoxesExploded, BoxNitroExplosionTileX, BoxNitroExplosionTileZ, TNTChainStart, TNTFuse, TileHalfX, TileHalfZ, BoxExplosionHalfX,
+    BoxExplosionHalfZ, RooHopFrame, RooYawInc, BoxIndex, BoxTileX, BoxTileZ, RooLastHitTime, RooVar18
+
+expr ROO_BOX_NITRO = 0.0
+expr ROO_BOX_TNT = 1.0
+
+sub SpawnRooBox(pos_x, pos_y, pos_z, tile_x, tile_z, index, box) {
+    if (box == ROO_BOX_NITRO) {
+        spawn(RRooC, S_NITRO, 1, pos_x, pos_y, pos_z, tile_x, tile_z, index)
+    }
+    else if (box == ROO_BOX_TNT) {
+        spawn(RRooC, S_TNT, 1, pos_x, pos_y, pos_z, tile_x, tile_z, index)
+    }
+}
+
+inline sub SoundRooHop() {
+    soundpitch(3.263)
+    soundplay([RJm6A], 1V)
+}
+
+inline sub ResetPhaseFlags() {
+    BoxesExploded = false
+    RooCanTakeDamage = false
+    RooDamageTaken = false
+    RooLastHitTime = 0s
+}
+
+inline sub RooDoHop(point, anim, drop, tile_x, tile_z, index, box, steps, frames) {
+    calcpath(point, vvec)
+    SoundRooHop()
+    var s_x = x
+    var s_y = y
+    var s_z = z
+    var t_x = vecx
+    var t_y = vecy
+    var t_z = vecz
+    troty = atan2(t_x)
+    setanim(anim)
+    do (var f = 1.0) {
+        x = s_x + ((t_x - s_x) * (f >> 8)) / steps
+        y = s_y + ((t_y - s_y) * (f >> 8)) / steps
+        z = s_z + ((t_z - s_z) * (f >> 8)) / steps
+        if (RooHopFrame == drop) {
+            SpawnRooBox(vecx, vecy, vecz, tile_x, tile_z, index, box)
+        }
+        RooHopFrame += 1
+        playframe((f - 1.0) * steps / steps)
+        f += 1.0
+    } while (f <= frames)
+}
+
+inline sub RooDoFinalHopTNT(anim, tile_x, tile_z, index, box) {
+    var s_x = x
+    var s_y = y
+    var s_z = z
+    var t_x = vecx
+    var t_y = vecy
+    var t_z = vecz
+    troty = atan2(player -> trans)
+    setanim(anim)
+    do (var f = 1.0) {
+        x = s_x + ((t_x - s_x) * (f >> 8) >> 4)
+        y = s_y + ((t_y - s_y) * (f >> 8) >> 4)
+        z = s_z + ((t_z - s_z) * (f >> 8) >> 4)
+        if (RooHopFrame >= 4) {
+            roty += RooYawInc
+        }
+        if (RooHopFrame == 15) {
+            SpawnRooBox(vecx, vecy, vecz, tile_x, tile_z, index, box)
+        }
+        RooHopFrame += 1
+        playframe((f - 1.0) << 4 >> 4)
+        f += 1.0
+    } while (f <= 16.0)
+}
+
+inline sub RooDoFinalHopNitro(point, anim, tile_x, tile_z, index, box) {
+    trotx = 0deg
+    calcpath(point, vvec)
+    RooYawInc = degdist(roty, 180deg + atan2(player, vecx))
+    RooYawInc >>= 3
+    SoundRooHop()
+    var s_x = x
+    var s_y = y
+    var s_z = z
+    var t_x = vecx
+    var t_y = vecy
+    var t_z = vecz
+    troty = atan2(player -> trans)
+    setanim(anim)
+    do (var f = 1.0) {
+        x = s_x + ((t_x - s_x) * (f >> 8)) / 12
+        y = s_y + ((t_y - s_y) * (f >> 8)) / 12
+        z = s_z + ((t_z - s_z) * (f >> 8)) / 12
+        if (RooHopFrame >= 4) {
+            roty += RooYawInc
+        }
+        if (RooHopFrame == 11) {
+            SpawnRooBox(vecx, vecy, vecz, tile_x, tile_z, index, box)
+        }
+        RooHopFrame += 1
+        playframe((f - 1.0) * 12 / 12)
+        f += 1.0
+    } while (f <= 12.0)
+}
+
+sub RooTNTPhase1() {
+    ResetPhaseFlags()
+    spawn(RRooC, S_NITRO_TRIGGER, 1, 0, 0, 9.5s)
+    RooHopFrame = 0
+    trotx = 360deg
+    RooDoHop(28.0, ROO_HOP_TNT_1, 26, 4, 3, 0, 1.0, 27, 27.0)
+    RooHopFrame = 0
+    RooDoHop(34.0, ROO_HOP_TNT_2, 11, 2, 4, 1, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(32.0, ROO_HOP_TNT_3, 11, 0, 4, 2, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(18.0, ROO_HOP_TNT_4, 11, 2, 2, 3, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(16.0, ROO_HOP_TNT_5, 11, 0, 2, 4, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(1.00, ROO_HOP_TNT_6, 11, 1, 0, 5, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(3.00, ROO_HOP_TNT_7, 11, 3, 0, 6, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(5.00, ROO_HOP_TNT_8, 11, 5, 0, 7, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(15.0, ROO_HOP_TNT_9, 11, 7, 1, 8, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(30.0, ROO_HOP_TNT_A, 11, 6, 3, 9, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(46.0, ROO_HOP_TNT_B, 11, 6, 5, 10, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(62.0, ROO_HOP_TNT_C, 11, 6, 7, 11, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(60.0, ROO_HOP_TNT_D, 13, 4, 7, 12, 1.0, 14, 14.0)
+    RooHopFrame = 0
+    trotx = 0deg
+    calcpath(44.0, vvec)
+    RooYawInc = degdist(roty, 180deg + atan2(player, vecx))
+    if (RooYawInc < 0deg) {
+        RooYawInc = 360deg + RooYawInc
+    }
+    RooYawInc /= 12
+    SoundRooHop()
+    RooDoFinalHopTNT(ROO_HOP_TNT_E, 4, 5, 13, 1.0)
+}
+
+sub RooTNTPhase1Repeat() {
+    ResetPhaseFlags()
+    spawn(RRooC, S_NITRO_TRIGGER, 1, 0, 0, 9.5s)
+    RooHopFrame = 0
+    trotx = 360deg
+    RooDoHop(28.0, ROO_HOP_TNT_START, 11, 4, 3, 0, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(34.0, ROO_HOP_TNT_2, 11, 2, 4, 1, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(32.0, ROO_HOP_TNT_3, 11, 0, 4, 2, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(18.0, ROO_HOP_TNT_4, 11, 2, 2, 3, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(16.0, ROO_HOP_TNT_5, 11, 0, 2, 4, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(1.00, ROO_HOP_TNT_6, 11, 1, 0, 5, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(3.00, ROO_HOP_TNT_7, 11, 3, 0, 6, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(5.00, ROO_HOP_TNT_8, 11, 5, 0, 7, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(15.0, ROO_HOP_TNT_9, 11, 7, 1, 8, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(30.0, ROO_HOP_TNT_A, 11, 6, 3, 9, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(46.0, ROO_HOP_TNT_B, 11, 6, 5, 10, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(62.0, ROO_HOP_TNT_C, 11, 6, 7, 11, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(60.0, ROO_HOP_TNT_D, 13, 4, 7, 12, 1.0, 14, 14.0)
+    RooHopFrame = 0
+    trotx = 0deg
+    calcpath(44.0, vvec)
+    RooYawInc = degdist(roty, 180deg + atan2(player, vecx))
+    if (RooYawInc < 0deg) {
+        RooYawInc = 360deg + RooYawInc
+    }
+    RooYawInc /= 12
+    SoundRooHop()
+    RooDoFinalHopTNT(ROO_HOP_TNT_E, 4, 5, 13, 1.0)
+}
+
+sub RooNitroPhase1() {
+    ResetPhaseFlags()
+    spawn(RRooC, S_NITRO_TRIGGER, 1, 3, 5, 8.3s)
+    RooHopFrame = 0
+    trotx = 360deg
+    RooDoHop(37.0, ROO_HOP_NITRO_3, 11, 5, 4, 0, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(39.0, ROO_HOP_NITRO_4, 11, 7, 4, 1, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(23.0, ROO_HOP_NITRO_5, 11, 7, 2, 2, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(7.00, ROO_HOP_NITRO_6, 11, 7, 0, 3, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(5.00, ROO_HOP_NITRO_7, 11, 5, 0, 4, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(21.0, ROO_HOP_NITRO_8, 11, 5, 2, 5, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(11.0, ROO_HOP_NITRO_9, 11, 3, 1, 6, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(1.00, ROO_HOP_NITRO_A, 11, 1, 0, 7, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(17.0, ROO_HOP_NITRO_B, 11, 1, 2, 8, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(27.0, ROO_HOP_NITRO_C, 11, 3, 3, 9, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(33.0, ROO_HOP_NITRO_D, 11, 1, 4, 10, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(49.0, ROO_HOP_NITRO_E, 11, 1, 6, 11, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(59.0, ROO_HOP_NITRO_F, 11, 3, 7, 12, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoFinalHopNitro(43.0, ROO_HOP_NITRO_G, 3, 5, 13, 0)
+
+}
+
+sub RooTNTPhase2() {
+    ResetPhaseFlags()
+    spawn(RRooC, S_NITRO_TRIGGER, 1, 0, 0, 9.5s)
+    RooHopFrame = 0
+    trotx = 360deg
+    RooDoHop(49.0, ROO_HOP_TNT_START, 11, 1, 6, 0, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(32.0, ROO_HOP_TNT_2, 11, 0, 4, 1, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(16.0, ROO_HOP_TNT_3, 11, 0, 2, 2, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(1.00, ROO_HOP_TNT_4, 11, 1, 0, 3, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(3.00, ROO_HOP_TNT_5, 11, 3, 0, 4, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(5.00, ROO_HOP_TNT_6, 11, 5, 0, 5, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(7.00, ROO_HOP_TNT_7, 11, 7, 0, 6, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(23.0, ROO_HOP_TNT_8, 11, 7, 2, 7, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(21.0, ROO_HOP_TNT_9, 11, 5, 2, 8, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(19.0, ROO_HOP_TNT_A, 11, 3, 2, 9, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(34.0, ROO_HOP_TNT_B, 11, 2, 4, 10, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(36.0, ROO_HOP_TNT_C, 11, 4, 4, 11, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(38.0, ROO_HOP_TNT_D, 13, 6, 4, 12, 1.0, 14, 14.0)
+    RooHopFrame = 0
+    trotx = 0deg
+    calcpath(54.0, vvec)
+    RooYawInc = degdist(roty, 180deg + atan2(player, vecx))
+    RooYawInc /= 12
+    SoundRooHop()
+    RooDoFinalHopTNT(ROO_HOP_TNT_E, 6, 6, 13, 1.0)
+}
+
+sub RooNitroPhase2() {
+    ResetPhaseFlags()
+    spawn(RRooC, S_NITRO_TRIGGER, 1, 3, 7, 8.3s)
+    RooHopFrame = 0
+    trotx = 360deg
+    RooDoHop(39.0, ROO_HOP_NITRO_3, 11, 7, 4, 0, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(23.0, ROO_HOP_NITRO_4, 11, 7, 2, 1, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(7.00, ROO_HOP_NITRO_5, 11, 7, 0, 2, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(5.00, ROO_HOP_NITRO_6, 11, 5, 0, 3, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(21.0, ROO_HOP_NITRO_7, 11, 5, 2, 4, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(37.0, ROO_HOP_NITRO_8, 11, 5, 4, 5, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(35.0, ROO_HOP_NITRO_9, 11, 3, 4, 6, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(19.0, ROO_HOP_NITRO_A, 11, 3, 2, 7, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(3.00, ROO_HOP_NITRO_B, 11, 3, 0, 8, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(1.00, ROO_HOP_NITRO_C, 11, 1, 0, 9, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(17.0, ROO_HOP_NITRO_D, 11, 1, 2, 10, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(33.0, ROO_HOP_NITRO_E, 11, 1, 4, 11, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(49.0, ROO_HOP_NITRO_F, 11, 1, 6, 12, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoFinalHopNitro(59.0, ROO_HOP_NITRO_G, 3, 7, 13, 0)
+}
+
+sub RooTNTPhase3() {
+    ResetPhaseFlags()
+    spawn(RRooC, S_NITRO_TRIGGER, 1, 0, 0, 9.5s)
+    RooHopFrame = 0
+    trotx = 360deg
+    RooDoHop(57.0, ROO_HOP_TNT_START, 11, 1, 7, 0, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(51.0, ROO_HOP_TNT_2, 11, 3, 6, 1, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(53.0, ROO_HOP_TNT_3, 11, 5, 6, 2, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(55.0, ROO_HOP_TNT_4, 11, 7, 6, 3, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(39.0, ROO_HOP_TNT_5, 11, 7, 4, 4, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(22.0, ROO_HOP_TNT_6, 11, 6, 2, 5, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(7.00, ROO_HOP_TNT_7, 11, 7, 0, 6, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(5.00, ROO_HOP_TNT_8, 11, 5, 0, 7, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(3.00, ROO_HOP_TNT_9, 11, 3, 0, 8, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(1.00, ROO_HOP_TNT_A, 11, 1, 0, 9, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(17.0, ROO_HOP_TNT_B, 11, 1, 2, 10, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(19.0, ROO_HOP_TNT_C, 11, 3, 2, 11, 1.0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(36.0, ROO_HOP_TNT_D, 13, 4, 4, 12, 1.0, 14, 14.0)
+    RooHopFrame = 0
+    trotx = 0deg
+    calcpath(34.0, vvec)
+    RooYawInc = degdist(roty, 180deg + atan2(player, vecx))
+    RooYawInc /= 12
+    SoundRooHop()
+    RooDoFinalHopTNT(ROO_HOP_TNT_E, 2, 4, 13, 1.0)
+}
+
+sub RooNitroPhase3() {
+    ResetPhaseFlags()
+    spawn(RRooC, S_NITRO_TRIGGER, 1, 2, 5, 8.3s)
+    RooHopFrame = 0
+    trotx = 360deg
+    RooDoHop(44.0, ROO_HOP_NITRO_3, 11, 4, 5, 0, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(61.0, ROO_HOP_NITRO_4, 11, 5, 7, 1, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(55.0, ROO_HOP_NITRO_5, 11, 7, 6, 2, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(38.0, ROO_HOP_NITRO_6, 11, 6, 4, 3, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(22.0, ROO_HOP_NITRO_7, 11, 6, 2, 4, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(6.00, ROO_HOP_NITRO_8, 11, 6, 0, 5, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(12.0, ROO_HOP_NITRO_9, 11, 4, 1, 6, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(28.0, ROO_HOP_NITRO_A, 11, 4, 3, 7, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(18.0, ROO_HOP_NITRO_B, 11, 2, 2, 8, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(1.00, ROO_HOP_NITRO_C, 11, 1, 0, 9, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(16.0, ROO_HOP_NITRO_D, 11, 0, 2, 10, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(32.0, ROO_HOP_NITRO_E, 11, 0, 4, 11, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoHop(48.0, ROO_HOP_NITRO_F, 11, 0, 6, 12, 0, 12, 12.0)
+    RooHopFrame = 0
+    RooDoFinalHopNitro(42.0, ROO_HOP_NITRO_G, 2, 5, 13, 0)
+}
+
+inline sub SoundRooIntroTrans() {
+    soundpitch(3.262)
+    sounddelay(1.85s)
+    sounddecay(10s)
+    soundplay([RRe6A], 2V)
+
+    soundpitch(6.892)
+    sounddelay(2.15s)
+    sounddecay(10s)
+    soundplay([RBF6A], 1V)
+
+    soundpitch(6.892)
+    sounddelay(63)
+    sounddecay(10s)
+    soundplay([RRG6A], 2V)
+}
+
+state Roo_Intro { // 0
+    code() {
+        soundpitch(3.625)
+        soundsetup(GLOBAL_6, self, 5)
+        soundsetup(0, self, 9)
+        sounddecay(10.2s)
+        soundplay([WflfA], 0.3V)
+        statusb = FLAG_ROT_Y | FLAG_COLLIDABLE | FLAG_SOLID_SIDES
+        zindex = 68
+        health = 3
+        spawn(BosBC, BosBC_S_HEALTH, 1, 3.0, 3)
+        calcpath(0, vvec)
+        calcpath(9.0)
+        TileHalfX = abs(vecx - x) >> 1
+        TileHalfZ = abs(vecz - z) >> 1
+        BoxExplosionHalfX = 3 * TileHalfX
+        BoxExplosionHalfZ = 3 * TileHalfZ
+        calcpath(64.0)
+        if (!RESPAWNCOUNT) {
+            playanim(0, ROO_INTRO_1)
+            playanim(0, ROO_INTRO_1)
+            WaitFrame(0, ROO_INTRO_1, 1s)
+            playframes(ROO_INTRO_1, 0.0, 78.0)
+            SoundRooIntroTrans()
+            playframes(ROO_INTRO_2, 0.0, 78.0)
+            playframes(ROO_INTRO_3, 0.0, 33.0)
+            playframes(ROO_INTRO_4, 0.0, 20.0)
+        }
+        else {
+            ins72(0, 0x8000)
+        }
+        changestate(Ripper_Roo)
+    }
+    event(e, a) {
+        accevcstate(Ripper_Roo, e == Event67)
+    }
+}
+
+inline sub RooDazed() {
+    setanim(ROO_DAZED_1, -1.0)
+    do {
+        animframe += 1.0
+        if (RooDamageTaken) {
+            goto exit
+        }
+        if (animframe == 32.0) {
+            soundpitch(6.892)
+            sounddecay(10s)
+            soundplay([RBT6A], 1V)
+            RooCanTakeDamage = true
+        }
+        playframe()
+    } while (animframe + 1.0 <= 82.0)
+    setanim(ROO_DAZED_2, -1.0)
+    do {
+        animframe += 1.0
+        if (RooDamageTaken) {
+            goto exit
+        }
+        playframe()
+    } while (animframe + 1.0 <= 41.0)
+    setanim(ROO_RECOVER, -1.0)
+    do {
+        animframe += 1.0
+        if (RooDamageTaken) {
+            goto exit
+        }
+        if (animframe == 2.0 || animframe == 7.0 || animframe == 11.0) {
+            soundpitch(3.625)
+            sounddecay(9.6s)
+            soundplay([brk0A], 0.8V)
+        }
+        if (animframe == 20.0) {
+            RooCanTakeDamage = false
+        }
+        playframe()
+    } while (animframe + 1.0 <= 49.0)
+    exit :
+}
+
+inline sub RooAttacked() {
+    RooCanTakeDamage = false
+    save (vfx) {
+        vfx = (vfx & 0xFFFFFF00) | 0x6
+        sounddecay(10.2s)
+        SoundPitchDefault()
+        soundplay([RRe6A], 1V)
+    }
+    health -= 1
+    changestateif(Roo_Defeated, health <= 0)
+    playframes(ROO_ATTACKED, 0.0, 42.0)
+    break
+}
+
+inline sub SoundRooNitroPhaseTrans() {
+    soundpitch(6.892)
+    sounddecay(10s)
+    soundplay([RCS6A], 1V)
+
+    soundpitch(3.263)
+    sounddelay(1.95s)
+    soundplay([RJm6A], 1V)
+
+    soundpitch(3.263)
+    sounddelay(2.5s)
+    soundplay([RJm6A], 1V)
+}
+
+state Ripper_Roo { // 1
+    code() {
+        SetColor1(0xFF, 0xFF, 0xFF)
+        RooTNTPhase1()
+        goto skip
+        do {
+            RooTNTPhase1Repeat()
+            skip :
+            playframes(ROO_HOP_WAIT_FOR_TNT, 0.0, 43.0)
+            until (BoxesExploded) {
+                playframe()
+            }
+            SoundRooNitroPhaseTrans()
+            playframes(ROO_HOP_NITRO_1, 0.0, 64.0)
+            playframes(ROO_HOP_NITRO_2, 0.0, 12.0)
+            RooNitroPhase1()
+            playframes(ROO_EXPLODE_NITRO, 0.0, 37.0)
+            RooDazed()
+            if (RooDamageTaken) { 
+                RooAttacked()
+            }
+            soundpitch(6.892)
+            sounddecay(10s)
+            soundplay([RRG6A], 1V)
+            playframes(ROO_PHASE_TRANS, 0.0, 14.0)
+        } while (1)
+        statusb |= FLAG_INVISIBLE
+        playframe(animframe, 0.85s)
+        statusb &= ~FLAG_INVISIBLE
+        playframes(ROO_PHASE_TRANS, 0.0, 14.0)
+        do {
+            RooTNTPhase2()
+            playframes(ROO_HOP_WAIT_FOR_TNT, 0.0, 43.0)
+            until (BoxesExploded) {
+                playframe()
+            }
+            SoundRooNitroPhaseTrans()
+            playframes(ROO_HOP_NITRO_1, 0.0, 64.0)
+            playframes(ROO_HOP_NITRO_2, 0.0, 12.0)
+            RooNitroPhase2()
+            playframes(ROO_EXPLODE_NITRO, 0.0, 37.0)
+            RooDazed()
+            if (RooDamageTaken) { 
+                RooAttacked()
+            }
+            playframes(ROO_PHASE_TRANS, 0.0, 14.0)
+        } while (1)
+        statusb |= FLAG_INVISIBLE
+        playframe(animframe, 0.85s)
+        statusb &= ~FLAG_INVISIBLE
+        playframes(ROO_PHASE_TRANS, 0.0, 14.0)
+        do {
+            RooTNTPhase3()
+            playframes(ROO_HOP_WAIT_FOR_TNT, 0.0, 43.0)
+            until (BoxesExploded) {
+                playframe()
+            }
+            SoundRooNitroPhaseTrans()
+            playframes(ROO_HOP_NITRO_1, 0.0, 64.0)
+            playframes(ROO_HOP_NITRO_2, 0.0, 12.0)
+            RooNitroPhase3()
+            playframes(ROO_EXPLODE_NITRO, 0.0, 37.0)
+            RooDazed()
+            if (RooDamageTaken) { 
+                RooAttacked()
+            }
+            playframes(ROO_PHASE_TRANS, 0.0, 14.0)
+        } while (1)
+        statusb |= FLAG_INVISIBLE
+        playframe(animframe, 0.85s)
+        statusb &= ~FLAG_INVISIBLE
+        playframes(ROO_PHASE_TRANS, 0.0, 14.0)
+    }
+    event(e, a) {
+        if (RooCanTakeDamage) {
+            if (RooDamageTaken) {
+                rejevret(e == EventJumpedOn || e == EventSpinHit || e == EventSlideHit || e == EventSlamHit)
+            }
+            else if (e == EventJumpedOn || e == EventSpinHit || e == EventSlideHit || e == EventSlamHit) {
+                accev()
+                RooDamageTaken = true
+            }
+            rejevif (interrupter == player && (e == EventJumpedOn || e == EventSlamHit)) {
+                sounddecay(6.4s)
+                SoundPitchDefault(0.23)
+                soundplay([bnk0A], 0.4V)
+                sendevent(EventBounce, interrupter, 12.649m)
+            }
+            if ((e == EventHit || e == EventHitInvincible || e == EventSpinHit || e == EventSlideHit) && interrupter == player && player -> statusb & 0x80) {
+                save (velx, vely, velz, troty) {
+                    troty = atan2(player -> trans)
+                    interrupter -> speed = 10m
+                    interrupter -> troty = atan2(player -> trans)
+                    setvel(10m, vvel)
+                    interrupter -> velx = velx
+                    interrupter -> vely = vely
+                    interrupter -> velz = velz
+                    interrupter -> statusb &= ~FLAG_DPAD_CONTROL
+                }
+            }
+        }
+        else {
+            if ((e == EventSpinHit || e == EventSlideHit) && interrupter == player && frametime - RooLastHitTime > 0.1s) {
+                sounddecay(6.4s)
+                SoundPitchDefault(0.23)
+                soundplay([sht0A], 0.4V)
+                RooLastHitTime = frametime
+            }
+            rejevif (interrupter == player && (e == EventJumpedOn || e == EventSlamHit)) {
+                sounddecay(6.4s)
+                SoundPitchDefault(0.23)
+                soundplay([bnk0A], 0.4V)
+                sendevent(EventBounce, interrupter, 12.649m)
+            }
+            if (e == EventSpinHit && interrupter == player && player -> statusb & 0x80) {
+                save (velx, vely, velz, troty) {
+                    troty = atan2(player -> trans)
+                    interrupter -> speed = 10m
+                    interrupter -> troty = atan2(player -> trans)
+                    setvel(10m, vvel)
+                    interrupter -> velx = velx
+                    interrupter -> vely = vely
+                    interrupter -> velz = velz
+                    interrupter -> statusb &= ~FLAG_DPAD_CONTROL
+                }
+            }
+        }
+    }
+    trans {
+        if (RooCanTakeDamage && !time(0.2s)) {
+            moda = 32.0
+        }
+        else {
+            moda = 0
+        }
+    }
+}
+
+state Roo_Defeated { // 2
+    stateflag 0x21
+    trans => state Ripper_Roo
+    code() {
+        playframes(ROO_DEATH_1, 0.0, 38.0)
+        soundpitch(2.903)
+        sounddelay(0.9s)
+        soundplay([RFH6A], 10V)
+        playframes(ROO_DEATH_2, 0.0, 37.0)
+        KillEntity()
+        sendevent(EventWarp, player, 0)
+        sleep()
+    }
+}
+
+state Nitro_Trigger_Timer { // 3
+    code(tile_x, tile_z, dur) {
+        parent -> BoxNitroExplosionTileX = -1
+        parent -> BoxNitroExplosionTileZ = -1
+        do (var start = frametime) {
+            if (parent -> BoxNitroExplosionTileX >= 0) {
+                return
+            }
+            playframe()
+        } while (frametime - start < dur)
+        parent -> BoxNitroExplosionTileX = tile_x
+        parent -> BoxNitroExplosionTileZ = tile_z
+    }
+}
+
+inline sub TNT_Countdown(anim, t) {
+    if (BoxIndex == 0) {
+        soundpitch(3.263)
+        soundplay([Ttb0A], 0.8V)
+    }
+    if (BoxIndex == 1) {
+        soundpitch(3.263)
+        soundplay([Ttb0A], 0.4V)
+    }
+    playanim(0, anim, t)
+}
+
+state Box_TNT { // 4
+    code(pos_x, pos_y, pos_z, tile_x, tile_z, index) {
+        BoxIndex = index
+        BoxTileX = tile_x
+        BoxTileZ = tile_z
+        if (!BoxIndex) {
+            parent -> TNTChainStart = 0
+        }
+        TNTFuse = (BoxIndex << 2) * 1s / 1.2s
+        zindex = 64
+        SetRot(0deg)
+        SetTrans(pos_x, pos_y, pos_z)
+        TNT_Countdown(BOX_TNT_0, 1s)
+        TNT_Countdown(BOX_TNT_6, 1s)
+        TNT_Countdown(BOX_TNT_5, 1s)
+        TNT_Countdown(BOX_TNT_4, 1s)
+        TNT_Countdown(BOX_TNT_3, 1s)
+        TNT_Countdown(BOX_TNT_2, 1s)
+        TNT_Countdown(BOX_TNT_1, 1s)
+        if (BoxIndex == 0) {
+            parent -> TNTChainStart = frametime
+            changestate(Box_TNT_Explode)
+        }
+    }
+    trans {
+        nofirst {
+            unless (!parent -> TNTChainStart) {
+                changestateif(Box_TNT_Explode, frametime - parent -> TNTChainStart >= TNTFuse)
+            }
+        }
+    }
+}
+
+state Box_TNT_Explode { // 5
+    code() {
+        statusb |= FLAG_INVISIBLE
+        spawn(9, 40, 1, 0, 7)
+        if (parent -> x > x - parent -> TileHalfX
+            && parent -> x < x + parent -> TileHalfX
+            && parent -> z > z - parent -> TileHalfZ
+            && parent -> z < z + parent -> TileHalfZ) {
+                parent -> BoxesExploded = true
+            }
+        WaitChildNull()
+    }
+    trans {
+        nofirst {
+            sendeventif(EventHit, player,
+                player -> x > x - parent -> BoxExplosionHalfX
+                && player -> x < x + parent -> BoxExplosionHalfX
+                && player -> z > z - parent -> BoxExplosionHalfZ
+                && player -> z < z + parent -> BoxExplosionHalfZ, 100.0)
+        }
+    }
+}
+
+state Box_Nitro { // 6
+    code(pos_x, pos_y, pos_z, tile_x, tile_z, index) {
+        SoundPitchDefault()
+        sounddecay(4.8s)
+        soundplay([nbu0A], 0.8V)
+        BoxIndex = index
+        BoxTileX = tile_x
+        BoxTileZ = tile_z
+        zindex = 64
+        SetRot(0deg)
+        SetTrans(pos_x, pos_y, pos_z)
+        do {
+            playanim(0, BOX_NITRO)
+            if (!rand(60)) {
+                SoundPitchDefault()
+                sounddecay(3.2s)
+                soundplay([nbu0A], 0.4V)
+
+            }
+        } while (1)
+    }
+    trans {
+        nofirst {
+            if (player -> statusa & FLAG_GROUNDLAND
+                && player -> x > x - parent -> TileHalfX
+                && player -> x < x + parent -> TileHalfX
+                && player -> z > z - parent -> TileHalfZ
+                && player -> z < z + parent -> TileHalfZ) {
+                    parent -> BoxNitroExplosionTileX = BoxTileX
+                    parent -> BoxNitroExplosionTileZ = BoxTileZ
+                }
+            changestateif(Box_Nitro_Explode, parent -> BoxNitroExplosionTileX >= 0, parent -> BoxNitroExplosionTileX, parent -> BoxNitroExplosionTileZ)
+        }
+    }
+}
+
+sub SpawnExplosionParticle(mode) {
+    moda = 16.0
+    if (mode < 2) {
+        soundpitch((30.4 + rand(3.2)) * 0.295 >> 8)
+        sounddecay(7.7s)
+        soundplay([nbr0A], 0.6V)
+        soundsetup(0, voice, 5)
+        spawn(9, 40, 1, getins(SetNitroExplosionColor2), 7)
+    }
+    else {
+        spawn(9, 4, 1, getins(SetNitroExplosionColor1), 7)
+    }
+}
+
+sub SetNitroExplosionColor1() {
+    if (var r = rand(5); r == 0) {
+        SetColor1(0x4B, 0x4B, 0x00)
+    }
+    else if (r == 1) {
+        SetColor1(0x00, 0x4B, 0x00)
+    }
+    else if (r == 2) {
+        SetColor1(0x19, 0x2F, 0x06)
+    }
+    else if (r == 3) {
+        SetColor1(0x4B, 0x33, 0x00)
+    }
+    else if (r == 4) {
+        SetColor1(0x00, 0x4B, 0x2c)
+    }
+    SetScale(2.5S)
+}
+
+sub SetNitroExplosionColor2() {
+    if (var r = rand(5); r == 0) {
+        SetColor1(0x4B, 0x4B, 0x00)
+    }
+    else if (r == 1) {
+        SetColor1(0x00, 0x4B, 0x00)
+    }
+    else if (r == 2) {
+        SetColor1(0x19, 0x2F, 0x06)
+    }
+    else if (r == 3) {
+        SetColor1(0x4B, 0x33, 0x00)
+    }
+    else if (r == 4) {
+        SetColor1(0x00, 0x4B, 0x2C)
+    }
+    SetScale(2.5S)
+}
+
+state Box_Nitro_Explode { // 7
+    code(ox, oz) {
+        {
+            var dist = abs(ox - BoxTileX) + abs(oz - BoxTileZ)
+            WaitFrame(dist * 3)
+        }
+        statusb |= FLAG_INVISIBLE
+        SpawnExplosionParticle(0)
+        sendeventif(EventDidgeridoo, player,
+            player -> x > x - parent -> BoxExplosionHalfX
+            && player -> x < x + parent -> BoxExplosionHalfX
+            && player -> z > z - parent -> BoxExplosionHalfZ
+            && player -> z < z + parent -> BoxExplosionHalfZ, 100.0)
+
+        if (parent -> x > x - parent -> TileHalfX
+            && parent -> x < x + parent -> TileHalfX
+            && parent -> z > z - parent -> TileHalfZ
+            && parent -> z < z + parent -> TileHalfZ) {
+                parent -> BoxesExploded = true
+            }
+        WaitChildNull()
+    }
+}

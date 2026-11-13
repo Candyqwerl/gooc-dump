@@ -1,0 +1,3471 @@
+#gool NCorC 94 3
+#interruptcount 98
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C3_FruiC.gooh"
+#include "..\\Includes\\C3_BosBC.gooh"
+#include "..\\Includes\\C3_ShadC.gooh"
+#include "..\\Includes\\C3_WEfOC.gooh"
+//gooc -c 3 -r pal "C3\C3_NCorC.gooc" "C3\Out\C3_NCorC.nsentry"
+
+#anim CORTEX_HOVER_1           [CH17V] [CH17G] 07 1 2
+#anim CORTEX_HOVER_2           [CH27V] [CH17G] 22 1 2
+#anim CORTEX_HOVER_RELOAD      [CH37V] [CH17G] 54 1 2
+#anim CORTEX_HOVER_FIRE        [CH47V] [CH17G] 26 1 2
+#anim CORTEX_THROW_MINE_1      [CF17V] [CF17G] 47 1 2
+#anim CORTEX_THROW_MINE_2      [CF27V] [CF17G] 18 1 2
+#anim CORTEX_THROW_MINE_3      [CF37V] [CF17G] 17 1 2
+#anim CORTEX_ATTACKED_1        [CT17V] [CT17G] 12 1 2
+#anim CORTEX_DAZED_1           [CT27V] [CT17G] 12 1 2
+#anim CORTEX_DAZED_2           [CT37V] [CT17G] 10 1 2
+#anim CORTEX_DAZED_3           [CT47V] [CT17G] 23 1 2
+#anim CORTEX_ATTACKED_2        [CV17V] [CV17G] 11 1 2
+#anim CORTEX_RECOVER_1         [CV27V] [CV17G] 62 1 2
+#anim CORTEX_RECOVER_2         [CV37V] [CV17G] 28 1 2
+#anim CORTEX_RECOVER_3         [CV47V] [CV17G] 60 1 2
+#anim CORTEX_RECOVER_4         [CV57V] [CV17G] 10 1 2
+#anim CORTEX_DAZED_JUMPED_ON   [CB17V] [CB17G] 12 1 2
+#anim CORTEX_MOUNT_HOVERBOARD  [CL17V] [CL17G] 52 1 2
+
+#anim CORTEX_INTRO_1 [CI17V] [CI17G] 102 1 2
+#anim CORTEX_INTRO_2 [CI27V] [CI17G] 104 1 2
+#anim CORTEX_INTRO_3 [CI37V] [CI17G] 102 1 2
+
+#anim BULLET             [Bu17V] [Bu17G] 27 1 2
+#anim FORCE_FIELD        [FF17V] [FF17G] 01 1 2
+#anim FORCE_FIELD_TRANS  [Fh17V] [Fh17G] 13 0 2
+#anim HOVERBOARD         [Sl17V] [Sl17G] 22 1 2
+#anim HOVERBOARD_SHADOW  [SS17V] [SS17G] 01 1 2
+#anim MINE_FLY           [Mi17V] [Mi17G] 07 1 2
+#anim MINE_FLASH         [Mi27V] [Mi17G] 08 1 2
+#anim MINE_EXPLODE       [ME17V] [ME17G] 15 1 2
+
+#anim UKA_UKA       [Uk17V] [Uk17G] 10 1 2
+#anim UKA_CHARGE_1  [Uk27V] [Uk27G] 08 1 2
+#anim UKA_CHARGE_2  [Uk37V] [Uk27G] 06 1 2
+#anim AKU_AKU       [Ak17V] [Ak17G] 01 1 2
+#anim AKU_CHARGE_1  [Ak27V] [Ak27G] 08 1 2
+#anim AKU_CHARGE_2  [Ak37V] [Ak27G] 06 1 2
+
+#anim MASK_CLASH_1           [Ru17V] [Ru17G] 22 1 2
+#anim COLLISION_SHOCKWAVE_1  [Ru27V] [Ru27G] 13 1 2
+#anim COLLISION_SHOCKWAVE_2  [Ru37V] [Ru37G] 15 1 2
+#anim MASK_CLASH_2           [Ru47V] [Ru47G] 01 1 2
+#anim ENERGY_PARTICLES_1     [Ru57V] [Ru57G] 23 1 2
+#anim ENERGY_PARTICLES_2     [Ru67V] [Ru57G] 19 1 2
+#anim EXPLOSION              [Ru77V] [Ru77G] 18 1 2
+#anim MASK_VORTEX            [Vo17V] [Vo17G] 21 0 2
+
+#anim BEAM_1  [Be17V] [Be17G] 08 1 2
+#anim BEAM_2  [Be27V] [Be17G] 11 1 2
+#anim BEAM_3  [Be37V] [Be17G] 06 1 2
+#anim BEAM_4  [Be47V] [Be47G] 08 1 2
+#anim BEAM_5  [Be57V] [Be47G] 11 1 2
+#anim BEAM_6  [Be67V] [Be47G] 06 1 2
+
+#anim GATE_CLOSE       [Ga17V] [Ga17G] 26 1 2
+#anim GATE_BREAK       [Ga27V] [Ga27G] 13 1 2
+#anim GATE_PARTICLE_1  [Ga37V] [Ga37G] 12 1 2
+#anim GATE_PARTICLE_2  [Ga47V] [Ga37G] 13 1 2
+#anim FORCEFIELD_FLASH [Bar3V] [Bar3G] 01 1 2
+#anim UKA_INTRO        [UC17V] [UC17G] 296 1 2
+
+#spawn S_CORTEX                 Cortex_Init
+#spawn S_BOSS_CAMERA            Boss_Camera_Init
+#spawn S_SHIELD_IMPACT          ForceField_Impact_Flash
+#spawn S_FORCEFIELD             ForceField_Init
+#spawn S_MINE                   Mine_Init
+#spawn S_UKA_UKA                UkaUka_Init
+#spawn S_AKU_AKU                AkuAku_Init
+#spawn S_MASK_BEAM              MaskBeam_Init
+#spawn S_BEAM_GROUND_GLOW       BeamGroundGlow_Init
+#spawn S_DRAIN_GATE             DrainGate_Init
+#spawn S_DRAIN_ENERGY           DrainEnergy_Init
+#spawn S_HOVERBOARD             Hoverboard_MoveAside
+#spawn S_RESCUE_SHIELD          RescueForceField_Init
+#spawn S_MASK_CLASH             MaskClash_Spin
+#spawn S_SHOCKWAVE              MaskClash_Shockwave
+#spawn S_SHOCKWAVE_GROUND       MaskClash_GroundShockwave
+#spawn S_CLASH_ENERGY           MaskClash_Energy
+#spawn S_CLASH_BLAST            MaskClash_Blast
+#spawn S_CORTEX_BULLET          CortexBullet_Init
+#spawn S_MASK_VORTEX            MaskVortex_Init
+#spawn S_HOVERBOARD_SHADOW      Hoverboard_Shadow
+#spawn S_UKA_INTRO              UkaUka_Intro
+#spawn S_FORCEFIELD_TRANS       ForceField_Transition
+
+var NeoVar1, NeoVar2, NeoVar3, NeoVar4, NeoVar5, NeoVar6, NeoVar7, NeoVar8, NeoVar9
+var NeoVar10, NeoVar11, NeoVar12, NeoVar13, NeoVar14, NeoVar15, NeoVar16, NeoVar17, NeoVar18
+var NeoVar19, NeoVar20
+
+expr CortexPatrolCount       = NeoVar1
+expr CortexTargetX           = NeoVar3
+expr CortexTargetY           = NeoVar4
+expr CortexTargetZ           = NeoVar5
+expr CortexPathSpeed         = NeoVar6
+expr LastForceFieldImpact    = NeoVar7
+expr ForceFieldOBJ           = NeoVar8
+expr DrainIsOpen             = NeoVar9
+expr CortexRiseY             = NeoVar10
+expr CortexRiseStartY        = NeoVar11
+expr MineIndex               = NeoVar12
+expr CortexDDA               = NeoVar13
+expr UkaUkaOBJ               = NeoVar14
+expr CortexRiseMarker        = NeoVar15
+expr AlternateEndingUnlocked = groundtime
+expr IntroVoice              = field_62
+expr PowerupAlreadyOwned     = field_61
+
+expr MineFirstBounce         = NeoVar1
+expr ForceFieldAlpha         = NeoVar1
+expr ImpactFlashTargetScale  = NeoVar1
+expr ImpactFlashAlpha        = NeoVar2
+
+expr CameraDistance          = NeoVar1
+expr CameraTargetDistance    = NeoVar2
+expr CameraFocusZ            = NeoVar3
+
+expr MaskOrbitRadius  = NeoVar1
+expr MaskOrbitAngle   = NeoVar2
+expr AkuAkuOBJ        = NeoVar3
+expr MaskOrbitSpeed   = NeoVar5
+expr CortexOBJ        = NeoVar6
+expr MaskHoverX       = NeoVar7
+expr MaskHoverY       = NeoVar8
+expr MaskTargetX      = NeoVar9
+expr MaskTargetY      = NeoVar10
+expr MaskTargetZ      = NeoVar11
+expr MaskStartX       = NeoVar12
+expr MaskStartY       = NeoVar13
+expr MaskStartZ       = NeoVar14
+expr NextMaskTurn     = NeoVar15
+expr MaskTargetSpeed  = NeoVar16
+expr FightPhase       = NeoVar17
+expr MaskRadiusPulse  = NeoVar18
+expr MaskFacingOffset = NeoVar19
+expr VortexVoice      = NeoVar20
+
+expr BoardTargetX = NeoVar1
+expr BoardTargetY = NeoVar2
+expr BoardTargetZ = NeoVar3
+expr BoardBaseX   = NeoVar4
+expr BoardBaseY   = NeoVar5
+expr BoardBaseZ   = NeoVar6
+
+expr ClashSpinSpeed   = NeoVar5
+expr VortexPathLength = NeoVar1
+expr VortexPathSpeed  = NeoVar2
+expr EffectAlpha      = NeoVar1
+
+state Cortex_Init { // 0
+    stateflag 0x1
+    statusc 0x0
+    code(uka) {
+        if ((GLOBAL_175 | GLOBAL_177) \ -0x400 && (GLOBAL_176 | GLOBAL_178) \ 63 && SAVEDGEMPOOL1 \ -2 && SAVEDGEMPOOL2 \ 0x7C00003F) {
+            AlternateEndingUnlocked = true
+        }
+        else {
+            AlternateEndingUnlocked = false
+        }
+        if (AlternateEndingUnlocked) {
+            ins72(0, 0x100)
+        }
+        zindex = 26
+        playnull()
+        UkaUkaOBJ = objectget(uka)
+        playnull()
+        GLOBAL_150 |= 0x100000
+        CortexDDA = GLOBAL_146 >> 8
+        if (GLOBAL_27 & 0x80) {
+            CortexDDA = 0
+        }
+        if (!!GLOBAL_105) {
+            CortexDDA = 0
+        }
+        if (CortexDDA > 15) {
+            CortexDDA = 15
+        }
+        statusb = FLAG_COLLIDABLE | FLAG_HAS_SHADOW | FLAG_STALL
+        groundy = 0
+        field_60 = 0
+        spawn(ShadC, ShadC_S_BOSS_VIDO, 1, 0, 2.5S, 2)
+        DrainIsOpen = 0
+        LastForceFieldImpact = 0
+        health = 3
+        spawn(BosBC, BosBC_S_HEALTH_TICK, 1, health << 8, 3)
+        spawn(NCorC, S_FORCEFIELD)
+        ForceFieldOBJ = objectspawned
+        pathprog = 0
+        calcpath(pathprog)
+        y = 3.5m + groundy
+        SetRot(0deg)
+        if (!RESPAWNCOUNT) {
+            if (AlternateEndingUnlocked) {
+                changestate(Cortex_WaitForUkaIntro)
+            }
+            else {
+                changestate(Cortex_Intro)
+            }
+        }
+        else {
+            changestate(Cortex_SkipIntro)
+        }
+    }
+}
+
+state Cortex_Intro { // 1
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        zindex = 40
+        soundpitch(6.891)
+        soundsetup(7, self, 8)
+        soundplay([CoP7A], 1V)
+        playframes(CORTEX_INTRO_1, 0.0, 7.0)
+        IntroVoice = 0
+        onstateexit(CortexIntroExit)
+        if (SFXVOL) {
+            if (var lang = GLOBAL_151; lang == LANG_FR) {
+                spawn2(9, 44, 1, [F007O], [F017O], [F027O], 3.0, 1000s, 8.0)
+                IntroVoice = objectspawned
+            }
+            else if (lang == LANG_DE) {
+                spawn2(9, 44, 1, [G007O], [G017O], [G027O], 3.0, 1000s, 8.0)
+                IntroVoice = objectspawned
+            }
+            else if (lang == LANG_IT) {
+                spawn2(9, 44, 1, [I007O], [I017O], [I027O], 3.0, 1000s, 8.0)
+                IntroVoice = objectspawned
+            }
+            else if (lang == LANG_ES) {
+                spawn2(9, 44, 1, [S007O], [S017O], [S027O], 3.0, 1000s, 8.0)
+                IntroVoice = objectspawned
+            }
+            else {
+                spawn2(9, 44, 1, [E007O], [E017O], [E027O], 3.0, 1000s, 8.0)
+                IntroVoice = objectspawned
+            }
+        }
+        animframe = 7.0
+        do {
+            animframe += 1.0
+            if (animframe == 52.0) {
+                soundpitch(3.99)
+                soundsetup(7, self, 8)
+                soundplay([ld27A], 0.9V)
+            }
+            else if (animframe == 66.0) {
+                soundpitch(2.902344)
+                soundsetup(7, self, 8)
+                soundplay([ld27A], 0.8V)
+            }
+            else if (animframe == 80.0) {
+                soundpitch(2.54)
+                soundsetup(7, self, 8)
+                soundplay([ld27A], 0.6V)
+            }
+            playframe()
+        } while (animframe + 1.0 <= 98.0)
+        interrupter = IntroVoice
+        sendevent(EventTriggered, interrupter)
+        IntroVoice = 0
+        playframes(99.0, 101.0)
+        playframes(CORTEX_INTRO_2, 0.0, 103.0)
+        setanim(CORTEX_INTRO_3, -1.0)
+        do {
+            animframe += 1.0
+            if (animframe == 53.0) {
+                interrupter = UkaUkaOBJ
+                sendevent(EventTriggered, interrupter)
+                soundpitch(2.805)
+                soundsetup(7, self, 8)
+                soundplay([jmp0A], 1V)
+            }
+            playframe()
+        } while (animframe + 1.0 <= 101.0)
+        changestate(Cortex_EnterArena)
+    }
+    event(e, a) {
+        accevcstate(Cortex_SkipIntro, e == Event67)
+    }
+}
+
+sub CortexIntroExit() {} // S-189
+
+state Cortex_WaitForUkaIntro { // 2
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepframes(CORTEX_HOVER_2, 0.0, 21.0)
+    }
+    event(e, a) {
+        accevcstate(Cortex_SkipIntro, e == Event67)
+        accevcstate(Cortex_FinishIntro, e == EventTriggered)
+    }
+}
+
+
+state Cortex_FinishIntro { // 3
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        playframes4(CORTEX_HOVER_2, -1.0, 21.0)
+        changestate(Cortex_EnterArena)
+    }
+}
+
+state UkaUka_Intro { // 4
+    stateflag 0x1
+    statusc 0x0
+    code(cortex, uka) {
+        playnull()
+        creator = objectget(cortex)
+        AlternateEndingUnlocked = creator -> AlternateEndingUnlocked
+        zindex = creator -> zindex
+        if (!AlternateEndingUnlocked || !(GLOBAL_119 & 0x400)) {
+            KillEntity()
+            changestate(Kill)
+        }
+        IntroVoice = 0
+        onstateexit(UkaIntroExit)
+        if (SFXVOL) {
+            if (var lang = GLOBAL_151; lang == LANG_FR) {
+                spawn2(9, 44, 1, [F207O], [F217O], [F227O], [F237O], [F247O], 5.0, 1000s, 8.0)
+                IntroVoice = objectspawned
+            }
+            else if (lang == LANG_DE) {
+                spawn2(9, 44, 1, [G207O], [G217O], [G227O], [G237O], [G247O], 5.0, 1000s, 8.0)
+                IntroVoice = objectspawned
+            }
+            else if (lang == LANG_IT) {
+                spawn2(9, 44, 1, [I207O], [I217O], [I227O], [I237O], [I247O], 5.0, 1000s, 8.0)
+                IntroVoice = objectspawned
+            }
+            else if (lang == LANG_ES) {
+                spawn2(9, 44, 1, [S207O], [S217O], [S227O], [S237O], [S247O], 5.0, 1000s, 8.0)
+                IntroVoice = objectspawned
+            }
+            else {
+                spawn2(9, 44, 1, [E207O], [E217O], [E227O], [E237O], [E247O], 5.0, 1000s, 8.0)
+                IntroVoice = objectspawned
+            }
+        }
+        SetScale(0x570)
+        playanim(0, UKA_INTRO, 21)
+        interrupter = IntroVoice
+        sendevent(EventTriggered, interrupter)
+        IntroVoice = 0
+        playframes(UKA_INTRO, 0.0, 295.0)
+        KillEntity()
+        sendevent(EventTriggered, creator)
+        interrupter = objectget(uka)
+        sendevent(Event97, interrupter)
+        playframe()
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event67 || e == Event88)
+    }
+}
+
+sub UkaIntroExit() {} // S-306
+
+state Cortex_SkipIntro { // 5
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        interrupter = UkaUkaOBJ
+        sendevent(Event88, interrupter)
+        changestate(Cortex_EnterArena)
+    }
+}
+
+inline sub CortexUpdateHoverHeight() {
+    vely = (vecy - y) >> 4
+    if (abs(vely) > 0.08m) {
+        if (vely >= 0) {
+            vely = 0.08m
+        }
+        else {
+            vely = -0.08m
+        }
+    }
+    y += vely
+}
+
+inline sub CortexCheckShieldImpact() {
+    if (frametime - LastForceFieldImpact >= 0.5s, abs((player -> y + 1m) - y) <= 2m, distance(player, DIST_NO_Y) <= 2m) {
+        LastForceFieldImpact = frametime
+        spawn(NCorC, S_SHIELD_IMPACT)
+        interrupter = ForceFieldOBJ
+        sendevent(Event81, interrupter)
+    }
+}
+
+state Cortex_EnterArena { // 6
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        zindex = 26
+        playanim(0, CORTEX_HOVER_1)
+        playanim(1, CORTEX_HOVER_1)
+        playanim(2, CORTEX_HOVER_1)
+        playanim(3, CORTEX_HOVER_1)
+        playanim(3, CORTEX_HOVER_1)
+        playanim(4, CORTEX_HOVER_1)
+        playanim(5, CORTEX_HOVER_1)
+        do {
+            playframes(CORTEX_HOVER_2, 0.0, 21.0)
+            changestateif(Cortex_BeginAttack, pathprog >= 29.0)
+        } while (1)
+    }
+    trans {
+        once {
+            statusb = FLAG_COLLIDABLE | FLAG_HAS_SHADOW | FLAG_STALL
+            pathprog = 0
+            CortexPathSpeed = 5.5
+        }
+        if (pathprog >= 29.0) {
+            pathprog = 29.0
+        }
+        pathprog = spd(pathprog, CortexPathSpeed)
+        var0 = pathprog + CortexPathSpeed
+        calcpath(var0, vvec)
+        save (y) {
+            calcpath(pathprog)
+        }
+        if (pathprog >= 29.0) {
+            troty = atan2(player -> trans)
+        }
+        else {
+            troty = atan(vecx - x, vecz - z)
+        }
+        vecy = 3.5m + groundy
+        if (distance(player, DIST_NO_Y) <= 5m) {
+            vecy += 1.5m
+        }
+        CortexUpdateHoverHeight()
+        roty = degseek(roty, troty, 120deg)
+        CortexCheckShieldImpact()
+    }
+}
+
+state Cortex_ReturnToArena { // 7
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepframes(CORTEX_HOVER_2, 0.0, 21.0)
+    }
+    trans {
+        once {
+            statusb = FLAG_COLLIDABLE | FLAG_HAS_SHADOW | FLAG_STALL
+            pathprog = 59.0
+            CortexPathSpeed = -5.5
+        }
+        changestateif(Cortex_BeginAttack, pathprog <= 44.0)
+        pathprog = spd(pathprog, CortexPathSpeed)
+        var0 = pathprog + CortexPathSpeed
+        calcpath(var0, vvec)
+        save (y) {
+            calcpath(pathprog)
+        }
+        troty = atan(vecx - x, vecz - z)
+        vecy = 3.5m + groundy
+        if (distance(player, DIST_NO_Y) <= 5m) {
+            vecy += 1.5m
+        }
+        CortexUpdateHoverHeight()
+        roty = degseek(roty, troty, 120deg)
+        CortexCheckShieldImpact()
+    }
+}
+
+state Cortex_BeginAttack { // 8
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        changestate(Cortex_FireBullets)
+    }
+}
+
+inline sub CortexClampPathProg() {
+    if (pathprog < 29.0) {
+        pathprog = 29.0
+    }
+    else if (pathprog > 44.0) {
+        pathprog = 44.0
+    }
+}
+
+state Cortex_Patrol { // 9
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        do {
+            playframes(CORTEX_HOVER_2, 0.0, 21.0)
+            if ((CortexPathSpeed >= 0 && pathprog >= 44.0) || (CortexPathSpeed < 0 && pathprog <= 29.0)) {
+                CortexPathSpeed = -CortexPathSpeed
+                CortexPatrolCount -= 1
+                changestateif(Cortex_ThrowMines, CortexPatrolCount <= 0)
+            }
+        } while (1)
+    }
+    trans {
+        once {
+            statusb = FLAG_COLLIDABLE | FLAG_HAS_SHADOW | FLAG_STALL
+            CortexPatrolCount = 2
+        }
+        pathprog = spd(pathprog, CortexPathSpeed)
+        CortexClampPathProg()
+        save (y) {
+            calcpath(pathprog)
+        }
+        vecy = 3.5m + groundy
+        if (distance(player, DIST_NO_Y) <= 5m) {
+            vecy += 1.5m
+        }
+        CortexUpdateHoverHeight()
+        troty = atan2(player -> trans)
+        roty = degseek(roty, troty, 120deg)
+        CortexCheckShieldImpact()
+        if (DEBUG, buttonpress(PAD_TRIANGLE)) {
+            changestate(Cortex_KnockedOffBoard)
+        }
+        if (collider) {
+            interrupter = ForceFieldOBJ
+            changestateifn(Cortex_KnockedOffBoard, interrupter -> stateflag & 0x100000)
+        }
+    }
+}
+
+inline sub SelectMineTargetX() {
+    if (CortexDDA >= 15) {
+        if (var index = MineIndex; index == 0) {
+            CortexTargetX = 6m
+        }
+        else if (index == 1) {
+            CortexTargetX = 2m
+        }
+        else if (index == 2) {
+            CortexTargetX = -2m
+        }
+        else {
+            CortexTargetX = -6m
+        }
+    }
+    else {
+        if (var index = MineIndex; index == 0) {
+            CortexTargetX = 6m
+        }
+        else if (index == 1) {
+            CortexTargetX = 3m
+        }
+        else if (index == 2) {
+            CortexTargetX = 0m
+        }
+        else if (index == 3) {
+            CortexTargetX = -3m
+        }
+        else {
+            CortexTargetX = -6m
+        }
+    }
+    if (CortexPathSpeed < 0) {
+        CortexTargetX = -CortexTargetX
+    }
+}
+
+state Cortex_ThrowMines { // 10
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        playframes(CORTEX_HOVER_2, 0.0, 21.0)
+        playframes(CORTEX_THROW_MINE_1, 0.0, 46.0)
+        playframes(CORTEX_THROW_MINE_2, 0.0, 17.0)
+        playframes(CORTEX_THROW_MINE_2, 0.0, 17.0)
+        playframes(CORTEX_THROW_MINE_2, 0.0, 17.0)
+        if (CortexDDA < 15) {
+            playframes(CORTEX_THROW_MINE_2, 0.0, 17.0)
+        }
+        playframes(CORTEX_THROW_MINE_3, 0.0, 16.0)
+        do {
+            if (CortexPatrolCount == 1) {
+                if ((CortexPathSpeed >= 0 && pathprog >= 44.0) || (CortexPathSpeed < 0 && pathprog <= 29.0)) {
+                    CortexPathSpeed = -CortexPathSpeed
+                    changestate(Cortex_Vulnerable)
+                }
+            }
+            playframes(CORTEX_HOVER_2, 0.0, 21.0)
+        } while (1)
+    }
+    trans {
+        once {
+            statusb = FLAG_COLLIDABLE | FLAG_HAS_SHADOW | FLAG_STALL
+            CortexPatrolCount = 2
+            MineIndex = 0
+        }
+        pathprog = spd(pathprog, CortexPathSpeed)
+        {
+            var edge = 0
+            if (pathprog < 29.0) {
+                edge = 1
+                if (CortexPatrolCount == 2) {
+                    pathprog = 29.0 + (29.0 - pathprog)
+                }
+                else {
+                    pathprog = 29.0
+                }
+            }
+            else if (pathprog >= 44.0) {   
+                edge = 1
+                if (CortexPatrolCount == 2) {
+                    pathprog = 44.0
+                }
+                else {
+                    pathprog = pathprog - (pathprog - 44.0)
+                }
+            }
+            if (edge) {
+                if (CortexPatrolCount == 2) {
+                    CortexPathSpeed = -CortexPathSpeed
+                    CortexPatrolCount = 1
+                    SelectMineTargetX()
+                    if (abs(degdist(0deg, roty)) >= 90deg) {
+                        CortexTargetZ = -1m - rand(1m)
+                    }
+                    else {
+                        CortexTargetZ = 1m + rand(10m)
+                    }
+                    CortexTargetZ += z
+                    CortexTargetY = 0
+                }
+            }
+        }
+        save (y) {
+            calcpath(pathprog)
+        }
+        if (animseq == getanim(CORTEX_HOVER_2)) {
+            vecy = 3.5m + groundy
+        }
+        else {
+            vecy = 1.5m + groundy
+        }
+        CortexUpdateHoverHeight()
+        if (CortexPatrolCount == 2) {
+            if (abs(degdist(0deg, atan2(player -> trans))) <= 90deg) {
+                troty = 0deg
+            }
+            else {
+                troty = 180deg
+            }
+        }
+        else {
+            troty = atan(CortexTargetX - x, CortexTargetZ - z)
+        }
+        roty = degseek(roty, troty, 120deg)
+        CortexCheckShieldImpact()
+        if ((animseq == getanim(CORTEX_THROW_MINE_2) && animframe == 4.0) || (animseq == getanim(CORTEX_THROW_MINE_3) && animframe == 4.0)) {
+            spawn(NCorC, S_MINE, 1, 3.0, CortexTargetX, CortexTargetY, CortexTargetZ)
+            MineIndex += 1
+            SelectMineTargetX()
+            if (abs(degdist(0deg, roty)) >= 90deg) {
+                CortexTargetZ = randi(-1m, 1m)
+            }
+            else {
+                CortexTargetZ = 1m + rand(10m)
+            }
+            CortexTargetZ += z
+            CortexTargetY = 0
+        }
+        if (DEBUG, buttonpress(PAD_TRIANGLE)) {
+            changestate(Cortex_KnockedOffBoard)
+        }
+    }
+}
+
+state Cortex_Vulnerable { // 11
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        do {
+            playframes(CORTEX_HOVER_2, 0.0, 21.0)
+            if ((CortexPathSpeed >= 0 && pathprog >= 44.0) || (CortexPathSpeed < 0 && pathprog <= 29.0)) {
+                if (CortexDDA >= 15) {
+                    playframes(CORTEX_HOVER_2, 0.0, 21.0)
+                    playframes(CORTEX_HOVER_2, 0.0, 21.0)
+                    playframes(CORTEX_HOVER_2, 0.0, 21.0)
+                }
+                CortexPathSpeed = -CortexPathSpeed
+                interrupter = ForceFieldOBJ
+                sendevent(Event83, interrupter)
+                changestate(Cortex_BeginAttack)
+            }
+        } while (1)
+    }
+    trans {
+        once {
+            statusb = FLAG_COLLIDABLE | FLAG_HAS_SHADOW | FLAG_STALL
+            interrupter = ForceFieldOBJ 
+            sendevent(Event82, interrupter)
+        }
+        pathprog = spd(pathprog, CortexPathSpeed)
+        CortexClampPathProg()
+        save (y) {
+            calcpath(pathprog)
+        }
+        vecy = 1.5m + groundy
+        CortexUpdateHoverHeight()
+        roty = degseek(roty, troty, 120deg)
+        if (collider) {
+            interrupter = ForceFieldOBJ
+            changestateifn(Cortex_KnockedOffBoard, interrupter -> stateflag & 0x100000)
+        }
+    }
+}
+
+state Cortex_FireBullets { // 12
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        do {
+            if (!(player -> stateflag & 0x20) && !player -> invincible) {
+                playframes(CORTEX_HOVER_RELOAD, 0.0, 53.0)
+                vecx = player -> x
+                vecy = player -> y + 0.25m
+                vecz = player -> z
+                vecx = atan2_3d(self, vecx)
+                spawn(NCorC, S_CORTEX_BULLET, 1, 3.0, vecx, roty)
+                playframes(CORTEX_HOVER_FIRE, 0.0, 25.0)
+            }
+            else {
+                playframes(CORTEX_HOVER_2, 0.0, 21.0)
+            }
+            if ((CortexPathSpeed >= 0 && pathprog >= 44.0) || (CortexPathSpeed < 0 && pathprog <= 29.0)) {
+                CortexPathSpeed = -CortexPathSpeed
+                CortexPatrolCount -= 1
+                changestateif(Cortex_ThrowMines, CortexPatrolCount <= 0 && !(player -> stateflag & 0x20) && !player -> invincible)
+            }
+        } while (1)
+    }
+    trans {
+        once {
+            statusb = FLAG_COLLIDABLE | FLAG_HAS_SHADOW | FLAG_STALL
+            CortexPatrolCount = 3
+        }
+        pathprog = spd(pathprog, CortexPathSpeed)
+        CortexClampPathProg()
+        save (y) {
+            calcpath(pathprog)
+        }
+        vecy = 3.5m + groundy
+        if (distance(player, DIST_NO_Y) <= 5m) {
+            vecy += 1.5m
+        }
+        CortexUpdateHoverHeight()
+        troty = atan2(player -> trans)
+        roty = degseek(roty, troty, 120deg)
+        CortexCheckShieldImpact()
+        if (DEBUG, buttonpress(PAD_TRIANGLE)) {
+            changestate(Cortex_KnockedOffBoard)
+        }
+        if (collider) {
+            interrupter = ForceFieldOBJ
+            changestateifn(Cortex_KnockedOffBoard, interrupter -> stateflag & 0x100000)
+        }
+    }
+}
+
+inline sub PlayCortexHitSound() {
+    SoundPitchDefault(0.293)
+    sounddecay(8.40001s)
+    soundsetup(7, self, 8)
+    soundplay([Bp10A], 1V)
+    if (GLOBAL_151 == 5.0) {
+        if (rand(2)) {
+            SoundPitchDefault()
+            sounddecay(8.2s)
+            soundsetup(7, self, 8)
+            soundplay([1123I], 1V)
+        }
+        else {
+            SoundPitchDefault(0.43)
+            sounddecay(8.2s)
+            soundsetup(7, self, 8)
+            soundplay([1124I], 1V)
+        }
+    }
+    GLOBAL_101 = 2
+    GLOBAL_100 = 0xFF
+}
+
+inline sub UpdateCortexAttackedMotion() {
+    if (vely < 0, collider) {
+        troty = atan2(player -> trans) + 180deg
+        velx = (sin(troty) * 6.25) >> 4
+        velz = (cos(troty) * 6.25) >> 4
+    }
+    x = spd(x, velx)
+    z = spd(z, velz)
+    if (x > 7m) {
+        x = 7m
+        velx = -velx << 1
+    }
+    else if (x < -7m) {
+        x = -7m
+        velx = -velx << 1
+    }
+    if (z > 7m) {
+        z = 7m
+        velz = -velz << 1
+    }
+    else if (z < -7m) {
+        z = -7m
+        velz = -velz << 1
+    }
+    vely -= 1.6m
+    y = spd(y, vely)
+}
+
+state Cortex_KnockedOffBoard { // 13
+    stateflag 0x100001
+    statusc 0x0
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | FLAG_HAS_SHADOW | FLAG_STALL
+        playframes(CORTEX_ATTACKED_1, 0.0, 11.0)
+        sleep()
+    }
+    event(e, a) {
+        accevif (e == Event85) {
+            DrainIsOpen = 1
+        }
+    }
+    trans {
+        once {
+            interrupter = ForceFieldOBJ
+            sendevent(Event82, interrupter)
+            statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | FLAG_HAS_SHADOW | FLAG_STALL
+            troty = atan2(player -> trans) + 180deg
+            velx = (sin(troty) * 6.25) >> 4
+            velz = (cos(troty) * 6.25) >> 4
+            vely = 12m
+            broadcastevent(Event84, 0)
+            spawn(NCorC, S_HOVERBOARD)
+            PlayCortexHitSound()
+        }
+        UpdateCortexAttackedMotion()
+        if (y <= 0) {
+            if (DrainIsOpen, distance(x, self, 10) <= 2m) {
+                changestate(Cortex_FallDownDrain)
+            }
+            y = 0
+            SetVel(0m)
+            changestate(Cortex_LandDazed)
+        }
+        roty = degseek(roty, troty, 120deg)
+    }
+}
+
+inline sub CortexAttackEvents(e) {
+    if (e == EventHit || e == EventFling || e == EventHitInvincible || e == EventSpinHit || e == EventSlideHit) {
+        PlayCortexHitSound()
+        vely += 16m
+        if (health == 3) {
+            troty = miscfunc(x, self, 1, 2) + 180deg
+        }
+        else {
+            troty = atan2(player -> trans) + 180deg
+        }
+        velx = (sin(troty) * 6.25) >> 4
+        velz = (cos(troty) * 6.25) >> 4
+        accevcstate(Cortex_Kicked)
+    }
+    if (e == Event95) {
+        vely += 16m
+        troty = atan2(creator -> trans) + 180deg
+        velx = (sin(troty) * 6.25) >> 4
+        velz = (cos(troty) * 6.25) >> 4
+        accevcstate(Cortex_Kicked)
+    }
+}
+
+inline sub CortexRecoveryEvents(e) {
+    if (e == Event85) {
+        accev()
+        DrainIsOpen = 1
+    }
+    accevcstate(Cortex_ReturnToHoverboard, e == Event87)
+}
+
+inline sub CortexCheckDrain() {
+    if (DrainIsOpen, distance(x, self, 10) <= 2m) {
+        SetVel(0m)
+        changestate(Cortex_FallDownDrain)
+    }
+}
+
+state Cortex_LandDazed { // 14
+    stateflag 0x100001
+    statusc 0x0
+    code() {
+        SoundPitchDefault(0.23)
+        soundsetup(7, self, 8)
+        soundplay([ld30A], 1V)
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | FLAG_HAS_SHADOW | FLAG_STALL
+        cascadeevent(Event96, self)
+        playframes(CORTEX_DAZED_1, 0.0, 11.0)
+        playframes(CORTEX_DAZED_2, 0.0, 9.0)
+        changestate(Cortex_Dazed)
+    }
+    event(e, a) {
+        CortexAttackEvents(e)
+        if (e == EventJumpedOn || e == EventSlamHit) {
+            rejev()
+            sendevent(EventBounce, interrupter, 0x13C3A5)
+        }
+        CortexRecoveryEvents(e)
+    }
+    trans {
+        CortexCheckDrain()
+    }
+}
+
+state Cortex_Kicked { // 15
+    stateflag 0x100001
+    statusc 0x0
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | FLAG_HAS_SHADOW | FLAG_STALL
+        sleepframes(CORTEX_ATTACKED_2, 0.0, 10.0)
+    }
+    event(e, a) {
+        CortexRecoveryEvents(e)
+    }
+    trans {
+        once {
+            troty = rand(360deg) + rand(400deg)
+            if (rand(2)) {
+                troty = -troty
+            }
+        }
+        UpdateCortexAttackedMotion()
+        if (y <= 0) {
+            if (DrainIsOpen, distance(x, self, 10) <= 2m) {
+                changestate(Cortex_FallDownDrain)
+            }
+            y = 0
+            SetVel(0m)
+            changestate(Cortex_LandAfterKick)
+        }
+        roty = spd(roty, troty) % 360deg
+    }
+}
+
+state Cortex_LandAfterKick { // 16
+    stateflag 0x100001
+    statusc 0x0
+    code() {
+        SoundPitchDefault(0.23)
+        soundsetup(7, self, 8)
+        soundplay([ld30A], 1V)
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | FLAG_HAS_SHADOW | FLAG_STALL
+        cascadeevent(Event96, self)
+        playframes(CORTEX_RECOVER_1, 0.0, 61.0)
+        playframes(CORTEX_DAZED_2, 0.0, 9.0)
+        changestate(Cortex_Dazed)
+    }
+    event(e, a) {
+        CortexAttackEvents(e)
+        if (e == EventJumpedOn || e == EventSlamHit) {
+            rejev()
+            sendevent(EventBounce, interrupter, 0x13C3A5)
+        }
+        CortexRecoveryEvents(e)
+    }
+    trans {
+        CortexCheckDrain()
+    }
+}
+
+state Cortex_Dazed { // 17
+    stateflag 0x100001
+    statusc 0x0
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | FLAG_HAS_SHADOW | FLAG_STALL
+        sleepframes(CORTEX_DAZED_3, 0.0, 22.0)
+    }
+    event(e, a) {
+        CortexAttackEvents(e)
+        rejevcstate(Cortex_JumpedOn, e == EventJumpedOn || e == EventSlamHit)
+        CortexRecoveryEvents(e)
+    }
+    trans {
+        CortexCheckDrain()
+    }
+}
+
+state Cortex_JumpedOn { // 18
+    stateflag 0x100001
+    statusc 0x0
+    code() {
+        sendevent(EventBounce, interrupter, 0x13C3A5)
+        soundpitch((8.0 + rand(3.2)) * 0.23 >> 8)
+        soundsetup(7, self, 8)
+        soundplay([ld30A], 1V)
+        playframes(CORTEX_DAZED_JUMPED_ON, 0.0, 11.0)
+        playframes(CORTEX_DAZED_2, 0.0, 9.0)
+        changestate(Cortex_Dazed)
+    }
+    event(e, a) {
+        CortexAttackEvents(e)
+        rejevcstate(Cortex_JumpedOn, e == EventJumpedOn || e == EventSlamHit)
+        CortexRecoveryEvents(e)
+    }
+    trans {
+        CortexCheckDrain()
+    }
+}
+
+state Cortex_FallDownDrain { // 19
+    stateflag 0x100001
+    statusc 0x0
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | FLAG_HAS_SHADOW | FLAG_STALL
+        zindex = -4
+        sleepframes(CORTEX_ATTACKED_2, 0.0, 10.0)
+    }
+    trans {
+        if (distance(x, self, 10) > 1m) {
+            var0 = miscfunc(x, self, 1, 2) + 180deg
+            velx = (sin(var0) * 6.25) >> 4
+            velz = (cos(var0) * 6.25) >> 4
+        }
+        x = spd(x, velx)
+        z = spd(z, velz)
+        vely -= 1.6m
+        y = spd(y, vely)
+        if (y <= -25m) {
+            y = -25m
+            changestate(Cortex_LoseHealth)
+        }
+    }
+}
+
+state Cortex_LoseHealth { // 20
+    stateflag 0x100001
+    statusc 0x0
+    code() {
+        statusb = 0
+        if (!SHAKEY) {
+            SHAKEY = 10.0
+        }
+        soundpitch(3.625)
+        sounddecay(7.68s)
+        soundsetup(8, self, 8)
+        soundplay([Slm7A], 1V)
+        health -= 1
+        changestateif(Cortex_Defeated, health <= 0)
+        broadcastevent(Event91, 0)
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Cortex_RiseFromDrain, e == Event90)
+    }
+}
+
+state Cortex_RiseFromDrain { // 21
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        DrainIsOpen = 0
+        SetRot(0deg)
+        do {
+            setanim(CORTEX_HOVER_2)
+            playframe(0)
+            playframe(0)
+            playnull()
+            playnull()
+        } while (1)
+    }
+    trans {
+        once {
+            SetTrans(0m, -9.7m, 0m)
+            CortexRiseY = y
+            CortexRiseStartY = y
+            CortexTargetY = 3.5m
+            CortexRiseMarker = 1
+        }
+        if (frametime - statetime >= 1.25s) {
+            if (frametime - statetime >= 3.24s) {
+                interrupter = ForceFieldOBJ
+                sendevent(Event83, interrupter)
+                broadcastevent(Event88, 0)
+                changestate(Cortex_EnterArena)
+            }
+        }
+        else {
+            var0 = ((frametime - statetime) << 10) / 31
+            CortexRiseY = CortexRiseStartY + ((sin(var0) * ((CortexTargetY - CortexRiseStartY) >> 8)) >> 4)
+        }
+        var0 = time(100, 25)
+        y = CortexRiseY + ((cos((360deg * var0) / 100) * 0.5m) >> 12)
+        if (y < 0) {
+            zindex = 0
+        }
+        else {
+            zindex = 26
+        }
+        if (!time(5) && y >= -1m) {
+            SoundPitchDefault(0.23)
+            soundsetup(7, self, 8)
+            soundplay([tnt0A], 1V)
+            spawn(9, 4, 1, getins(SetUkaExplosionColor), 1)
+        }
+        if (abs((player -> y + 1m) - y) <= 2m, distance(player, DIST_NO_Y) <= 2m) {
+            sendevent(Event32, player, atan2(player -> trans), 10m)
+        }
+    }
+}
+
+sub SetUkaExplosionColor() { // S-1956
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    if (var r = rand(4); r == 0) {
+        SetColor1(0x80, 0x00, 0x00)
+    }
+    else if (r == 1) {
+        SetColor1(0x41, 0x00, 0x00)
+    }
+    else if (r == 2) {
+        SetColor1(0xBE, 0x00, 0x00)
+    }
+    else if (r == 3) {
+        SetColor1(0x28, 0x28, 0x28)
+    }
+}
+
+state Cortex_ReturnToHoverboard { // 22
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        playframes(CORTEX_RECOVER_2, 0.0, 27.0)
+        sleepframes(CORTEX_RECOVER_3, 0.0, 59.0)
+    }
+    trans {
+        once {
+            troty = 0deg
+            pathprog = 59.0
+            calcpath(pathprog, vvec)
+            CortexTargetX = vecx
+            CortexTargetY = 5.5m
+            CortexTargetZ = vecz
+        }
+        velx = CortexTargetX - x
+        vely = CortexTargetY - y
+        velz = CortexTargetZ - z
+        var0 = distance(velx, self, 8)
+        if (var0 < 0.05m) {
+            SetTrans(CortexTargetX, CortexTargetY, CortexTargetZ)
+            changestate(Cortex_PrepareToMount)
+        }
+        var0 >>= 2
+        if (var0 > 0.56m) {
+            var0 = 0.56m
+        }
+        misc5(velx, var0)
+        x += velx
+        y += vely
+        z += velz
+        roty = degseek(roty, troty, 60deg)
+    }
+}
+
+state Cortex_PrepareToMount { // 23
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        if (animseq == getanim(CORTEX_RECOVER_2)) {
+            playframes4(CORTEX_RECOVER_2, -1.0, 27.0)
+        }
+        else if (animseq == getanim(CORTEX_RECOVER_3)) {
+            playframes4(CORTEX_RECOVER_3, -1.0, 59.0)
+        }
+        vely = 0
+        settrans(CortexMountHoverboard)
+        playframes(CORTEX_RECOVER_4, 0.0, 9.0)
+        sleep()
+    }
+    trans {
+        roty = degseek(roty, troty, 60deg)
+    }
+}
+
+sub CortexMountHoverboard() { // S-2082
+    vely -= 1.6m
+    y = spd(y, vely)
+    if (y <= 3.5m) {
+        y = 3.5m
+        changestate(Cortex_MountHoverboard)
+    }
+    roty = degseek(roty, troty, 60deg)
+}
+
+state Cortex_MountHoverboard { // 24
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        playframes4(CORTEX_RECOVER_4, -1.0, 9.0)
+        cascadeevent(Event89, self)
+        soundpitch(3.99)
+        soundsetup(7, self, 8)
+        soundplay([ld27A], 0.9V)
+        setanim(CORTEX_MOUNT_HOVERBOARD, -1.0)
+        do {
+            animframe += 1.0
+            if (animframe == 32.0) {
+                soundpitch(2.54)
+                soundsetup(7, self, 8)
+                soundplay([ld27A], 0.8V)
+            }
+            else if (animframe == 45.0) {
+                soundpitch(1.8125)
+                soundsetup(7, self, 8)
+                soundplay([ld27A], 0.65V)
+            }
+            playframe()
+        } while (animframe + 1.0 <= 51.0)
+        broadcastevent(Event88, 0)
+        DrainIsOpen = 0
+        changestate(Cortex_ReturnToArena)
+    }
+    trans {
+        roty = degseek(roty, troty, 60deg)
+    }
+}
+
+state Cortex_Defeated { // 25
+    stateflag 0x21
+    statusc 0x0
+    code() {
+        broadcastevent(Event92, 0)
+        GAMEFLAGS |= -0x80000000
+        if (var offs = LEVEL >> 8; offs < 32) {
+            GLOBAL_27 = (1 << offs) | GLOBAL_27
+        }
+        else {
+            GLOBAL_28 = (1 << (offs - 32)) | GLOBAL_28
+        }
+        statusb = 0
+        if (!(player -> stateflag & 0x20)) {
+            if (GLOBAL_160 & 0x10) {
+                PowerupAlreadyOwned = true
+            }
+            else {
+                PowerupAlreadyOwned = false
+                vecx = GLOBAL_160
+                save (x, y, z) {
+                    SetTrans(0, 1.5m, 0)
+                    spawn2(FruiC, FruiC_S_FRUIT_HOP, 1, 704.0, 0)
+                }
+            }
+        }
+        sleepnull()
+    }
+    trans {
+        nofirst {
+            if (vecx != GLOBAL_160 || PowerupAlreadyOwned) {
+                vecx = GLOBAL_160
+                save (x, y, z) {
+                    x = 0
+                    z = -6m
+                    y = 2m
+                    if (PowerupAlreadyOwned) {
+                        var0 = 5m
+                    }
+                    else {
+                        var0 = 6.76m
+                    }
+                    if (AlternateEndingUnlocked) {
+                        if (var0 == 5m) {
+                            statetime = frametime
+                            settrans(CortexLoadGameWin)
+                            return
+                        }
+                        var0 += 5m
+                    }
+                    PowerupAlreadyOwned = 0
+                    spawn2(WEfOC, WEfOC_S_WARP_OUT, 1, 0, 0, 0x28A000, 0x320000, 2S, var0)
+                    creator = objectspawned
+                }
+            }
+        }
+    }
+}
+
+sub CortexLoadGameWin() { // S-2204
+    if (frametime - statetime >= 5s) {
+        GLOBAL_193 = 0
+        GLOBAL_17 = 3.0
+        GLOBAL_131 = 0
+        loadlevel(LEVEL_GameWin2)
+    }
+}
+
+state Mine_Init { // 26
+    stateflag 0x1
+    statusc 0x0
+    code(vertex, tx, ground, tz) {
+        getvert(vtrans, creator, vertex)
+        groundy = ground
+        vely = -(((y - groundy) * 25 / 12) - 14.4m)
+        velx = (tx - x) / 12
+        velz = (tz - z) / 12
+        zindex = 24
+        statusb = FLAG_COLLIDABLE
+        changestate(Mine_Bounce)
+    }
+}
+
+inline sub MineExplosionEvents(e, a) {
+    if (e == Event94, distance(interrupter, DIST_NO_Y) <= a[0]) {
+        accevcstate(Mine_Explode)
+    }
+    if (e == Event85, distance(x, self, 10) <= 2m) {
+        accevcstate(Mine_Explode)
+    }
+}
+
+state Mine_Bounce { // 27
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        playanim(0, MINE_FLY)
+        playanim(1, MINE_FLY)
+        playanim(2, MINE_FLY)
+        playanim(3, MINE_FLY)
+        playanim(4, MINE_FLY)
+        playanim(4, MINE_FLY)
+        playanim(5, MINE_FLY)
+        sleep()
+    }
+    event(e, a) {
+        MineExplosionEvents(e, a)
+    }
+    trans {
+        once {
+            MineFirstBounce = 1
+        }
+        x += velx
+        y += (vely / 25)
+        z += velz
+        if (y <= 0) {
+            y = 0
+            vely = -vely >> 2
+            velx = 0
+            velz = 0
+            if (MineFirstBounce) {
+                MineFirstBounce = 0
+                soundpitch(2.54)
+                soundplay([Co27A], 0.8V)
+            }
+            changestateif(Mine_Countdown, vely <= 0.5m)
+        }
+        vely = spd(vely, -60m)
+        if (collider) {
+            sendevent(EventExplode, player, 100.0)
+            changestate(Mine_Explode)
+        }
+    }
+}
+
+inline sub PlayMineFlash() {
+    playanim(0, MINE_FLASH)
+    playanim(1, MINE_FLASH)
+    playanim(2, MINE_FLASH)
+    playanim(3, MINE_FLASH)
+    playanim(4, MINE_FLASH)
+    playanim(4, MINE_FLASH)
+    playanim(5, MINE_FLASH)
+    playanim(6, MINE_FLASH)
+}
+
+inline sub SoundMineBeep() {
+    soundpitch(3.262)
+    soundplay([Ttb0A], 1V)
+}
+
+state Mine_Countdown { // 28
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        SoundMineBeep()
+        PlayMineFlash()
+        playframe(animframe, 17)
+        SoundMineBeep()
+        PlayMineFlash()
+        playframe(animframe, 13)
+        SoundMineBeep()
+        PlayMineFlash()
+        playframe(animframe, 8)
+        SoundMineBeep()
+        PlayMineFlash()
+        playframe(animframe, 4)
+        SoundMineBeep()
+        PlayMineFlash()
+        SoundMineBeep()
+        PlayMineFlash()
+        changestate(Mine_Explode)
+    }
+    event(e, a) {
+        MineExplosionEvents(e, a)
+        if (e == Event96, distance(interrupter, DIST_NO_Y) <= 2m) {
+            accevcstate(Mine_Explode)
+        }
+    }
+    trans {
+        if (collider) {
+            sendevent(EventExplode, player, 100.0)
+            changestate(Mine_Explode)
+        }
+    }
+}
+
+state Mine_Explode { // 29
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        statusb = 0
+        spawn(9, 4, 1, getins(SetMineExplosionColor), 1)
+        SoundPitchDefault(0.23)
+        sounddecay(7.68s)
+        soundsetup(6, self, 8)
+        soundplay([tnt0A], 1V)
+        playframes(MINE_EXPLODE, 0.0, 14.0)
+    }
+    trans {
+        if (player -> y - y <= 3.5m, distance(player, DIST_NO_Y) <= 1.75m) {
+            sendevent(EventExplode, player, 100.0)
+        }
+        if (creator -> stateflag & 0x100000, player -> y - y <= 3.5m, distance(creator, DIST_NO_Y) <= 1.75m) {
+            sendevent(Event95, creator)
+        }
+    }
+}
+
+sub SetMineExplosionColor() { // S-2453
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    SetScale(4S)
+    if (var r = rand(3); r == 0) {
+        SetColor1(0xD2, 0x14, 0x00)
+    }
+    else if (r == 1) {
+        SetColor1(0x78, 30, 0x00)
+    }
+    else if (r == 2) {
+        SetColor1(0x46, 40, 0x00)
+    }
+}
+
+state ForceField_Init { // 30
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        statusb = FLAG_NO_CAMERA_CLIP
+        ForceFieldAlpha = 8.0
+        zindex = 0
+        changestate(ForceField_Active)
+    }
+}
+
+state ForceField_Active { // 31
+    stateflag 0x100001
+    statusc 0x0
+    trans => sub ForceFieldFollowCortex
+    code() {
+        ForceFieldAlpha = 8.0
+        moda = 8.0
+        sleepanim(0, FORCE_FIELD)
+    }
+    event(e, a) {
+        accevcstate(ForceField_Flash, e == Event81)
+        accevcstate(ForceField_Deactivate, e == Event82)
+        accevcstate(ForceField_Hidden, e == Event84)
+    }
+}
+
+sub ForceFieldFollowCortex() { // S-2496
+    getvert(vtrans, creator, 2.0)
+    roty = CAMROTY
+    rotz = roty
+    rotx = CAMROTX
+}
+
+state ForceField_Flash { // 32
+    stateflag 0x100001
+    statusc 0x0
+    code() {
+        sleepanim(0, FORCE_FIELD)
+    }
+    event(e, a) {
+        accevcstate(ForceField_Flash, e == Event81)
+        accevcstate(ForceField_Deactivate, e == Event82)
+        accevcstate(ForceField_Hidden, e == Event84)
+    }
+    trans {
+        if (frametime - statetime >= 18) {
+            moda = 8.0
+            changestate(ForceField_Active)
+        }
+        ForceFieldFollowCortex()
+        moda = vecx + (vecy + rand(8.0))
+        moda = 16.0 - (8.0 + rand(8.0))
+    }
+}
+
+state ForceField_Deactivate { // 33
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        SoundPitchDefault(0.293)
+        sounddecay(8.40001s)
+        soundsetup(7, self, 8)
+        sounddelay(5)
+        soundplay([Bar2A], 0.7V)
+        spawn(NCorC, S_FORCEFIELD_TRANS, 1, 0, 0, 16.0)
+        spawn(NCorC, S_FORCEFIELD_TRANS, 1, 0, 5, 12.8)
+        spawn(NCorC, S_FORCEFIELD_TRANS, 1, 0, 10, 6.4)
+        sleepanim(0, FORCE_FIELD)
+    }
+    event(e, a) {
+        accevcstate(ForceField_Activate, e == Event83)
+        accevcstate(ForceField_Active, e == Event88)
+        accevcstate(ForceField_Hidden, e == Event84)
+    }
+    trans {
+        ForceFieldFollowCortex()
+        ForceFieldAlpha = seek(ForceFieldAlpha, 0.0, 0x6D)
+        changestateifn(ForceField_Hidden, ForceFieldAlpha)
+        var0 = ForceFieldAlpha
+        if (frametime & 1) {
+            var0 >>= 1
+        }
+        moda = 16.0 - var0
+    }
+}
+
+state ForceField_Activate { // 34
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        SoundPitchDefault(0.293)
+        sounddecay(8.40001s)
+        soundsetup(7, self, 8)
+        sounddelay(5)
+        soundplay([Bar2A], 0.7V)
+        spawn(NCorC, S_FORCEFIELD_TRANS, 1, 1, 0, 6.4)
+        spawn(NCorC, S_FORCEFIELD_TRANS, 1, 1, 5, 12.8)
+        spawn(NCorC, S_FORCEFIELD_TRANS, 1, 1, 10, 16.0)
+        sleepanim(0, FORCE_FIELD)
+    }
+    event(e, a) {
+        accevcstate(ForceField_Deactivate, e == Event82)
+        accevcstate(ForceField_Hidden, e == Event84)
+    }
+    trans {
+        ForceFieldFollowCortex()
+        ForceFieldAlpha = seek(ForceFieldAlpha, 8.0, 0x6D)
+        var0 = ForceFieldAlpha
+        if (frametime & 1) {
+            var0 >>= 1
+        }
+        moda = 16.0 - var0
+        if (ForceFieldAlpha == 8.0) {
+            moda = 16.0 - ForceFieldAlpha
+            changestate(ForceField_Active)
+        }
+    }
+}
+
+state ForceField_Hidden { // 35
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        ForceFieldAlpha = 0
+        moda = 16.0
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(ForceField_Activate, e == Event83)
+        accevcstate(ForceField_Active, e == Event88)
+    }
+}
+
+state ForceField_Impact_Flash { // 36
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        SoundPitchDefault(0.293)
+        sounddecay(7.6s)
+        soundsetup(7, self, 8)
+        soundplay([Bar2A], 0.4V)
+        sendevent(Event32, player, atan2(player -> trans), 10m)
+        sleepanim(0, FORCEFIELD_FLASH)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            zindex = 300
+            SetScale(0S)
+            ImpactFlashTargetScale = 4.5S
+            ImpactFlashAlpha = 0
+            x = player -> x
+            y = player -> y + 1m
+            z = player -> z
+        }
+        rotz = CAMROTY
+        roty = CAMROTY
+        rotx = CAMROTX
+        var v1 = seek(scalex, ImpactFlashTargetScale, 6.0)
+        scalez = v1
+        scaley = v1
+        scalex = v1
+        v1 = seek(ImpactFlashAlpha, 16.0, 1.6)
+        moda = v1
+        ImpactFlashAlpha = v1
+        if (scalex == ImpactFlashTargetScale) {
+            changestateifn(Kill, scalex)
+            ImpactFlashTargetScale = 0S
+        }
+    }
+}
+
+state ForceField_Transition { // 37
+    stateflag 0x1
+    statusc 0x0
+    trans => sub ForceFieldTransitionFollow
+    code(reverse, delay, alpha) {
+        zindex = creator -> zindex
+        zindex += 20
+        do {
+            playnull()
+        } until (frametime - statetime >= delay)
+        settrans(ForceFieldTransitionFollow)
+        ForceFieldTransitionFollow()
+        moda = 16.0 - alpha
+        if (reverse) {
+            playframesback(FORCE_FIELD_TRANS, 12.0, 0.0)
+        }
+        else {
+            playframes(FORCE_FIELD_TRANS, 0.0, 12.0)
+        }
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event84)
+    }
+}
+
+sub ForceFieldTransitionFollow() { // S-2749
+    rotz = CAMROTY
+    roty = CAMROTY
+    rotx = CAMROTX
+    x = creator -> x
+    y = creator -> y
+    z = creator -> z
+}
+
+state Boss_Camera_Init { // 38
+    stateflag 0x10001
+    statusc 0x0
+    code() {
+        playnull()
+        creator = objectget(15.0)
+        while (GLOBAL_119 & 0x400) {
+            playnull()
+        }
+        SetTrans(0, 6m, 14m)
+        SetRot(330.645deg, 0deg, 0deg)
+        ins72(0xA00, self)
+        GLOBAL_97 = self
+        changestate(Boss_Camera_Follow)
+    }
+}
+
+state Boss_Camera_Follow { // 39
+    stateflag 0x10001
+    statusc 0x0
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Boss_Camera_Init, e == Event19)
+    }
+    trans {
+        once {
+            if (abs(degdist(roty, player -> roty)) > 90deg) {
+                CameraTargetDistance = 7m
+            }
+            else {
+                CameraTargetDistance = 5.5m
+            }
+            CameraDistance = CameraTargetDistance
+        }
+        CameraFocusZ = player -> z
+        if (creator -> z > CameraFocusZ) {
+            CameraFocusZ = creator -> z
+        }
+        var0 = CameraFocusZ - 7.5m
+        if (var0 > 0) {
+            var0 = 0
+        }
+        var0 = -var0
+        if (var0 > 15m) {
+            var0 = 15m
+        }
+        trotz = 330.732422deg + (((var0 >> 8) * -10deg) / 0x1770)
+        var0 = player -> y
+        if (var0 > 6m) {
+            var0 = 6m
+        }
+        trotz += (12deg * (var0 >> 8)) / 0x960
+        rotx += degdist(rotx, trotz) >> 1
+        roty = ((x >> 8) * 15deg / 0xC80) + 180deg
+        if (abs(degdist(roty, player -> roty)) > 90deg) {
+            CameraTargetDistance = 7m
+        }
+        else {
+            CameraTargetDistance = 5.5m
+        }
+        CameraDistance = seek(CameraDistance, CameraTargetDistance, 0.12m)
+        vecx = (player -> x * 0x96) >> 8
+        vecz = CameraFocusZ + CameraDistance
+        if (vecz < 0) {
+            vecz = 0
+        }
+        x += (vecx - x) >> 2
+        z += (vecz - z) >> 2
+    }
+}
+
+state UkaUka_Init { // 40
+    stateflag 0x1
+    statusc 0x0
+    code(cortex) {
+        playnull()
+        CortexOBJ = objectget(cortex)
+        zindex = 26
+        SetScale(0x270E)
+        spawn(NCorC, S_AKU_AKU)
+        AkuAkuOBJ = objectspawned
+        creator = AkuAkuOBJ
+        changestate(UkaUka_WaitForIntro)
+    }
+}
+
+state UkaUka_WaitForIntro { // 41
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(UkaUka_LeaveCortex, e == EventTriggered)
+        accevif (e == Event88) {
+            CopyInterrupterTrans()
+            z += 3.5m
+            y += 1m
+            accevcstate(UkaUka_BeginFight)
+        }
+        accevif (e == Event97) {
+            CopyInterrupterTrans()
+            CopyInterrupterRot()
+            accevcstate(UkaUka_BeginFight)
+        }
+    }
+}
+
+state UkaUka_LeaveCortex { // 42
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepframes(UKA_UKA, 0.0, 9.0)
+    }
+    trans {
+        changestateif(UkaUka_BeginFight, frametime - statetime >= 0.2s)
+        interrupter = CortexOBJ
+        getvert(vtrans, interrupter, 3.0)
+    }
+}
+
+state UkaUka_BeginFight { // 43
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        FightPhase = 1
+        sendevent(EventTriggered, creator)
+        changestate(UkaUka_EnterBeamOrbit)
+    }
+}
+
+inline sub MaskClampToArena() {
+    if (x > 9m) {
+        x = 9m
+    }
+    else if (x < -9m) {
+        x = -9m
+    }
+    if (z > 9m) {
+        z = 9m
+    }
+    else if (z < -9m) {
+        z = -9m
+    }
+}
+
+state UkaUka_EnterBeamOrbit { // 44
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepframes(UKA_UKA, 0.0, 9.0)
+    }
+    trans {
+        once {
+            MaskStartX = x
+            MaskStartY = y
+            MaskStartZ = z
+            MaskOrbitSpeed = 60deg
+            MaskOrbitRadius = 2m
+            MaskOrbitAngle = 220deg
+            MaskTargetY = 0.75m
+        }
+        changestateif(UkaUka_BeamOrbit, frametime - statetime >= 1s)
+        MaskOrbitAngle = spd(MaskOrbitAngle, MaskOrbitSpeed) & 0xFFF
+        var0 = time(100, 25)
+        MaskRadiusPulse = (cos((360deg * var0) / 100) * 1.5m) >> 12
+        vecy = (MaskOrbitRadius + MaskRadiusPulse) >> 8
+        MaskTargetX = (sin(MaskOrbitAngle) * vecy) >> 4
+        MaskTargetZ = (cos(MaskOrbitAngle) * vecy) >> 4
+        var0 = (4.0 * (frametime - statetime)) / 25
+        var0 = sin(var0)
+        x = x + (MaskStartX + ((((MaskTargetX - MaskStartX) >> 8) * var0) >> 4)) >> 1
+        y = y + (MaskStartY + ((((MaskTargetY - MaskStartY) >> 8) * var0) >> 4)) >> 1
+        z = z + (MaskStartZ + ((((MaskTargetZ - MaskStartZ) >> 8) * var0) >> 4)) >> 1
+        MaskClampToArena()
+        troty = atan2(creator -> trans)
+        roty = degseek(roty, troty, 180deg)
+    }
+}
+
+state UkaUka_BeamOrbit { // 45
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepframes(UKA_UKA, 0.0, 9.0)
+    }
+    event(e, a) {
+        accevcstate(UkaUka_LeaveArena, e == Event84)
+    }
+    trans {
+        once {
+            spawn(NCorC, S_MASK_BEAM, 1, creator)
+            MaskOrbitSpeed = 60deg
+            NextMaskTurn = frametime + rand(0.2s)
+            MaskFacingOffset = 0
+        }
+        MaskOrbitRadius = seek(MaskOrbitRadius, 8m, 0.02m)
+        MaskOrbitAngle = spd(MaskOrbitAngle, MaskOrbitSpeed) % 360deg
+        var0 = time(100, 25)
+        MaskRadiusPulse = (cos((360deg * var0) / 100) * 1.5m) >> 12
+        vecy = (MaskOrbitRadius + MaskRadiusPulse) >> 8
+        x = (sin(MaskOrbitAngle) * vecy) >> 4
+        z = (cos(MaskOrbitAngle) * vecy) >> 4
+        MaskClampToArena()
+        if (frametime >= NextMaskTurn) {
+            NextMaskTurn = frametime + (1s + rand(1s))
+            vecy = rand(1.0)
+            if (MaskFacingOffset >= 0) {
+                MaskFacingOffset = -vecy
+            }
+            else {
+                MaskFacingOffset = vecy
+            }
+        }
+        troty = atan2(creator -> trans) + MaskFacingOffset
+        roty = degseek(roty, troty, 120deg)
+    }
+}
+
+state UkaUka_LeaveArena { // 46
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepframes(UKA_UKA, 0.0, 9.0)
+    }
+    event(e, a) {
+        accevcstate(UkaUka_ApproachDrain, e == Event91)
+    }
+    trans {
+        once {
+            vely = 0
+            MaskStartX = x
+            MaskStartZ = z
+        }
+        MaskOrbitRadius = seek(MaskOrbitRadius, 2m, 0.06m)
+        MaskOrbitSpeed = seek(MaskOrbitSpeed, 600deg, 54)
+        MaskOrbitAngle = spd(MaskOrbitAngle, MaskOrbitSpeed) & 0xFFF
+        roty = degseek(roty, MaskOrbitAngle + 90deg, 360deg)
+        vecx = (sin(MaskOrbitAngle) * (MaskOrbitRadius >> 8)) >> 4
+        vecz = (cos(MaskOrbitAngle) * (MaskOrbitRadius >> 8)) >> 4
+        velx = vecx - MaskStartX
+        velz = vecz - MaskStartZ
+        var0 = frametime - statetime
+        if (var0 > 2s) {
+            var0 = 2s
+        }
+        var0 = (var0 << 8) / 2s
+        x = MaskStartX + ((velx >> 8) * var0)
+        z = MaskStartZ + ((velz >> 8) * var0)
+        MaskClampToArena()
+        vely += 0.08m
+        y = spd(y, vely)
+        if (y >= 15m) {
+            y = 15m
+            changestate(UkaUka_WaitAboveArena)
+        }
+    }
+}
+
+state UkaUka_WaitAboveArena { // 47
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(UkaUka_ApproachDrain, e == Event91)
+    }
+    trans {
+        once {
+            sendevent(Event86, creator)
+        }
+        changestateif(UkaUka_ReturnToCortex, frametime - statetime >= 3s)
+    }
+}
+
+state UkaUka_ReturnToCortex { // 48
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepframes(UKA_UKA, 0.0, 9.0)
+    }
+    event(e, a) {
+        accevcstate(UkaUka_ApproachDrain, e == Event91)
+        accevcstate(UkaUka_ExitFight, e == Event92)
+    }
+    trans {
+        once {
+            z = -8m
+            MaskHoverX = 5m
+            MaskHoverY = 12m
+            x = MaskHoverX
+            y = MaskHoverY
+            interrupter = CortexOBJ
+            troty = atan2(interrupter -> trans)
+            roty = troty
+        }
+        interrupter = CortexOBJ
+        changestateif(UkaUka_ExitFight, interrupter -> stateflag & 0x20)
+        vely = (4.5m - MaskHoverY) >> 4
+        if (vely < -3m) {
+            vely = -3m
+        }
+        MaskHoverY += vely
+        changestateif(UkaUka_RescueCortex, abs(MaskHoverY - 4.5m) <= 0.1m)
+        var0 = time(57)
+        y = MaskHoverY + ((cos((360deg * var0) / 57) * 0.3m) >> 12)
+        var0 = time(100)
+        x = MaskHoverX + ((cos((360deg * var0) / 100) * 0.25m) >> 12)
+        interrupter = CortexOBJ
+        troty = atan2(interrupter -> trans)
+        roty = degseek(roty, troty, 120deg)
+    }
+}
+
+state UkaUka_ExitFight { // 49
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        playframes4(UKA_UKA, -1.0, 9.0)
+        sleepframes(UKA_UKA, 0.0, 9.0)
+    }
+    trans {
+        once {
+            MaskHoverX = x
+            MaskHoverY = y
+            vely = 0
+        }
+        vecy = (15m - MaskHoverY) >> 4
+        if (vecy > 0.12m) {
+            vecy = 0.12m
+        }
+        vely = seek(vely, vecy, 1.2m)
+        MaskHoverY += vely
+        if (MaskHoverY >= 15m) {
+            KillEntity()
+            changestate(Kill)
+        }
+        var0 = time(57)
+        y = MaskHoverY + ((cos((360deg * var0) / 57) * 0.3m) >> 12)
+        var0 = time(100)
+        x = MaskHoverX + ((cos((360deg * var0) / 100) * 0.25m) >> 12)
+    }
+}
+
+state UkaUka_RescueCortex { // 50
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        playframes4(UKA_UKA, -1.0, 9.0)
+        sleepframes(UKA_UKA, 0.0, 9.0)
+    }
+    event(e, a) {
+        if (e == Event88) {
+            save (creator) {
+                creator = CortexOBJ
+                health = creator -> health
+            }
+            if (FightPhase == 1) {
+                accevcstate(UkaUka_EnterBeamOrbit)
+            } 
+            else {
+                accevcstate(UkaUka_DuelOrbit)
+            }
+        }
+        accevcstate(UkaUka_ApproachDrain, e == Event91) 
+        accevcstate(UkaUka_ExitFight, e == Event92)
+    }
+    trans {
+        once {
+            save (x, y) {
+                x = MaskHoverX
+                y = MaskHoverY
+                spawn(NCorC, S_RESCUE_SHIELD, 1, CortexOBJ)
+            }
+        }
+        interrupter = CortexOBJ 
+        changestateif(UkaUka_ExitFight, interrupter -> stateflag & 0x20)
+        var0 = time(57)
+        y = MaskHoverY + ((cos((360deg * var0) / 57) * 0.3m) >> 12)
+        var0 = time(100)
+        x = MaskHoverX + ((cos((360deg * var0) / 100) * 0.25m) >> 12)
+        interrupter = CortexOBJ
+        troty = atan2(interrupter -> trans)
+        roty = degseek(roty, troty, 120deg)
+    }
+}
+
+state UkaUka_ApproachDrain { // 51
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepframes(UKA_UKA, 0.0, 9.0)
+    }
+    trans {
+        once {
+            MaskOrbitAngle = miscfunc(self, self, 1, 2)
+            MaskOrbitSpeed = -60deg
+            MaskHoverY = y
+            MaskTargetY = 7m
+            MaskOrbitRadius = 7m
+        }
+        var0 = distance(x, self, 10)
+        changestateif(UkaUka_GoDownDrain, var0 <= 1.25m && frametime - statetime >= 1s)
+        if (var0 > 7m) {
+            var0 = 7m
+        }
+        MaskTargetY = seek(MaskTargetY, var0, 0.0933301m)
+        MaskOrbitRadius = seek(MaskOrbitRadius, 0.5m, 0.13m)
+        MaskOrbitAngle = spd(MaskOrbitAngle, MaskOrbitSpeed) & 0xFFF
+        MaskTargetX = (sin(MaskOrbitAngle) * (MaskOrbitRadius >> 8)) >> 4
+        MaskTargetZ = (cos(MaskOrbitAngle) * (MaskOrbitRadius >> 8)) >> 4
+        velx = MaskTargetX - x
+        vely = MaskTargetY - y
+        velz = MaskTargetZ - z
+        var0 = distance(velx, self, 8)
+        var0 >>= 2
+        if (var0 > 0.56m) {
+            var0 = 0.56m
+        }
+        misc5(velx, var0)
+        x += velx
+        y += vely
+        z += velz
+        MaskClampToArena()
+        troty = miscfunc(x, self, 1, 2) + 180deg
+        roty = degseek(roty, troty, 300deg)
+        rotz = roty
+        rotx = degseek(rotx, 60deg, 20deg)
+    }
+}
+
+state UkaUka_GoDownDrain { // 52
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepframes(UKA_UKA, 0.0, 9.0)
+    }
+    trans {
+        once {
+            zindex = 0
+        }
+        changestateif(UkaUka_RetrieveCortex, y <= -8m)
+        MaskOrbitRadius = seek(MaskOrbitRadius, 0.5m, 0.0866602m)
+        MaskOrbitAngle = spd(MaskOrbitAngle, MaskOrbitSpeed) & 0xFFF
+        MaskTargetX = (sin(MaskOrbitAngle) * (MaskOrbitRadius >> 8)) >> 4
+        MaskTargetZ = (cos(MaskOrbitAngle) * (MaskOrbitRadius >> 8)) >> 4
+        MaskTargetY = seek(MaskTargetY, -30m, 0.4m)
+        velx = MaskTargetX - x
+        vely = MaskTargetY - y
+        velz = MaskTargetZ - z
+        var0 = distance(velx, self, 8)
+        var0 >>= 2
+        if (var0 > 0.56m) {
+            var0 = 0.56m
+        }
+        misc5(velx, var0)
+        x += velx
+        y += vely
+        z += velz
+        troty = MaskOrbitAngle + 180deg
+        roty = degseek(roty, troty, 300deg)
+        rotz = roty
+        rotx = degseek(rotx, 60deg, 20deg)
+    }
+}
+
+state UkaUka_RetrieveCortex { // 53
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepframes(UKA_UKA, 0.0, 9.0)
+    }
+    event(e, a) {
+        if (e == Event88) {
+            save (creator) {
+                creator = CortexOBJ
+                health = creator -> health
+            }
+            if (FightPhase == 1) {
+                accevcstate(UkaUka_EnterBeamOrbit)
+            }
+            else {
+                accevcstate(UkaUka_DuelOrbit)
+            }
+        }
+    }
+    trans {
+        once {
+            FightPhase += 1
+            SetRot(0deg)
+            interrupter = CortexOBJ
+            sendevent(Event90, interrupter)
+        }
+        interrupter = CortexOBJ
+        x = interrupter -> x
+        y = interrupter -> y + 1.5m
+        z = interrupter -> z + 1m
+        zindex = interrupter -> zindex
+    }
+}
+
+inline sub MaskMoveToTarget() {
+    velx = MaskTargetX - x
+    vely = MaskTargetY - y
+    velz = MaskTargetZ - z
+    var0 = distance(velx, self, 8)
+    var0 >>= 2
+    if (var0 > 0.48m) {
+        var0 = 0.48m
+    }
+    misc5(velx, var0)
+    x += velx
+    y += vely
+    z += velz
+}
+
+state UkaUka_DuelOrbit { // 54
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepframes(UKA_UKA, 0.0, 9.0)
+    }
+    event(e, a) {
+        accevcstate(UkaUka_LeaveArena, e == Event84)
+    }
+    trans {
+        once {
+            interrupter = CortexOBJ
+            changestateif(UkaUka_LeaveArena, interrupter -> stateflag & 0x100000)
+            MaskOrbitRadius = 8m
+            MaskOrbitAngle = miscfunc(x, self, 1, 2)
+            MaskHoverY = 3.5m
+            MaskOrbitSpeed = 0
+            NextMaskTurn = frametime
+        }
+        changestateif(UkaUka_ChargeAku, frametime - statetime >= 4s)
+        if (frametime >= NextMaskTurn) {
+            NextMaskTurn = frametime + (6 + rand(50))
+            MaskTargetSpeed = 30deg + rand(50deg)
+            if (rand(2)) {
+                MaskTargetSpeed = -MaskOrbitSpeed
+            }
+        }
+        MaskOrbitSpeed = seek(MaskOrbitSpeed, MaskTargetSpeed, 6.33deg)
+        MaskOrbitAngle = spd(MaskOrbitAngle, MaskOrbitSpeed) & 0xFFF
+        MaskTargetX = (sin(MaskOrbitAngle) * (MaskOrbitRadius >> 8)) >> 4
+        MaskTargetZ = (cos(MaskOrbitAngle) * (MaskOrbitRadius >> 8)) >> 4
+        var0 = time(2.68s)
+        MaskTargetY = MaskHoverY + ((cos((16.0 * var0) / 2.68s) * 1.5m) >> 12)
+        MaskMoveToTarget()
+        troty = atan2(creator -> trans)
+        roty = degseek(roty, troty, 120deg)
+    }
+}
+
+state UkaUka_ChargeAku { // 55
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        playanim(0, UKA_CHARGE_1)
+        playanim(1, UKA_CHARGE_1)
+        playanim(2, UKA_CHARGE_1)
+        playanim(3, UKA_CHARGE_1)
+        playanim(4, UKA_CHARGE_1)
+        playanim(4, UKA_CHARGE_1)
+        playanim(5, UKA_CHARGE_1)
+        playanim(6, UKA_CHARGE_1)
+        do {
+            playanim(0, UKA_CHARGE_2)
+            playanim(1, UKA_CHARGE_2)
+            playanim(2, UKA_CHARGE_2)
+            playanim(3, UKA_CHARGE_2)
+            playanim(3, UKA_CHARGE_2)
+            playanim(4, UKA_CHARGE_2)
+        } while (1)
+    }
+    trans {
+        once {
+            if (FightPhase == 2) {
+                pathprog = 0
+                calcpath(pathprog, vvec)
+                MaskTargetX = vecx
+                MaskTargetY = 1.5m
+                MaskTargetZ = vecz
+            }
+            else {
+                MaskTargetX = player -> x
+                MaskTargetZ = player -> z
+                MaskTargetY = 3.5m
+            }
+            if (MaskTargetZ < -4m) {
+                MaskTargetZ = -4m
+            }
+            MaskStartX = x
+            MaskStartY = y
+            MaskStartZ = z
+            sendevent(EventTriggered, creator)
+            soundpitch(2.805)
+            soundsetup(7, self, 8)
+            soundplay([jmp0A], 1V)
+        }
+        var0 = frametime - statetime
+        if (var0 >= 8) {
+            x = MaskTargetX
+            y = MaskTargetY
+            z = MaskTargetZ
+            if (FightPhase == 2) {
+                changestate(UkaUka_WaitForVortex)
+            }
+            else if (FightPhase == 3) {
+                soundpitch(4.0)
+                soundsetup(7, self, 8)
+                soundplay([Co87A], 1V)
+                changestate(UkaUka_WaitForClash)
+            }
+        }
+        x = MaskStartX + ((var0 * ((MaskTargetX - MaskStartX) >> 8)) / 8 << 8)
+        y = MaskStartY + ((var0 * ((MaskTargetY - MaskStartY) >> 8)) / 8 << 8)
+        z = MaskStartZ + ((var0 * ((MaskTargetZ - MaskStartZ) >> 8)) / 8 << 8)
+        SetVec(MaskTargetX, MaskTargetY, MaskTargetZ)
+        troty = atan2(self, vecx)
+        roty = degseek(roty, troty, 600deg)
+    }
+}
+
+state UkaUka_WaitForClash { // 56
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sendevent(EventTriggered, creator)
+        spawn(NCorC, S_MASK_CLASH, 1, creator, roty)
+        sleepnull()
+    }
+    event(e, a) {
+        if (e == Event93) {
+            CopyInterrupterTrans()
+            CopyInterrupterVec()
+            sendevent(Event93, creator)
+            accevcstate(UkaUka_DuelOrbit)
+        }
+    }
+}
+
+state UkaUka_WaitForVortex { // 57
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        soundpitch(3.262)
+        soundsetup(5, self, 8)
+        sounddecay(10.12s)
+        soundcount(0xFFFF)
+        soundplay([Co77A], 1V)
+        VortexVoice = voice
+        sendevent(EventTriggered, creator)
+        spawn(NCorC, S_MASK_VORTEX)
+        sleepnull()
+    }
+    event(e, a) {
+        if (e == Event93) {
+            CopyInterrupterTrans()
+            CopyInterrupterVec()
+            sendevent(Event93, creator)
+            voice = VortexVoice
+            soundfadet(12, voice)
+            soundfadev(0V, voice, 3)
+            accevcstate(UkaUka_DuelOrbit)
+        }
+    }
+}
+
+state RescueForceField_Init { // 58
+    stateflag 0x1
+    statusc 0x0
+    code(cortex) {
+        creator = cortex
+        zindex = 30
+        statusb = FLAG_NO_CAMERA_CLIP
+        ForceFieldAlpha = 8.0
+        SetScale(0S)
+        soundpitch(1.4141)
+        sounddecay(7.6s)
+        soundsetup(7, self, 8)
+        soundplay([Bar2A], 0.6V)
+        changestate(RescueForceField_Grow)
+    }
+}
+
+state RescueForceField_Grow { // 59
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        moda = 8.0
+        sleepanim(0, FORCE_FIELD)
+    }
+    trans {
+        changestateif(RescueForceField_Fade, creator -> y < 0)
+        var0 = (1S - scalex) >> 2
+        if (var0 > 0xA3) {
+            var0 = 0xA3
+        }
+        scalex += var0
+        scaley = scalex
+        scalez = scalex
+        if (1S - scalex <= 40) {
+            SetScale(1S, scalex, scalex)
+            changestate(RescueForceField_ApproachCortex)
+        }
+        roty = CAMROTY
+        rotz = roty
+        rotx = CAMROTX
+    }
+}
+
+inline sub RescueForceFieldPushPlayer() {
+    vecy = abs((player -> y + 1m) - y)
+    vecz = distance(player, DIST_NO_Y | DIST_EXACT)
+    if (vecy <= 1.5m && vecz <= 3m) {
+        vecy = ((vecy >> 8) << 10) / 0x258
+        var0 = (0x4B0 * cos(vecy)) >> 4
+        if (vecz <= var0) {
+            var0 >>= 8
+            {
+                var yaw, back
+                yaw = atan2(player -> trans)
+                vecx = x + ((sin(yaw) * var0) >> 4)
+                vecz = z + ((cos(yaw) * var0) >> 4)
+                if (abs(vecx) > 6.72m || abs(vecz) > 6.96m) {
+                    back = yaw
+                    start:
+                    yaw += 45deg
+                    vecx = x + ((sin(yaw) * var0) >> 4)
+                    vecz = z + ((cos(yaw) * var0) >> 4)
+                    if (abs(vecx) <= 6.72m && abs(vecz) <= 6.96m) {
+                        goto exit
+                    }
+                    back -= 45deg
+                    vecx = x + ((sin(back) * var0) >> 4)
+                    vecz = z + ((cos(back) * var0) >> 4)
+                    if (abs(vecx) <= 6.72m && abs(vecz) <= 6.96m) {
+                        goto exit
+                    }
+                    goto start
+                }
+            }
+            exit:
+            player -> x += (vecx - player -> x) >> 2
+            player -> z += (vecz - player -> z) >> 2
+        }
+    }
+}
+
+state RescueForceField_ApproachCortex { // 60
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepanim(0, FORCE_FIELD)
+    }
+    trans {
+        changestateif(RescueForceField_Fade, creator -> y < 0)
+        getvert(vvec, creator, 2.0)
+        velx = vecx - x
+        vely = vecy - y
+        velz = vecz - z
+        var0 = distance(velx, self, 8)
+        changestateif(RescueForceField_CarryCortex, var0 <= 0.2m)
+        var0 >>= 1
+        if (var0 > 0.56m) {
+            var0 = 0.56m
+        }
+        misc5(velx, var0)
+        x += velx
+        y += vely
+        z += velz
+        roty = CAMROTY
+        rotz = roty
+        rotx = CAMROTX
+        RescueForceFieldPushPlayer()
+    }
+}
+
+state RescueForceField_CarryCortex { // 61
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepanim(0, FORCE_FIELD)
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event88)
+    }
+    trans {
+        once {
+            sendevent(Event87, creator)
+        }
+        getvert(vtrans, creator, 2.0)
+        roty = CAMROTY
+        rotz = roty
+        rotx = CAMROTX
+        zindex -= 1
+        if (zindex < 0) {
+            zindex = 0
+        }
+        RescueForceFieldPushPlayer()
+    }
+}
+
+state RescueForceField_Fade { // 62
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepanim(0, FORCE_FIELD)
+    }
+    trans {
+        ForceFieldAlpha = seek(ForceFieldAlpha, 0, 0x147)
+        changestateifn(Kill, ForceFieldAlpha)
+        moda = 16.0 - ForceFieldAlpha
+        roty = CAMROTY
+        rotz = roty
+        rotx = CAMROTX
+    }
+}
+
+state AkuAku_Init { // 63
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        zindex = 26
+        CortexOBJ = creator -> CortexOBJ
+        SetScale(0x270E)
+        y = player -> y + 4m
+        z = player -> z + 4m
+        x = player -> x - 4m
+        changestate(AkuAku_WaitForFight)
+    }
+}
+
+state AkuAku_WaitForFight { // 64
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(AkuAku_BeginFight, e == EventTriggered)
+    }
+}
+
+state AkuAku_BeginFight { // 65
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        changestate(AkuAku_EnterBeamOrbit)
+    }
+}
+
+state AkuAku_EnterBeamOrbit { // 66
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepanim(0, AKU_AKU)
+    }
+    trans {
+        once {
+            MaskStartX = x
+            MaskStartY = y
+            MaskStartZ = z
+            MaskTargetY = 0.75m
+        }
+        changestateif(AkuAku_BeamOrbit, frametime - statetime >= 1s)
+        MaskOrbitRadius = creator -> MaskOrbitRadius
+        MaskOrbitAngle = creator -> MaskOrbitAngle
+        MaskRadiusPulse = creator -> MaskRadiusPulse
+        MaskOrbitAngle += 180deg
+        vecy = (MaskOrbitRadius - MaskRadiusPulse) >> 8
+        MaskTargetX = (sin(MaskOrbitAngle) * vecy) >> 4
+        MaskTargetZ = (cos(MaskOrbitAngle) * vecy) >> 4
+        var0 = (4.0 * (frametime - statetime)) / 25
+        var0 = sin(var0)
+        x = x + (MaskStartX + ((((MaskTargetX - MaskStartX) >> 8) * var0) >> 4)) >> 1
+        y = y + (MaskStartY + ((((MaskTargetY - MaskStartY) >> 8) * var0) >> 4)) >> 1
+        z = z + (MaskStartZ + ((((MaskTargetZ - MaskStartZ) >> 8) * var0) >> 4)) >> 1
+        MaskClampToArena()
+        troty = atan2(creator -> trans)
+        roty = degseek(roty, troty, 360deg)
+    }
+}
+
+state AkuAku_BeamOrbit { // 67
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepanim(0, AKU_AKU)
+    }
+    event(e, a) {
+        accevcstate(AkuAku_WaitAboveArena, e == Event86)
+        accevcstate(AkuAku_LeaveArena, e == Event84)
+    }
+    trans {
+        once {
+            NextMaskTurn = frametime + rand(5)
+            MaskFacingOffset = 0
+        }
+        MaskOrbitAngle = creator -> MaskOrbitAngle
+        MaskOrbitRadius = creator -> MaskOrbitRadius
+        y = creator -> y
+        MaskRadiusPulse = creator -> MaskRadiusPulse
+        MaskOrbitAngle += 180deg
+        vecy = (MaskOrbitRadius - MaskRadiusPulse) >> 8
+        x = (sin(MaskOrbitAngle) * vecy) >> 4
+        z = (cos(MaskOrbitAngle) * vecy) >> 4
+        MaskClampToArena()
+        if (frametime >= NextMaskTurn) {
+            NextMaskTurn = frametime + (1s + rand(1s))
+            vecy = rand(1.0)
+            if (MaskFacingOffset >= 0) {
+                MaskFacingOffset = -vecy
+            }
+            else {
+                MaskFacingOffset = vecy
+            }
+        }
+        troty = atan2(creator -> trans) + MaskFacingOffset
+        roty = degseek(roty, troty, 120deg)
+    }
+}
+
+state AkuAku_LeaveArena { // 68
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepanim(0, AKU_AKU)
+    }
+    trans {
+        once {
+            vely = 0
+            MaskOrbitSpeed = creator -> MaskOrbitSpeed
+            MaskStartX = x
+            MaskStartZ = z
+        }
+        MaskOrbitRadius = seek(MaskOrbitRadius, 2m, 0.06m)
+        MaskOrbitSpeed = seek(MaskOrbitSpeed, 600deg, 4.75deg)
+        MaskOrbitAngle = spd(MaskOrbitAngle, MaskOrbitSpeed) & 0xFFF
+        vecx = (sin(MaskOrbitAngle) * (MaskOrbitRadius >> 8)) >> 4
+        vecz = (cos(MaskOrbitAngle) * (MaskOrbitRadius >> 8)) >> 4
+        velx = vecx - MaskStartX
+        velz = vecz - MaskStartZ
+        var0 = frametime - statetime
+        if (var0 > 55) {
+            var0 = 55
+        }
+        var0 = (var0 << 8) / 55
+        x = MaskStartX + ((velx >> 8) * var0)
+        z = MaskStartZ + ((velz >> 8) * var0)
+        MaskClampToArena()
+        vely += 0.076m
+        y = spd(y, vely)
+        if (y >= 15m) {
+            y = 15m
+            changestate(AkuAku_WaitAboveArena)
+        }
+        troty = atan2(creator -> trans)
+        roty = degseek(roty, troty, 180deg)
+    }
+}
+
+state AkuAku_WaitAboveArena { // 69
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        SetTrans(-3m, 10m, 9m)
+        sleepnull()
+    }
+    event(e, a) {
+        if (e == Event88) {
+            FightPhase = creator -> FightPhase
+            if (FightPhase == 1) {
+                accevcstate(AkuAku_EnterBeamOrbit)
+            }
+            else {
+                accevcstate(AkuAku_DuelOrbit)
+            }
+        }
+    }
+}
+
+state AkuAku_DuelOrbit { // 70
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepanim(0, AKU_AKU)
+    }
+    event(e, a) {
+        accevcstate(AkuAku_LeaveArena, e == Event84)
+        accevcstate(AkuAku_ChargeUkaUka, e == EventTriggered)
+    }
+    trans {
+        once {
+            interrupter = CortexOBJ
+            changestateif(AkuAku_LeaveArena, interrupter -> stateflag & 0x100000)
+            MaskOrbitAngle = creator -> MaskOrbitAngle
+            MaskOrbitRadius = creator -> MaskOrbitRadius
+            MaskOrbitAngle += 180deg
+            MaskOrbitSpeed = creator -> MaskOrbitSpeed
+            MaskTargetSpeed = creator -> MaskTargetSpeed
+            NextMaskTurn = frametime
+            MaskHoverY = 3.5m
+        }
+        if (frametime >= NextMaskTurn) {
+            NextMaskTurn = frametime + (6 + rand(50))
+            MaskTargetSpeed = 30deg + rand(50deg)
+            if (rand(2)) {
+                MaskTargetSpeed = -MaskOrbitSpeed
+            }
+        }
+        vecy = creator -> MaskOrbitAngle + 180deg
+        var0 = degdist(MaskOrbitAngle, vecy)
+        if (abs(var0) >= 15deg) {
+            if (var0 >= 0) {
+                if (MaskTargetSpeed < 0) {
+                    MaskTargetSpeed = creator -> MaskTargetSpeed
+                    MaskTargetSpeed = abs(MaskTargetSpeed)
+                    if (MaskTargetSpeed >= 0) {
+                        MaskTargetSpeed = (MaskTargetSpeed + 80deg) >> 1
+                    }
+                    else {
+                        MaskTargetSpeed = (MaskTargetSpeed - 80deg) >> 1
+                    }
+                }
+            }
+            else if (MaskTargetSpeed > 0) {
+                MaskTargetSpeed = creator -> MaskTargetSpeed
+                MaskTargetSpeed = -abs(MaskTargetSpeed)
+                if (MaskTargetSpeed >= 0) {
+                    MaskTargetSpeed = (MaskTargetSpeed + 80deg) >> 1
+                }
+                else {
+                    MaskTargetSpeed = (MaskTargetSpeed - 80deg) >> 1
+                }
+            }
+        }
+        MaskOrbitSpeed = seek(MaskOrbitSpeed, MaskTargetSpeed, 12.744141deg)
+        MaskOrbitAngle = spd(MaskOrbitAngle, MaskOrbitSpeed) & 0xFFF
+        MaskTargetX = (sin(MaskOrbitAngle) * (MaskOrbitRadius >> 8)) >> 4
+        MaskTargetZ = (cos(MaskOrbitAngle) * (MaskOrbitRadius >> 8)) >> 4
+        var0 = time(45)
+        MaskTargetY = MaskHoverY + ((cos((16.0 * var0) / 45) * 1.5m) >> 12)
+        MaskMoveToTarget()
+        troty = atan2(creator -> trans)
+        roty = degseek(roty, troty, 120deg)
+    }
+}
+
+state AkuAku_ChargeUkaUka { // 71
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        playanim(0, AKU_CHARGE_1)
+        playanim(1, AKU_CHARGE_1)
+        playanim(2, AKU_CHARGE_1)
+        playanim(3, AKU_CHARGE_1)
+        playanim(4, AKU_CHARGE_1)
+        playanim(4, AKU_CHARGE_1)
+        playanim(5, AKU_CHARGE_1)
+        playanim(6, AKU_CHARGE_1)
+        do {
+            playanim(0, AKU_CHARGE_2)
+            playanim(1, AKU_CHARGE_2)
+            playanim(2, AKU_CHARGE_2)
+            playanim(3, AKU_CHARGE_2)
+            playanim(3, AKU_CHARGE_2)
+            playanim(4, AKU_CHARGE_2)
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(AkuAku_WaitForDuelEnd, e == EventTriggered)
+    }
+    trans {
+        once {
+            MaskTargetX = creator -> MaskTargetX
+            MaskTargetY = creator -> MaskTargetY
+            MaskTargetZ = creator -> MaskTargetZ
+            MaskStartX = x
+            MaskStartY = y
+            MaskStartZ = z
+            soundpitch(2.805)
+            soundsetup(7, self, 8)
+            soundplay([jmp0A], 1V)
+        }
+        var0 = frametime - statetime
+        changestateif(AkuAku_DuelOrbit, var0 >= 8)
+        x = MaskStartX + ((var0 * ((MaskTargetX - MaskStartX) << 8)) / 8 >> 8)
+        y = MaskStartY + ((var0 * ((MaskTargetY - MaskStartY) << 8)) / 8 >> 8)
+        z = MaskStartZ + ((var0 * ((MaskTargetZ - MaskStartZ) << 8)) / 8 >> 8)
+        SetVec(MaskTargetX, MaskTargetY, MaskTargetZ)
+        troty = atan2(self, vecx)
+        roty = degseek(roty, troty, 600deg)
+    }
+}
+
+state AkuAku_WaitForDuelEnd { // 72
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        if (e == Event93) {
+            x = creator -> vecx
+            y = creator -> vecy
+            z = creator -> vecz
+            accevcstate(AkuAku_DuelOrbit)
+        }
+    }
+}
+
+state MaskBeam_Init { // 73
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        zindex = 30
+        vfx = (vfx & 0xFFFFFF00) | 0x5
+        statusb = FLAG_NO_CAMERA_CLIP
+        AkuAkuOBJ = creator -> AkuAkuOBJ
+        y = creator -> y
+        scaley = 1S
+        scalex = 1S
+        spawn(NCorC, S_BEAM_GROUND_GLOW)
+        soundsetup(7, self, 8)
+        sounddecay(10.16s)
+        soundcount(0xFFFF)
+        soundpitch(2.54)
+        soundplay([Co17A], 0.15V)
+        changestate(MaskBeam_Active)
+    }
+}
+
+state MaskBeam_Active { // 74
+    stateflag 0x1
+    statusc 0x0
+    trans => sub MaskBeamUpdateTransform
+    code() {
+        playanim(0, BEAM_1)
+        playanim(1, BEAM_1)
+        playanim(2, BEAM_1)
+        playanim(3, BEAM_1)
+        playanim(4, BEAM_1)
+        playanim(4, BEAM_1)
+        playanim(5, BEAM_1)
+        playanim(6, BEAM_1)
+        settrans(MaskBeamUpdateDamage)
+        sleepframes(BEAM_2, 0.0, 10.0)
+    }
+    event(e, a) {
+        accevcstate(MaskBeam_Disappear, e == Event84)
+    }
+}
+
+sub MaskBeamUpdateTransform() { // S-4606
+    interrupter = AkuAkuOBJ
+    x = (interrupter -> x + creator -> x) >> 1
+    z = (interrupter -> z + creator -> z) >> 1
+    MaskOrbitAngle = creator -> MaskOrbitAngle
+    MaskOrbitRadius = creator -> MaskOrbitRadius
+    roty = MaskOrbitAngle + 180deg
+    scalez = 4.0 + ((0x10CC * ((MaskOrbitRadius - 2m) >> 8)) / 0x960)
+    rotz = (rotz + 14.33deg) % 360deg
+}
+
+sub MaskBeamUpdateDamage() { // S-4629
+    MaskBeamUpdateTransform()
+    if (player -> y - y <= 0.25m) {
+        vecx = player -> x - x >> 8
+        vecz = player -> z - z >> 8
+        var lx, lz, yc, ys
+        yc = cos(-roty)
+        ys = sin(-roty)
+        lz = ((vecz * yc) - (vecx * ys)) >> 4
+        lx = ((vecz * ys) + (vecx * yc)) >> 4
+        sendeventif(EventBurn, player, abs(lz) <= MaskOrbitRadius && abs(lx) <= 0.25m, 100.0)
+    }
+}
+
+state MaskBeam_Disappear { // 75
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        playanim(0, BEAM_3)
+        playanim(1, BEAM_3)
+        playanim(2, BEAM_3)
+        playanim(3, BEAM_3)
+        playanim(3, BEAM_3)
+        playanim(4, BEAM_3)
+    }
+    trans {
+        interrupter = AkuAkuOBJ
+        x = (interrupter -> x + creator -> x) >> 1
+        z = (interrupter -> z + creator -> z) >> 1
+        MaskOrbitAngle = creator -> MaskOrbitAngle
+        MaskOrbitRadius = creator -> MaskOrbitRadius
+        roty = MaskOrbitAngle + 180deg
+        scalez = 4.0 + ((0x10CC * ((MaskOrbitRadius - 2m) >> 8)) / 0x960)
+    }
+}
+
+state BeamGroundGlow_Init { // 76
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        zindex = 16
+        statusb = FLAG_NO_CAMERA_CLIP
+        y = 0
+        SetScale(1S)
+        changestate(BeamGroundGlow_Active)
+    }
+}
+
+state BeamGroundGlow_Active { // 77
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        playanim(0, BEAM_4)
+        playanim(1, BEAM_4)
+        playanim(2, BEAM_4)
+        playanim(3, BEAM_4)
+        playanim(4, BEAM_4)
+        playanim(4, BEAM_4)
+        playanim(5, BEAM_4)
+        playanim(6, BEAM_4)
+        sleepframes(BEAM_5, 0.0, 10.0)
+    }
+    trans {
+        x = creator -> x
+        z = creator -> z
+        scalez = creator -> scalez
+        roty = creator -> roty
+    }
+}
+
+state DrainGate_Init { // 78
+    stateflag 0x4081
+    statusc 0x80010
+    code(cortex) {
+        playnull()
+        creator = objectget(cortex)
+        zindex = 16
+        changestate(DrainGate_Close)
+    }
+}
+
+state DrainGate_Close { // 79
+    stateflag 0x4081
+    statusc 0x80010
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_TOP
+        playframes(GATE_CLOSE, 0.0, 25.0)
+        sleep()
+    }
+    event(e, a) {
+        accevcstate(DrainGate_PrepareToOpen, e == Event84)
+    }
+}
+
+state DrainGate_PrepareToOpen { // 80
+    stateflag 0x4081
+    statusc 0x80010
+    code() {
+        spawn(NCorC, S_DRAIN_ENERGY)
+        playframe(animframe, 31)
+        changestate(DrainGate_Open)
+    }
+}
+
+state DrainGate_Open { // 81
+    stateflag 0x4081
+    statusc 0x80010
+    code() {
+        statusb = 0
+        broadcastevent(Event85, 0)
+        zindex = -10
+        SoundPitchDefault(0.23)
+        sounddecay(7.68s)
+        soundsetup(6, self, 8)
+        soundplay([tnt0A], 1V)
+        playframes(GATE_BREAK, 0.0, 12.0)
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(DrainGate_Close, e == Event88 || e == Event92)
+    }
+}
+
+state DrainEnergy_Init { // 82
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        zindex = 24
+        changestate(DrainEnergy_Active)
+    }
+}
+
+state DrainEnergy_Active { // 83
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        soundpitch(4.0)
+        soundsetup(5, self, 8)
+        sounddecay(10.16s)
+        soundcount(0xFFFF)
+        soundplay([Co37A], 0.5V)
+        playframes(GATE_PARTICLE_1, 0.0, 11.0)
+        sleepframes(GATE_PARTICLE_2, 0.0, 12.0)
+    }
+    event(e, a) {
+        accevcstate(DrainEnergy_Fade, e == Event88 || e == Event92)
+    }
+}
+
+state DrainEnergy_Fade { // 84
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        soundfadet(37, voice)
+        soundfadev(0V, voice, 3)
+        if (animseq == getanim(GATE_PARTICLE_1)) {
+            playframes4(GATE_PARTICLE_1, -1.0, 11.0)
+        }
+        else if (animseq == getanim(GATE_PARTICLE_2)) {
+            playframes4(GATE_PARTICLE_2, -1.0, 12.0)
+        }
+        sleepframes(GATE_PARTICLE_2, 0.0, 12.0)
+    }
+    trans {
+        once {
+            EffectAlpha = 16.0
+        }
+        EffectAlpha = seek(EffectAlpha, 0, 0x6D)
+        moda = 16.0 - EffectAlpha
+        changestateifn(Kill, EffectAlpha)
+    }
+}
+
+inline sub HoverboardUpdateHover() {
+    x = BoardBaseX
+    z = BoardBaseZ
+    var0 = time(50, 37)
+    rotx = (cos((360deg * var0) / 50) * -7deg) >> 12
+    var0 = time(50, 25)
+    y = BoardBaseY + ((cos((360deg * var0) / 50) * 100.0) >> 12)
+    var0 = degdist(roty, troty) >> 2
+    if (abs(var0) > 54) {
+        if (var0 >= 0) {
+            var0 = 54
+        }
+        else {
+            var0 = -54
+        }
+    }
+    roty += var0
+    rotz = roty
+}
+
+state Hoverboard_MoveAside { // 85
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        spawn(NCorC, S_HOVERBOARD_SHADOW)
+        playframes(HOVERBOARD, 0.0, 21.0)
+        sleep()
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event89)
+        accevcstate(Hoverboard_Explode, e == Event91 || e == Event92)
+    }
+    trans {
+        once {
+            CopyCreatorRot()
+            zindex = 26
+            BoardBaseX = x
+            BoardBaseY = y
+            BoardBaseZ = z
+            save (pathlen, entity) {
+                pathlen = creator -> pathlen
+                entity = creator -> entity
+                pathprog = 59.0
+                calcpath(pathprog, vvec)
+            }
+            BoardTargetX = vecx
+            BoardTargetY = 3.5m
+            BoardTargetZ = vecz
+        }
+        velx = BoardTargetX - BoardBaseX
+        vely = BoardTargetY - BoardBaseY
+        velz = BoardTargetZ - BoardBaseZ
+        var0 = distance(velx, self, 8)
+        if (var0 < 0.05m) {
+            BoardBaseX = BoardTargetX
+            BoardBaseY = BoardTargetY
+            BoardBaseZ = BoardTargetZ
+            changestate(Hoverboard_WaitForCortex)
+        }
+        if (var0 >= 3.5m) {
+            troty = atan(velx, velz)
+        }
+        else {
+            troty = 0deg
+        }
+        var0 >>= 4
+        if (var0 > 0.2m) {
+            var0 = 0.2m
+        }
+        misc5(velx, var0)
+        BoardBaseX += velx
+        BoardBaseY += vely
+        BoardBaseZ += velz
+        HoverboardUpdateHover()
+    }
+}
+
+state Hoverboard_WaitForCortex { // 86
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleep()
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event89 || e == Event92)
+        accevcstate(Hoverboard_Explode, e == Event91)
+    }
+    trans {
+        once {
+            troty = 0deg
+            statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        }
+        HoverboardUpdateHover()
+    }
+}
+
+state Hoverboard_Explode { // 87
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        statusb = 0
+        SoundPitchDefault(0.23)
+        sounddecay(7.68s)
+        soundsetup(7, self, 8)
+        soundplay([tnt0A], 0.8V)
+        spawn(9, 4, 1, getins(SetHoverboardExplosionColor), 1)
+        playframe()
+        WaitChildNull()
+    }
+}
+
+sub SetHoverboardExplosionColor() { // S-5018
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    if (var r = rand(3); r == 0) {
+        SetColor1(0xD2, 0xC8, 0xC8)
+    }
+    else if (r == 1) {
+        SetColor1(0x78, 0x6E, 0x6E)
+    }
+    else if (r == 2) {
+        SetColor1(0x46, 0x3C, 0x3C)
+    }
+}
+
+state Hoverboard_Shadow { // 88
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        y = 0
+        moda = 6.4
+        rotx = 0
+        do {
+            x = creator -> x
+            z = creator -> z
+            roty = creator -> roty
+            if (distance(x, self, 10) <= 2m) {
+                playnull()
+            }
+            else {
+                playanim(0, HOVERBOARD_SHADOW)
+            }
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event89 || e == Event91 || e == Event92)
+    }
+}
+
+state MaskClash_Spin { // 89
+    stateflag 0x1
+    statusc 0x0
+    trans => sub MaskClashLower
+    code(yaw) {
+        roty = yaw
+        rotz = roty
+        rotx = 0
+        zindex = creator -> zindex
+        SetScale(0x270E)
+        statusb = FLAG_NO_CAMERA_CLIP
+        playframes(MASK_CLASH_1, 0.0, 2.0)
+        spawn(NCorC, S_SHOCKWAVE)
+        spawn(NCorC, S_SHOCKWAVE_GROUND)
+        animframe = 2.0
+        do {
+            animframe += 1.0
+            if (animframe == 7.0) {
+                spawn(NCorC, S_CLASH_ENERGY)
+                ClashSpinSpeed = 30deg
+                settrans(MaskClashUpdateSpin)
+            }
+            playframe()
+        } while (animframe + 1.0 <= 21.0)
+        sleepanim(0, MASK_CLASH_2)
+    }
+    event(e, a) {
+        accevcstate(MaskClash_Explode, e == EventTriggered)
+    }
+}
+
+sub MaskClashLower() { // S-5098
+    y = seek(y, 1.75m, 0.07m)
+}
+
+sub MaskClashUpdateSpin() { // S-5102
+    MaskClashLower()
+    ClashSpinSpeed = seek(ClashSpinSpeed, 900deg, 72deg)
+    roty = spd(roty, ClashSpinSpeed) % 360deg
+}
+
+state MaskClash_Explode { // 90
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        SoundPitchDefault(0.23)
+        sounddecay(7.68s)
+        soundsetup(6, self, 8)
+        soundplay([tnt0A], 1V)
+        if (!SHAKEY) {
+            SHAKEY = 10.0
+        }
+        spawn(NCorC, S_CLASH_BLAST)
+        getvert(vtrans, self, 0.0)
+        getvert(vvec, self, 1.0)
+        sendevent(Event93, creator)
+        WaitChildNull()
+    }
+    trans {
+        ClashSpinSpeed = seek(ClashSpinSpeed, 900deg, 72deg)
+        roty = spd(roty, ClashSpinSpeed) % 360deg
+    }
+}
+
+state MaskClash_Shockwave { // 91
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        roty = creator -> roty
+        zindex = creator -> zindex
+        rotx = 0deg
+        rotz = 0deg
+        statusb = FLAG_NO_CAMERA_CLIP
+        SetScale(1S)
+        playframes(COLLISION_SHOCKWAVE_1, 0.0, 12.0)
+    }
+    trans {
+        once {
+            EffectAlpha = 16.0
+            SetRot(0deg, creator -> roty, roty)
+        }
+        y = creator -> y
+        if (frametime - statetime >= 9) {
+            EffectAlpha = seek(EffectAlpha, 0, 3.2)
+            moda = 16.0 - EffectAlpha
+        }
+    }
+}
+
+state MaskClash_GroundShockwave { // 92
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        roty = creator -> roty
+        zindex = creator -> zindex
+        rotx = 0deg
+        rotz = 0deg
+        y = 0
+        statusb = FLAG_NO_CAMERA_CLIP
+        SetScale(1S)
+        playframes(COLLISION_SHOCKWAVE_2, 0.0, 14.0)
+    }
+    trans {
+        once {
+            EffectAlpha = 16.0
+        }
+        if (frametime - statetime >= 10) {
+            EffectAlpha = seek(EffectAlpha, 0, 3.2)
+            moda = 16.0 - EffectAlpha
+        }
+    }
+}
+
+state MaskClash_Energy { // 93
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        playframes(ENERGY_PARTICLES_1, 0.0, 22.0)
+        sleepframes(ENERGY_PARTICLES_2, 0.0, 18.0)
+    }
+    trans {
+        once {
+            zindex = creator -> zindex
+            rotx = 0deg
+            rotz = 0deg
+            statusb = FLAG_NO_CAMERA_CLIP
+            SetScale(0S)
+            EffectAlpha = 0
+        }
+        y = creator -> y
+        EffectAlpha = seek(EffectAlpha, 6.4, 38)
+        moda = 16.0 - EffectAlpha
+        scalex = seek(scalex, 1S, 0x60)
+        scaley = scalex
+        scalez = scalex
+        rotx = CAMROTX
+        roty = CAMROTY
+        rotz = roty
+        if (frametime - statetime >= 45) {
+            sendevent(EventTriggered, creator)
+            changestate(Kill)
+        }
+    }
+}
+
+state MaskClash_Blast { // 94
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        SetScale(0x1400)
+        SetRot(0deg)
+        y = 0
+        zindex = 30
+        playframes(EXPLOSION, 0.0, 17.0)
+        sleep()
+    }
+    trans {
+        once {
+            EffectAlpha = 16.0
+        }
+        if (frametime - statetime >= 16) {
+            EffectAlpha = seek(EffectAlpha, 0, 0x1EC)
+            moda = 16.0 - EffectAlpha
+            changestateifn(Kill, EffectAlpha)
+        }
+        else {
+            var0 = frametime - statetime
+            if (var0 > 6) {
+                var0 = 6
+            }
+            var0 = (var0 * 6.72 / 6) << 8
+            sendeventif(EventBurn, player, distance(player, DIST_NO_Y) <= var0, 100.0)
+            broadcastevent(Event94, 0, var0)
+        }
+    }
+}
+
+state MaskVortex_Init { // 95
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        SetScale(0x1385)
+        zindex = 26
+        SetTrans(0, 0, 0)
+        SetRot(0deg)
+        pathprog = 0
+        save (pathlen) {
+            pathlen = creator -> pathlen
+            entity = creator -> entity
+            VortexPathLength = pathlen - 1.0
+        }
+        VortexPathSpeed = 0
+        changestate(MaskVortex_FollowPath)
+    }
+}
+
+state MaskVortex_FollowPath { // 96
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepframes(MASK_VORTEX, 0.0, 20.0)
+    }
+    event(e, a) {
+        accevcstate(MaskVortex_End, e == Event84)
+    }
+    trans {
+        VortexPathSpeed = seek(VortexPathSpeed, -6.0, -15)
+        pathprog = spd(pathprog, VortexPathSpeed)
+        if (pathprog >= VortexPathLength) {
+            pathprog -= VortexPathLength
+        }
+        if (pathprog < 0) {
+            pathprog += VortexPathLength
+        }
+        save (pathlen, entity) {
+            pathlen = creator -> pathlen
+            entity = creator -> entity
+            calcpath(pathprog)
+        }
+        if (player -> y - y <= 2m, distance(player, DIST_NO_Y) <= 2m) {
+            sendevent(EventBurn, player, 100.0)
+        }
+        roty = spd(roty, -540deg) % 360deg
+    }
+}
+
+state MaskVortex_End { // 97
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sendevent(Event93, creator)
+        playnull()
+    }
+}
+
+state CortexBullet_Init { // 98
+    stateflag 0x1
+    statusc 0x0
+    code(vertex, pitch, yaw) {
+        SetRot(pitch, yaw, 0deg)
+        SetTrans(0, 0, 0)
+        vectransf(vtrans, vvel, 10m, 0, 0)
+        getvert(vtrans, creator, vertex)
+        zindex = creator -> zindex
+        statusb = FLAG_COLLIDABLE
+        SoundPitchDefault(0.25)
+        sounddecay(8s)
+        soundsetup(8, self, 8)
+        soundplay([Cob7A], 1V)
+        changestate(CortexBullet_Fly)
+    }
+}
+
+state CortexBullet_Fly { // 99
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepframes(BULLET, 0.0, 26.0)
+    }
+    trans {
+        rotx = CAMROTX
+        roty = CAMROTY
+        rotz = roty
+        x = spd(x, velx)
+        y = spd(y, vely)
+        z = spd(z, velz)
+        changestateif(CortexBullet_Impact, y <= 0 && z <= 7.47m)
+        changestateif(Kill, abs(x) >= 9m || z >= 14m || z <= -10m)
+        sendevent(EventBurn, collider, 100.0)
+        if (eventaccepted) {
+            x += (((player -> x - x) * 3) >> 2)
+            z += (((player -> z - z) * 3) >> 2)
+            changestate(CortexBullet_Impact)
+        }
+    }
+}
+
+state CortexBullet_Impact { // 100
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        spawn(9, 4, 1, getins(SetBulletExplosionColor), 1)
+        SoundPitchDefault(0.23)
+        sounddecay(7.68s)
+        soundsetup(6, self, 8)
+        soundplay([tnt0A], 1V)
+        WaitChildNull()
+        playnull(16)
+    }
+}
+
+sub SetBulletExplosionColor() { // S-5445
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    SetScale(3S)
+    if (var r = rand(3); r == 0) {
+        SetColor1(0xD2, 0x34, 0x00)
+    }
+    else if (r == 1) {
+        SetColor1(0x78, 0x1E, 0x00)
+    }
+    else if (r == 2) {
+        SetColor1(0x46, 0x14, 0x00)
+    }
+}
+
+state Kill { // 101
+    stateflag 0x1
+    statusc 0x0
+    code() {}
+}

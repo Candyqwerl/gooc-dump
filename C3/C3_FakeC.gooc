@@ -1,0 +1,38 @@
+#gool FakeC 54 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C3_ShadC.gooh"
+//gooc -c 3 -r pal -l y "C3\C3_FakeC.gooc" "C3\Out\C3_FakeC.nsentry"
+
+#anim FAKE_CRASH [FC10V] [FC10G] 186 1 2
+
+#spawn S_FAKE_CRASH   Fake_Crash
+
+state Fake_Crash {
+    code() {
+        if (var level = LEVEL; level == LEVEL_ToadVillage) {
+            if (!(GLOBAL_150 & 0x8000000)) {
+                KillEntity()
+                return
+            }
+        }
+        else if (level == LEVEL_MakinWaves) {
+            if (!(GLOBAL_150 & 0x10000000)) {
+                KillEntity()
+                return
+            }
+            spawn(ShadC, ShadC_S_WILLY_VIDO_GROUND, 1, y, 2.2S, 0)
+        }
+        else if (level == LEVEL_HogRide) {
+            if (!(GLOBAL_150 & 0x20000000)) {
+                KillEntity()
+                return
+            }
+        }
+        statusb = FLAG_HAS_SHADOW | 0x10000000
+        do {
+            playframes(FAKE_CRASH, 0.0, 185.0)
+            roty += 120deg
+        } while (1)
+    }
+}

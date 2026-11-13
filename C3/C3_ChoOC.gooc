@@ -1,0 +1,622 @@
+#gool ChoOC 8 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C3_FruiC.gooh"
+#include "..\\Includes\\C3_BoxsC.gooh"
+//gooc -c 3 -r pal "C3\C3_ChoOC.gooc" "C3\Out\C3_ChoOC.nsentry"
+
+#anim BASKET             [BskaV] [BskaG] 01 1 2
+#anim BARREL_ROLL        [Ba1aV] [Ba1aG] 30 1 2
+#anim BARREL_SHADOW      [Ba2aV] [Ba2aG] 01 1 2
+#anim BARREL_BREAK       [Bx1aV] [Bx1aG] 09 1 2
+
+#iflev 11
+#anim BANNER_1           [Bn1hV] [Bn1hG] 16 0 2
+#anim BANNER_2           [Bn1hV] [Bn2hG] 16 0 2
+#anim BANNER_3           [Bn1hV] [Bn3hG] 16 0 2
+#anim BANNER_4           [Bn1hV] [Bn4hG] 16 0 2
+#anim BANNER_5           [Bn1hV] [Bn5hG] 16 0 2
+#anim BANNER_6           [Bn1hV] [Bn6hG] 16 0 2
+#anim BANNER_7           [Bn1hV] [Bn7hG] 16 0 2
+#anim BANNER_8           [Bn1hV] [Bn8hG] 16 0 2
+#anim BANNER_9           [Bn1hV] [Bn9hG] 16 0 2
+#anim BANNER_A           [Bn1hV] [BnahG] 16 0 2
+#anim BANNER_B           [Bn1hV] [BnbhG] 16 0 2
+#anim BANNER_C           [Bn1hV] [BnchG] 16 0 2
+#anim BANNER_D           [Bn1hV] [BndhG] 16 0 2
+#anim BANNER_E           [Bn1hV] [BnehG] 16 0 2
+#anim BANNER_F           [Bn1hV] [BnfhG] 16 0 2
+#anim BANNER_G           [Bn1hV] [BnghG] 16 0 2
+#anim TALL_BANNER_1      [Tb1hV] [Tb1hG] 16 0 2
+#anim TALL_BANNER_2      [Tb1hV] [Tb2hG] 16 0 2
+#anim TALL_BANNER_3      [Tb1hV] [Tb3hG] 16 0 2
+#anim TALL_BANNER_4      [Tb1hV] [Tb4hG] 16 0 2
+#anim TALL_BANNER_5      [Tb1hV] [Tb5hG] 16 0 2
+#anim TALL_BANNER_6      [Tb1hV] [Tb6hG] 16 0 2
+#anim TALL_BANNER_7      [Tb1hV] [Tb7hG] 16 0 2
+#anim TALL_BANNER_8      [Tb1hV] [Tb8hG] 16 0 2
+#anim TALL_BANNER_9      [Tb1hV] [Tb9hG] 16 0 2
+#anim TALL_BANNER_A      [Tb1hV] [TbahG] 16 0 2
+#anim TALL_BANNER_B      [Tb1hV] [TbbhG] 16 0 2
+#anim TALL_BANNER_C      [Tb1hV] [TbchG] 16 0 2
+#anim TALL_BANNER_D      [Tb1hV] [TbdhG] 16 0 2
+#anim TALL_BANNER_E      [Tb1hV] [TbehG] 16 0 2
+#anim TALL_BANNER_F      [Tb1hV] [TbfhG] 16 0 2
+#anim TALL_BANNER_G      [Tb1hV] [TbghG] 16 0 2
+#else
+#anim BANNER_1           [Bn1aV] [Bn1aG] 16 0 2
+#anim BANNER_2           [Bn1aV] [Bn2aG] 16 0 2
+#anim BANNER_3           [Bn1aV] [Bn3aG] 16 0 2
+#anim BANNER_4           [Bn1aV] [Bn4aG] 16 0 2
+#anim BANNER_5           [Bn1aV] [Bn5aG] 16 0 2
+#anim BANNER_6           [Bn1aV] [Bn6aG] 16 0 2
+#anim BANNER_7           [Bn1aV] [Bn7aG] 16 0 2
+#anim BANNER_8           [Bn1aV] [Bn8aG] 16 0 2
+#anim BANNER_9           [Bn1aV] [Bn9aG] 16 0 2
+#anim BANNER_A           [Bn1aV] [BnaaG] 16 0 2
+#anim BANNER_B           [Bn1aV] [BnbaG] 16 0 2
+#anim BANNER_C           [Bn1aV] [BncaG] 16 0 2
+#anim BANNER_D           [Bn1aV] [BndaG] 16 0 2
+#anim BANNER_E           [Bn1aV] [BneaG] 16 0 2
+#anim BANNER_F           [Bn1aV] [BnfaG] 16 0 2
+#anim BANNER_G           [Bn1aV] [BngaG] 16 0 2
+#anim TALL_BANNER_1      [Tb1aV] [Tb1aG] 16 0 2
+#anim TALL_BANNER_2      [Tb1aV] [Tb2aG] 16 0 2
+#anim TALL_BANNER_3      [Tb1aV] [Tb3aG] 16 0 2
+#anim TALL_BANNER_4      [Tb1aV] [Tb4aG] 16 0 2
+#anim TALL_BANNER_5      [Tb1aV] [Tb5aG] 16 0 2
+#anim TALL_BANNER_6      [Tb1aV] [Tb6aG] 16 0 2
+#anim TALL_BANNER_7      [Tb1aV] [Tb7aG] 16 0 2
+#anim TALL_BANNER_8      [Tb1aV] [Tb8aG] 16 0 2
+#anim TALL_BANNER_9      [Tb1aV] [Tb9aG] 16 0 2
+#anim TALL_BANNER_A      [Tb1aV] [TbaaG] 16 0 2
+#anim TALL_BANNER_B      [Tb1aV] [TbbaG] 16 0 2
+#anim TALL_BANNER_C      [Tb1aV] [TbcaG] 16 0 2
+#anim TALL_BANNER_D      [Tb1aV] [TbdaG] 16 0 2
+#anim TALL_BANNER_E      [Tb1aV] [TbeaG] 16 0 2
+#anim TALL_BANNER_F      [Tb1aV] [TbfaG] 16 0 2
+#anim TALL_BANNER_G      [Tb1aV] [TbgaG] 16 0 2
+#endif
+
+#anim KITE               [Ki1aV] [Ki1aG] 33 1 2
+#anim KITE_BREAK         [Ki2aV] [Ki2aG] 33 1 2
+
+#anim STONED_ASS_LIFT    [StaaV] [StaaG] 53 1 2
+#anim STONED_ASS_WALK    [StuaV] [StuaG] 50 1 2
+#anim GUARD_DEFEND       [Gu1aV] [Gu1aG] 34 1 2
+
+#spawn S_BARREL          Barrell_Spawn
+#spawn S_KITE            Kite
+#spawn S_BANNER          Banner
+#spawn S_BANNER_TALL     Banner_Tall
+#spawn S_CHINA_ASS_1     Chinese_Ass_Init
+#spawn S_CHINA_ASS_2     Chinese_Ass_Init
+#spawn S_BASKET          Basket_Spawn
+#spawn S_7               __s_7
+#spawn S_CHINA_ASS_3     Chinese_Ass_Init
+#spawn S_BARREL_SHADOW   Barrel_Shadow
+#spawn S_SLAP            Slap_Coco
+
+var ChinaVar1, ChinaVar2, ChinaVar3, ChinaVar4,
+    ChinaVar5, ChinaVar6, ChinaVar7, ChinaVar8,
+    ChinaVar9, ChinaVar10
+
+expr BarrelTriggerDistance = ChinaVar9
+expr BarrelPathStep        = ChinaVar10
+expr KiteBaseY             = ChinaVar1
+expr KiteSpringOffset      = ChinaVar2
+expr KiteSpringVel         = ChinaVar3
+expr KiteSwayOffset        = ChinaVar4
+expr KiteNextImpulseTime   = ChinaVar5
+expr KiteRewardBox         = ChinaVar6
+expr AssYaw                = ChinaVar1
+expr AssFrameOffset        = ChinaVar2
+expr ZindexDefault         = ChinaVar3
+expr ZindexAlt             = ChinaVar4
+expr ZindexDistance        = ChinaVar5
+
+state Slap_Coco { // 0
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepnull()
+    }
+    trans {
+        vecz = player -> z - z
+        if (vecz <= 1.25m, vecz >= -4m) {
+            vecy = player -> y - y
+            if (vecy > -2.25m && vecy < 1.5m) {
+                player -> y = y + 1.5m
+                ins72(0, 0x1000)
+            }
+        }
+    }
+}
+
+state Basket_Spawn { // 1
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        statusb = FLAG_COLLIDABLE
+        sleepanim(0, BASKET)
+    }
+    trans {
+        changestateif(Basket_Fling, collider)
+        changestateif(Kill, z - player -> z > 5m)
+    }
+}
+
+state Basket_Fling { // 2
+    stateflag 0x30
+    statusc 0x32
+    code() {
+        spawn2(FruiC, FruiC_S_FRUIT_AUTO, 1, 80.0, 0)
+        KillEntity()
+        SoundEnemyFling()
+        soundpitch(4.895)
+        soundplay([Ba3aA], 1V)
+        soundsetup(0, voice, 5)
+        EnemyFlingSetDir(0x80000)
+        setvel(10m)
+        vely = 0m
+        statusb = FLAG_GRAVITY | FLAG_PHYSICS_ENGINE
+        EnemyFlingWaitScale()
+    }
+    trans {
+        unless (STATUS_FIRSTFRAME) {
+            scalex = seek(scalex, 0S, 0.255)
+            scaley -= 0.255
+            scalez -= 0.255
+        }
+        rotx = (rotx + 16deg) % 360deg
+    }
+}
+
+state Barrell_Spawn { // 3
+    stateflag 0x1
+    statusc 0x0
+    code(range, speed) {
+        BarrelTriggerDistance = range
+        BarrelPathStep = speed
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        zindex = 30
+        pathprog = 0
+        calcpath(pathprog)
+        vecx = y
+        vecy = y
+        settrans(BarrelTransWait)
+        spawn(ChoOC, S_BARREL_SHADOW)
+        sleepanim(0, BARREL_ROLL)
+    }
+    event(e, a) {
+        accevcstate(Barrel_Break, e == EventSpinHit || e == EventHitInvincible || e == EventSlideHit)
+        accevif (e == EventDespawn || e == EventRespawn) {
+            voice = -1
+            soundfadet(2s, voice)
+            soundfadev(0V, voice, 3)
+            voice = -1
+            soundsetup(0, voice, 5)
+        }
+    }
+}
+
+sub BarrelTransWait() {
+    changestateif(Barrel_Roll, player -> z - z <= BarrelTriggerDistance)
+    sendevent(EventHit, collider, 100.0)
+    changestateif(Barrel_Break, eventaccepted)
+}
+
+state Barrel_Roll { // 4
+    stateflag 0x1
+    statusc 0x0
+    event => state Barrell_Spawn
+    code() {
+        soundpitch(4.0)
+        soundcount(0xFFFF)
+        sounddecay(8s)
+        soundplay([Ba2aA], 0.6V)
+        sleepframes(BARREL_ROLL, 0.0, 29.0)
+    }
+    trans {
+        pathprog += BarrelPathStep
+        if (pathprog >= pathlen) {
+            pathprog = pathlen - 1
+            if (z + 2m < CAMTRANSZ) {
+                changestate(Barrel_Break)
+            }
+            else {
+                changestate(Barrel_Despawn)
+            }
+        }
+        sendevent(EventHit, collider, 100.0)
+        changestateif(Barrel_Break, eventaccepted)
+        calcpath(pathprog)
+    }
+}
+
+state Barrel_Despawn { // 5
+    stateflag 0x1
+    statusc 0x0
+    event => state Barrell_Spawn
+    code() {
+        soundfadet(0.1s, voice)
+        soundfadev(0V, voice, 2)
+        soundpitch(3.263)
+        soundplay([Ba1aA], 1V)
+        sleep()
+    }
+    trans {
+        sendevent(EventHit, collider, 100.0)
+        changestateif(Barrel_Break, eventaccepted)
+    }
+}
+
+state Barrel_Break { // 6
+    stateflag 0x1
+    statusc 0x0
+    event => state Banner
+    code() {
+        statusb = 0
+        KillEntity()
+        soundfadet(0.1s, voice)
+        soundfadev(0V, voice, 2)
+        soundpitch(3.263)
+        soundplay([Ba3aA], 1V)
+        soundsetup(0, voice, 5)
+        cascadeevent(Event1, self)
+        playframes(BARREL_BREAK, 0.0, 8.0)
+    }
+}
+
+state Barrel_Shadow { // 7
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        zindex = creator -> zindex
+        roty = creator -> roty
+        sleepanim(0, BARREL_SHADOW)
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event1)
+    }
+    trans {
+        CopyCreatorTrans()
+    }
+}
+
+expr BOX_FLAG_AUTO_COLLECT  = 0x4
+expr BOX_FLAG_NO_BOTTOM     = 0x2000
+expr BOX_FLAG_NO_SIDES      = 0x4000
+expr BOX_FLAG_NO_TOP        = 0x8000
+expr BOX_FLAG_PARENT_VERTEX = 0x400000
+
+state Kite { // 8
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        statusb = FLAG_COLLIDABLE
+        if (entitygetstate(3)) {
+            spawn2(BoxsC, BoxsC_S_BOX_PICKUP, 1, 76.0, BOX_FLAG_AUTO_COLLECT | BOX_FLAG_NO_BOTTOM | BOX_FLAG_NO_SIDES | BOX_FLAG_NO_TOP | BOX_FLAG_PARENT_VERTEX, id)
+            KiteRewardBox = objectspawned
+        }
+        else {
+            spawn2(BoxsC, BoxsC_S_BOX_1UP, 1, 97.0, BOX_FLAG_AUTO_COLLECT | BOX_FLAG_NO_BOTTOM | BOX_FLAG_NO_SIDES | BOX_FLAG_NO_TOP | BOX_FLAG_PARENT_VERTEX, id)
+            KiteRewardBox = objectspawned
+        }
+        KiteBaseY = y
+        KiteSpringOffset = 0
+        KiteSpringVel = 0
+        KiteSwayOffset = 0
+        KiteNextImpulseTime = frametime
+        sleepframes(KITE, 0.0, 32.0)
+    }
+    event(e, a) {
+        if (e == EventTriggered) {
+            entitysetstate(5)
+            accevcstate(Kite_Break)
+        }
+        accevif (e == EventDespawn) {
+            if (KiteRewardBox) {
+                interrupter = KiteRewardBox
+                sendevent(Event12, interrupter, 100.0)
+            }
+        }
+    }
+    trans {
+        nofirst {
+            if (collider) {
+                if (KiteRewardBox) {
+                    interrupter = KiteRewardBox
+                    sendevent(EventHit, interrupter, 0)
+                    entitysetstate(5)
+                }
+                changestate(Kite_Break)
+            }
+            if (frametime >= KiteNextImpulseTime) {
+                KiteSpringVel += (rand(0.5m) + 0.5m) / 25
+                KiteNextImpulseTime = frametime + (rand(2s) + 1s)
+            }
+            
+            if (var old = KiteSpringOffset; KiteSpringVel || KiteSpringOffset) {
+                KiteSpringVel -= KiteSpringOffset / 25
+                KiteSpringOffset += KiteSpringVel
+                if (old >= 0) {
+                    if (KiteSpringOffset <= 0) {
+                        KiteSpringVel += -(KiteSpringVel >> 2)
+                    }
+                }
+                else if (KiteSpringOffset >= 0) {
+                    KiteSpringVel += -(KiteSpringVel >> 2)
+                }
+            }
+            KiteSwayOffset = ((sin((frametime << 2) & 0xFFF)) * 0.6m) >> 12
+            y = KiteBaseY + (KiteSwayOffset + KiteSpringOffset)
+        }
+    }
+}
+
+state Kite_Break { // 9
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        statusb = 0
+        KillEntity()
+        playframes(KITE_BREAK, 0.0, 32.0)
+    }
+}
+
+inline sub SoundBannerFlap() {
+    if (frametime - statetime >= 0.9s) {
+        statetime = frametime
+        SoundPitchDefault(0.295)
+        soundfadet(1s, self)
+        soundsetup(0.2V + rand(0.1V), self, 2, 0)
+        soundplay([Fl1aA], 0V)
+    }
+}
+
+state Banner { // 10
+    stateflag 0x1
+    statusc 0x0
+    code(yaw) {
+        roty = yaw
+        statusb = 0
+        zindex = fieldval(ENTITY_FIELD_ZINDEX)
+        animframe = 0
+        var0 = ((x >> 17) + (z >> 17)) & 15
+        {
+            var frame = var0
+            if (frame == 0) { goto F0 }
+            if (frame == 1) { goto F1 }
+            if (frame == 2) { goto F2 }
+            if (frame == 3) { goto F3 }
+            if (frame == 4) { goto F4 }
+            if (frame == 5) { goto F5 }
+            if (frame == 6) { goto F6 }
+            if (frame == 7) { goto F7 }
+            if (frame == 8) { goto F8 }
+            if (frame == 9) { goto F9 }
+            if (frame == 10) { goto F10 } 
+            if (frame == 11) { goto F11 } 
+            if (frame == 12) { goto F12 } 
+            if (frame == 13) { goto F13 } 
+            if (frame == 14) { goto F14 } 
+            if (frame == 15) { goto F15 } 
+        }
+        do {
+            SoundBannerFlap() 
+            F0: playanim(0, BANNER_1)
+            F1: playanim(1, BANNER_2)
+            F2: playanim(2, BANNER_3)
+            F3: playanim(3, BANNER_4)
+            F4: playanim(4, BANNER_5)
+            F5: playanim(5, BANNER_6)
+            F6: playanim(6, BANNER_7)
+            F7: playanim(7, BANNER_8)
+            F8: playanim(8, BANNER_9)
+            F9: playanim(9, BANNER_A)
+            F10: playanim(10, BANNER_B)
+            F11: playanim(11, BANNER_C)
+            F12: playanim(12, BANNER_D)
+            F13: playanim(13, BANNER_E)
+            F14: playanim(14, BANNER_F)
+            F15: playanim(15, BANNER_G)
+        } while (1)
+    }
+    event(e, a) {
+        accevif (e == EventDespawn || e == EventRespawn) {
+            voice = -1
+            soundfadet(2s, voice)
+            soundfadev(0V, voice, 3)
+            voice = -1
+            soundsetup(0, voice, 5)
+        }
+    }
+}
+
+state Banner_Tall { // 11
+    stateflag 0x1
+    statusc 0x0
+    event => state Banner
+    code(yaw, scax, scay, yoffs, alpha) {
+        roty = yaw
+        scalex = scax
+        scaley = scay
+        y += yoffs
+        moda = 16.0 - alpha
+        statusb = 0
+        zindex = fieldval(ENTITY_FIELD_ZINDEX)
+        animframe = 0
+        var0 = ((x >> 17) + (z >> 17)) & 15
+        {
+            var frame = var0
+            if (frame == 0) { goto F0 }
+            if (frame == 1) { goto F1 }
+            if (frame == 2) { goto F2 }
+            if (frame == 3) { goto F3 }
+            if (frame == 4) { goto F4 }
+            if (frame == 5) { goto F5 }
+            if (frame == 6) { goto F6 }
+            if (frame == 7) { goto F7 }
+            if (frame == 8) { goto F8 }
+            if (frame == 9) { goto F9 }
+            if (frame == 10) { goto F10 }
+            if (frame == 11) { goto F11 }
+            if (frame == 12) { goto F12 }
+            if (frame == 13) { goto F13 }
+            if (frame == 14) { goto F14 }
+            if (frame == 15) { goto F15 }
+        }
+        do {
+            SoundBannerFlap() 
+            F0: playanim(0, TALL_BANNER_1)
+            F1: playanim(1, TALL_BANNER_2)
+            F2: playanim(2, TALL_BANNER_3)
+            F3: playanim(3, TALL_BANNER_4)
+            F4: playanim(4, TALL_BANNER_5)
+            F5: playanim(5, TALL_BANNER_6)
+            F6: playanim(6, TALL_BANNER_7)
+            F7: playanim(7, TALL_BANNER_8)
+            F8: playanim(8, TALL_BANNER_9)
+            F9: playanim(9, TALL_BANNER_A)
+            F10: playanim(10, TALL_BANNER_B)
+            F11: playanim(11, TALL_BANNER_C)
+            F12: playanim(12, TALL_BANNER_D)
+            F13: playanim(13, TALL_BANNER_E)
+            F14: playanim(14, TALL_BANNER_F)
+            F15: playanim(15, TALL_BANNER_G)
+        } while (1)
+    }
+}
+
+state Chinese_Ass_Init { // 12
+    stateflag 0x1
+    statusc 0x0
+    code(type, yaw, phase, zbase, zalt, depth) {
+        AssYaw = yaw
+        AssFrameOffset = phase * 1s / 1.2s
+        ZindexDefault = zbase
+        ZindexAlt = zalt
+        ZindexDistance = depth
+        if (type == 0) {
+            changestate(Stoned_Ass_Lift)
+        }
+        else if (type == 1) {
+            changestate(Chinese_Guard)
+        }
+        else if (type == 2) {
+            changestate(Stoned_Ass_Walk)
+        }
+    }
+}
+
+state Stoned_Ass_Lift { // 13
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        roty = AssYaw
+        statusb = FLAG_COLLIDABLE
+        SetScale(1.3S)
+        animframe = (52 * AssFrameOffset) >> 8 << 8
+        setanim(STONED_ASS_LIFT)
+        playframes(STONED_ASS_LIFT, animframe, 52.0)
+        do {
+            playanim(52, STONED_ASS_LIFT)
+            playanim(52, STONED_ASS_LIFT)
+            playanim(52, STONED_ASS_LIFT)
+            playanim(52, STONED_ASS_LIFT)
+            soundpitch(4.0)
+            soundplay([St1aA], 1V)
+            playframes(STONED_ASS_LIFT, 0.0, 52.0)
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Kill, e == EventHitInvincible)
+    }
+    trans {
+        sendevent(Event24, collider, 100.0)
+        if (eventaccepted) {
+            soundpitch(4.0)
+            soundplay([St3aA], 1V)
+        }
+        if (CAMTRANSZ - z >= ZindexDistance) {
+            zindex = ZindexAlt
+        }
+        else {
+            zindex = ZindexDefault
+        }
+    }
+}
+
+state Chinese_Guard { // 14
+    stateflag 0x1
+    statusc 0x0
+    event => state Stoned_Ass_Lift
+    code() {
+        roty = AssYaw
+        statusb = FLAG_COLLIDABLE
+        zindex = 26
+        do {
+            if (distance(player, DIST_NO_Y) <= 13m) {
+                soundpitch(4.0)
+                sounddelay(10)
+                soundplay([St4aA], 1V)
+                playframes(GUARD_DEFEND, 0.0, 33.0)
+                sleep()
+            }
+            playanim(0, GUARD_DEFEND)
+        } while (1)
+    }
+    trans {
+        if (CAMTRANSZ - z >= ZindexDistance) {
+            zindex = ZindexAlt
+        }
+        else {
+            zindex = ZindexDefault
+        }
+        unless (STATUS_FIRSTFRAME) {
+            sendevent(Event24, collider, 100.0)
+            if (eventaccepted) {
+                soundpitch(4.0)
+                soundplay([St3aA], 1V)
+            }
+        }
+    }
+}
+
+state Stoned_Ass_Walk { // 15
+    stateflag 0x1
+    statusc 0x0
+    event => state Stoned_Ass_Lift
+    code() {
+        roty = AssYaw 
+        statusb = FLAG_COLLIDABLE
+        zindex = 26
+        do {
+            soundpitch(4.0)
+            soundplay([St1aA], 1V)
+            playframes(STONED_ASS_WALK, 0.0, 49.0)
+        } while (1)
+    }
+    trans {
+        if (CAMTRANSZ - z >= ZindexDistance) {
+            zindex = ZindexAlt
+        }
+        else {
+            zindex = ZindexDefault
+        }
+        unless (STATUS_FIRSTFRAME) {
+            sendevent(Event24, collider, 100.0)
+            if (eventaccepted) {
+                soundpitch(4.0)
+                soundplay([St3aA], 1V)
+            }
+        }
+    }
+}
+
+state Kill { // 16
+    stateflag 0x1
+    statusc 0x0
+    code() {}
+}

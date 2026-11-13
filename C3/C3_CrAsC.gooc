@@ -1,0 +1,124 @@
+#gool CrAsC 49 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_CrAsC.gooc" "C3\Out\C3_CrAsC.nsentry"
+
+#anim CROW_TOWER [CA1dV] [CA1dG] 01 1 2
+#anim CROW_REEL  [CD1dV] [CD1dG] 31 1 2
+#anim CROW_CAST  [CD2dV] [CD1dG] 19 1 2
+
+#spawn S_CROW_ASS  Tower_Control
+#spawn S_ANCHOR    Anchor_Init
+
+var PlayerDistance
+
+expr SpinSpeed = troty
+expr ReelTargetFrame = trotz
+
+state Tower_Control { // 0
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        zindex = 48
+        spawn(CrAsC, S_ANCHOR)
+        do {
+            PlayerDistance = distance(player, DIST_NO_Y)
+            if (PlayerDistance > 90m) {
+                animseq = 0
+                playframe(0)
+            }
+            else if (PlayerDistance > 50m) {
+                scalez = (((90m - PlayerDistance) >> 8) << 12) / 0x2EE0
+                scalex = scalez
+                vfx &= 0xFFFF00FF
+                playanim(0, CROW_TOWER)
+            }
+            else if (PlayerDistance > 10m) {
+                vfx &= 0xFFFF00FF
+                playanim(0, CROW_TOWER)
+            }
+            else {
+                vfx = (vfx & 0xFFFF00FF) | 0x1A00
+                playanim(0, CROW_TOWER)
+            }
+        } while (1)
+    }
+}
+
+state Anchor_Init { // 1
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        changestate(Anchor_Active)
+    }
+}
+
+state Anchor_Active { // 2
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        goto WaitForPlayer
+        UpdateAnchor :
+        if (PlayerDistance > 55m) {
+            playframesback(CROW_CAST, 18.0, 0.0)
+        }
+        else {
+            if (animseq != getanim(CROW_REEL)) {
+                setanim(CROW_REEL, 0)
+            }
+            if (PlayerDistance < 15m) {
+                animframe = seek(animframe, ((PlayerDistance - 3.5m) * 30) / 0x578, 1.0)
+            }
+            else {
+                if (!rand(3) && !time(12)) {
+                    ReelTargetFrame = rand(31) << 8
+                }
+                animframe = seek(animframe, ReelTargetFrame, 1.0)
+            }
+            if (animframe < 0) {
+                animframe = 0
+            }
+            else if (animframe > 30.0) {
+                animframe = 30.0
+            }
+            playframe()
+            goto UpdateAnchor
+        }
+        WaitForPlayer :
+        while (PlayerDistance > 55m) {
+            playnull()
+        }
+        SoundPitchDefault(0.25)
+        sounddecay(6.4s)
+        soundplay([CD2dA], 1V)
+        playframes(CROW_CAST, 0.0, 18.0)
+        goto UpdateAnchor
+    }
+    trans {
+        getvert(vtrans, parent, 0.0)
+        PlayerDistance = parent -> PlayerDistance
+        SpinSpeed = 180deg + (((7m - PlayerDistance) >> 8) * 200deg) / 0xAF0
+        if (SpinSpeed > 380deg) {
+            SpinSpeed = 380deg
+        }
+        else if (SpinSpeed < 180deg) {
+            SpinSpeed = 180deg
+        }
+        roty = spd(roty, SpinSpeed)
+        getvert(vvec, self, 0.0)
+        if (distance(vecx, player, DIST_NO_Y) < 1.5m) {
+            sendevent(EventHit, player, roty + 90deg)
+            if (eventaccepted) {
+                SoundPitchDefault()
+                sounddecay(6.4s)
+                soundplay([CD3dA], 1V)
+            }
+        }
+        if (!time(45)) {
+            SoundPitchDefault(0.293)
+            sounddecay(6.4s)
+            soundplay([CD1dA], 1V)
+        }
+        zindex = (sin(90deg - abs(degdist(CAMROTY, roty))) >> 7) + 24
+    }
+}

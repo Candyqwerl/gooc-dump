@@ -1,0 +1,310 @@
+#gool PorcC 27 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C2_ShadC.gooh"
+//gooc -c 2 -r pal "C2\C2_PorcC.gooc" "C2\Out\C2_PorcC.nsentry"
+
+#anim PORCUPINE_WALK       [Po1eV] 20 1
+#anim PORCUPINE_SPIKE      [Po2eV] 16 1
+#anim PORCUPINE_SPIKE_WALK [Po3eV] 11 1
+#anim PORCUPINE_WAIT       [Po4eV] 50 1
+
+#spawn S_PORCUPINE         Porcupine_Init
+#spawn S_PORCUPINE_SMART   Porcupine_Init
+
+event EventJumpedOn       => state Porcupine_Squash
+event EventHit            => state Porcupine_Squash
+event EventSpinHit        => state Porcupine_Fling
+event EventHitInvincible  => state Porcupine_Squash
+event EventFling          => state Porcupine_Squash
+event EventSlideHit       => state Porcupine_Fling
+event EventSlamHit        => state Porcupine_Squash
+
+var BasePathSpeed, PathSpeed, Waddle, PorcupineVar4, ProcupineTrackOffset, PorcupineVar6, PorcupineVar7, PorcupineVar8, PorcupineVar9,
+    PathStartX, PathStartZ, PathEndX, PathEndZ, PathTriggerDist, StartSpikeCycleCount,
+    TriggerMode, EntityID_1, EntityID_2
+
+expr PlayerWithinPathSpan = (((player -> x - PathStartX) >> 8) * ((PathEndX - PathStartX) >> 8) + ((player -> z - PathStartZ) >> 8) * ((PathEndZ - PathStartZ) >> 8)) >= PathTriggerDist
+                             && (((player -> x - PathEndX) >> 8) * ((PathStartX - PathEndX) >> 8) + ((player -> z - PathEndZ) >> 8) * ((PathStartZ - PathEndZ) >> 8)) >= PathTriggerDist
+
+inline sub SoundPorcupineRetract() {
+    sounddelay(0.35s)
+    sounddecay(6.4s)
+    soundpitch((12.8 + rand(3.2)) << 6 >> 8)
+    soundplay([PorGA], 0.2V)
+}
+
+inline sub SoundPorcupineSpike() {
+    sounddelay(0.35s)
+    sounddecay(6.4s)
+    soundpitch((16.0 + rand(3.2)) << 6 >> 8)
+    soundplay([PorGA], 0.2V)
+}
+
+state Porcupine_Init {
+    statusc 0x12
+    code(limit, speed, mode, dist, obj1, side, obj2, reflection) {
+        if (reflection) {
+            if (ZONEFLAGS & 0x800) {
+                spawn(9, 28, 1)
+            }
+            else {
+                vfx = (vfx & 0xFFFF00FF) | 0xC00
+            }
+        }
+        pathdist = limit
+        BasePathSpeed = speed
+        TriggerMode = mode
+        PathTriggerDist = dist
+        EntityID_1 = obj1
+        EntityID_2 = obj2
+        ProcupineTrackOffset = 0m
+        density = 0.15m
+        zindex = 30
+        Waddle = 0deg
+        spawn(ShadC, ShadC_S_SHADOW_STATIONARY, 1, 0, 1S, 10)
+        PorcupineVar4 = 10.0
+        SetScale(0.6S)
+        statusb = FLAG_ROT_Y | FLAG_TRACK_PATH_ROT | FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | FLAG_SOLID_ALL | 0x800 | 0x2000 | 0x20000000
+        if (!side) {
+            var start_dist, end_dist
+            calcpath(0, vvec)
+            PathStartX = vecx
+            PathStartZ = vecz
+            start_dist = distance(vecx, player, DIST_EXACT)
+            calcpath(pathlen - 1.0, vvec)
+            PathEndX = vecx
+            PathEndZ = vecz
+            end_dist = distance(vecx, player, DIST_EXACT)
+            pathprog = start_dist > end_dist ? 0 : pathlen - 1.0
+        }
+        else {
+            pathprog = side == 1.0 ? 0 : pathlen - 1.0
+        }
+        calcpath(pathprog)
+        roty = troty
+        if (!!TriggerMode) {
+            StartSpikeCycleCount = 1.0
+            if (entitygetstate(2)) {
+                changestate(Porcupine_Triggered)
+            }
+            else {
+                changestate(Porcupine_Wait)
+            }
+        }
+        StartSpikeCycleCount = 0
+        changestate(Porcupine_Retract)
+    }
+}
+
+state Porcupine_Wait {
+    stateflag 0x5
+    statusc 0
+    code() {
+        sleepframes(PORCUPINE_WAIT, 0.0, 49.0)
+    }
+    event(e, a) {
+        accevcstate(Porcupine_Triggered, e == EventTriggered)
+    }
+    trans {
+        once {
+            PathSpeed = BasePathSpeed
+            trotx = 180deg
+            yzapproach = 120deg
+        }
+        changestateif(Porcupine_Triggered, entitygetstate(2))
+        if (TriggerMode == 1.0) {
+            if (abs(player -> y - y) < 2m && PorcupineVar4 >= 90deg && !(STATUS_PATH_END)) {
+                changestateif(Porcupine_Spike, PlayerWithinPathSpan)
+            }
+        }
+        sendeventif(EventHit, collider, player -> statusa \ FLAG_GROUNDLAND, 100.0)
+    }
+}
+
+state Porcupine_Retract {
+    stateflag 0x5
+    statusc 0
+    code() {
+        if (animseq == getanim(PORCUPINE_SPIKE_WALK)) {
+            statusb &= ~FLAG_ROT_Y
+            SoundPorcupineRetract()
+            playframesback(PORCUPINE_SPIKE, 15.0, 0.0)
+            statusb |= FLAG_ROT_Y
+        }
+        sleepframes(PORCUPINE_WALK, 0.0, 19.0)
+    }
+    trans {
+        once {
+            PathSpeed = BasePathSpeed
+            trotx = 180deg
+            yzapproach = 120deg
+        }
+        if (abs(player -> y - y) < 2m && PorcupineVar4 >= 90deg && !(STATUS_PATH_END)) {
+            changestateif(Porcupine_Spike, abs(degdist(roty, atan2(player -> trans))) < 30deg && distance(player, DIST_NO_Y) < 5.5m)
+        }
+        PorcupinePathTrack()
+    }
+}
+
+sub PorcupinePathTrack() {
+    if (STATUS_PATH_END) {
+        if (STATUS_REACHED_TROT) {
+            trotx = 180deg
+            statusb |= 0x20000000
+            statusa &= ~FLAG_PATH_END
+        }
+    }
+    else {
+        if (animseq == getanim(PORCUPINE_WALK) || animseq == getanim(PORCUPINE_SPIKE_WALK)) {
+            calcpath(loopseek(pathprog, pathlen + spd(PathSpeed) - 1.0, spd(PathSpeed)))
+        }
+        else {
+            calcpath(abs(pathprog))
+        }
+        {
+            var v1 = 0
+            var deg_to_player = 0deg
+            var pathrot = troty
+            save (troty, statusa, statusb, x, y, z, pathprog) {
+                statusb = FLAG_PATH_CALCS | FLAG_TRACK_PATH_SIGN
+                x = player -> x
+                y = player -> y
+                z = player -> z
+                calcpath(0)
+                v1 = troty
+                troty += 90deg
+                setvel(ProcupineTrackOffset)
+            }
+            x += velx
+            z += velz
+            if (abs(ProcupineTrackOffset - vecy) > 0.1m) {
+                deg_to_player = degdist(troty, atan2(player -> trans))
+                if (abs(deg_to_player) < 60deg) {
+                    if (deg_to_player < -45deg) {
+                        deg_to_player = -45deg
+                    }
+                    else if (deg_to_player > 45deg) {
+                        deg_to_player = 45deg
+                    }
+                    troty += deg_to_player
+                }
+            }
+            ProcupineTrackOffset = seek(ProcupineTrackOffset, vecy, spd(2m))
+            if (ProcupineTrackOffset < -pathdist) {
+                troty = pathrot
+                ProcupineTrackOffset = -pathdist
+            }
+            else if (ProcupineTrackOffset > pathdist) {
+                troty = pathrot
+                ProcupineTrackOffset = pathdist
+            }
+        }
+        troty += loopseek(Waddle, 4deg, 0.1s) - 2deg
+        if (STATUS_PATH_END) {
+            PorcupineVar4 += 1.0
+            trotx = 720deg
+            statusb &= ~0x20000000
+        }
+    }
+    if (animseq == getanim(PORCUPINE_SPIKE_WALK)) {
+        sendeventif(Event24, collider, player -> statusa \ FLAG_GROUNDLAND, 100.0)
+    }
+    else {
+        sendeventif(EventHit, collider, player -> statusa \ FLAG_GROUNDLAND, 100.0)
+    }
+}
+
+state Porcupine_Triggered {
+    stateflag 0x5
+    statusc 0
+    code() {
+        if (TriggerMode == 2.0) {
+            entitysetstate(1)
+            TriggerMode = 1.0
+        }
+        if (EntityID_1) {
+            interrupter = objectget(EntityID_1)
+            if (interrupter) {
+                sendevent(EventHit, interrupter)
+            }
+            else {
+                entitysetstate(EntityID_1, 1)
+            }
+        }
+        if (EntityID_2) {
+            interrupter = objectget(EntityID_2)
+            if (interrupter) {
+                sendevent(EventHit, interrupter)
+            }
+            else {
+                entitysetstate(EntityID_2, 1)
+            }
+        }
+        changestate(Porcupine_Spike)
+    }
+}
+
+state Porcupine_Spike {
+    stateflag 0x5
+    statusc 0
+    code() {
+        SoundPorcupineSpike()
+        playframes(PORCUPINE_SPIKE, 0.0, 15.0)
+        setevent(PorcupineEvent)
+        sleepframes(PORCUPINE_SPIKE_WALK, 0.0, 10.0)
+    }
+    trans {
+        once {
+            PathSpeed = BasePathSpeed << 1
+            PorcupineVar4 = StartSpikeCycleCount
+            StartSpikeCycleCount = 0
+            trotx = 180deg
+            yzapproach = 120deg
+        }
+        changestateif(Porcupine_Retract, PorcupineVar4 >= 3.0)
+        PorcupinePathTrack()
+    }
+}
+
+sub PorcupineEvent(e, a) {
+    rejevret(e == EventJumpedOn || e == EventSlamHit || e == EventSpinHit || e == EventSlideHit)
+}
+
+state Porcupine_Squash {
+    stateflag 0x21
+    statusc 0x32
+    code(h) {
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        playframe()
+    }
+}
+
+sub SetParticleColor() {
+    if (var r = rand(3); r == 0) {
+        SetColor1(0xBD, 0x96, 0x74)
+    }
+    else if (r == 1) {
+        SetColor1(0xFF, 0xD2, 0xA2)
+    }
+    else if (r == 2) {
+        SetColor1(0x3E, 0x32, 0x26)
+    }
+}
+
+state Porcupine_Fling {
+    stateflag 0x30
+    statusc 0x12
+    code(h) {
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir()
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    } 
+    trans {
+        EnemyFlingTrans(2m, EventFling)
+    }
+}

@@ -1,0 +1,52 @@
+#gool DonOC 51 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_DonOC.gooc" "C3\Out\C3_DonOC.nsentry"
+
+#sprite LIGHT [Cr10T]
+#tex 0xFFFFFF 0 2 2 9 800 32 32 32
+
+#spawn S_DONE  Done_Object
+
+state Done_Object { // 0
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        changestateif(Die, DEBUG || GLOBAL_95 == 42)
+        playnull()
+        playnull()
+        playnull()
+        GLOBAL_80 = 0
+        miscfunc(0, player, 10, 15)
+        GAMEFLAGS |= 0x200000
+        statetime = frametime
+        do {
+            if (GLOBAL_95 == 42) {
+                GAMEFLAGS &= ~0x200000
+                changestate(Die)
+            }
+            playnull()
+        } until (frametime - statetime >= 8s)
+        player = -0x7FF00004
+        do {
+            player -> self = rand(0x3A436)
+            player -= 4
+        } while (1)
+    }
+}
+
+state Die { // 1
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        KillEntity()
+        sendevent(Event14, parent, self)
+        playnull()
+    }
+}
+
+state Kill { // 2
+    stateflag 0x1
+    statusc 0x0
+    code() {}
+}

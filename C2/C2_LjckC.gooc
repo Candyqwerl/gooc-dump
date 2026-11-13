@@ -1,0 +1,203 @@
+#gool LJckC 45 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 2 -r pal "C2\C2_LjckC.gooc" "C2\Out\C2_LjckC.nsentry"
+
+#anim LABJACK_WALK    [LJ1lV] 18 1
+#anim LABJACK_SMASH   [LJ3lV] 31 0
+
+#spawn S_LABJACK_OLD  Lab_Jack_Init
+#spawn S_LABJACK      Lab_Jack_Init
+
+event EventJumpedOn      => state LabJack_Squash
+event EventHit           => state LabJack_Squash
+event EventSpinHit       => state LabJack_Fling
+event EventHitInvincible => state LabJack_Squash
+event EventFling         => state LabJack_Fling
+event EventSlideHit      => state LabJack_Fling
+event EventSlamHit       => state LabJack_Squash
+
+var PathSpeed, LabJackVar2, TrackOffset, LabJackVar4, WaitingForPlayerInPathSpan, PathStartX, PathStartZ, PathEndX, PathEndZ, LabJackVar10
+
+expr PlayerWithinPathSpan =
+    (((player -> x - PathStartX) >> 8) * ((PathEndX - PathStartX) >> 8) + ((player -> z - PathStartZ) >> 8) * ((PathEndZ - PathStartZ) >> 8)) >= 0 &&
+    (((player -> x - PathEndX) >> 8) * ((PathStartX - PathEndX) >> 8) + ((player -> z - PathEndZ) >> 8) * ((PathStartZ - PathEndZ) >> 8)) >= 0
+
+state Lab_Jack_Init { // 0
+    code(speed, arg, wait) {
+        zindex = 24
+        WaitingForPlayerInPathSpan = wait
+        save (vecx, vecy, vecz) {
+            calcpath(pathlen - 1.0, vvec)
+            PathEndX = vecx
+            PathEndZ = vecz
+            calcpath(0, vvec)
+            PathStartX = vecx
+            PathStartZ = vecz
+        }
+        PathSpeed = speed
+        LabJackVar2 = arg * 1s / 1.2s
+        statusb = FLAG_ROT_Y | FLAG_TRACK_PATH_ROT | FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | 0x800 | 0x2000 | FLAG_SOLID_SIDES | 0x20000000
+        trotx = 180deg
+        yzapproach = 120deg
+        density = 0.1m
+        pathdist = 2m
+        TrackOffset = 0
+        LabJackVar4 = 1m
+        changestate(LabJack_Active)
+    }
+}
+
+state LabJack_Active { // 1
+    statusc 0
+    event => state LabJack_Attack
+    code() {
+        while (WaitingForPlayerInPathSpan) {
+            playanim(0, LABJACK_WALK)
+        }
+        do {
+            do (var start = frametime) {
+                if (animseq != getanim(LABJACK_WALK)) {
+                    setanim(LABJACK_WALK, -1.0)
+                }
+                playframe((animframe + 1.0) % 18.0)
+            } while (frametime - start < 2s)
+        } while (1)
+    }
+    trans {
+        if (!WaitingForPlayerInPathSpan || PlayerWithinPathSpan) {
+            WaitingForPlayerInPathSpan = 0
+            trotx = 720deg
+            if (pathprog >= 0) {
+                pathprog = seek(pathprog, pathlen - 1.0, spd(PathSpeed))
+            }
+            else {
+                pathprog = seek(pathprog, 0, spd(PathSpeed))
+            }
+            calcpath(abs(pathprog))
+            {
+                var v1 = 0
+                var deg_to_player = 0deg
+                var pathrot = troty
+                save (troty, statusa, statusb, x, y, z, pathprog) {
+                    statusb = FLAG_PATH_CALCS | FLAG_TRACK_PATH_SIGN
+                    x = player -> x
+                    y = player -> y
+                    z = player -> z
+                    calcpath(0)
+                    stalltime = troty
+                    troty += 90deg
+                    setvel(TrackOffset, vvel)
+                }
+                x += velx
+                z += velz
+                if (abs(TrackOffset - vecy) > 0.1m) {
+                    deg_to_player = degdist(troty, atan2(player -> trans))
+                    troty += deg_to_player
+                }
+                TrackOffset = seek(TrackOffset, vecy, spd(4m))
+                if (TrackOffset < -pathdist) {
+                    TrackOffset = -pathdist
+                }
+                else if (TrackOffset > pathdist) {
+                    TrackOffset = pathdist
+                }
+            }
+            troty = atan2(player -> trans)
+            if (abs(degdist(stalltime, troty)) < 90deg) {
+                pathprog = abs(pathprog)
+            }
+            else {
+                pathprog = -abs(pathprog)
+            }
+            var0 = 0
+            changestateif(LabJack_Attack, distance(player, DIST_NO_Y) < 2.4m && (!(player -> stateflag & 0x20) && !player -> invincible))
+        }
+        sendevent(EventHit, collider, 100.0)
+    }
+}
+
+state LabJack_Wait { // 2
+    statusc 0
+    code() {
+        do {
+            if (animseq != getanim(LABJACK_WALK)) {
+                setanim(LABJACK_WALK, -1.0)
+            }
+            playframe((animframe + 1.0) % 18.0)
+        } while (1)
+    }
+    trans {
+        changestateif(LabJack_Active, roty != troty)
+        sendevent(EventHit, collider, 100.0)
+    }
+}
+
+state LabJack_Attack { // 3
+    statusc 0
+    code() {
+        playframes(LABJACK_SMASH, 2.0, 0.0, 12.0)
+        if (!SHAKEY) {
+            SHAKEY = 6.0
+        }
+        playanim(13, LABJACK_SMASH)
+        SoundPitchDefault(0.203)
+        soundplay([CsmsA], 0.75V)
+        sendeventif(Event14, player, distance(player) < 2.5m && abs(degdist(roty, atan2(player -> trans))) < 80deg, 100.0)
+        playframes(LABJACK_SMASH, 2.0, 13.0, 30.0)
+        do {
+            playanim(8, LABJACK_WALK)
+        } while (player -> stateflag & 0x20)
+        changestate(LabJack_Active)
+    }
+    event(e, a) {
+        rejevret(e == EventHitInvincible && player -> stateflag & 0x20000000)
+    }
+    trans {
+        sendevent(EventHit, collider, 100.0)
+        troty = atan2(player -> trans)
+    }
+}
+
+state LabJack_Squash { // 4
+    stateflag 0x32
+    statusc 0x12
+    code(h) {
+        statusb &= ~(FLAG_ROT_Y | 0x2000)
+        spawn(9, 10, 1, 0, getins(SetParticleColor), 0)
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        playframe()
+    }
+    trans {
+        roty += 60deg
+    }
+}
+
+sub SetParticleColor() {
+    if (var r = rand(3); r == 0) {
+        SetColor1(40, 0x83, 0x52)
+    }
+    else if (r == 1) {
+        SetColor1(0xE1, 0xD6, 0xBC)
+    }
+    else if (r == 2) {
+        SetColor1(0x80, 19, 0x00)
+    }
+}
+
+state LabJack_Fling { // 5
+    stateflag 0x30
+    statusc 0x12
+    code(h) {
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir()
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    }
+    trans {
+        EnemyFlingTrans(2m, EventFling)
+    }
+}
+

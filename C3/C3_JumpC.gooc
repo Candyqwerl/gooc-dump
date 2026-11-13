@@ -1,0 +1,162 @@
+#gool JumpC 79 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_JumpC.gooc" "C3\Out\C3_JumpC.nsentry"
+
+#anim JUMPER_JUMP[Ju1rV] [Ju1rG] 80 1 2
+#anim JUMPER_MOVE[Ju2rV] [Ju1rG] 27 1 2
+
+#spawn S_JUMPER Jumper_Init
+
+event EventJumpedOn      => state Jumper_Squash
+event EventHit           => state Jumper_Squash
+event EventSpinHit       => state Jumper_Fling
+event EventHitInvincible => state Jumper_Squash
+event EventFling         => state Jumper_Fling
+event EventSlideHit      => state Jumper_Fling
+event EventSlamHit       => state Jumper_Squash
+
+var ReturnDuration, JumpTravelDuration, CycleLength, CycleOffset, CycleTime, PhaseTime, PathPoint, JumpYOffset, JumperVar9
+
+inline sub SpawnReflection() {
+    if (ZONEFLAGS & 0x800) {
+        spawn(77, 11, 1) // FutOC-11
+    }
+}
+
+state Jumper_Init {
+    code(cycleoffs, arg, returndur){
+        JumperVar9 = arg
+        ReturnDuration = returndur * 1s / 1.2s
+        if (ReturnDuration) {
+            JumpTravelDuration = (4.3s * (pathlen - 1.0) >> 8) - 40
+            CycleLength = JumpTravelDuration + (ReturnDuration + 27)
+        }
+        else {
+            JumpTravelDuration = 4.3s * (pathlen - 1.0) >> 8
+            CycleLength = JumpTravelDuration
+        }
+        CycleOffset = cycleoffs * 1s / 1.2s
+        statusb = FLAG_ROT_Y | FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        trotx = 720deg
+        SetZindexField(32)
+        SpawnReflection()
+        changestate(Jumper)
+    }
+}
+
+state Jumper {
+    code() {
+        do {
+            CycleTime = time(CycleLength, CycleOffset)
+            statusb &= ~FLAG_ROT_Y
+            if (CycleTime < JumpTravelDuration) {
+                statusb |= FLAG_ROT_Y
+                PhaseTime = CycleTime % 4.3s
+                PathPoint = CycleTime / 4.3s
+                JumpYOffset = 0
+                if (PhaseTime >= 27) {
+                    pathprog = (PathPoint << 8) + 1.0
+                    setanim(JUMPER_JUMP)
+                    animframe = (PhaseTime - 27) << 8
+                }
+                else {
+                    pathprog = (PathPoint << 8) + ((PhaseTime << 8) / 27)
+                    setanim(JUMPER_MOVE)
+                    animframe = PhaseTime << 8
+                    PhaseTime -= 13
+                }
+                calcpath(pathprog)
+                y += JumpYOffset
+                playframe()
+            }
+            else {
+                PhaseTime = CycleTime - JumpTravelDuration
+                statusb |= FLAG_ROT_Y
+                if (PhaseTime < ReturnDuration) {
+                    calcpath(0, vvec)
+                    calcpath(pathlen - 1.0)
+                    x += ((vecx - x) * PhaseTime) / ReturnDuration
+                    y += ((vecy - y) * PhaseTime) / ReturnDuration
+                    z += ((vecz - z) * PhaseTime) / ReturnDuration
+                    setanim(JUMPER_JUMP)
+                    playframe(40.0 + ((PhaseTime % 13) << 8))
+                }
+                else {
+                    setanim(JUMPER_JUMP)
+                    playframe(53.0 + ((PhaseTime - ReturnDuration) << 8))
+                }
+            }
+            if (animseq == getanim(JUMPER_MOVE) || (animseq == getanim(JUMPER_JUMP) && (animframe < 27.0 || animframe >= 53.0))) {
+                roty = atan2(player -> trans)
+            }
+            else {
+                roty = 0
+            }
+            if (animseq == getanim(JUMPER_JUMP) && animframe >= 15.0 && animframe < 69.0) {
+                if (animframe == 15.0) {
+                    soundpitch(0x343)
+                    soundsetup(7, self, 8)
+                    sounddecay(0xC7)
+                    soundplay([Ju1rA], 1V)
+                    soundpitch(0x173)
+                    sounddelay(10)
+                    soundcount(2)
+                    sounddecay(0xC8)
+                    soundsetup(6, self, 8)
+                    soundplay([Ju3rA], 1V)
+                }
+                if (animframe == 61.0) {
+                    soundpitch(0x343)
+                    soundsetup(7, self, 8)
+                    sounddecay(0xC7)
+                    soundplay([Ju2rA], 1V)
+                }
+                sendevent(Event86, collider, 100.0)
+            }
+            else {
+                sendevent(EventHit, collider, 100.0)
+            }
+        } while (1)
+    }
+}
+
+state Jumper_Fling {
+    stateflag 0x30
+    statusc 0x32
+    code(h) {
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir(0x80000)
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    } 
+    trans {
+        EnemyFlingTrans(2m, EventFling)
+    }
+}
+
+state Jumper_Squash {
+    stateflag 0x23
+    statusc 0x32
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        playframe()
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        playframe()
+    }
+}
+
+sub SetParticleColor() {
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x05, 0xBD, 0xBE)
+    }
+    else if (r == 1) {
+        SetColor1(0x0D, 0x4C, 0x4C)
+    }
+    else if (r == 2) {
+        SetColor1(0xE7, 0x85, 0x81)
+    }
+}

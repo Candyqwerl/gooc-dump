@@ -1,0 +1,650 @@
+#gool SarOC 57 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_SarOC.gooc" "C3\Out\C3_SarOC.nsentry"
+
+#anim SARCOPHAGASS_WALK    [Sa1iV] [Sa1iG] 24 1 2
+#anim SARCOPHAGASS_BREAK   [Sa2iV] [Sa2iG] 12 1 2
+#anim SARCOPHAGASS_CRUSH   [Sa3iV] [Sa3iG] 22 1 2
+#anim MUMMY_WALK           [Mu1iV] [Mu1iG] 54 1 2
+#anim MUMMY_GRAB           [Mu2iV] [Mu1iG] 24 1 2
+#anim MUMMY_SHAKE          [Mu3iV] [Mu1iG] 12 1 2
+
+#spawn S_SARCOPHAGASS   Sarcophagass_Init
+#spawn S_BREAK_ANIM     Sarcophagass_Break_Anim
+#spawn S_MUMMY          Mummy
+
+event Event19 => sub KillVoice
+event Event26 => sub KillVoice
+
+var PathMinZ, PathMaxZ, InversePath, MummyTargetPlayer, MummyTargetX, MummyTargetZ, EnemyFlags, ZBias, MummyFallBaseY, TrackSpeed,
+    TrackOffset, PathBaseX, PathBaseY, PathBaseZ, PathAngle, ZindexNear, ZindexFar, ZindexDistance
+
+expr HalfCycleLength = field_61
+expr CycleLength     = groundvel
+expr CycleOffset     = groundtime
+expr TrackLimit      = field_60
+expr TrackOffsetX    = field_63
+expr TrackOffsetZ    = stalltime
+expr Returning       = invincibletime
+expr PlayerInRange   = misc
+
+state Sarcophagass_Init { // 0
+    statusc 0
+    code(cyclelen, cycleoffs, limit, flags, speed, override, near, far, range) {
+        HalfCycleLength = cyclelen * 1s / 1.2s
+        CycleLength = HalfCycleLength << 1
+        CycleOffset = cycleoffs
+        TrackLimit = limit
+        EnemyFlags = flags
+        TrackSpeed = speed
+        ZindexNear = near
+        ZindexFar = far
+        ZindexDistance = range
+        zindex = ZindexNear
+        if (override >= 0) {
+            TrackSpeed = override
+        }
+        TrackSpeed /= 1s
+        statusb = FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | FLAG_SOLID_SIDES
+        SetScale(1.25S)
+        TrackOffsetX = 0
+        TrackOffsetZ = 0
+        TrackOffset = 0
+        ZBias = 0
+        velz = 0
+        calcpath(0, vvec)
+        PathMinZ = vecz
+        PathBaseX = vecx
+        PathBaseY = vecy
+        PathBaseZ = vecz
+        calcpath(pathlen - 1, vtrans)
+        PathMaxZ = z
+        PathAngle = atan2(self, vecx) + 180deg
+        InversePath = 0
+        if (PathMinZ > PathMaxZ) {
+            InversePath = 1
+            var0 = PathMinZ
+            PathMinZ = PathMaxZ
+            PathMaxZ = var0
+        }
+        if (entitygetstate(2)) {
+            roty = atan2(player -> trans)
+            troty = roty
+            setanim(MUMMY_WALK, 0)
+            spawn = S_MUMMY
+            changestate(Mummy_Walk)
+        }
+        else {
+            var cycletime = time(CycleLength, CycleOffset)
+            if (cycletime >= HalfCycleLength) {
+                Returning = 1
+                cycletime -= HalfCycleLength
+                pathprog = (pathlen - 1) - ((cycletime * pathlen) / HalfCycleLength)
+            }
+            else {
+                pathprog = cycletime * pathlen / HalfCycleLength
+            }
+            calcpath(pathprog)
+            field_62 = troty
+            roty = troty
+            changestate(Sarcophagass_Walk)
+        }
+    }
+}
+
+inline sub SetZindex() {
+    if (CAMTRANSZ - z >= ZindexDistance) {
+        zindex = ZindexFar
+    }
+    else {
+        zindex = ZindexNear
+    }
+}
+
+state Sarcophagass_Walk { // 1
+    statusc 0
+    code() {
+        setanim(SARCOPHAGASS_WALK)
+        do {
+            setanim(SARCOPHAGASS_WALK, -1.0)
+            do {
+                animframe += 1.0
+                if (animframe == 0 || animframe == 12.0) {
+                    spawn(9, 21, 1, 0, 0, 0, 0, 1.2S, 0, 24, 2)
+                    SoundPitchDefault()
+                    soundsetup(6, self, 8)
+                    soundplay([Mu2iA], 1V)
+                }
+                playframe()
+            } while (animframe + 1.0 <= 23.0)
+        } while (1)
+    }
+    event(e, a) {
+        accevif (e == EventJumpedOn || e == EventSlamHit || e == EventHit || e == EventFling || e == EventHitInvincible || e == EventSpinHit || e == EventSlideHit) {
+            if (ZBias >= 0) {
+                velz = 14m
+            }
+            else {
+                velz = -14m
+            }
+        }
+        accevcstate(Sarcophagass_Broken, e == EventHit || e == EventHitInvincible || e == EventFling)
+        accevcstate(Sarcophagass_Break, e == EventJumpedOn || e == EventSlamHit)
+        accevcstate(Sarcophagass_Break, e == EventSpinHit || e == EventSlideHit)
+    }
+    trans {
+        once {
+            statusb = FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | FLAG_SOLID_SIDES
+        }
+        sendevent(EventHit, collider, 100.0)
+        changestateif(Sarcophagass_Crush, eventaccepted)
+        var cycletime = time(CycleLength, CycleOffset)
+        Returning = 0
+        if (cycletime >= HalfCycleLength) {
+            Returning = 1
+            cycletime -= HalfCycleLength
+            pathprog = (pathlen - 1) - ((cycletime * pathlen) / HalfCycleLength)
+        }
+        else {
+            pathprog = cycletime * pathlen / HalfCycleLength
+        }
+        calcpath(pathprog, vvec)
+        y = vecy
+        if (Returning) {
+            troty = (troty + 180deg) % 360deg
+        }
+        if (TrackLimit && Returning) {
+            var yc, ys, lx, lz
+            yc = cos(-PathAngle)
+            ys = sin(-PathAngle)
+            velx = player -> x - PathBaseX
+            velz = player -> z - PathBaseZ
+            lx = ((velz >> 8) * ys) + ((velx >> 8) * yc) >> 4
+            velx = vecx - PathBaseX
+            velz = vecz - PathBaseZ
+            lz = ((velz >> 8) * yc) - ((velx >> 8) * ys) >> 4
+            if (abs(lx) > TrackLimit) {
+                if (lx >= 0) {
+                    lx = TrackLimit
+                }
+                else {
+                    lx = -TrackLimit
+                }
+            }
+            velx = lx - TrackOffset >> 4
+            if (velx > TrackSpeed) {
+                velx = TrackSpeed
+            }
+            if (velx < -TrackSpeed) {
+                velx = -TrackSpeed
+            }
+            lx = TrackOffset + velx
+            TrackOffset = lx
+            yc = cos(PathAngle)
+            ys = sin(PathAngle)
+            velz = ((lz >> 8) * yc) - ((lx >> 8) * ys) >> 4
+            velx = ((lz >> 8) * ys) + ((lx >> 8) * yc) >> 4
+            x = PathBaseX + velx
+            z = PathBaseZ + velz
+            TrackOffsetX = x - vecx
+            TrackOffsetZ = z - vecz
+            troty += degdist(troty, atan2(player -> trans)) >> 1 // Bugged in C2
+        }
+        else {
+            x = vecx + TrackOffsetX
+            z = vecz + TrackOffsetZ
+        }
+        if (z >= player -> z) {
+            ZBias += 1
+            if (ZBias > 6) {
+                ZBias = 6
+            }
+        }
+        else {
+            ZBias -= 1
+            if (ZBias < -6) {
+                ZBias = -6
+            }
+        }
+        var0 = degdist(roty, troty) >> 2
+        if (var0 > 18.65deg) {
+            var0 = 18.65deg
+        }
+        if (var0 < -18.65deg) {
+            var0 = -18.65deg
+        }
+        roty = (roty + var0) % 360deg
+        if (EnemyFlags & 8) {
+            broadcastevent(EventHit, 4, 100.0)
+        }
+        SetZindex()
+    }
+}
+
+state Sarcophagass_Break { // 2
+    statusc 0
+    code() {
+        spawn(SarOC, S_BREAK_ANIM, 1)
+        entitysetstate(1)
+        spawn = S_MUMMY
+        changestate(Mummy_Walk_Start)
+    }
+}
+
+state Sarcophagass_Broken { // 3
+    statusc 0
+    code() {
+        spawn(SarOC, S_BREAK_ANIM, 1)
+        KillEntity()
+        statusb = 0
+        WaitChildNull()
+    }
+}
+
+inline sub CheckMummyGroundStatus() {
+    if (EnemyFlags & 1) {
+        var groundcheck = 0
+        if (EnemyFlags & 2 && z >= PathMinZ && z <= PathMaxZ) {
+            groundcheck = 1
+            vecy = PathBaseY
+        }
+        else {
+            save (y) {
+                y += 2m
+                projectzoneshadow(null)
+                if (eventaccepted && y - vecy < 6m) {
+                    groundcheck = 1
+                }
+            }
+        }
+        if (groundcheck) {
+            y += (vecy - y) >> 1
+        }
+        else {
+            changestateif(Mummy_Fall, EnemyFlags & 4)
+        }
+    }
+}
+
+state Mummy_Walk_Start { // 4
+    statusc 0
+    code() {
+        SoundPitchDefault()
+        soundplay([Mu4iA], 1V)
+        sleepframes(MUMMY_WALK, 0.0, 53.0)
+    }
+    trans {
+        z = spd(z, velz)
+        velz = seek(velz, 0m, 0.85m)
+        changestateifn(Mummy_Walk, velz)
+        CheckMummyGroundStatus()
+        if (EnemyFlags & 8) {
+            broadcastevent(EventHit, 4, 100.0)
+        }
+        SetZindex()
+        SoundMummyFootstep()
+    }
+}
+
+sub MummyWalkCycle() {
+    if (animseq == getanim(MUMMY_WALK)) {
+        playframes4(MUMMY_WALK, -1.0, 53.0)
+    }
+    do {
+        playframes(MUMMY_WALK, 0.0, 53.0)
+        unless (rand(2)) {
+            SoundPitchDefault()
+            soundplay([Mu4iA], 1V)
+        }
+    } while (1)
+}
+
+state Mummy_Walk { // 5
+    statusc 0
+    code => sub MummyWalkCycle
+    event(e, a) {
+        accevcstate(Mummy_Squash, e == EventJumpedOn
+            || e == EventSlamHit
+            || e == EventHit
+            || e == EventFling
+            || e == EventHitInvincible)
+        accevcstate(Mummy_Fling, e == EventSpinHit || e == EventSlideHit)
+    }
+    trans {
+        once {
+            statusb = FLAG_COLLIDABLE | FLAG_SOLID_SIDES
+            CheckPlayerInRange()
+            if (PlayerInRange) {
+                MummyTargetPlayer = 1
+                MummyTargetX = player -> x
+                MummyTargetZ = player -> z
+            }
+            else {
+                MummyTargetPlayer = 0
+                RandomizeMummyTarget()
+            }
+        }
+        if (animseq == getanim(MUMMY_WALK) && (animframe >= 0 && animframe <= 12.0)
+            || animseq == getanim(MUMMY_WALK) && (animframe >= 24.0 && animframe <= 37.0)) {
+                CheckPlayerInRange()
+                if (PlayerInRange) {
+                    MummyTargetPlayer = 1
+                    MummyTargetX = player -> x
+                    MummyTargetZ = player -> z
+                }
+                else if (MummyTargetPlayer) {
+                    MummyTargetPlayer = 0
+                    RandomizeMummyTarget()
+                }
+                velx = MummyTargetX - x
+                velz = MummyTargetZ - z
+                vecx = abs(velx)
+                vecz = abs(velz)
+                if (MummyTargetPlayer == 0 && vecx <= 0.12m && vecz <= 0.12m) {
+                    x = MummyTargetX
+                    z = MummyTargetZ
+                    RandomizeMummyTarget()
+                    velx = MummyTargetX - x
+                    velz = MummyTargetZ - z
+                    vecx = abs(velx)
+                    vecz = abs(velz)
+                }
+                troty = atan(velx, velz)
+                roty = degseek(roty, troty, 200deg)
+                {
+                    var max_step_x, max_step_z
+                    var0 = 48
+                    max_step_z = abs((var0 * cos(roty)) >> 4)
+                    max_step_x = abs((var0 * sin(roty)) >> 4)
+                    if (vecx >= vecz) {
+                        if (vecx > max_step_x) {
+                            velz = ((max_step_x >> 8) * (velz >> 8) / (vecx >> 8)) << 8
+                            if (velx >= 0) {
+                                velx = max_step_x
+                            }
+                            else {
+                                velx = -max_step_x
+                            }
+                            vecx = max_step_x
+                            vecz = abs(velz)
+                        }
+                    }
+                    else if (vecz > max_step_z) {
+                        velx = ((max_step_z >> 8) * (velx >> 8) / (vecz >> 8)) << 8
+                        if (velz >= 0) {
+                            velz = max_step_z
+                        }
+                        else {
+                            velz = -max_step_z
+                        }
+                        vecz = max_step_z
+                        vecx = abs(velx)
+                    }
+                }
+                x += velx
+                z += velz
+                CheckMummyGroundStatus()
+            }
+        if (EnemyFlags & 8) {
+            broadcastevent(EventHit, 4, 100.0)
+        }
+        if (z >= player -> z) {
+            ZBias += 1
+            if (ZBias > 6) {
+                ZBias = 6
+            }
+        }
+        else {
+            ZBias -= 1
+            if (ZBias < -6) {
+                ZBias = -6
+            }
+        }
+        sendevent(EventHit, collider, 100.0)
+        changestateif(Mummy_Grab, eventaccepted)
+        SetZindex()
+        SoundMummyFootstep()
+    }
+}
+
+sub SoundMummyFootstep() {
+    if (animseq == getanim(MUMMY_WALK) && (animframe == 12.0 || animframe == 37.0)) {
+        soundpitch((8.0 + rand(3.2)) * 0.205 >> 8)
+        soundplay([Mu2iA], 1V)
+    }
+}
+
+sub CheckPlayerInRange() {
+    PlayerInRange = 0
+    if (player -> z > PathMaxZ || player -> z < PathMinZ) {
+        return
+    }
+    save (vecx, vecy, vecz, pathprog) {
+        pathprog = ((player -> z - PathMinZ) >> 8) * (pathlen - 1) / ((PathMaxZ - PathMinZ) >> 8)
+        if (InversePath) {
+            pathprog = (pathlen - 1) - pathprog
+        }
+        calcpath(pathprog, vvec)
+        if (abs(player -> x - vecx) > TrackLimit) {
+            return
+        }
+    }
+    PlayerInRange = 1
+}
+
+sub RandomizeMummyTarget() {
+    var attempts = 4
+    do {
+        MummyTargetZ = rand(PathMaxZ - PathMinZ) + PathMinZ
+        if (attempts == 0 || abs(z - MummyTargetZ) >= 5m) {
+            break
+        }
+        attempts -= 1
+    } while (1)
+    save (vecx, vecy, vecz, pathprog) {
+        pathprog = (((MummyTargetZ - PathMinZ) >> 8) * (pathlen - 1)) / ((PathMaxZ - PathMinZ) >> 8)
+        if (InversePath) {
+            pathprog = (pathlen - 1) - pathprog
+        }
+        calcpath(pathprog, vvec)
+        attempts = 4
+        do {
+            MummyTargetX = (rand(TrackLimit << 1) + vecx) - TrackLimit
+            if (attempts == 0 || abs(x - MummyTargetX) >= 1m) {
+                break
+            }
+            attempts -= 1
+        } while (1)
+    }
+}
+
+state Mummy_Fall { // 6
+    statusc 0
+    code() {
+        SoundPitchDefault()
+        soundplay([Mu4iA], 1V)
+        MummyWalkCycle()
+    }
+    trans {
+        once {
+            KillEntity()
+            statusb = FLAG_COLLIDABLE | FLAG_SOLID_SIDES
+            MummyFallBaseY = y
+            zindex >>= 1
+            vely = 0
+        }
+        changestateif(Kill, MummyFallBaseY - y >= 20m)
+        save (y, z) {
+            y += 1m
+            z += 2m
+            projectzoneshadow(null)
+            if (eventaccepted && y - vecy <= 2m) {
+                velz = -3m
+            }
+            else {
+                z -= 4m
+                projectzoneshadow(null)
+                if (eventaccepted && y - vecy <= 2m) {
+                    velz = 3m
+                }
+            }
+        }
+        z = spd(z, velz)
+        velz = seek(velz, 0m, 0.85m)
+        vely -= 16.0
+        y += vely
+        if (EnemyFlags & 8) {
+            broadcastevent(EventHit, 4, 100.0)
+        }
+    }
+}
+
+state Sarcophagass_Break_Anim { // 7
+    statusc 0
+    code() {
+        soundpitch(3.265)
+        sounddecay(10s)
+        soundplay([Mu1iA], 1V)
+        soundsetup(0, voice, 5)
+        CopyCreatorScale()
+        zindex = creator -> zindex
+        playframes(SARCOPHAGASS_BREAK, 0.0, 11.0)
+    }
+}
+
+state Mummy_Fling { // 8
+    stateflag 0x30
+    statusc 0x32
+    code(h) {
+        EnemyFlingCombo(h)
+        if (ZBias >= 0) {
+            troty = 0deg
+        }
+        else {
+            troty = 180deg
+        }
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale(animframe)
+    }
+    trans {
+        unless (STATUS_FIRSTFRAME) {
+            EnemyFlingTransSendEv(2m, EventFling)
+            if (eventaccepted) {
+                health += 1.0
+            }
+            unless (ZONEFLAGS & 0x800) {
+                vecy = y - 1m
+                do {
+                    y = vecy + 1m
+                    projectzoneshadow(var0)
+                } until (!eventaccepted || y >= vecy + 1m)
+            }
+            scalex = seek(scalex, 0S, 1S / 30)
+            scaley -= 1S / 30
+            scalez -= 1S / 30
+            EnemyFlingAccel()
+        }
+    }
+}
+
+state Sarcophagass_Crush { // 9
+    stateflag 0x23
+    statusc 0x32
+    code() {
+        SoundPitchDefault()
+        soundplay([Mu4iA], 1V)
+        playframes(SARCOPHAGASS_CRUSH, 0.0, 21.0)
+        if (!SHAKEY) SHAKEY = 10.0;
+        soundpitch((8.0 + rand(3.2)) * 0.205 >> 8)
+        soundsetup(6, self, 8)
+        soundplay([Mu2iA], 1V)
+        soundpitch(3.265)
+        sounddecay(10s)
+        soundplay([Mu1iA], 1V)
+        sleep()
+    }
+    event(e, a) {
+        accevcstate(Sarcophagass_Broken, e == EventHitInvincible || e == EventHit)
+    }
+    trans {
+        nofirst {
+            x = seek(x, player -> x, spd(4m))
+            rotx = degseek(rotx, player -> rotx, 1000deg)
+            y = seek(y, player -> y, spd(4m))
+            roty = degseek(roty, player -> roty, 1000deg)
+            z = seek(z, player -> z, spd(4m))
+            rotz = degseek(rotz, player -> rotz, 1000deg)
+            zindex = seek(zindex, player -> zindex + 30, 1)
+            if (frametime - statetime >= 0.5s) {
+                tpc = 0
+            }
+        }
+    }
+}
+
+state Mummy_Grab { // 10
+    stateflag 0x23
+    statusc 0
+    code() {
+        scalex = abs(scalex)
+        statusb = FLAG_ROT_Y | FLAG_COLLIDABLE | 0x40000000
+        roty += 180deg
+        trotx = 720deg
+        troty = atan2(player -> trans) + 180deg
+        player -> x = x
+        player -> y = y
+        player -> z = z
+        player -> troty = troty
+        SoundPitchDefault()
+        soundplay([Mu4iA], 1V)
+        playframes(MUMMY_GRAB, 0.0, 23.0)
+        soundpitch((19.2 + rand(3.2)) * 0.205 >> 8)
+        soundplay([Mu4iA], 1V)
+        do {
+            zindex = player -> zindex
+            playframes(MUMMY_SHAKE, 0.0, 11.0)
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Mummy_Squash, e == EventHitInvincible || e == EventHit)
+    }
+}
+
+state Mummy_Squash { // 11
+    stateflag 0x23
+    statusc 0x32
+    code(h) {
+        EnemyDieCombo(h)
+        playframe()
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        playframe()
+    }
+}
+
+sub SetParticleColor() {
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x05, 0xBD, 0xBE)
+    }
+    else if (r == 1) {
+        SetColor1(0x0D, 0x4C, 0x4C)
+    }
+    else if (r == 2) {
+        SetColor1(0xE7, 0x85, 0x81)
+    }
+}
+
+
+state Kill { // 12
+    statusc 0
+    code() {}
+}
+
+sub KillVoice() {
+    voice = -1
+    soundfadet(0.3s, voice)
+    soundfadev(0V, voice, 3)
+    voice = -1
+    soundsetup(0, voice, 5)
+}

@@ -1,0 +1,240 @@
+#gool ArmaC 20 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C2_ShadC.gooh"
+//gooc -c 2 -r pal "C2\C2_ArmaC.gooc" "C2\Out\C2_ArmaC.nsentry"
+
+#iflev suv
+#anim ARMADILLO_1     [Ar1bV] 16 1
+#anim ARMADILLO_2     [Ar2bV] 16 1
+#anim ARMADILLO_3     [Ar3bV] 14 1
+#anim ARMADILLO_4     [Ar4bV] 23 1
+#else     
+#anim ARMADILLO_1     [Ar1lV] 16 1
+#anim ARMADILLO_2     [Ar2lV] 16 1
+#anim ARMADILLO_3     [Ar3lV] 14 1
+#anim ARMADILLO_4     [Ar4lV] 23 1
+#endif
+
+#spawn S_ARMADILLO_ARMOURED   Armadillo_Init
+#spawn S_ARMADILLO_NAKED      Armadillo_Init
+#spawn S_ARMOR_BREAK          Armour_Break
+
+var PathSpeed, Waddle, TrackOffset, HitCooldown
+
+state Armadillo_Init { // 0
+    statusc 0x12
+    code(limit, speed) {
+        pathdist = limit
+        PathSpeed = speed
+        health = 0
+        TrackOffset = 0m
+        density = 0.15m
+        zindex = 25
+        Waddle = 0deg
+        HitCooldown = 0s
+        spawn(ShadC, ShadC_S_SHADOW_STATIONARY, 1, 0m, 1S, 10)
+        statusb = FLAG_ROT_Y | FLAG_TRACK_PATH_ROT | FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | 0x800 | FLAG_SOLID_ALL | 0x2000 | 0x20000000
+        if (spawn == S_ARMADILLO_NAKED || entitygetstate(2)) {
+            health = 1.0
+        }
+        changestate(Armadillo_Walk)
+    }
+}
+
+state Armadillo_Walk { // 1
+    stateflag 0x5
+    statusc 0x0
+    trans => sub ArmadilloPathTrack
+    code() {
+        trotx = 180deg
+        yzapproach = 120deg
+        if (health) {
+            setevent(NakedEvents)
+            sleepframes(ARMADILLO_3, 0.0, 13.0)
+        }
+        else {
+            sleepframes(ARMADILLO_1, 0.0, 15.0)
+        }
+    }
+    event(e, a) {
+        if ((e == EventSpinHit || e == EventSlideHit) && interrupter == player && frametime - HitCooldown > 0.1s) {
+            sounddecay(6.4s)
+            SoundPitchDefault(0.23)
+            soundplay([sht0A], 0.4V)
+            HitCooldown = frametime
+        }
+        rejevif (interrupter == player && e == EventJumpedOn) {
+            sounddecay(6.4s)
+            SoundPitchDefault(0.23)
+            soundplay([bnk0A], 0.4V)
+            sendevent(Event21, interrupter, 12.65m)
+        }
+        if ((e == EventSpinHit || e == EventSlideHit) && interrupter == player && player -> statusb \ FLAG_DPAD_CONTROL) {
+            save (velx, vely, velz, troty) {
+                troty = atan2(player -> trans)
+                interrupter -> speed = 15m
+                interrupter -> troty = atan2(player -> trans)
+                setvel(15m, vvel)
+                interrupter -> velx = velx
+                interrupter -> vely = vely
+                interrupter -> velz = velz
+                interrupter -> statusb &= ~FLAG_DPAD_CONTROL
+            }
+        }
+        rejevcstate(Armadillo_Exposed, e == EventSlamHit)
+        accevcstate(Armadillo_Exposed, e == EventHitInvincible || e == EventHit || e == EventFling)
+    }
+}
+
+sub NakedEvents(e, a) {
+    accevcstate(Armadillo_Fling, e == EventSpinHit || e == EventSlideHit)
+    accevcstate(Armadillo_Squash, e == EventJumpedOn || e == EventHitInvincible || e == EventHit || e == EventFling || e == EventSlamHit)
+}
+
+sub ArmadilloPathTrack() {
+    if (STATUS_PATH_END) {
+        if (STATUS_REACHED_TROT) {
+            trotx = 180deg
+            statusb |= 0x20000000
+            statusa &= ~FLAG_PATH_END
+        }
+    }
+    else {
+        calcpath(loopseek(pathprog, pathlen + spd(PathSpeed) - 1.0, spd(PathSpeed)))
+        if (STATUS_PATH_END) {
+            trotx = 720deg
+            statusb &= ~0x20000000
+        }
+        {
+            var v1 = 0
+            var deg_to_player = 0deg
+            var pathrot = troty
+            save (troty, statusa, statusb, x, y, z, pathprog) {
+                statusb = FLAG_PATH_CALCS | FLAG_TRACK_PATH_SIGN
+                x = player -> x
+                y = player -> y
+                z = player -> z
+                calcpath(0)
+                v1 = troty
+                troty += 90deg
+                setvel(TrackOffset, vvel)
+            }
+            x += velx
+            z += velz
+            if (abs(TrackOffset - vecy) > 0.1m) {
+                deg_to_player = degdist(troty, atan2(player -> trans))
+                if (abs(deg_to_player) < 60deg) {
+                    if (deg_to_player < -45deg) {
+                        deg_to_player = -45deg
+                    }
+                    else if (deg_to_player > 45deg) {
+                        deg_to_player = 45deg
+                    }
+                    troty += deg_to_player
+                }
+            }
+            TrackOffset = seek(TrackOffset, vecy, spd(2m))
+            if (TrackOffset < -pathdist) {
+                troty = pathrot
+                TrackOffset = -pathdist
+            }
+            else if (TrackOffset > pathdist) {
+                troty = pathrot
+                TrackOffset = pathdist
+            }
+        }
+        troty += loopseek(Waddle, 4deg, 0.2deg) - 2deg
+    }
+    sendeventif(EventHit, collider, player -> statusa \ FLAG_GROUNDLAND && !(player -> stateflag & 0x200000), 100.0)
+}
+
+state Armour_Break { // 2
+    statusc 0x12
+    code() {
+        zindex = creator -> zindex
+        playframes(ARMADILLO_2, 0.0, 15.0)
+    }
+}
+
+state Armadillo_Exposed { // 3
+    stateflag 0x3
+    statusc 0x12
+    event => sub NakedEvents
+    code() {
+        sounddecay(6.4s)
+        SoundPitchDefault(0.16)
+        soundplay([ArmJA], 1V)
+        spawn(ArmaC, S_ARMOR_BREAK, 1)
+        entitysetstate(1)
+        playframes(ARMADILLO_4, 0.0, 22.0)
+        playframes(ARMADILLO_3, 0.0, 13.0)
+        health += 1.0
+        PathSpeed = PathSpeed * 12.6s >> 8
+        changestate(Armadillo_Walk)
+    }
+    trans {
+        once {
+            vecx = player -> velx
+            vecy = player -> vely
+            vecz = player -> velz
+            save (troty) {
+                troty += 180deg
+                pathdist = troty
+                setvel(20m, vvel)
+            }
+        }
+        if (collider && collider -> stateflag \ 0x200000) {
+            collider -> velx = velx + vecx
+            collider -> velz = velz + vecz
+            collider -> troty = pathdist
+            speed = 5m
+            stateflag |= 0x80
+            statetime = frametime
+        }
+        if (stateflag \ 0x80 && frametime - statetime >= 0.05s) {
+            player -> velx = 0
+            player -> velz = 0
+            player -> speed = 0
+        }
+    }
+}
+
+sub SetParticleColor() {
+    var r = rand(5)
+    if (r == 0 || r == 1) {
+        SetColor1(0x78, 0x78, 0xC0)
+    }
+    else if (r == 2 || r == 3) {
+        SetColor1(0x4B, 0x4B, 0xC0)
+    }
+    else if (r == 4) {
+        SetColor1(0xC0, 0xB4, 0xA5)
+    }
+}
+
+state Armadillo_Squash { // 4
+    stateflag 0x23
+    statusc 0x12
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        spawn(9, 4, 1, getins(SetParticleColor), 0)
+        statusb = FLAG_INVISIBLE
+        playnull()
+    }
+}
+
+state Armadillo_Fling { // 5
+    stateflag 0x30
+    statusc 0x12
+    code(h) {
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir()
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    } 
+    trans {
+        EnemyFlingTrans(2m, EventFling)
+    }
+}

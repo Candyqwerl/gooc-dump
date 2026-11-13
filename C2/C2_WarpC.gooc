@@ -1,0 +1,306 @@
+#gool WarpC 1 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 2 -r pal "C2\C2_WarpC.gooc" "C2\Out\C2_WarpC.nsentry"
+
+#anim WARP_PARTICLES[WWP0V] 361 1
+
+#iflev uepvo
+#anim GATE_TOP_ENTER  [WGt0V] 7 1
+#anim GATE_BOT_ENTER  [WGb0V] 7 1
+#anim GATE_TOP_EXIT   [WGT0V] 7 1
+#anim GATE_BOT_EXIT   [WGB0V] 7 1
+#eliflev hwtrz
+#anim GATE_TOP_ENTER  [WGt5V] 7 1
+#anim GATE_BOT_ENTER  [WGb5V] 7 1
+#anim GATE_TOP_EXIT   [WGT5V] 7 1
+#anim GATE_BOT_EXIT   [WGB5V] 7 1
+#eliflev xaymn
+#anim GATE_TOP_ENTER  [WGtzV] 7 1
+#anim GATE_BOT_ENTER  [WGbzV] 7 1
+#anim GATE_TOP_EXIT   [WGTzV] 7 1
+#anim GATE_BOT_EXIT   [WGBzV] 7 1
+#eliflev dfjlA
+#anim GATE_TOP_ENTER  [WGtdV] 7 1
+#anim GATE_BOT_ENTER  [WGbdV] 7 1
+#anim GATE_TOP_EXIT   [WGTdV] 7 1
+#anim GATE_BOT_EXIT   [WGBdV] 7 1
+#eliflev cgiqC
+#anim GATE_TOP_ENTER  [WGtiV] 7 1
+#anim GATE_BOT_ENTER  [WGbiV] 7 1
+#anim GATE_TOP_EXIT   [WGTiV] 7 1
+#anim GATE_BOT_EXIT   [WGBiV] 7 1
+#else
+#anim GATE_TOP_ENTER  [WGtBV] 7 1
+#anim GATE_BOT_ENTER  [WGbBV] 7 1
+#anim GATE_TOP_EXIT   [WGTBV] 7 1
+#anim GATE_BOT_EXIT   [WGBBV] 7 1
+#endif
+
+#sprite WARP_SMOKE[Cr10T]
+#tex 0x00FFFF 0 1 0 9 864 64 32 32
+#tex 0x00B4FF 0 1 0 9 864 64 32 32
+#tex 0x0082FF 0 1 0 9 864 64 32 32
+
+#spawn S_0              __s_0
+#spawn S_WARP_OUT       Warp_Out
+#spawn S_2              __s_2
+#spawn S_SPAWN_3        Warp_Smoke_Master
+#spawn S_SPAWN_4        Warp_Smoke_Slave
+#spawn S_5              __s_5
+#spawn S_GATE_TOP       Warp_Gate_Top
+#spawn S_GATE_ENTER     Warp_Gate_Bottom
+#spawn S_GATE_EXIT      Warp_Gate_Bottom
+#spawn S_WARP_SECRET    Warp_Secret
+
+var GateLastPlayerSide
+
+state Warp_Out { // 0
+    code() {
+        groundy = y + 1m
+        y -= 0.25m
+        zindex = 24
+        soundpitch(3.625)
+        sounddecay(8.6s)
+        soundfadet(0.6s)
+        soundfadev(0.3V, 0, 2)
+        soundplay([WAn0A], 0V)
+        do { playnull() } until (isloaded([WWP0G]) && isloaded([WWP0V]))
+        sleepframes(WARP_PARTICLES, 0.0, 360.0)
+    }
+    event(e, a) {
+        if (e == Event26) {
+            soundsetup(0, voice, 5)
+            soundfadet(0.3s, voice)
+            soundfadev(0V, voice, 3)
+        }
+    }
+    trans {
+        nofirst {
+            if (LEVEL == LEVEL_Intro) {
+                if (player -> z < z) {
+                    sendevent(EventWarp, player, 0)
+                    if (eventaccepted) {
+                        tpc = 0
+                    }
+                }
+            }
+            else if (distance(player, DIST_EXACT | DIST_NO_Y) < 1.6m) {
+                if (player -> y >= groundy - 1.3m && player -> y < groundy && player -> statusa \ FLAG_GROUNDLAND && !(player -> statusa \ 0x200000)) {
+                    if (player -> invincible == 5) {
+                        player -> invincible = 0
+                    }
+                    sendevent(EventWarp, player, 0)
+                    if (eventaccepted) {
+                        tpc = 0
+                    }
+                }
+            }
+            roty = GAMEDIR
+            if (scalex < 1S) {
+                scalex += 0.05S
+                scalez = scalex
+            }
+        }
+    }
+}
+
+state Warp_Smoke_Master { // 1
+    statusc 0x22
+    code(xoff, yoff, zoff) {
+        vecx = xoff
+        vecy = yoff
+        vecz = zoff
+        x += vecx
+        y += vecy
+        z += vecz
+        vely = rand(0.25m)
+        SetScale(1S)
+        trotz = !rand(2) ? 15deg + rand(5deg) : -(15deg + rand(5deg))
+        if (FRAMETIME < 27) {
+            spawn(WarpC, S_SPAWN_4, 1, 0.4m, 2.5S)
+        }
+        spawn(WarpC, S_SPAWN_4, 1, 0.2m, 1.6S)
+        spawn(WarpC, S_SPAWN_4, 1, -0.2m, 0.8S)
+        spawn(WarpC, S_SPAWN_4, 1, -0.4m, 1.2S)
+        FlipRand()
+        setanim(WARP_SMOKE, rand(3.0))
+        sleep()
+    }
+    trans {
+        nofirst {
+            groundy = parent -> y + vecy
+            y = groundy + sin(loopseek(vely, 1m, 1m >> 7), 1m - 800)
+            rotz += trotz
+            x = parent -> x + vecx
+            z = parent -> z + vecz
+        }
+    }
+}
+
+state Warp_Smoke_Slave { // 2
+    statusc 0x22
+    code(vz, sz) {
+        zindex = 48
+        SetScale(0S, 0S, sz)
+        field_61 = sz
+        trotz = !rand(2) ? 15deg + rand(5deg) : -(15deg + rand(5deg))
+        v0 = rand(0.6s)
+        SetVel(0, 0, vz)
+        vecx = randi(-0.5m, 0.5m)
+        vecy = rand(0.5m)
+        vecz = vz
+        setanim(WARP_SMOKE, rand(3.0))
+        sleep()
+    }
+    trans {
+        nofirst {
+            x = creator -> x + velx
+            y = creator -> y + vely
+            z = creator -> z + velz
+            velx = seek(velx, vecx, 180deg)
+            vely = seek(vely, vecy, 180deg)
+            velz = seek(velz, vecz, 180deg)
+            unless (time(0.6s, v0)) {
+                vecx = randi(-0.8m, 0.8m)
+                vecy = randi(-0.4m, 0.4m)
+                vecz = randi(-0.8m, 0.8m)
+            }
+            rotz += trotz
+            if (FRAMETIME < 30) {
+                scalez = seek(scalez, field_61, 0.05S)
+            }
+            else {
+                scalez = seek(scalez, 0.1S, 0.05S)
+            }
+            scalex = seek(scalex, scalez, 0.1S)
+            scaley = seek(scaley, scalez, 0.1S)
+        }
+    }
+}
+
+state Kill { // 3
+    statusc 0x0
+    code() {}
+}
+
+state Warp_Gate_Bottom { // 4
+    statusc 0x22
+    code() {
+        SetZindexField(-10)
+        spawn(WarpC, S_GATE_TOP, 1)
+        if (spawn == S_GATE_ENTER) {
+            setanim(GATE_BOT_ENTER, 0)
+        }
+        else if (spawn == S_GATE_EXIT) {
+            setanim(GATE_BOT_EXIT, 0)
+        }
+        changestate(Warp_Gate_Close)
+    }
+}
+
+state Warp_Gate_Close { // 5
+    statusc 0x22
+    code() {
+        if (!!animframe) {
+            soundpitch(3.625)
+            sounddecay(10.22s)
+            soundplay([WDo0A], 1.28V)
+        }
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_SIDES
+        if (v0 != GateLastPlayerSide) {
+            playframe(0)
+        }
+        playframesback(animframe, 0.0)
+        sleep()
+    }
+    trans {
+        v0 = abs(degdist(atan2(player -> trans), GAMEDIR + 180deg)) < 90deg
+        changestateif(Warp_Gate_Open, distance(player, DIST_NO_Y) <= 3m && (!(player -> stateflag \ 0x4000000) || spawn == S_GATE_ENTER) || v0)
+    }
+}
+
+state Warp_Gate_Open { // 6
+    statusc 0x22
+    code() {
+        if (animframe != 6.0) {
+            soundpitch(3.625)
+            sounddecay(10.22s)
+            soundplay([WDo0A], 1.28V)
+        }
+        if (v0) {
+            playframe(6.0)
+        }
+        playframes(animframe, 6.0)
+        statusb = FLAG_INVISIBLE
+        sleep()
+    }
+    trans {
+        v0 = abs(degdist(atan2(player -> trans), GAMEDIR + 180deg)) < 90deg
+        changestateif(Warp_Gate_Close, distance(player, DIST_NO_Y) >= 4m && !v0)
+        GateLastPlayerSide = v0
+    }
+}
+
+state Warp_Gate_Top { // 7
+    statusc 0x22
+    code() {
+        if (parent -> spawn == S_GATE_ENTER) {
+            setanim(GATE_TOP_ENTER)
+        }
+        else if (parent -> spawn == S_GATE_EXIT) {
+            setanim(GATE_TOP_EXIT)
+        }
+        zindex = creator -> zindex - 40
+        do {
+            statusb = creator -> statusb
+            playframe(creator -> animframe)
+        } while (1)
+    }
+}
+
+state Warp_Secret { // 8
+    __transargs
+    code(secret, b) {
+        groundy = y + 1m
+        y -= 0.25m
+        sleepnull()
+    }
+    trans {
+        once {
+            if (LEVEL == LEVEL_AirCrash) {
+                if (secret) {
+                    v0 = LEVEL_AirCrash
+                }
+                else {
+                    v0 = 0x2B00
+                }
+            }
+            else if (LEVEL == LEVEL_BearDown) v0 = 0x2C00;
+            else if (LEVEL == LEVEL_Unbearable) v0 = 0x2E00;
+            else if (LEVEL == LEVEL_HanginOut) v0 = 0x2F00;
+            else if (LEVEL == LEVEL_DigginIt) v0 = 0x2D00;
+            else if (LEVEL == LEVEL_BeeHaving) v0 = 0x2400;
+            else {
+                v0 = 0
+            }
+        }
+        unless (STATUS_FIRSTFRAME) {
+            if (distance(player, DIST_EXACT | DIST_NO_Y) < 1.6m) {
+                if (player -> y >= groundy - 1.6m && (!b || !entitygetstate(b, 1)) && player -> y < groundy && player -> statusa \ FLAG_GROUNDLAND && !(player -> stateflag & 0x20000000)) {
+                    if (player -> invincible == 5) {
+                        player -> invincible = 0
+                    }
+                    sendevent(EventWarp, player, v0)
+                    changestateif(Sleep, eventaccepted)
+                }
+            }
+        }
+    }
+}
+
+state Sleep { // 9
+    code() {
+        sleepnull()
+    }
+}

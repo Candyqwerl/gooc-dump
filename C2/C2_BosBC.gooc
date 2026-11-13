@@ -1,0 +1,176 @@
+#gool BosBC 31 2
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 2 -r pal -l 9 "C2\C2_BosBC.gooc" "C2\C2_BosBC.nsentry"
+
+#iflev 3
+#sprite BOSS_HUD[Taz1T]
+#tex 0x808080 0 0 14 13 448 64 64 64
+#tex 0x808080 0 0 15 13 192 16 32 16
+#tex 0x808080 0 0 0 14 224 16 32 16
+#tex 0x808080 0 0 1 14 256 16 32 16
+#tex 0x808080 0 0 1 14 256 16 32 16
+#tex 0x808080 0 0 1 14 256 16 32 16
+#tex 0x808080 0 0 1 14 256 16 32 16
+#tex 0x808080 0 0 1 14 256 16 32 16
+#tex 0x808080 0 0 1 14 256 16 32 16
+#tex 0x808080 0 0 1 14 256 16 32 16
+#eliflev 6
+#sprite BOSS_HUD[Roo1T]
+#tex 0x808080 0 0 2 8 64 64 64 64
+#tex 0x808080 0 0 3 8 960 64 32 16
+#tex 0x808080 0 0 4 8 960 48 32 16
+#tex 0x808080 0 0 5 8 960 32 32 16
+#tex 0x808080 0 0 5 8 960 32 32 16
+#tex 0x808080 0 0 5 8 960 32 32 16
+#tex 0x808080 0 0 5 8 960 32 32 16
+#tex 0x808080 0 0 5 8 960 32 32 16
+#tex 0x808080 0 0 5 8 960 32 32 16
+#tex 0x808080 0 0 5 8 960 32 32 16
+#eliflev 7
+#sprite BOSS_HUD[As17T]
+#tex 0x808080 0 0 15 0 320 64 64 64
+#tex 0x808080 0 0 0 2 64 16 32 16
+#tex 0x808080 0 0 1 2 96 16 32 16
+#tex 0x808080 0 0 2 2 128 16 32 16
+#tex 0x808080 0 0 2 2 128 16 32 16
+#tex 0x808080 0 0 2 2 128 16 32 16
+#tex 0x808080 0 0 2 2 128 16 32 16
+#tex 0x808080 0 0 2 2 128 16 32 16
+#tex 0x808080 0 0 2 2 128 16 32 16
+#tex 0x808080 0 0 2 2 128 16 32 16
+#eliflev 8
+#sprite BOSS_HUD[KimoT]
+#tex 0x808080 0 0 13 0 0 64 64 64
+#tex 0x808080 0 0 15 0 96 48 32 16
+#tex 0x808080 0 0 0 3 96 32 32 16
+#tex 0x808080 0 0 1 3 96 16 32 16
+#tex 0x808080 0 0 1 3 96 16 32 16
+#tex 0x808080 0 0 1 3 96 16 32 16
+#tex 0x808080 0 0 1 3 96 16 32 16
+#tex 0x808080 0 0 1 3 96 16 32 16
+#tex 0x808080 0 0 1 3 96 16 32 16
+#tex 0x808080 0 0 1 3 96 16 32 16
+#else
+#sprite BOSS_HUD[NJi4T]
+#tex 0x808080 0 0 6 8 896 64 64 64
+#tex 0x808080 0 0 1 8 0 16 32 16
+#tex 0x808080 0 0 2 8 32 16 32 16
+#tex 0x808080 0 0 3 8 64 16 32 16
+#tex 0x808080 0 0 4 8 96 16 32 16
+#tex 0x808080 0 0 5 8 128 16 32 16
+#tex 0x808080 0 0 5 8 128 16 32 16
+#tex 0x808080 0 0 5 8 128 16 32 16
+#tex 0x808080 0 0 5 8 128 16 32 16
+#tex 0x808080 0 0 5 8 128 16 32 16
+#endif
+
+#iflev 8
+#sprite KOMODO_JOE_MUG[KimoT]
+#tex 0x808080 0 0 14 0 64 64 64 64
+#else
+#sprite KOMODO_JOE_MUG[1002I]
+#tex 0x808080 0 0 14 0 64 64 64 64
+#endif
+
+#spawn S_HEALTH          Health
+#spawn S_HEALTH_TICK     Health_Tick
+#spawn S_KOMODO_MUG      Komodo_Joe_Mug
+
+var mem1, mem2, mem3, mem4, mem5, mem6, mem7, mem8, mem9, mem10
+
+state Health_Tick {
+    statusc 0
+    code(h) {
+        statusb = creator -> statusb
+        vfx = creator -> vfx
+        zindex = creator -> zindex - 1
+        SetScale(1.275, 1.015, 16.0)
+        setanim(BOSS_HUD)
+        x = creator -> vecx + creator -> x + 31.0 * (h >> 8)
+        y = creator -> y + vecy
+        while (health > h) {
+            playframe(h + 1.0)
+        }
+        do (var i = 0) {
+            playnull()
+            setanim(BOSS_HUD)
+            playframe(h + 1.0, 0.1s)
+            i += 1.0
+        } while (i < 6.0)
+    }
+    trans {
+        health = creator -> health
+    }
+}
+
+state Health {
+    statusc 0
+    __transargs
+    code(h, f) {
+        zindex = 50
+        SetTrans(-220.0, 82.965, 0)
+        SetRot(0deg)
+        vfx = (vfx & 0xFFFFFF00) | 0x6
+        while (GLOBAL_119 & 0x400 || FADECONTROL) {
+            playnull()
+        }
+        vecx = 39.0
+        SetScale(2.555, 4.055, 16.0)
+        if (var level = LEVEL; level == LEVEL_BossTazTiger) {
+            vecy = 15.0
+            vecx = 28.0
+        }
+        else if (level == LEVEL_BossCortex) {
+            scalex = 2.875
+            scaley = 37.0
+            vecy += 14.22
+        }
+        else if (level == LEVEL_BossRipperRoo) {
+            x += 5.0
+            vecy = 21.335
+            vecx = 40.0
+        }
+        else if (level == LEVEL_BossNGin) {
+            y = -99.555
+            vecy = -3.555
+            vecx = 37.0
+        }
+        else if (level == LEVEL_BossKimodo) {
+            y = -82.965
+            vecy = -18.965
+            vecx = 90.0
+            spawn(BosBC, S_KOMODO_MUG, 1)
+        }
+        do (var hp = 0) {
+            spawn2(BosBC, S_HEALTH_TICK, 1, hp)
+            hp += 1.0
+        } while (hp < h)
+
+        while (health) {
+            playanim(0, BOSS_HUD)
+        }
+    }
+    trans {
+        if (f == 1) {
+            health = h - (health << 8)
+        }
+        else if (f == 2) {
+            health = h - health
+        }
+        else if (f == 3) {
+            health <<= 8
+        }
+    }
+}
+
+state Komodo_Joe_Mug {
+    statusc 0
+    code() { 
+        x += 63.0
+        statusb = creator -> statusb
+        vfx = creator -> vfx
+        zindex = creator -> zindex
+        sleepanim(0, KOMODO_JOE_MUG)
+    }
+}

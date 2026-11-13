@@ -1,0 +1,2215 @@
+#gool BoxsC 34 4
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C3_FruiC.gooh"
+//gooc -c 3 -r pal "C3\C3_BoxsC.gooc" "C3\Out\C3_BoxsC.nsentry"
+//gooc -c 3 -r pal -h "Includes\C3_BoxsC.gooh" "C3\C3_BoxsC.gooc" "C3\Out\C3_BoxsC.nsentry"
+
+#anim BOX_NORMAL           [BN10V] [BN10G] 01 0 2
+#anim BOX_EXPLODE          [BE10V] [BE10G] 12 0 2
+#anim BOX_TNT              [BN10V] [BT10G] 01 0 2
+#anim BOX_TNT_1            [BN10V] [BT20G] 01 0 2
+#anim BOX_TNT_2            [BN10V] [BT30G] 01 0 2
+#anim BOX_TNT_3            [BN10V] [BT40G] 01 0 2
+#anim BOX_SPRING           [BS10V] [BS10G] 08 0 2
+#anim BOX_IRON             [BN10V] [BI10G] 01 0 2
+#anim BOX_IRON_GHOST       [Bi10V] [Bi10G] 01 0 2
+#anim BOX_FRUIT            [BS10V] [BF10G] 08 0 2
+#anim BOX_ACTION_1         [BA10V] [BA10G] 10 0 2
+#anim BOX_ACTION_2         [BA20V] [BA10G] 10 0 2
+#anim BOX_ACTION_NITRO_1   [BA10V] [Ba10G] 10 0 2
+#anim BOX_ACTION_NITRO_2   [BA20V] [Ba10G] 10 0 2
+#anim BOX_GHOST            [BN10V] [BG10G] 01 0 2
+#anim BOX_NITRO            [BN10V] [Bn10G] 01 0 2
+#anim BOX_STEEL            [Bs10V] [Bs10G] 10 0 2
+#anim BOX_SPRING_IRON      [BS10V] [BS20G] 08 0 2
+#anim BOX_CONTINUE         [BC10V] [BC10G] 16 0 2
+#anim BOX_CONTINUE_IRON    [Bo10V] [Bo10G] 16 0 2
+#anim BOX_SLOT             [BN10V] [Bl10G] 01 0 2
+#anim BOX_CLOCK            [Bc10V] [Bc10G] 01 0 2
+
+#sprite CONTINUE_LETTER [Cr20T]
+#tex 0x808080 0 0 4 0 512 32 32 32 // C
+#tex 0x808080 0 0 4 0 544 32 32 32 // H
+#tex 0x808080 0 0 4 0 544 64 32 32 // E
+#tex 0x808080 0 0 4 0 576 64 32 32 // K
+#tex 0x808080 0 0 4 0 640 96 32 32 // P
+#tex 0x808080 0 0 4 0 608 32 32 32 // O
+#tex 0x808080 0 0 4 0 576 96 32 32 // I
+#tex 0x808080 0 0 4 0 608 64 32 32 // N
+#tex 0x808080 0 0 4 0 672 96 32 32 // T
+#tex 0x808080 0 0 4 0 576 64 32 32 // K
+#tex 0x808080 0 0 4 0 640 64 32 32 // R
+#tex 0x808080 0 0 4 0 672 96 32 32 // T
+#tex 0x808080 0 0 4 0 544 64 32 32 // E
+#tex 0x808080 0 0 4 0 608 64 32 32 // N
+#tex 0x808080 0 0 4 0 480 32 32 32 // B
+#tex 0x808080 0 0 4 0 544 96 32 32 // D
+#tex 0x808080 0 0 4 0 640 96 32 32 // P
+#tex 0x808080 0 0 4 0 576 32 32 32 // L
+
+#sprite ACTION_MARK[Cr10T]
+#tex 0x505050 0 0 12 8 960 64 16 32
+#tex 0x505014 0 0 12 8 960 64 16 32
+
+#spawn S_BOX_TNT              Box_TNT_Spawn              // 0
+#spawn S_1                    __s_1                      // 1
+#spawn S_BOX_NORMAL           Box_Normal_Spawn           // 2
+#spawn S_BOX_SPRING           Box_Spring_Spawn           // 3
+#spawn S_BOX_CONTINUE         Box_Continue_Spawn         // 4
+#spawn S_BOX_IRON             Box_Iron_Spawn             // 5
+#spawn S_BOX_FRUIT            Box_Fruit_Spawn            // 6
+#spawn S_BOX_ACTION           Box_Action_Spawn           // 7
+#spawn S_BOX_1UP              Box_Normal_Spawn           // 8
+#spawn S_BOX_DOCTOR           Box_Normal_Spawn           // 9
+#spawn S_BOX_PICKUP           Box_Normal_Spawn           // 10
+#spawn S_11                   __s_11                     // 11
+#spawn S_12                   __s_12                     // 12
+#spawn S_BOX_GHOST            Box_Ghost_Spawn            // 13
+#spawn S_CONTINUE_LETTER      Continue_Letter            // 14
+#spawn S_BOX_SPRING_IRON      Box_Spring_Spawn           // 15
+#spawn S_TNT_AUTO             Box_TNT_Spawn              // 16
+#spawn S_17                   __s_17                     // 17
+#spawn S_BOX_NITRO            Box_Nitro_Spawn            // 18
+#spawn S_BOX_GHOST_IRON       Box_Ghost_Spawn            // 19
+#spawn S_20                   __s_20                     // 20
+#spawn S_21                   __s_21                     // 21
+#spawn S_ACTION_MARK          Action_Mark                // 22
+#spawn S_BOX_STEEL            Box_Steel_Spawn            // 23
+#spawn S_BOX_ACTION_NITRO     Box_Action_Spawn           // 24
+#spawn S_BOX_SLOT             Box_Slot                   // 25
+#spawn S_26                   __s_26                     // 26
+#spawn S_BOX_CONTINUE_IRON    Box_Continue_Iron_Spawn    // 27
+#spawn S_BOX_CLOCK            Box_Clock_Spawn            // 28
+#spawn S_BOX_DUCK             Box_Duck_Area              // 29
+
+event EventBoxStackBreak => sub BoxBreakRecalc
+event Event12            => state Kill
+event Event15            => sub BoxRecalcStack
+event Event18            => sub BoxTrack
+event EventBounce        => sub BoxBounce
+event Event23            => sub BoxVolley
+
+expr REWARD_ID_WUMPA = 76.0
+expr REWARD_ID_1UP = 97.0
+expr REWARD_ID_DOCTOR = 102.0
+expr REWARD_ID_10_WUMPA = 106.0
+
+expr EventTimeTrial = Event66
+
+expr BOX_FLAG_INVISIBLE              = 0x1
+expr BOX_FLAG_GHOST_OLD              = 0x2
+expr BOX_FLAG_AUTO_COLLECT           = 0x4
+expr BOX_FLAG_RANDOM_TILT            = 0x8
+expr BOX_FLAG_ACTION_REPEAT          = 0x10
+expr BOX_FLAG_NO_GHOST               = 0x20
+expr BOX_FLAG_GHOST_BREAK            = 0x40
+expr BOX_FLAG_NO_ABOVE               = 0x80
+expr BOX_FLAG_NO_TRIGGER             = 0x100
+expr BOX_FLAG_IRON_GHOST             = 0x200
+expr BOX_FLAG_UNK                    = 0x400
+expr BOX_FLAG_WAVE                   = 0x800
+expr BOX_FLAG_GHOST                  = 0x1000
+expr BOX_FLAG_NO_BOTTOM              = 0x2000
+expr BOX_FLAG_NO_SIDES               = 0x4000
+expr BOX_FLAG_NO_TOP                 = 0x8000
+expr BOX_FLAG_REFLECTION             = 0x10000
+expr BOX_FLAG_WATER                  = 0x20000
+expr BOX_FLAG_NITRO_NO_HOP           = 0x40000
+expr BOX_FLAG_NO_BELOW               = 0x80000
+expr BOX_FLAG_NITRO_SOLID            = 0x100000
+expr BOX_FLAG_NO_HIT                 = 0x200000
+expr BOX_FLAG_PARENT_VERTEX          = 0x400000
+expr BOX_FLAG_PLAYER_COLLISION_MASK  = 0x1000000
+expr BOX_FLAG_NO_REWARD              = 0x2000000
+expr BOX_FLAG_TARGET_RANGE           = 0x4000000
+
+var BoxVar1, BoxVar2, BoxVar3, BoxVar4, BoxVar5, BoxVar6,
+    BoxVar7, BoxVar8, BoxVar9, BoxVar10, BoxVar11, BoxVar12,
+    BoxVar13, BoxVar14, BoxVar15, BoxVar16, BoxVar17, BoxVar18
+
+expr BoxFlags                 = invincibletime
+expr BoxReward                = speed
+expr BoxBelow                 = field_63
+expr BoxStackLastSpinHitTime  = BoxVar1
+expr BoxGhostTargetStart      = BoxVar2
+expr BoxGhostTargetEnd        = BoxVar3
+expr BoxTransFunc             = BoxVar4
+expr BoxCollisionMask         = BoxVar5
+expr BoxPathParent            = BoxVar5
+expr BoxBaseY                 = BoxVar10
+
+expr BoxWaveOriginX           = BoxVar5
+expr BoxWaveOriginZ           = BoxVar11
+
+expr BoxSlotLastChangeTime    = BoxVar5
+expr BoxSlotInterval          = BoxVar10
+expr BoxSlotIndex             = BoxVar11
+
+expr BoxSpringPopulsion       = BoxVar8
+
+expr BoxFruitHits             = BoxVar8
+expr BoxFruitBreakPoint       = BoxVar9
+
+expr BoxFlashInterval         = BoxVar6
+expr BoxFlashOffset           = BoxVar7
+expr BoxTNTFuse               = BoxVar9
+expr BoxExplosionEvent        = BoxVar9
+expr TIMETRIAL                = GLOBAL_173
+
+inline sub SetBoxAnim(anim, tex, frame) {
+    setanim(anim)
+    stalltime = tex
+    animframe = frame
+}
+
+sub BoxTransWave() { // S-0
+    var phase = ((BoxWaveOriginX >> 8) + ((BoxWaveOriginZ >> 8) + GAMETICK)) << 6
+    if (((BoxWaveOriginX << 2) + BoxWaveOriginZ) & 0x2000) {
+        phase = -phase
+    }
+    var c, s
+    s = sin(phase)
+    c = cos(phase)
+    x = BoxWaveOriginX + (s << 1)
+    z = BoxWaveOriginZ + (c << 1)
+    y = BoxBaseY - (s << 2)
+    rotx = c >> 5
+}
+
+sub BoxTransParentVertex() { // S-64
+    interrupter = BoxPathParent
+    getvert(vtrans, interrupter, 0)
+    groundy = y
+    field_60 = y
+}
+
+sub BoxTransPlayerCollisionMask() { // S-69
+    if (player -> stateflag & 0x2000000) {
+        statusb &= ~BoxCollisionMask
+    }
+    else {
+        statusb |= BoxCollisionMask
+    }
+}
+
+sub BoxTransAtlantis() { // S-94
+    if ((player -> stateflag & 0x80000) | (player -> stateflag & 0x10)) {
+        statusb &= ~BoxCollisionMask
+    }
+    else {
+        statusb |= BoxCollisionMask
+    }
+    if (LEVEL == LEVEL_DeepTrouble || LEVEL == LEVEL_UnderPressure) {
+        if (collider) {
+            changestateif(Box_TNT_Countdown, spawn == S_BOX_TNT && !(stateflag & 0x2))
+        }
+    }
+}
+
+sub BoxInitWaterEffect() { // S-158
+    vfx = (vfx & 0xFFFF00FF) | 0xA00
+    vfx = (vfx & 0xFFFFFF00) | 0x5
+    statusb |= -0x80000000
+    field_61 = &BoxVar12
+    BoxVar13 = 2
+    BoxVar14 = 0x3F3F3F
+    BoxVar15 = 0
+    BoxVar16 = &vecx
+    BoxVar17 = 30
+    BoxVar18 = -0x50
+    SetVec(0)
+}
+
+sub BoxTransOcean() { // S-177
+    ins79(x, BoxWaveOriginX)
+    BoxVar12 = sp
+    groundy = BoxVar12 - 0.4m
+    y = groundy
+    ins80(BoxWaveOriginX, vecx)
+}
+
+sub BoxTransWater() { // S-195
+    var c
+    c = cos((frametime + ((x + z) / 2000)) << 6)
+    y = GLOBAL_118 - (0.4m + (c << 2))
+    if (y < groundy) {
+        rotx = degseek(rotx, 0deg, 180deg)
+        y = groundy
+    }
+    else {
+        rotx = degseek(rotx, c >> 5, 180deg)
+    }
+}
+
+sub BoxTransCommon() { // S-268
+    if (STATUS_GROUNDLAND && vely < 0m && y == groundy) {
+        if (BoxBelow) {
+            statusb &= ~(FLAG_GRAVITY | FLAG_PHYSICS_ENGINE | FLAG_SOLID_BOTTOM)
+        }
+        else {
+            statusb &= ~(FLAG_GRAVITY | FLAG_PHYSICS_ENGINE)
+        }
+        rotx = 0deg
+        vely = 0m
+        if (groundvel) {
+            SoundPitchDefault(0.23)
+            sounddecay(0.25)
+            soundplay([ld10A], 0.35V)
+            interrupter = BoxBelow
+            sendevent(Event14, interrupter, groundvel)
+        }
+    }
+    if (STATUS_GRAVITY) {
+        if (!(BoxFlags & BOX_FLAG_REFLECTION)) {
+            rotx -= pathprog
+        }
+    }
+    if (collider) {
+        if (statusa & 0x80000 && player -> stateflag & 0x2000) {
+            if (spawn == S_BOX_CLOCK) {
+                // Old clock box branch that got removed
+            }
+            else if (spawn == S_BOX_CONTINUE) {
+                changestate(Box_Continue_Opened)
+            }
+            else {
+                changestate(Box_Break_Reward)
+            }
+        }
+        if ((y - field_60 > 0m) | (vely > 0m)) {
+            if (abs(x - collider -> x) <= 0.5m && abs(z - collider -> z) <= 0.5m && collider -> y > y) {
+                var boxabovenexty = spd(y + 1m, vely)
+                if (collider -> y < boxabovenexty) {
+                    collider -> y = boxabovenexty
+                }
+            }
+        }
+        statusb &= ~FLAG_INVISIBLE
+        if (BoxFlags & BOX_FLAG_INVISIBLE) {
+            entitysetstate(1)
+        }
+    }
+    if (!STATUS_FIRSTFRAME) {
+        call(BoxTransFunc)
+    }
+    field_60 = y
+}
+
+sub BoxCheckSpinEvent(e, a) { // S-503
+    eventaccepted = false
+    if (interrupter && e == EventSpinHit) {
+        if (LEVEL == LEVEL_DeepTrouble || LEVEL == LEVEL_UnderPressure) {
+            eventaccepted = true
+            return
+        }
+        if (frametime - BoxStackLastSpinHitTime >= 1s) {
+            unless (STATUS_GRAVITY && !(abs(player -> speed) & ~0x3)) {
+                var playerinrange, s_interrupter
+                if (BoxBelow || (STATUS_GRAVITY && !(buttonhold(PAD_SQUARE | PAD_CIRCLE) || buttonbuffer(PAD_SQUARE | PAD_CIRCLE)))) {
+                    playerinrange = player -> y >= y - 0.2m && player -> y <= y + 1.1m
+                }
+                else {
+                    playerinrange = player -> y >= y - 2m && player -> y <= y + 1.1m
+                }
+                if (playerinrange) {
+                    if (BoxBelow) {
+                        s_interrupter = interrupter
+                        interrupter = BoxBelow
+                        do {
+                            interrupter -> BoxStackLastSpinHitTime = frametime
+                            interrupter = interrupter -> BoxBelow
+                        } while (interrupter)
+                        interrupter = s_interrupter
+                    }
+                    eventaccepted = true
+                }
+                else {
+                    if (BoxBelow) {
+                        s_interrupter = interrupter
+                        interrupter = BoxBelow
+                        sendevent(EventSpinHit, interrupter, a[0])
+                        interrupter = s_interrupter
+                    }
+                }
+            }
+        }
+    }
+}
+
+sub BoxTriggerTargets() { // S-566
+    do (var obj_id = BoxGhostTargetStart) {
+        if (obj_id && !(BoxFlags & BOX_FLAG_NO_GHOST)) {
+            interrupter = objectget(obj_id)
+            eventaccepted = interrupter
+            if (eventaccepted) {
+                sendevent(EventTriggered, interrupter)
+            }
+            if (!eventaccepted) {
+                entitysetstate(obj_id, 1)
+            }
+        }
+    } while ({ obj_id += 1.0 }; obj_id <= BoxGhostTargetEnd)
+}
+
+sub BoxCheckDDA() { // S-586
+    var reward = BoxReward
+    if (reward != 100.0) {
+        if (reward == REWARD_ID_1UP) {
+            var lives = fieldval(ENTITY_FIELD_DDA_LIVES)
+            if (entitygetstate(3) || ((lives && getfield(player, 65.0) + 3.0 >= lives) || (BoxFlags & BOX_FLAG_NO_REWARD))) {
+                if (spawn == S_BOX_1UP) {
+                    spawn = S_BOX_PICKUP
+                    SetBoxAnim(BOX_NORMAL, 2, 0)
+                }
+                if (TIMETRIAL) {
+                    BoxReward = 0
+                }
+                else {
+                    BoxReward = 101.0
+                }
+            }
+        }
+        else if (reward == REWARD_ID_DOCTOR) {
+            var deaths = fieldval(ENTITY_FIELD_DDA_DEATHS)
+            var player_health = 0
+            sendevent(Event15, player, 4.0)
+            player_health = v0
+            // Native ins783 stores the deep trouble check at 4($s6) but ins802 reads 0($s6) ??
+            if ((deaths && SECTIONDEATHCOUNT < deaths && !TIMETRIAL)
+                || ((LEVEL == LEVEL_DeepTrouble
+                    || LEVEL == LEVEL_UnderPressure
+                    || LEVEL == LEVEL_MidnightRun
+                    || LEVEL == LEVEL_OrientExpress
+                    || LEVEL == LEVEL_Area51 
+                    || LEVEL == LEVEL_OrangeAsphalt 
+                    || LEVEL == LEVEL_RoadCrash 
+                    || LEVEL == LEVEL_HogRide
+                    || LEVEL == LEVEL_BossNGin2 
+                    || LEVEL == LEVEL_RingsOfPower
+                    || LEVEL == LEVEL_MadBombers
+                    || LEVEL == LEVEL_ByeByeBlimps
+                    || LEVEL == LEVEL_HotCoco 
+                    || LEVEL == LEVEL_SkiCrazed
+                    || LEVEL == LEVEL_TellNoTales 
+                    || LEVEL == LEVEL_MakinWaves)
+                    && (player -> stateflag & 0x2000000) && player_health >= 2.0) || ((BoxFlags & BOX_FLAG_NO_REWARD) && !TIMETRIAL)) {
+                        if (spawn == S_BOX_DOCTOR) {
+                            spawn = S_BOX_PICKUP
+                            SetBoxAnim(BOX_NORMAL, 2, 0)
+                        }
+                        if (TIMETRIAL) {
+                            BoxReward = 0
+                        }
+                        else {
+                            BoxReward = 101.0
+                        }
+                    }
+        }
+    }
+}
+
+state Box_Normal_Spawn { // 0
+    statusc 0
+    event => sub BoxEventNormal
+    trans => sub BoxTransCommon
+    code(reward, flags, ghost_target) {
+        if (flags & BOX_FLAG_PARENT_VERTEX) {
+            pathlen = parent -> pathlen
+            entity = parent -> entity
+        }
+        if (spawn == S_BOX_NORMAL) {
+            SetBoxAnim(BOX_NORMAL, 0, 0)
+            v0 = 100.0
+        }
+        else if (spawn == S_BOX_PICKUP) {
+            SetBoxAnim(BOX_NORMAL, 2, 0)
+            var lives = fieldval(ENTITY_FIELD_DDA_LIVES)
+            if (!entitygetstate(3) && lives && getfield(player, 65.0) < lives) {
+                v0 = REWARD_ID_1UP
+            }
+            else {
+                v0 = 101.0
+            }
+        }
+        else if (spawn == S_BOX_DOCTOR) {
+            SetBoxAnim(BOX_NORMAL, 3, 0)
+            v0 = REWARD_ID_DOCTOR
+        }
+        else if (spawn == S_BOX_1UP) {
+            SetBoxAnim(BOX_NORMAL, 1, 0)
+            v0 = REWARD_ID_1UP
+        }
+        else {
+            SetBoxAnim(BOX_NORMAL, 0, 0)
+            v0 = 100.0
+        }
+        if (TIMETRIAL) {
+            var originalreward = reward
+            var timetrialreward = fieldval(ENTITY_FIELD_TIMETRIAL_REWARD)
+            if (!reward) {
+                originalreward = v0
+            }
+            if (v0 < REWARD_ID_1UP || v0 == 100.0 || v0 == 101.0) {
+                reward = 0
+                v0 = 0
+                SetBoxAnim(BOX_NORMAL, 0, 0)
+            }
+            if (timetrialreward) {
+                reward = timetrialreward
+                flags |= BOX_FLAG_AUTO_COLLECT
+            }
+            var reward = reward
+            if (reward == 111.0) {
+                SetBoxAnim(BOX_NORMAL, 4, 0)
+            }
+            else if (reward == 112.0) {
+                SetBoxAnim(BOX_NORMAL, 5, 0)
+            }
+            else if (reward == 113.0) {
+                SetBoxAnim(BOX_NORMAL, 6, 0)
+            }
+            else if (reward == REWARD_ID_DOCTOR) {
+                SetBoxAnim(BOX_NORMAL, 3, 0)
+                spawn = S_BOX_DOCTOR
+            }
+        }
+        BoxInit(v0)
+        BoxCheckDDA()
+        sleep()
+    }
+}
+
+expr CheckBodyslamStatus = ((player -> vely <= -12m || player -> statusa & FLAG_GROUNDLAND) && !creator) || interrupter != player
+expr CheckJumpStatus = !creator && interrupter -> vely <= 0m && interrupter -> y >= y + 0.9m
+
+sub BoxEventNormal(e, a) {
+    if (interrupter) {
+        accevcstate(Box_Break_Reward, e == EventJumpedOn && CheckJumpStatus)
+        accevcstate(Box_Break_Reward, e == EventSlamHit && CheckBodyslamStatus)
+    }
+    if (e == EventHitInvincible) {
+        if (player -> y > y + 0.9m && player -> invincible == 5) {
+            accevcstate(Box_Break_Reward_Delayed)
+        }
+        else {
+            accevcstate(Box_Break_Reward)
+        }
+    }
+    else if (e == EventFling || (e == EventHit && !(BoxFlags & BOX_FLAG_NO_HIT))) {
+        if (a[0] && e == EventHit && (BoxReward < 110.0 || BoxReward >= 200.0)) {
+            accevcstate(Box_Break)
+        }
+        else {
+            accevcstate(Box_Break_Reward)
+        }
+    }
+    BoxCheckSpinEvent(e, a)
+    if (eventaccepted) {
+        accevcstate(Box_Break_Reward)
+    }
+    accevcstate(Box_Break_Reward, e == Event23)
+    accevcstate(Box_Break_Reward, e == EventSlideHit)
+    if (e == EventTimeTrial && (BoxReward <= REWARD_ID_1UP || BoxReward == 100.0 || BoxReward == 101.0)) {
+        accev()
+        BoxReward = 0
+        SetBoxAnim(BOX_NORMAL, 0, 0)
+        var reward = fieldval(ENTITY_FIELD_TIMETRIAL_REWARD)
+        if (reward) {
+            BoxReward = reward
+            BoxFlags |= BOX_FLAG_AUTO_COLLECT
+        }
+        if (BoxReward == REWARD_ID_DOCTOR) {
+            SetBoxAnim(BOX_NORMAL, 3, 0)
+            spawn = S_BOX_DOCTOR
+        }
+        else if (BoxReward == 111.0) {
+            SetBoxAnim(BOX_NORMAL, 4, 0)
+        }
+        else if (BoxReward == 112.0) {
+            SetBoxAnim(BOX_NORMAL, 5, 0)
+        }
+        else if (BoxReward == 113.0) {
+            SetBoxAnim(BOX_NORMAL, 6, 0)
+        }
+    }
+}
+
+sub BoxSleep() { 
+    playframe()
+    changestateif(Box_Break_Reward, collider && entitygetstate(2))
+    sleep()
+}
+
+sub BoxInit(reward, flags, ghost_target) __trans __args(r) { // S-1285
+    BoxTransFunc = 0
+    if (reward) {
+        BoxReward = reward
+    }
+    else {
+        BoxReward = r
+    }
+    BoxFlags = flags
+    BoxGhostTargetStart = ghost_target
+    if (!(flags & BOX_FLAG_TARGET_RANGE)) {
+        BoxGhostTargetEnd = ghost_target
+    }
+    if (flags & BOX_FLAG_NO_SIDES) {
+        statusb = FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | FLAG_SOLID_GROUND | FLAG_HAS_SHADOW | 0x100000
+    }
+    else {
+        statusb = FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | FLAG_SOLID_GROUND | FLAG_SOLID_SIDES | FLAG_HAS_SHADOW | 0x100000
+    }
+    calclight()
+    SetZindexField(32)
+    density = -40.0
+    if (LEVEL == LEVEL_DeepTrouble || LEVEL == LEVEL_UnderPressure) {
+        unless (spawn == S_BOX_IRON || spawn == S_BOX_ACTION || spawn == S_BOX_ACTION_NITRO || spawn == S_BOX_STEEL || spawn == S_BOX_CONTINUE_IRON || spawn == S_BOX_SLOT || spawn == S_BOX_CLOCK) {
+            BoxCollisionMask = statusb & FLAG_SOLID_ALL2
+            BoxTransFunc = getins(BoxTransAtlantis)
+        }
+    }
+    if (BoxFlags) {
+        if (BoxFlags & BOX_FLAG_GHOST) {
+            setanim(BOX_GHOST, 0)
+        }
+        if (BoxFlags & 0x800000) {
+            statusb |= 0x40000000
+        }
+        if (BoxFlags & BOX_FLAG_INVISIBLE && !entitygetstate(2)) {
+            statusb |= FLAG_INVISIBLE
+        }
+        if (BoxFlags & BOX_FLAG_WAVE) {
+            BoxWaveOriginX = x
+            BoxBaseY = y
+            BoxWaveOriginZ = z
+            BoxTransFunc = getins(BoxTransWave)
+        }
+        if (BoxFlags & BOX_FLAG_RANDOM_TILT) {
+            BoxBaseY = y
+            rotz = rand(360deg)
+            rotx = rand(20deg)
+            vfx = (vfx & 0xFFFF00FF) | 0xA00
+        }
+        if (BoxFlags & BOX_FLAG_PLAYER_COLLISION_MASK) {
+            BoxCollisionMask = statusb & FLAG_SOLID_ALL2
+            BoxTransFunc = getins(BoxTransPlayerCollisionMask)
+        }
+        if (BoxFlags & BOX_FLAG_PARENT_VERTEX) {
+            CopyParentPath()
+            BoxTransFunc = getins(BoxTransParentVertex)
+            BoxPathParent = parent
+        }
+        if (BoxFlags & BOX_FLAG_WATER) {
+            if (GLOBAL_119 & 0x1000000) {
+                SetScale(1.6S)
+                BoxInitWaterEffect()
+                BoxTransFunc = getins(BoxTransOcean)
+            }
+            else {
+                BoxTransFunc = getins(BoxTransWater)
+            }
+        }
+        if (BoxFlags & BOX_FLAG_REFLECTION) {
+            if (ZONEFLAGS & 0x800) {
+                spawn(77, 11, 1)
+            }
+            else {
+                vfx = (vfx & 0xFFFF00FF) | 0xE00
+            }
+        }
+    }
+    creator = 0
+    BoxBelow = 0
+    field_60 = y
+    groundy = y
+    pathprog = 0.5deg + rand(0.2deg)
+    BoxStackLastSpinHitTime = 0s
+    if (entity) {
+        movetolist(4.0, self)
+    }
+    {
+        var savedvelx = velx, savedvely = vely
+        if (!(BoxFlags & (BOX_FLAG_NO_ABOVE | BOX_FLAG_NO_BELOW))) {
+            velx = 0m
+            vely = 0m
+            playframe()
+            BoxBelow = savedvelx
+            creator = savedvely
+        }
+        if (!(creator | (BoxFlags & BOX_FLAG_NO_TOP))) {
+            statusb |= FLAG_SOLID_TOP
+        }
+        if (!(BoxBelow | (BoxFlags & BOX_FLAG_NO_BOTTOM))) {
+            statusb |= FLAG_SOLID_BOTTOM
+        }
+        statusa |= 0x80000
+    }
+    if (BoxFlags & (BOX_FLAG_GHOST | BOX_FLAG_GHOST_OLD)) {
+        if (entitygetstate(2)) {
+            changestate(Box_Ghost_Appear)
+        }
+        else {
+            changestate(Box_Ghost)
+        }
+    }
+}
+
+sub BoxBreak() { // S-1709
+    sendevent(EventBoxBreak, player, self)
+    movetolist(3.0, self)
+    if (creator) {
+        creator -> BoxBelow = BoxBelow
+        sendevent(Event9, creator, 4m)
+    }
+    else {
+        statusb &= ~FLAG_COLLIDABLE
+    }
+    if (BoxBelow) {
+        interrupter = BoxBelow
+        interrupter -> creator = creator
+        if (BoxBelow && !creator) {
+            interrupter = BoxBelow
+            interrupter -> statusb |= FLAG_SOLID_TOP
+        }
+    }
+}
+
+state Box_Normal { // 1
+    statusc 0
+    code => sub BoxSleep
+    event => sub BoxEventNormal
+    trans => sub BoxTransCommon
+}
+
+state Box_Iron_Spawn { // 2
+    stateflag 0x201
+    statusc 0
+    trans => sub BoxTransCommon
+    code(reward, flags, ghost_target) {
+        setanim(BOX_IRON, 0)
+        BoxInit(0)
+        if (BoxFlags & BOX_FLAG_IRON_GHOST) {
+            setanim(BOX_IRON_GHOST, 0)
+        }
+        if (entitygetstate(2)) {
+            BoxTriggerTargets()
+        }
+        changestate(Box_Iron)
+    }
+}
+
+state Box_Iron { // 3
+    stateflag 0x4000281
+    trans => sub BoxTransCommon
+    code() {
+        sleep()
+    }
+    event(e, a) {
+        if (e == EventSpinHit || e == EventSlideHit || e == EventSlamHit) {
+            rejev()
+            if (frametime - statetime >= 0.8s) {
+                SoundPitchDefault()
+                sounddecay(0.625)
+                soundplay([iht0A], 0.4V)
+                statetime = frametime
+            }
+        }
+        if (e == EventHit, interrupter, interrupter -> spawn == S_BOX_CLOCK) {
+            accev()
+            SoundPitchDefault()
+            sounddecay(0.625)
+            soundplay([iht0A], 0.4V)
+        }
+    }
+}
+
+state Box_Steel_Spawn { // 4
+    stateflag 0x281
+    statusc 0
+    trans => sub BoxTransCommon
+    code(reward, flags, ghost_target) {
+        setanim(BOX_STEEL, 0)
+        BoxInit(100.0)
+        changestate(Box_Steel)
+    }
+    event(e, a) {
+        accevcstate(Box_Break_Reward, e == EventSlamHit && CheckBodyslamStatus)
+        if (interrupter) {
+            rejevcstate(Box_Steel_Hit, e == EventJumpedOn && CheckJumpStatus)
+        }
+        accevcstate(Box_Break_Reward, e == EventHitInvincible && player -> invincible == 5)
+        accevcstate(Box_Steel_Hit, (e == EventHit && !(BoxFlags & BOX_FLAG_NO_HIT)) || e == EventHitInvincible || e == EventFling)
+        BoxCheckSpinEvent(e, a)
+        if (eventaccepted) {
+            accevcstate(Box_Steel_Hit)
+        }
+        if (STATUS_GRAVITY) {
+            accevcstate(Box_Break_Reward, e == Event23)
+        }
+        else {
+            accevcstate(Box_Steel_Hit, e == Event23)
+        }
+        accevcstate(Box_Steel_Hit, e == EventSlideHit)
+    }
+}
+
+state Box_Steel { // 5
+    stateflag 0x281
+    statusc 0
+    event => state Box_Steel_Spawn
+    trans => sub BoxTransCommon
+    code() {
+        playframe()
+        changestateif(Box_Break_Reward, collider && entitygetstate(2))
+        sleep()
+    }
+}
+
+state Box_Steel_Hit { // 6
+    stateflag 0x81
+    statusc 0
+    trans => sub BoxTransCommon
+    code() {
+        SoundPitchDefault()
+        sounddecay(0.625)
+        soundplay([iht0A], 0.2V)
+        SoundPitchDefault(40)
+        soundplay([swb0A], 0.5V)
+        playframes(BOX_STEEL, 0.0, 9.0)
+        changestate(Box_Steel)
+    }
+    event(e, a) {
+        accevcstate(Box_Break_Reward, e == EventSlamHit && CheckBodyslamStatus)
+    }
+}
+
+state Box_Slot { // 7 
+    statusc 0
+    trans => sub BoxTransCommon
+    code(reward, flags, ghost_target, mask) {
+        changestateif(Box_Normal_Spawn, TIMETRIAL, reward, flags, ghost_target)
+        flags |= BOX_FLAG_AUTO_COLLECT
+        BoxInit(100.0)
+        if (entitygetstate(2)) {
+            finish:
+            setanim(BOX_IRON, 0)
+            BoxSlotInterval = 0
+            spawn = S_BOX_IRON
+            changestate(Box_Iron)
+        }
+        else if (entitygetstate(3)) {
+            mask &= ~0x4
+        }
+        setanim(BOX_SLOT, 0)
+        statusb |= 0x100000
+        BoxSlotInterval = 25
+        BoxSlotLastChangeTime = frametime
+        BoxSlotIndex = 0
+        BoxTNTFuse = 3.0
+        do {
+            if (distance(player) < 10m) {
+                if (BoxSlotInterval > 20) {
+                    BoxSlotInterval = 20
+                }
+            }
+            else if (BoxSlotInterval == 20) {
+                BoxSlotInterval = 25
+            }
+            if (BoxSlotInterval && frametime - BoxSlotLastChangeTime >= BoxSlotInterval) {
+                BoxSlotLastChangeTime = frametime
+                if (BoxSlotInterval != 25) {
+                    soundpitch(3.263)
+                    soundplay([Bl10A], 1V)
+                }
+                do {
+                    if (BoxSlotIndex == 31) {
+                        BoxSlotIndex = 0
+                        if (BoxSlotInterval <= 5) {
+                            BoxSlotInterval -= 2
+                        }
+                        else {
+                            BoxSlotInterval -= 5
+                        }
+                        if (BoxSlotInterval <= 0) {
+                            entitysetstate(1)
+                            goto finish;
+                        }
+                    }
+                    else {
+                        BoxSlotIndex += 1
+                    }
+                } until (mask & (1 << BoxSlotIndex))
+                setevent(BoxEventNormal)
+                if (var type = BoxSlotIndex % 5; type == 0) {
+                    BoxReward = 0
+                }
+                else if (type == 1) {
+                    BoxReward = REWARD_ID_10_WUMPA
+                }
+                else if (type == 2) {
+                    BoxReward = REWARD_ID_1UP
+                }
+                else if (type == 3) {
+                    setevent(EventBoxTNT)
+                }
+                else if (type == 4) {
+                    BoxReward = REWARD_ID_DOCTOR
+                }
+            }
+            if (frametime - BoxSlotLastChangeTime < 2) {
+                stalltime = GLOBAL_79 % 3
+            }
+            else {
+                stalltime = (BoxSlotIndex % 5) + 3
+            }
+            playframe()
+        } while (1)
+    }
+}
+
+state Box_Clock_Spawn { // 8
+    stateflag 0x201
+    statusc 0
+    code(reward, flags, ghost_target) {
+        statusb = FLAG_COLLIDABLE
+        zindex = 32
+        GLOBAL_174 = id
+        CheckItemPool(LEVEL >> 8, SAVEDCRYSTALPOOL1, SAVEDCRYSTALPOOL2)
+        var0 = !misc
+        if (LEVEL == LEVEL_EggipusRex || LEVEL == LEVEL_Area51 || LEVEL == LEVEL_HotCoco || LEVEL == LEVEL_SkiCrazed || LEVEL == LEVEL_RingsOfPower) {
+            var0 = 0
+        }
+        if (var0 || (frametime - GLOBAL_66 >= 15s && !(player -> stateflag & 0x2000))) {
+            KillEntity()
+            return
+        }
+        setanim(BOX_CLOCK, 0)
+        vfx = (vfx & 0xFFFFFF00) | 0xA
+        vfx = (vfx & 0xFF00FFFF) | 0x30000
+        SetColor1(0xD8, 0xD2, 0x9)
+        SetColor2(-0xB6D, 0x61F, 0x960)
+        moda = 4.0
+        changestate(Box_Clock)
+    }
+}
+
+state Box_Clock { // 9
+    statusc 0
+    code => state Box_Iron
+    event(e, a) {
+        rejevcstate(Box_Clock_Triggered, e == EventSlamHit || e == Event8)
+        accevcstate(Box_Clock_Triggered, e == EventHitInvincible 
+            || e == EventHit
+            || e == EventJumpedOn
+            || e == EventSpinHit
+            || e == EventSlideHit
+            || e == EventFling
+            || e == Event23)
+    }
+    trans {
+        roty = spd(roty, 180deg)
+        changestateif(Box_Clock_Triggered, collider)
+    }
+    
+}
+
+state Box_Clock_Triggered { // 10
+    stateflag 0x4000081
+    statusc 0
+    code() {
+        sendevent(Event15, player, 3.0)
+        soundpitch(3.625)
+        sounddecay(9.6s)
+        soundplay([1up0A], 0.8V)
+        soundsetup(0, voice, 5)
+        KillEntity()
+        GLOBAL_101 = 12
+        GLOBAL_100 = 0x7F
+        spawn(9, 43, 1, 0.5m, 0x6C, 0x69, 4, 1S, 0, 0)
+        spawn(4, 25, 1)
+        while (child || !(frametime - statetime >= 50)) {
+            playnull()
+        }
+    }
+    trans {
+        if (!time(5)) {
+            if (!time(10)) {
+                soundpitch(0x399)
+                sounddecay(0xC8)
+                soundplay([Clt0A], 1V)
+            }
+            else {
+                soundpitch(0x266)
+                sounddecay(0xC8)
+                soundplay([Clt0A], 1V)
+            }
+        }
+    }
+}
+
+state Box_Ghost_Spawn { // 11
+    statusc 0
+    trans => sub BoxTransCommon
+    code(reward, flags, ghost_target) {
+        if (entitygetstate(2)) {
+            BoxGhostSelectAnim(reward)
+        }
+        else {
+            setanim(BOX_GHOST, 0)
+        }
+        BoxInit(100.0)
+        BoxCheckDDA()
+        changestateif(Box_Ghost_Appear, entitygetstate(2))
+        setanim(BOX_GHOST, 0)
+        changestate(Box_Ghost)
+    }
+    event(e, a) {
+        accevif (e == EventTriggered) {
+            entitysetstate(1)
+        }
+    }
+}
+
+state Box_Ghost { // 12
+    statusc 0
+    trans => sub BoxTransCommon
+    code() {
+        statusb &= ~FLAG_COLLIDABLE
+        sleep()
+    }
+    event(e, a) {
+        accevcstate(Box_Ghost_Appear, e == EventTriggered && !(BoxFlags & BOX_FLAG_NO_GHOST))
+    }
+}
+
+state Box_Ghost_Appear { // 13
+    stateflag 0x201
+    statusc 0
+    trans => sub BoxTransCommon
+    code() {
+        v0 = entitygetstate(2)
+        unless (v0) {
+            playframe(animframe, 4)
+        }
+        entitysetstate(1)
+        unless (BoxFlags & BOX_FLAG_NO_TRIGGER) {
+            BoxTriggerTargets()
+        }
+        if (!v0 && (spawn == S_BOX_IRON || spawn == S_BOX_SPRING_IRON || spawn == S_BOX_ACTION || spawn == S_BOX_ACTION_NITRO)) {
+            save (statusb) {
+                statusb |= FLAG_COLLIDABLE
+                statusb &= ~FLAG_SOLID_ALL2
+                playframe()
+                while (collider) {
+                    playframe()
+                }
+            }
+        }
+        SoundPitchDefault()
+        soundplay([bap0A], 0.4V)
+        statusb |= FLAG_COLLIDABLE
+        statusb &= ~FLAG_INVISIBLE
+        BoxGhostActivate(spawn)
+    }
+}
+
+sub BoxGhostSelectAnim(reward) { // S-2170
+    if (spawn == S_BOX_SPRING) {
+        setanim(BOX_SPRING, 0)
+    }
+    else if (spawn == S_BOX_NORMAL) {
+        SetBoxAnim(BOX_NORMAL, 0, 0)
+    }
+    else if (spawn == S_BOX_1UP) {
+        SetBoxAnim(BOX_NORMAL, 1, 0)
+        BoxReward = REWARD_ID_1UP
+    }
+    else if (spawn == S_BOX_DOCTOR) {
+        SetBoxAnim(BOX_NORMAL, 3, 0)
+        BoxReward = REWARD_ID_DOCTOR
+    }
+    else if (spawn == S_BOX_FRUIT) {
+        setanim(BOX_FRUIT, 0)
+    }
+    else if (spawn == S_BOX_ACTION) {
+        setanim(BOX_ACTION_1, 0)
+    }
+    else if (spawn == S_BOX_ACTION_NITRO) {
+        setanim(BOX_ACTION_NITRO_1, 0)
+    }
+    else if (spawn == S_BOX_PICKUP) {
+        SetBoxAnim(BOX_NORMAL, 2, 0)
+    }
+    else if (spawn == S_BOX_NITRO) {
+        setanim(BOX_NITRO, 0)
+    }
+    else if (spawn == S_BOX_TNT) {
+        setanim(BOX_TNT, 0)
+    }
+    else if (spawn == S_BOX_GHOST) {
+        if (reward == REWARD_ID_1UP) {
+            SetBoxAnim(BOX_NORMAL, 1, 0)
+        }
+        else if (reward == REWARD_ID_DOCTOR) {
+            SetBoxAnim(BOX_NORMAL, 3, 0)
+        }
+        else {
+            SetBoxAnim(BOX_NORMAL, 0, 0)
+        }
+    }
+    else if (spawn == S_BOX_GHOST_IRON || spawn == S_BOX_IRON) {
+        if (BoxFlags & BOX_FLAG_IRON_GHOST) {
+            setanim(BOX_IRON_GHOST, 0)
+        }
+        else {
+            setanim(BOX_IRON, 0)
+        }
+    }
+    else if (spawn == S_BOX_SPRING_IRON) {
+        setanim(BOX_SPRING_IRON, 0)
+    }
+}
+
+sub BoxGhostActivate(s) { // S-2263
+    spawn = s
+    BoxCheckDDA()
+    BoxGhostSelectAnim(BoxReward)
+    if (spawn == S_BOX_SPRING || spawn == S_BOX_SPRING_IRON) {
+        changestate(Box_Spring)
+    }
+    else if (spawn == S_BOX_IRON || spawn == S_BOX_GHOST_IRON) {
+        changestate(Box_Iron)
+    }
+    else if (spawn == S_BOX_FRUIT) {
+        changestate(Box_Fruit)
+    }
+    else if (spawn == S_BOX_TNT) {
+        changestate(Box_TNT)
+    }
+    else if (spawn == S_BOX_NITRO) {
+        changestate(Box_Nitro)
+    }
+    else if (spawn == S_BOX_ACTION || spawn == S_BOX_ACTION_NITRO) {
+        changestate(Box_Action)
+    }
+    else {
+        if (BoxFlags & BOX_FLAG_GHOST_BREAK) {
+            changestate(Box_Break_Reward)
+        }
+        else {
+            changestate(Box_Normal)
+        }
+    }
+}
+
+state Box_Action_Spawn { // 14
+    statusc 0
+    code(reward, flags, ghost_start, ghost_end) {
+        if (entitygetstate(2) && (!(flags & BOX_FLAG_GHOST) || entitygetstate(ghost_start, 2))) {
+            spawn = S_BOX_IRON
+            changestate(Box_Iron_Spawn, reward, flags, ghost_start)
+        }
+        BoxGhostTargetEnd = ghost_end
+        flags |= BOX_FLAG_TARGET_RANGE
+        if (spawn == S_BOX_ACTION_NITRO) {
+            setanim(BOX_ACTION_NITRO_1, 0)
+        }
+        else {
+            setanim(BOX_ACTION_1, 0)
+        }
+        BoxInit(100.0)
+        changestate(Box_Action)
+    }
+}
+
+state Box_Action { // 15
+    stateflag 0x4000081
+    statusc 0
+    code => state Box_Iron
+    trans => sub BoxTransCommon
+    event(e, a) {
+        if (interrupter) {
+            accevcstate(Box_Action_Trigger_1, e == EventJumpedOn && CheckJumpStatus)
+        }
+        rejevcstate(Box_Action_Trigger_1, e == EventSlamHit || e == EventTriggered)
+        accevcstate(Box_Action_Trigger_1, (e == EventHit && !(BoxFlags & BOX_FLAG_NO_HIT)) || e == EventHitInvincible || e == EventFling)
+        BoxCheckSpinEvent(e, a)
+        if (eventaccepted) {
+            accevcstate(Box_Action_Trigger_2)
+        }
+        accevcstate(Box_Action_Trigger_1, e == EventTriggered && !(BoxFlags & BOX_FLAG_NO_GHOST))
+        accevcstate(Box_Action_Trigger_1, e == Event23)
+        accevcstate(Box_Action_Trigger_1, e == EventSlideHit)
+    }
+}
+
+expr ACTION_MARK_YELLOW = 0.0
+expr ACTION_MARK_GREEN = 1.0
+
+sub BoxActionExec() { // S-2365
+    unless (BoxFlags & BOX_FLAG_ACTION_REPEAT) {
+        entitysetstate(1)
+    }
+    var mark = ACTION_MARK_YELLOW
+    if (spawn == S_BOX_ACTION_NITRO) {
+        GLOBAL_101 = 25
+        GLOBAL_100 = 0x7F
+        spawn(9, 43, 1, 0.5m, 0, 0x60, 0, 1S, 0, 0)
+        mark = ACTION_MARK_GREEN
+    }
+    spawn(BoxsC, S_ACTION_MARK, 1, mark, 0, 0, 0.5m)
+    spawn(BoxsC, S_ACTION_MARK, 1, mark, 0.5m, 0, 0)
+    spawn(BoxsC, S_ACTION_MARK, 1, mark, 0, 0, -0.5m)
+    spawn(BoxsC, S_ACTION_MARK, 1, mark, -0.5m, 0, 0)
+    spawn(BoxsC, S_ACTION_MARK, 1, mark, 0, 1.5m, 0)
+    if (spawn == S_BOX_ACTION_NITRO) {
+        GLOBAL_139 |= 0x2
+        killvictims()
+        soundpitch((30.4 + rand(3.2)) * 69 >> 8)
+        sounddecay(0.75)
+        soundplay([nbr0A], 0.4V)
+        SoundPitchDefault(0.23)
+        sounddecay(0.75)
+        soundplay([tnt0A], 1.0V)
+        if (!SHAKEY) {
+            SHAKEY = 15.0
+        }
+    }
+    if (LEVEL == LEVEL_HotCoco || LEVEL == LEVEL_SkiCrazed || LEVEL == LEVEL_TellNoTales || LEVEL == LEVEL_MakinWaves) {
+        KillEntity()
+        changestate(Box_Break)
+    }
+}
+
+state Box_Action_Trigger_1 { // 16
+    stateflag 0x4000081
+    statusc 0
+    trans => sub BoxTransCommon
+    code() {
+        sendevent(Event15, player, 3.0)
+        SoundPitchDefault(0.23)
+        soundplay([swb0A], 0.5V)
+        if (spawn == S_BOX_ACTION_NITRO) {
+            playframes(BOX_ACTION_NITRO_1, 0.0, 9.0)
+        }
+        else {
+            playframes(BOX_ACTION_1, 0.0, 9.0)
+        }
+        BoxTriggerTargets()
+        BoxActionExec()
+        if (BoxFlags & BOX_FLAG_ACTION_REPEAT) {
+            playframe(animframe, 42)
+            changestate(Box_Action)
+        }
+        else {
+            setanim(BOX_IRON, 0)
+            changestate(Box_Iron)
+        }
+    }
+}
+
+state Box_Action_Trigger_2 { // 17
+    stateflag 0x4000081
+    statusc 0
+    trans => sub BoxTransCommon
+    code() {
+        sendevent(Event15, player, 3.0)
+        SoundPitchDefault(40)
+        soundplay([swb0A], 0.5V)
+        if (spawn == S_BOX_ACTION_NITRO) {
+            playframes(BOX_ACTION_NITRO_2, 0.0, 9.0)
+        }
+        else {
+            playframes(BOX_ACTION_2, 0.0, 9.0)
+        }
+        BoxTriggerTargets()
+        BoxActionExec()
+        if (BoxFlags & BOX_FLAG_ACTION_REPEAT) {
+            playframe(animframe, 42)
+            changestate(Box_Action)
+        }
+        else {
+            setanim(BOX_IRON, 0)
+            changestate(Box_Iron)
+        }
+    }
+}
+
+state Box_Continue_Spawn { // 18
+    statusc 0x1000000
+    trans => sub BoxTransCommon
+    code(reward, flags, ghost_target) {
+        {
+            var deaths = fieldval(ENTITY_FIELD_DDA_DEATHS)
+            var section = fieldval(ENTITY_FIELD_DDA_SECTION)
+            var checkpoint_enabled
+            checkpoint_enabled = (deaths == 0 || (SECTIONDEATHCOUNT >= deaths && SECTION == section) || entitygetstate(3))
+            if (!checkpoint_enabled || TIMETRIAL) {
+                spawn = S_BOX_PICKUP
+                if (!reward) {
+                    reward = 100.0
+                }
+                changestate(Box_Normal_Spawn, reward, flags, ghost_target)
+            }
+        }
+        if (entitygetstate(3)) {
+            setanim(BOX_CONTINUE, 15.0)
+        }
+        else {
+            setanim(BOX_CONTINUE, 0)
+        }
+        BoxInit(100.0)
+        changestateif(Box_Continue_Opened, entitygetstate(3) || collider)
+        sleep()
+    }
+    event(e, a) {
+        if (interrupter) {
+            accevcstate(Box_Continue_Open, e == EventJumpedOn && CheckJumpStatus)
+            accevcstate(Box_Continue_Open, e == EventSlamHit && CheckBodyslamStatus)
+        }
+        BoxCheckSpinEvent(e, a)
+        if (eventaccepted) {
+            accevcstate(Box_Continue_Open)
+        }
+        accevcstate(Box_Continue_Open, e == EventHitInvincible)
+        accevcstate(Box_Continue_Open, e == Event23)
+        accevcstate(Box_Continue_Open, e == EventSlideHit)
+    }
+}
+
+state Box_Continue_Iron_Spawn { // 19
+    stateflag 0x4000081
+    statusc 0x1000000
+    trans => sub BoxTransCommon
+    code(reward, flags, ghost_target) {
+        if (entitygetstate(3) || TIMETRIAL) {
+            spawn = S_BOX_IRON
+            changestate(Box_Iron_Spawn, reward, flags, ghost_target)
+        }
+        setanim(BOX_CONTINUE_IRON, 0)
+        BoxInit(100.0)
+        if (entitygetstate(3) || collider) {
+            spawn = S_BOX_IRON
+            changestate(Box_Iron_Spawn, reward, flags, ghost_target)
+        }
+        sleep()
+    }
+    event(e, a) {
+        if (interrupter) {
+            accevcstate(Box_Continue_Iron_Open, e == EventJumpedOn && CheckJumpStatus)
+        }
+        rejevcstate(Box_Continue_Iron_Open, e == EventSlamHit)
+        BoxCheckSpinEvent(e, a)
+        if (eventaccepted) {
+            accevcstate(Box_Continue_Iron_Open)
+        }
+        accevcstate(Box_Continue_Iron_Open, e == EventHitInvincible)
+        accevcstate(Box_Continue_Iron_Open, e == Event23)
+        accevcstate(Box_Continue_Iron_Open, e == EventSlideHit)
+    }
+}
+
+state Box_Continue_Iron_Open { // 20
+    stateflag 0x4000283
+    code() {
+        CHECKPOINTID = id
+        SPAWNTRANSX = x
+        SPAWNTRANSY = y + 1m
+        SPAWNTRANSZ = z
+        entitysetstate(3)
+        savecheckpoint(0)
+        if (var section = fieldval(ENTITY_FIELD_DDA_SECTION); section) {
+            GLOBAL_140 |= 1 << (section >> 8)
+        }
+        SoundPitchDefault()
+        soundplay([con0A], 0.3V)
+        playframes(BOX_CONTINUE_IRON, 0.0, 15.0)
+        setanim(BOX_IRON, 0)
+        playframe()
+        BoxSpawnContinueLetter()
+        spawn = S_BOX_IRON
+        changestate(Box_Iron)
+    }
+}
+
+expr CONTINUE_C = 0.0
+expr CONTINUE_H = 1.0
+expr CONTINUE_E = 2.0
+expr CONTINUE_K = 3.0
+expr CONTINUE_P = 4.0
+expr CONTINUE_O = 5.0
+expr CONTINUE_I = 6.0
+expr CONTINUE_N = 7.0
+expr CONTINUE_T = 8.0
+
+sub BoxSpawnContinueLetter() { // S-2658
+    troty = GAMEDIR + 90deg
+    spawn(BoxsC, S_CONTINUE_LETTER, 1, CONTINUE_C, -1.2m)
+    playframe(animframe, 0.1s)
+    spawn(BoxsC, S_CONTINUE_LETTER, 1, CONTINUE_H, -0.6m)
+    playframe(animframe, 0.1s)
+    spawn(BoxsC, S_CONTINUE_LETTER, 1, CONTINUE_E, 0.0m)
+    playframe(animframe, 0.1s)
+    spawn(BoxsC, S_CONTINUE_LETTER, 1, CONTINUE_C, 0.6m)
+    playframe(animframe, 0.1s)
+    spawn(BoxsC, S_CONTINUE_LETTER, 1, CONTINUE_K, 1.2m)
+    playframe(animframe, 1s)
+    spawn(BoxsC, S_CONTINUE_LETTER, 1, CONTINUE_P, -1.2m)
+    playframe(animframe, 0.1s)
+    spawn(BoxsC, S_CONTINUE_LETTER, 1, CONTINUE_O, -0.6m)
+    playframe(animframe, 0.1s)
+    spawn(BoxsC, S_CONTINUE_LETTER, 1, CONTINUE_I, 0.0m)
+    playframe(animframe, 0.1s)
+    spawn(BoxsC, S_CONTINUE_LETTER, 1, CONTINUE_N, 0.6m)
+    playframe(animframe, 0.1s)
+    spawn(BoxsC, S_CONTINUE_LETTER, 1, CONTINUE_T, 1.2m)
+}
+
+state Box_Continue_Open { // 21
+    stateflag 0x203
+    trans => sub BoxTransCommon
+    code() {
+        CHECKPOINTID = id
+        SPAWNTRANSX = x
+        SPAWNTRANSY = y
+        SPAWNTRANSZ = z
+        sendevent(EventBoxBreak, player, self)
+        entitysetstate(3)
+        savecheckpoint(0)
+        if (var section = fieldval(ENTITY_FIELD_DDA_SECTION); section) {
+            GLOBAL_140 |= 1 << (section >> 8)
+        }
+        sendevent(EventBoxStackBreak, creator, 4m)
+        if (!creator) {
+            statusb &= ~FLAG_COLLIDABLE
+        }
+        SoundPitchDefault()
+        soundsetup(7, self, 8)
+        soundplay([con0A], 0.7V)
+        playframes(0.0, 15.0)
+        playframe(14.0)
+        zindex = 26
+        statusb &= ~FLAG_COLLIDABLE
+        if (BoxBelow && !creator) {
+            interrupter = BoxBelow
+            interrupter -> statusb |= FLAG_SOLID_TOP
+        }
+        animframe = 15.0
+        BoxSpawnContinueLetter()
+        sleepframe(15.0)
+    }
+}
+
+state Box_Continue_Opened { // 22
+    stateflag 0x203
+    trans => sub BoxTransCommon
+    code() {
+        statusb &= ~FLAG_COLLIDABLE
+        zindex = 26
+        playframe(15.0)
+        sendevent(EventBoxStackBreak, creator, 4m)
+        if (BoxBelow && !creator) {
+            interrupter = BoxBelow
+            interrupter -> statusb |= FLAG_SOLID_TOP
+        }
+        sleepframe(15.0)
+    }
+}
+
+state Action_Mark { // 23
+    stateflag 0x3
+    code(frame, xoff, yoff, zoff) {
+        zindex = 46
+        SetScale(0.5S, 1S, 0.5S)
+        SetRot(0deg)
+        setanim(ACTION_MARK, frame)
+        x += xoff
+        y += yoff
+        z += zoff
+        velx = xoff << 6
+        vely = yoff >> 1
+        velz = zoff << 6
+        statusb = FLAG_PHYSICS_ENGINE
+        playframe(animframe, 42)
+        if (yoff) {
+            statusb = 0
+            do (var i = 0) {
+                playnull(2)
+                setanim(ACTION_MARK)
+                playframe(frame, 2)
+            } while ({ i += 1.0 }; i < 8.0)
+        }
+    }
+}
+
+state Continue_Letter { // 24
+    stateflag 0x3
+    code(frame, v) {
+        vfx = (vfx & 0xFFFF00FF) | 0x400
+        SetColor1(0xFF, 0xC8, 0x00)
+        moda = 16.0
+        zindex = 33
+        SetScale(0S)
+        SetRot(0deg)
+        setanim(CONTINUE_LETTER)
+        soundpitch((15.36 + rand(1.28)) * 0.205 >> 8)
+        sounddecay(0.125)
+        soundsetup(7, self, 8)
+        soundplay([jmp0A], 0.4V)
+        troty = creator -> troty
+        setvel(v, vvec)
+
+        do (var i = 0) {
+            x += vecx / 5
+            z += vecz / 5
+            scalex += 9.6 / 5
+            scaley = scalex
+            y += 0.4m
+            playframe(frame)
+        } while ({ i += 1.0 }; i < 5.0)
+
+        groundy = y
+        vely = 0.2m
+
+        do (var start = frametime) {
+            y = groundy + (loopseek(vely, 0.2m, 0.6m / 30) - 0.2m)
+            playframe()
+        } while (frametime - start < 0.7s)
+
+        statusb = FLAG_PHYSICS_ENGINE
+        setvel(-20m)
+        soundpitch((15.36 + rand(1.28)) * 0.205 >> 8)
+        sounddecay(0.25)
+        soundplay([jmp0A], 0.3V)
+
+        do (var start = frametime) {
+            velx = (velx * 1.05) >> 8
+            velz = (velz * 1.05) >> 8
+            playframe()
+        } while (frametime - start < 1s)
+    }
+}
+
+state Box_Spring_Spawn { // 25
+    statusc 0
+    trans => sub BoxTransCommon
+    code(reward, flags, ghost_target, propulsion) {
+        if (spawn == S_BOX_SPRING) {
+            setanim(BOX_SPRING, 0)
+        }
+        else {
+            setanim(BOX_SPRING_IRON, 0)
+        }
+        BoxSpringPopulsion = propulsion
+        BoxInit(100.0)
+        changestate(Box_Spring)
+    }
+}
+
+state Box_Spring { // 26
+    statusc 0
+    trans => sub BoxTransCommon
+    code() {
+        if (spawn == S_BOX_SPRING_IRON) {
+            statusc |= 0x1000000
+            stateflag |= 0x4000280
+        }
+        sleep()
+    }
+    event(e, a) {
+        if (player -> y > y + 0.5m && interrupter == player && (e == EventJumpedOn || (spawn == S_BOX_SPRING_IRON && e == EventSlamHit)) && !creator) {
+            sendevent(EventBounce, interrupter, BoxSpringPopulsion)
+            rejevcstate(Box_Spring_Bounce)
+        }
+        if (spawn == S_BOX_SPRING) {
+            accevcstate(Box_Break_Reward, e == EventSlamHit && CheckBodyslamStatus)
+            BoxCheckSpinEvent(e, a)
+            if (eventaccepted) {
+                accevcstate(Box_Break_Reward)
+            }
+            if (e == EventHitInvincible) {
+                if (player -> y > y + 0.9m && player -> invincible == 5) {
+                    accevcstate(Box_Break_Reward_Delayed)
+                }
+                else {
+                    accevcstate(Box_Break_Reward)
+                }
+            }
+            else if (e == EventFling || (e == EventHit && !(BoxFlags & BOX_FLAG_NO_HIT))) {
+                if (a[0] && e == EventHit && (BoxReward < 110.0 || BoxReward >= 200.0)) {
+                    accevcstate(Box_Break)
+                }
+                else {
+                    accevcstate(Box_Break_Reward)
+                }
+            }
+            accevcstate(Box_Break_Reward, e == Event23)
+            accevcstate(Box_Break_Reward, e == EventSlideHit)
+        }
+        accevcstate(Box_Spring_Bounce_Box, e == Event14)
+    }
+}
+
+sub BoxSpringPlayAnim() { // S-2961
+    if (spawn == S_BOX_SPRING_IRON) {
+        playanim(0, BOX_SPRING_IRON)
+        playanim(1, BOX_SPRING_IRON)
+        playanim(2, BOX_SPRING_IRON)
+        playanim(2, BOX_SPRING_IRON)
+        playanim(3, BOX_SPRING_IRON)
+        playanim(4, BOX_SPRING_IRON)
+        playanim(5, BOX_SPRING_IRON)
+        playanim(6, BOX_SPRING_IRON)
+        playanim(6, BOX_SPRING_IRON)
+        playanim(7, BOX_SPRING_IRON)
+    }
+    else {
+        playanim(0, BOX_SPRING)
+        playanim(1, BOX_SPRING)
+        playanim(2, BOX_SPRING)
+        playanim(2, BOX_SPRING)
+        playanim(3, BOX_SPRING)
+        playanim(4, BOX_SPRING)
+        playanim(5, BOX_SPRING)
+        playanim(6, BOX_SPRING)
+        playanim(6, BOX_SPRING)
+        playanim(7, BOX_SPRING)
+    }
+}
+
+state Box_Spring_Bounce { // 27
+    event => state Box_Spring
+    trans => sub BoxTransCommon
+    code() {
+        if (spawn == S_BOX_SPRING_IRON) {
+            stateflag |= 0x200
+        }
+        SoundPitchDefault(0.23)
+        sounddecay(0.625)
+        soundplay([bnc0A], 0.5V)
+        BoxSpringPlayAnim()
+        changestate(Box_Spring)
+    }
+}
+
+state Box_Spring_Bounce_Box { // 28
+    trans => sub BoxTransCommon
+    code() {
+        if (spawn == S_BOX_SPRING_IRON) {
+            stateflag |= 0x4000280
+        }
+        statusb |= FLAG_SOLID_TOP
+        SoundPitchDefault(0.23)
+        sounddecay(0.625)
+        soundplay([bnc0A], 0.5V)
+        sendevent(EventBounce, creator, 17.88854m)
+        BoxSpringPlayAnim()
+        changestate(Box_Spring)
+    }
+    event(e, a) {
+        if (player -> y > y + 0.75m) {
+            rejevcstate(Box_Spring_Bounce, e == EventJumpedOn && STATUS_SOLID_TOP)
+        }
+        if (spawn == S_BOX_SPRING) {
+            BoxCheckSpinEvent(e, a)
+            if (eventaccepted) {
+                accevcstate(Box_Break_Reward)
+            }
+            if (e == EventHitInvincible) {
+                if (player -> y > y + 0.9m && player -> invincible == 5) {
+                    accevcstate(Box_Break_Reward_Delayed)
+                }
+                else {
+                    accevcstate(Box_Break_Reward)
+                }
+            }
+            else if (e == EventFling || (e == EventHit && !(BoxFlags & BOX_FLAG_NO_HIT))) {
+                if (a[0] && e == EventHit && (BoxReward < 110.0 || BoxReward >= 200.0)) {
+                    accevcstate(Box_Break)
+                }
+                else {
+                    accevcstate(Box_Break_Reward)
+                }
+            }
+            accevcstate(Box_Break_Reward, e == Event23)
+            accevcstate(Box_Break_Reward, e == EventSlideHit)
+        }
+    }
+}
+
+state Box_Fruit_Spawn { // 29
+    statusc 0
+    trans => sub BoxTransCommon
+    code(reward, flags, ghost_target) {
+        changestateif(Box_Normal_Spawn, TIMETRIAL, reward, flags, ghost_target)
+        setanim(BOX_FRUIT, 0)
+        flags |= BOX_FLAG_AUTO_COLLECT
+        BoxInit(94.0)
+        BoxCheckDDA()
+        BoxFruitHits = 0
+        changestate(Box_Fruit)
+    }
+}
+
+state Box_Fruit { // 30
+    statusc 0
+    code => state Box_Spring
+    trans => sub BoxTransCommon
+    event(e, a) {
+        if (player -> y > y + 0.75m) {
+            accevcstate(Box_Fruit_Hit, e == EventJumpedOn && STATUS_SOLID_TOP)
+        }
+        if (e == EventHitInvincible) {
+            if (BoxReward == REWARD_ID_WUMPA) {
+                BoxReward = 78.0
+            }
+            accevcstate(Box_Break_Reward)
+        }
+        accevcstate(Box_Break_Reward, e == EventSlamHit && CheckBodyslamStatus)
+        accevcstate(Box_Break, (e == EventHit && !(BoxFlags & BOX_FLAG_NO_HIT)) || e == EventHitInvincible || e == EventFling)
+        BoxCheckSpinEvent(e, a)
+        if (eventaccepted) {
+            accevcstate(Box_Break)
+        }
+        accevcstate(Box_Break, e == EventSlideHit)
+        if (e == Event23) {
+            accevcstate(Box_Break, STATUS_GRAVITY || (collider && player -> stateflag & 0x800000) || player -> statusa & FLAG_GROUNDLAND)
+            accevcstate(Box_Fruit_Hit)
+        }
+        if (e == EventTimeTrial) {
+            BoxReward = 0
+            SetBoxAnim(BOX_NORMAL, 0, 0)
+            spawn = S_BOX_NORMAL
+            accevcstate(Box_Normal)
+        }
+    }
+}
+
+state Box_Fruit_Hit { // 31
+    statusc 0
+    event => state Box_Fruit
+    trans => sub BoxTransCommon
+    code() {
+        if (BoxFruitHits == 0) {
+            if (entitygetstate(2)) {
+                BoxFruitBreakPoint = frametime - 3.5s
+            }
+            else {
+                entitysetstate(1)
+                sendevent(Event15, player, 8.0)
+                BoxFruitBreakPoint = frametime
+            }
+        }
+        changestateif(Box_Break_Reward, getfield(self, offsetof(BoxFruitHits)) >= 8.0)
+        changestateif(Box_Break, frametime - BoxFruitBreakPoint >= 3.5s)
+        spawn2(FruiC, FruiC_S_FRUIT_AUTO, 1, REWARD_ID_WUMPA, 0)
+        playanim(0, BOX_FRUIT)
+        playanim(1, BOX_FRUIT)
+        spawn2(FruiC, FruiC_S_FRUIT_AUTO, 1, REWARD_ID_WUMPA, 0)
+        BoxFruitHits += 2.0
+        playframes(2.0, 7.0)
+        playanim(6, BOX_FRUIT)
+        playanim(7, BOX_FRUIT)
+        changestate(Box_Fruit)
+    }
+}
+
+state Box_Break { // 32
+    stateflag 0x203
+    code() {
+        vfx = (vfx & 0xFFFF00FF) | 0x600
+        if (spawn == S_BOX_ACTION_NITRO) {
+            SetColor1(0x51, 0xA9, 0x00)
+            epc = 0
+        }
+        else {
+            KillEntity()
+            entitysetstate(0)
+            if (statusa & 0x80) {
+                statusb &= ~FLAG_COLLIDABLE
+            }
+            BoxBreak()
+            SetColor1(0xE6, 0x69, 0x08)
+            epc = 0
+        }
+        moda = 16.0
+        SoundPitchDefault(0.23)
+        sounddecay(0.625)
+        soundplay([brk0A], 0.35V)
+        FlipRand()
+        playanim(0, BOX_EXPLODE)
+        playanim(1, BOX_EXPLODE)
+        playanim(2, BOX_EXPLODE)
+        statusb &= ~FLAG_COLLIDABLE
+        playframes(3.0, 11.0)
+    }
+    event(e, a) {
+        accevif (e == EventDespawn && spawn != S_BOX_ACTION_NITRO) {
+            sendevent(EventBoxBreak, player, self)
+            KillEntity()
+            epc = 0
+        }
+    }
+}
+
+state Box_Break_Reward { // 33
+    stateflag 0x203
+    code() {
+        vfx = (vfx & 0xFFFF00FF) | 0x600
+        KillEntity()
+        entitysetstate(0)
+        if (statusa & 0x80) {
+            statusb &= ~FLAG_COLLIDABLE
+        }
+        BoxBreak()
+        var0 = 0
+        if (BoxReward == REWARD_ID_1UP) {
+            var0 = id
+        }
+        else if (BoxReward == REWARD_ID_DOCTOR) {
+            var0 = fieldval(ENTITY_FIELD_PARENT_ID)
+        }
+        interrupter = child
+        if (creator || BoxFlags & BOX_FLAG_AUTO_COLLECT || eventreceived == EventHit || eventreceived == EventHitInvincible || BoxReward == REWARD_ID_DOCTOR) {
+            if (BoxReward) {
+                spawn2(FruiC, FruiC_S_FRUIT_AUTO, 1, BoxReward, v0)
+            }
+        }
+        else if (BoxReward) {
+            spawn2(FruiC, FruiC_S_FRUIT_HOP, 1, BoxReward, v0)
+        }
+        if (interrupter == child && BoxReward) {
+            BoxForceReward(BoxReward, var0)
+        }
+        SoundPitchDefault(0.23)
+        sounddecay(0.625)
+        soundplay([brk0A], 0.35V)
+        FlipRand()
+        BoxTriggerTargets()
+        SetColorC2(16.0, 0xE6, 0x69, 0x08)
+        playanim(0, BOX_EXPLODE)
+        playanim(1, BOX_EXPLODE)
+        playanim(2, BOX_EXPLODE)
+        playanim(3, BOX_EXPLODE)
+        statusb &= ~FLAG_COLLIDABLE
+        playframes(4.0, 11.0)
+    }
+}
+
+state Box_Break_Reward_Delayed { // 34
+    stateflag 0x203
+    statusc 0
+    trans => sub BoxTransCommon
+    code() {
+        WaitFrame(12)
+        changestate(Box_Break_Reward)
+    }
+}
+
+sub BoxForceReward(reward, parent_id) { // S-3305
+    if (reward == REWARD_ID_1UP) {
+        sendevent(Event5, player, 1.0)
+        entitysetstate(parent_id, 5)
+    }
+    else {
+        sendevent(Event2, player, 1.0)
+    }
+}
+
+inline sub TNTDefaultColor() {
+    SetColor1(0xFF, 0xFF, 0xFF)
+    SetColor2(0xFF, 0xFF, 0xFF)
+    SetColor3(0xFF, 0xFF, 0xFF)
+    SetColor4(0xFF, 0xFF, 0xFF)
+}
+
+inline sub TNTFlashColor() {
+    SetColor1(0x200, 0x96, 0x96)
+    SetColor2(0x200, 0x96, 0x96)
+    SetColor3(0x200, 0x96, 0x96)
+    SetColor4(0x200, 0x96, 0x96)
+}
+
+state Box_TNT_Spawn { // 35
+    stateflag 0x281
+    statusc 0
+    event => sub EventBoxTNT
+    trans => sub TransBoxTNT
+    code(reward, flags, ghost_target, path_delay, fuse) {
+        setanim(BOX_TNT, 0)
+        BoxFlashInterval = 2s
+        BoxFlashOffset = rand(2s)
+        BoxTNTFuse = fuse
+        BoxInit(100.0)
+        unless (creator || BoxBelow) {
+            stateflag &= ~0x200
+        }
+        sleep()
+    }
+}
+
+sub EventBoxTNT(e, a) {
+    rejevret(!(statusa & 0x80000))
+    if (e == Event23) {
+        accevcstate(Box_TNT_Explosion, STATUS_GRAVITY || BoxFlags & BOX_FLAG_WATER)
+        accevcstate(Box_TNT_Countdown)
+    }
+    accevcstate(Box_TNT_Explosion, (e == EventHit && !(BoxFlags & BOX_FLAG_NO_HIT)) || e == EventHitInvincible || e == EventFling)
+    BoxCheckSpinEvent(e, a)
+    if (eventaccepted) {
+        accevcstate(Box_TNT_Explosion)
+    }
+    accevcstate(Box_TNT_Explosion, e == EventSlideHit)
+    if (interrupter) {
+        accevcstate(Box_TNT_Countdown, e == EventJumpedOn && CheckJumpStatus)
+        accevcstate(Box_TNT_Explosion, e == EventSlamHit && CheckBodyslamStatus)
+    }
+    interrupter = BoxBelow
+    misc = BoxBelow
+    if (misc) {
+        misc = interrupter -> spawn == S_BOX_NITRO
+    }
+    if (!misc) {
+        misc = 0
+    }
+    misc = creator
+    if (misc) {
+        misc = creator -> spawn == S_BOX_NITRO
+    }
+    if (!misc) {
+        misc = 0
+    }
+    unless (misc || misc) {
+        accevcstate(Box_TNT_Countdown, e == Event14)
+    }
+    accevcstate(Box_TNT_Countdown, e == EventHitInvincible)
+}
+
+sub TransBoxTNT() {
+    BoxTransCommon()
+    if (!STATUS_FIRSTFRAME) {
+        if (time(BoxFlashInterval, BoxFlashOffset)) {
+            TNTDefaultColor()
+        }
+        else {
+            TNTFlashColor()
+        }
+    }
+}
+
+state Box_TNT { // 36
+    stateflag 0x201
+    statusc 0
+    event => sub EventBoxTNT
+    trans => sub TransBoxTNT
+    code() {
+        sleep()
+    }
+}
+
+state Box_Nitro_Spawn { // 37
+    statusc 0
+    trans => sub TransBoxNitro
+    code(reward, flags, ghost_target) {
+        settrans(TransBoxNitro)
+        setanim(BOX_NITRO, 0)
+        BoxInit(100.0)
+        density = 40.0
+        sleep()
+    }
+    event(e, a) {
+        accevcstate(Box_TNT_Explosion, e == EventSlamHit && CheckBodyslamStatus)
+        if (e == Event23) {
+            accevcstate(Box_TNT_Explosion)
+        }
+        accevcstate(Box_TNT_Explosion, (e == EventHit && !(BoxFlags & BOX_FLAG_NO_HIT)) || e == EventHitInvincible || e == EventFling)
+        BoxCheckSpinEvent(e, a)
+        if (eventaccepted) {
+            accevcstate(Box_TNT_Explosion)
+        }
+        accevcstate(Box_TNT_Explosion, e == EventSlideHit)
+    }
+}
+
+inline sub SetBoxGravity(velocity) {
+    if (vely < 0m) {
+        vely = velocity
+    } 
+    vely += velocity
+    rotx = 0deg
+    statusb |= FLAG_GRAVITY | FLAG_PHYSICS_ENGINE | FLAG_SOLID_BOTTOM
+}
+
+sub TransBoxNitro() {
+    BoxTransCommon()
+    if (collider && !(BoxFlags & BOX_FLAG_NITRO_SOLID)) {
+        sendevent(Event63, collider, 100.0)
+        changestate(Box_TNT_Explosion, 0)
+    }
+    if (!STATUS_FIRSTFRAME && !rand(60) && !STATUS_GRAVITY && !(BoxFlags & (BOX_FLAG_WATER | BOX_FLAG_NITRO_NO_HOP))) {
+        SoundPitchDefault()
+        sounddecay(0.3125)
+        soundplay([nbu0A], 0.4V)
+        SetBoxGravity(3.46411m)
+        sendevent(EventBounce, creator, 5.65685m)
+    }
+}
+
+state Box_Nitro { // 38
+    stateflag 0x201
+    statusc 0
+    event => state Box_Nitro_Spawn
+    trans => sub TransBoxNitro
+    code() {
+        sleep()
+    }
+}
+
+inline sub TNTBeep() {
+    if (LEVEL == LEVEL_SkiCrazed) {
+        soundpitch(3.265)
+        soundplay([Ttb0A], 0.4V)
+    }
+    else {
+        soundpitch(3.265)
+        soundplay([Ttb0A], 0.8V)
+    }
+}
+
+state Box_TNT_Countdown { // 39
+    stateflag 0x283
+    statusc 0
+    trans => sub BoxTransCommon
+    code() {
+        if (BoxTNTFuse >= 3.0) {
+            TNTFlashColor()
+            TNTBeep()
+            playanim(0, BOX_TNT_3, 4)
+            TNTDefaultColor()
+            playanim(0, BOX_TNT_3, 25)
+        }
+        if (BoxTNTFuse >= 2.0) {
+            TNTFlashColor()
+            TNTBeep()
+            playanim(0, BOX_TNT_2, 4)
+            TNTDefaultColor()
+            playanim(0, BOX_TNT_2, 10)
+            TNTBeep()
+            playanim(0, BOX_TNT_2, 15)
+        }
+        TNTFlashColor()
+        TNTBeep()
+        playanim(0, BOX_TNT_1, 4)
+        TNTDefaultColor()
+        playanim(0, BOX_TNT_1, 3)
+        TNTBeep()
+        if (BoxTNTFuse >= 1.0) {
+            playanim(0, BOX_TNT_1, 7)
+            TNTBeep()
+            playanim(0, BOX_TNT_1, 7)
+            TNTBeep()
+            playanim(0, BOX_TNT_1, 7)
+        }
+        statusc &= ~0x2
+        changestate(Box_TNT_Explosion, 0)
+    }
+    event(e, a) {
+        accevcstate(Box_TNT_Explosion, (e == EventHit && !(BoxFlags & BOX_FLAG_NO_HIT)) || e == EventHitInvincible || e == EventFling)
+        BoxCheckSpinEvent(e, a)
+        if (eventaccepted) {
+            accevcstate(Box_TNT_Explosion)
+        }
+        accevcstate(Box_TNT_Explosion, e == EventSlideHit)
+        accevcstate(Box_TNT_Explosion, e == EventSlamHit && CheckBodyslamStatus)
+        accevcstate(Box_TNT_Explosion, e == Event73)
+        if (STATUS_GRAVITY) {
+            accevcstate(Box_TNT_Explosion, e == Event23)
+        }
+        if (e == EventDespawn) {
+            statusc |= 0x22
+            SoundPitchDefault(0.23)
+            sounddecay(0.75)
+            soundplay([tnt0A], 1.0V)
+            soundsetup(0, voice, 5)
+            sendevent(EventBoxBreak, player, self)
+            killvictims()
+            KillEntity()
+        }
+    }
+}
+
+state Box_TNT_Explosion { // 40
+    stateflag 0x3
+    code(a) {
+        statusb &= ~FLAG_COLLIDABLE
+        KillEntity()
+        entitysetstate(0)
+        if (statusa & 0x80) {
+            statusb &= ~FLAG_COLLIDABLE
+        }
+        BoxBreak()
+        epc = 0
+        if (spawn == S_BOX_NITRO) {
+            soundpitch((30.4 + rand(3.2)) * 0x45 >> 8)
+            sounddecay(0.75)
+            soundplay([nbr0A], 0.4V)
+        }
+        SoundPitchDefault(0.23)
+        sounddecay(0.75)
+        soundplay([tnt0A], 1.0V)
+        soundsetup(0, voice, 5)
+        statusb &= ~FLAG_SOLID_ALL2
+        statusb |= FLAG_COLLIDABLE
+        FlipRand()
+        moda = 16.0
+        if (var dist = distance(player); dist < 5m) {
+            dist = 0x4C + (0xB2 - (dist / 0x7D0))
+            if (GLOBAL_112 && GLOBAL_113 > dist) {
+                dist = GLOBAL_113
+            }
+            GLOBAL_112 = 7
+            GLOBAL_113 = dist
+        }
+        if (spawn == S_BOX_NITRO) {
+            BoxExplosionEvent = Event63
+            spawn(9, 4, 1, getins(BoxSelectExplosionColor), 0)
+            SetColor1(0x51, 0xA9, 0x00)
+            spawn(9, 43, 1, 0.5m, 0, 0x60, 0, 16.0, 0, 0)
+            spawn(9, 46, 1, 20, 45, 2, 0, 0)
+            sendeventif(BoxExplosionEvent, interrupter, interrupter == player, 100.0)
+        }
+        else {
+            BoxExplosionEvent = Event30
+            spawn(9, 4, 1, 0, 0)
+            SetColor1(0xE6, 0x23, 0x04)
+            spawn(9, 43, 1, 0.5m, 0x60, 38, 0, 16.0, 0, 0)
+            spawn(9, 46, 1, 51, 51, 3, 0, 0)
+        }
+        playframes(BOX_EXPLODE, 0.0, 11.0)
+    }
+    event(e, a) {
+        if (e == EventDespawn) {
+            statusc |= 0x22
+            SoundPitchDefault(0.23)
+            sounddecay(0.75)
+            soundplay([tnt0A], 1.0V)
+            soundsetup(0, voice, 5)
+            sendevent(EventBoxBreak, player, self)
+            killvictims()
+            KillEntity()
+            epc = 0
+        }
+    }
+    trans {
+        nofirst {
+            sendeventif(BoxExplosionEvent, collider, !(player -> stateflag & 0x20) && !player -> invincible, 100.0)
+            broadcastevent(EventHit, 4, 1)
+        }
+    }
+}
+
+sub BoxSelectExplosionColor() { // S-3837
+    if (var r = rand(5); r == 0) {
+        SetColor1(0x4B, 0x4B, 0x00)
+    }
+    else if (r == 1) {
+        SetColor1(0x00, 0x4B, 0x00)
+    }
+    else if (r == 2) {
+        SetColor1(0x19, 0x2F, 0x06)
+    }
+    else if (r == 3) {
+        SetColor1(0x4B, 0x33, 0x00)
+    }
+    else if (r == 4) {
+        SetColor1(0x00, 0x4B, 0x2C)
+    }
+    SetScale(2.5S)
+}
+
+state Box_Duck_Area { // 41
+    stateflag 0x800201
+    statusc 0
+    code(sx, sy, sz) {
+        statusb = FLAG_COLLIDABLE
+        y += 0.5m
+        SetScale(sx, sy, sz)
+        do (var0 = 0) {
+            if (collider) {
+                collider -> statusa |= 0x80
+                sendeventif(Event45, player, var0 && !(player -> stateflag & 0x10), 0)
+            }
+            var0 = player -> stateflag & 0x10
+            playnull()
+        } while (1)
+    }
+}
+
+sub BoxRecalcStack(a) { // S-3895
+    if (interrupter) {
+        if (a == 1.0) {
+            if (abs((y - 1m) - interrupter -> y) < 0.1m && abs(x - interrupter -> x) < 0.1m && abs(z - interrupter -> z) < 0.1m) {
+                interrupter -> v0 = 1.0
+            }
+            else {
+                interrupter -> v0 = 0
+            }
+        }
+        else if (a == 2.0) {
+            BoxBelow = interrupter
+        }
+    }
+}
+
+sub BoxBreakRecalc(p) { // S-3921
+    groundy -= 1m
+    SetBoxGravity(p)
+    sendevent(EventBoxStackBreak, creator, p)
+}
+
+sub BoxBounce(p) { // S-3934
+    SetBoxGravity(p)
+    sendevent(EventBounce, creator, p)
+}
+
+sub BoxTrack(a) { // S-3945
+    if (interrupter) {
+        x = interrupter -> x
+        z = interrupter -> z
+    }
+    sendevent(Event18, creator, a)
+}
+
+sub BoxVolley() { // S-3950
+    if (interrupter) {
+        if (spawn == S_BOX_IRON || spawn == S_BOX_ACTION) {
+            if (STATUS_GRAVITY && vely < 0) {
+                interrupter = DOCTOR
+                sendevent(Event15, interrupter, 4.0)
+                if (v0) {
+                    sendevent(EventHit, interrupter, 100.0)
+                }
+                else {
+                    sendevent(EventHit, player, 100.0)
+                }
+                if (!(player -> stateflag & 0x20)) {
+                    SoundPitchDefault(0.23)
+                    sounddecay(0.25)
+                    soundplay([ld10A], 0.7V)
+                    SoundPitchDefault(0.23)
+                    sounddecay(0.625)
+                    soundplay([bnc0A], 0.5V)
+                    y = player -> y + 2m
+                    SetBoxGravity(15.49194m)
+                }
+            }
+        }
+    }
+}
+
+state Kill { // 42
+    stateflag 0x20
+    statusc 0
+    code() {}
+}

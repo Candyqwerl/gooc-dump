@@ -1,0 +1,92 @@
+#gool BiROC 64 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal -l y "C3\C3_BiROC.gooc" "C3\Out\C3_BiROC.nsentry"
+
+#iflev kB
+#anim BIKE_RAMP [Ra1kV] [Ra1kG] 1 1 2
+#else
+#anim BIKE_RAMP [Ra1lV] [Ra1lG] 1 1 2
+
+#spawn S_BIKE_RAMP      Bike_Ramp
+#spawn S_BIKE_RAMP_ALT  Bike_Ramp
+
+var PlayerOnRamp, Brightness
+
+state Bike_Ramp {
+    statusc 0
+    code(yaw, mirror, launch_scale, xoffs, zoffs) {
+        x += xoffs
+        z += zoffs
+        vfx = (vfx & 0xFFFF00FF) | 0x600
+        PlayerOnRamp = 0
+        if (LEVEL == LEVEL_Area51) {
+            Brightness = 0
+            settrans(UpdateRampLighting)
+            UpdateRampLighting()
+        }
+        else {
+            settrans(UpdateRampInteraction)
+            UpdateRampInteraction()
+        }
+        movetolist(0.0, self)
+        roty = yaw
+        rotz = yaw
+        rotx = 0x14B
+        if (mirror) {
+            scalex = -abs(scalex)
+        }
+        SetZindexField(30)
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_TOP | 0x400000
+        sleepanim(0, BIKE_RAMP)
+    }
+}
+
+sub UpdateRampInteraction(yaw, mirror, launch_scale, xoffs, zoffs) __trans {
+    if (abs(player -> x - x) <= 3m && abs(player -> z - z) <= 3m) {
+        if (PlayerOnRamp || abs(degdist(roty, atan2(player -> trans))) < 50deg) {
+            player -> vely = (player -> speed * launch_scale) >> 8
+            if (player -> speed > 5m) {
+                player -> rotx = degseek(player -> rotx, -30deg, 720deg)
+            }
+            sendeventif(Event21, player, abs(degdist(player -> roty, roty)) > 90deg, 0)
+            PlayerOnRamp = true
+        }
+        else {
+            sendevent(Event27, player, 3.2m, 0)
+            if (eventaccepted && player -> speed > 4m && frametime - statetime >= 1s) {
+                statetime = frametime
+                soundpitch(3.263)
+                soundplay([Ra1kA], 1V)
+            }
+        }
+    }
+    else {
+        PlayerOnRamp = false
+    }
+}
+
+sub UpdateRampLighting(yaw, mirror, launch_scale, xoffs, zoffs) __trans {
+    UpdateRampInteraction()
+    vecz = distance(player, DIST_NO_Y)
+    if (GLOBAL_54) {
+        interrupter = GLOBAL_54
+        var0 = distance(interrupter, DIST_NO_Y)
+        if (var0 < vecz) {
+            vecz = var0
+        }
+    }
+    if (GLOBAL_120) {
+        interrupter = GLOBAL_120
+        var0 = distance(interrupter, DIST_NO_Y)
+        if (var0 < vecz) {
+            vecz = var0
+        }
+    }
+    if (vecz > 55m) {
+        vecz = 55m
+    }
+    vecz = (((55m - vecz) >> 8) << 12) / 85.94
+    Brightness = seek(Brightness, vecz, 2.56)
+    moda = 16.0 - Brightness
+}

@@ -1,0 +1,2183 @@
+#gool DispC 4 2
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C2_FruiC.gooh"
+//gooc -c 2 -r pal "C2\C2_DispC.gooc" "C2\Out\C2_DispC.nsentry"
+//gooc -c 2 -r pal -h "Includes\C2_DispC.gooh" "C2\C2_DispC.gooc" "C2\Out\C2_DispC.nsentry"
+
+#sprite FRUIT_WUMPA[Cr10T]
+#tex 0x808080 1 1 0 3 32 32 32 32
+#tex 0x808080 1 1 0 3 64 96 32 32
+#tex 0x808080 1 1 0 3 64 64 32 32
+#tex 0x808080 1 1 0 3 64 32 32 32
+#tex 0x808080 1 1 0 3 96 96 32 32
+#tex 0x808080 1 1 0 3 96 64 32 32
+#tex 0x808080 1 1 0 3 96 32 32 32
+#tex 0x808080 1 1 0 3 128 96 32 32
+#tex 0x808080 1 1 0 3 128 64 32 32
+#tex 0x808080 1 1 0 3 128 32 32 32
+#tex 0x808080 1 1 0 3 160 96 32 32
+#tex 0x808080 1 1 0 3 160 64 32 32
+#tex 0x808080 1 1 0 3 160 32 32 32
+#tex 0x808080 1 1 0 3 192 96 32 32
+
+#sprite LIFE_ICON[Cr10T]
+#tex 0x808080 0 1 7 6 64 64 64 32
+
+#anim BOX_DISPLAY         [Bd10V] 1 0
+#anim BOX_PICKUP          [Bp10V] 1 0
+#anim CRYSTAL             [Cry1V] 1 0
+#anim GEM_1               [Ge10V] 1 0
+#anim GEM_2               [Ge30V] 1 0
+#anim GEM_3               [Ge40V] 1 0
+#anim PAUSE_BACKGROUND    [Pb10V] 1 0
+
+#include "..\\Includes\\Fonts\\C2_FONT_SMALL.gooc"
+#include "..\\Includes\\Fonts\\C2_FONT_BIG.gooc"
+
+#text TEXT                          FONT_BIG[Cr20T]
+"%d"                                // 0.0
+"BONUS"                             // 1.0
+"B===="                             // 2.0
+"BO==="                             // 3.0
+"BON=="                             // 4.0
+"BONU="                             // 5.0
+"UNKNOWN"                           // 6.0
+"INTRO"                             // 7.0
+"WARP ROOM"                         // 8.0
+"TURTLE WOODS"                      // 9.0
+"SNOW GO"                           // 10.0
+"HANG EIGHT"                        // 11.0
+"THE PITS"                          // 12.0
+"CRASH DASH"                        // 13.0
+"SNOW BIZ"                          // 14.0
+"AIR CRASH"                         // 15.0
+"BEAR IT"                           // 16.0
+"CRASH CRUSH"                       // 17.0
+"THE EEL DEAL"                      // 18.0
+"PLANT FOOD"                        // 19.0
+"SEWER OR LATER"                    // 20.0
+"BEAR DOWN"                         // 21.0
+"ROAD TO RUIN"                      // 22.0
+"UN-BEARABLE"                       // 23.0
+"HANGIN' OUT"                       // 24.0
+"DIGGIN' IT"                        // 25.0
+"COLD HARD CRASH"                   // 26.0
+"RUINATION"                         // 27.0
+"BEE-HAVING"                        // 28.0
+"PISTON IT AWAY"                    // 29.0
+"ROCK IT"                           // 30.0
+"NIGHT FIGHT"                       // 31.0
+"PACK ATTACK"                       // 32.0
+"SPACED OUT"                        // 33.0
+"TOTALLY BEAR"                      // 34.0
+"TOTALLY FLY"                       // 35.0
+"RIPPER ROO"                        // 36.0
+"K. BROS"                           // 37.0
+"TINY"                              // 38.0
+"N. GIN"                            // 39.0
+"N. CORTEX"                         // 40.0
+"EBENE %d"                          // 41.0 (German: Level)
+"BOSS %d"                           // 42.0
+"NIVEL %d"                          // 43.0 (Spanish: Level)
+"JEFE SUPREMO %d"                   // 44.0 (Spanish: Boss)
+"LIVELLO %d"                        // 45.0 (Italian: Level)
+"NIVEAU %d"                         // 46.0 (French: Level)
+"PATRON %d"                         // 47.0 (French: Boss)
+"LEVEL %d"                          // 48.0
+"WEITER"                            // 49.0 (German: Continue)
+"REANUDAR"                          // 50.0 (Spanish: Resume)
+"RIPRENDI"                          // 51.0 (Italian: Resume)
+"REPRENDRE"                         // 52.0 (French: Resume)
+"RESUME"                            // 53.0
+"OPTIONEN"                          // 54.0 (German: Options)
+"OPCIONES"                          // 55.0 (Spanish: Options)
+"OPZIONI"                           // 56.0 (Italian: Options)
+"OPTIONS"                           // 57.0
+"BEENDEN"                           // 58.0 (German: Quit)
+"SALIR"                             // 59.0 (Spanish: Quit)
+"ESCI"                              // 60.0 (Italian: Quit)
+"SORTIR"                            // 61.0 (French: Quit)
+"QUIT"                              // 62.0
+"# OPTIONEN"                        // 63.0
+"OPCIONES #"                        // 64.0
+"OPZIONI #"                         // 65.0
+"OPTIONS #"                         // 66.0
+"# OPTIONS"                         // 67.0
+"PAD: FLIGHT"                       // 68.0
+"~sx800~<~sx400~ZTR: %d~sx800~>"    // 69.0
+"~sx800~<~sx400~CEN: %d~sx800~>"    // 70.0
+"~sx800~<~sx400~CTR: %d~sx800~>"    // 71.0
+"KALIBRIEREN"                       // 72.0 (German: Calibrate)
+"CALIBRARE"                         // 73.0 (Italian: Calibrate)
+"CALIBRAR"                          // 74.0 (Spanish: Calibrate)
+"CALIBRER"                          // 75.0 (French: Calibrate)
+"CALIBRATE"                         // 76.0
+"FERTIG"                            // 77.0 (German: Done)
+"HECHO"                             // 78.0 (Spanish: Done)
+"FATTO"                             // 79.0 (Italian: Done)
+"TERMINE"                           // 80.0 (French: Done)
+"DONE"                              // 81.0
+"PAD: DIREKT"                       // 82.0 (German: Direct)
+"PAD: DIRECTO"                      // 83.0 (Spanish: Direct)
+"PAD: VUELO"                        // 84.0 (Spanish: Flight)
+"PAD: DIRETTO"                      // 85.0 (Italian: Direct)
+"PAD: VOLO"                         // 86.0 (Italian: Flight)
+"CONT:DIRECT"                       // 87.0
+"CONT:EN VOL"                       // 88.0 (French: In Flight)
+"PAD: DIRECT"                       // 89.0
+"~sx800~<~sx400~MONO~sx800~>"       // 90.0
+"~sx800~<~sx400~STEREO~sx800~>"     // 91.0
+"~sx800~<~sx400~%d$~sx800~>"        // 92.0
+"MUSIK"                             // 93.0 (German: Music)
+"VOL MUSIQUE"                       // 94.0 (French: Music Vol)
+"VOL MUSICA"                        // 95.0 (Italian/Spanish: Music Vol)
+"MUSIC VOL"                         // 96.0
+"SOUNDEFFEKTE"                      // 97.0 (German: Sound Effects)
+"VOL FX"                            // 98.0
+"VOL EFFETTI"                       // 99.0 (Italian: Effects Vol)
+"VOL EFFETS"                        // 100.0 (French: Effects Vol)
+"FX VOL"                            // 101.0
+"~sx800~<~sx400~ESTEREO~sx800~>"    // 102.0 (Spanish: Stereo)
+"PAD ZENTR. U. X-~nOD. SELECT-TASTE~nZUM ZURUECKSETZ.~nDRUECKEN."               // 103.0 (German calibration instruction)
+"CENTREZ LA MANETTE~nET APPUYEZ SUR X,~nOU CHOISISSEZ DE~nREINITIALISER."       // 104.0 (French calibration instruction)
+"CENTRARE IL PAD E~nPREMERE X, O~nSELEZIONARE~nPER RESETTARE."                  // 105.0 (Italian calibration instruction)
+"CENTRA PAD Y~nPULSA BOTON X,~nO SELECCIONA~nPARA REINICIAR."                   // 106.0 (Spanish calibration instruction)
+"CENTER LEFT~nSTICK AND PRESS~nX BUTTON, OR~nSELECT TO RESET."                  // 107.0
+"ZURUECKSETZEN!"                                                                // 108.0 (German: Reset!)
+"REINITIALISEZ!"                                                                // 109.0 (French: Reset!)
+"!REINICIO!"                                                                    // 110.0 (Spanish: Reset!)
+"RESET!"                                                                        // 111.0
+"PAD NACH LINKS~nOBEN BEWEGEN~nUND DIE X-TASTE~nDRUECKEN."                      // 112.0 (German: Move pad upper left)
+"DEPLACEZ LA~nMANETTE EN HAUT~nVERS LA GAUCHE ET~nAPPUYEZ SUR X"                // 113.0 (French: Move pad upper left)
+"SPOSTARE IL PAD~nIN ALTO A~nSINISTRA E PREMERE~nIL TASTO X"                    // 114.0 (Italian: Move pad upper left)
+"MUEVE PAD A LA~nPARTE SUP.~nIZDA. Y~nPULSA BOTON X"                            // 115.0 (Spanish: Move pad upper left)
+"MOVE LEFT STICK~nTO UPPER LEFT~nAND PRESS~nX BUTTON"                           // 116.0
+"PAD NACH RECHTS~nOBEN BEWEGEN~nUND DIE X-TASTE~nDRUECKEN."                     // 117.0 (German: Move pad upper right)
+"DEPLACEZ LA~nMANETTE EN HAUT~nVERS LA DROITE ET~nAPPUYEZ SUR X"                // 118.0 (French: Move pad upper right)
+"SPOSTARE IL PAD~nIN ALTO A~nDESTRA E PREMERE~nIL TASTO X"                      // 119.0 (Italian: Move pad upper right)
+"MUEVE PAD A LA~nPARTE SUP.~nDCHA. Y~nPULSA BOTON X"                            // 120.0 (Spanish: Move pad upper right)
+"MOVE LEFT STICK~nTO UPPER RIGHT~nAND PRESS~nX BUTTON"                          // 121.0
+"PAD NACH RECHTS~nUNTEN BEWEGEN~nUND DIE X-TASTE~nDRUECKEN."                    // 122.0 (German: Move pad lower right)
+"DEPLACEZ LA~nMANETTE EN BAS~nVERS LA DROITE ET~nAPPUYEZ SUR X"                 // 123.0 (French: Move pad lower right)
+"SPOSTARE IL PAD~nIN BASSO A~nDESTRA E PREMERE~nIL TASTO X"                     // 124.0 (Italian: Move pad lower right)
+"MUEVE PAD A LA~nPARTE INF.~nDCHA. Y~nPULSA BOTON X"                            // 125.0 (Spanish: Move pad lower right)
+"MOVE LEFT STICK~nTO LOWER RIGHT~nAND PRESS~nX BUTTON"                          // 126.0
+"PAD NACH LINKS~nUNTEN BEWEGEN~nUND DIE X-TASTE~nDRUECKEN."                     // 127.0 (German: Move pad lower left)
+"DEPLACEZ LA~nMANETTE EN BAS~nVERS LA GAUCHE ET~nAPPUYEZ SUR X"                 // 128.0 (French: Move pad lower left)
+"SPOSTARE IL PAD~nIN BASSO A~nSINISTRA E PREMERE~nIL TASTO X"                   // 129.0 (Italian: Move pad lower left)
+"MUEVE PAD A LA~nPARTE INF.~nIZDA Y~nPULSAR BOTON X"                            // 130.0 (Spanish: Move pad lower left)
+"MOVE LEFT STICK~nTO LOWER LEFT~nAND PRESS~nX BUTTON"                           // 131.0
+"GUT!"                                                                          // 132.0 (German: Good!)
+"BIEN JOUE!"                                                                    // 133.0 (French: Good!)
+"BENE!"                                                                         // 134.0 (Italian: Good!)
+"!MUY BIEN!"                                                                    // 135.0 (Spanish: Good!)
+"GOOD!"                                                                         // 136.0
+"~y400~UNGUELTIG, ERNEUT~nVERSUCHEN."                                           // 137.0 (German: Invalid, try again)
+"ERREUR:~nREESSAYEZ."                                                           // 138.0 (French: Error, try again)
+"NON VALIDO,~nRIPROVA."                                                         // 139.0 (Italian: Invalid, try again)
+"~y400~NO VALIDO,~nINTENTALO~nDE NUEVO."                                        // 140.0 (Spanish: Invalid, try again)
+"INVALID~nTRY AGAIN."                                                           // 141.0
+"%s"                                                                            // 142.0
+"CRASH B."                                                                      // 143.0
+"%d~x-100~~sx800~~sy800~/~sx400~~sy400~~l25"                                    // 144.0
+"+%2d     ^~n~n     GEMS"                                                       // 145.0
+"%d~x-100~~sx800~~sy800~/~sx400~~sy400~~l42"                                    // 146.0
+"%d~x100~~sx200~~sy200~*~sx400~~sy400~~x-300~/~sx200~~sy200~~y-200~~x-150~*"    // 147.0
+"DEMO"                                                                          // 148.0
+"%d/%d"                                                                         // 149.0
+"%d:%02d"                                                                       // 150.0
+
+#spawn S_LIFE_DISPLAY             HUD_Life_Display                // S0
+#spawn S_WUMPA_DISPLAY            HUD_Wumpa_Display               // S1
+#spawn S_2                        __s_2                           // S2
+#spawn S_3                        __s_3                           // S3
+#spawn S_PAUSE_MENU               Pause_Menu_Init                 // S4
+#spawn S_COLLECTABLE_MANAGER      Collectable_Manager_Init        // S5
+#spawn S_6                        __s_6                           // S6
+#spawn S_7                        __s_7                           // S7
+#spawn S_DEMO_TEXT                Demo_Text                       // S8
+#spawn S_9                        __s_9                           // S9
+#spawn S_VARIABLE_DISPLAY         Variable_Display                // S10
+#spawn S_COLLECTABLE_DISPLAY      HUD_Collectable_Display         // S11
+#spawn S_12                       __s_12                          // S12
+#spawn S_BONUS_WUMPA_DISPLAY      HUD_Bonus_Wumpa_Display         // S13
+#spawn S_BONUS_LIFE_DISPLAY       HUD_Bonus_Life_Display          // S14
+#spawn S_BONUS_BOX_DISPLAY        HUD_Bonus_Box_Display           // S15
+#spawn S_BONUS_TEXT               Bonus_Text                      // S16
+#spawn S_BOX_COUNTER              Box_Counter                     // S17
+#spawn S_PAUSE_MENU_ROOT          Pause_Menu_Root                 // S18
+#spawn S_MENU_BUTTON              Menu_Button                     // S19
+#spawn S_MENU_TEXT                Menu_Text                       // S20
+#spawn S_INVENTORY                Pause_Menu_Inventory            // S21
+#spawn S_BOX_DISPLAY              HUD_Box_Display                 // S22
+#spawn S_PAUSE_BACKGROUND         Pause_Menu_Background           // S23
+#spawn S_HOLOGRAM                 Box_Hologram                    // S24
+#spawn S_TIMETRIAL                River_TimeTrial                 // S25
+#spawn S_26                       __s_26                          // S26
+
+var mem1, mem2, mem3, mem4, mem5, mem6, mem7, mem8, mem9, mem10,
+    DisplayFrame, DisplayVarField, DisplayStatus,
+    DisplayVar14, DisplayVar15, ClearGemCount, ActiveDisplayOBJCount
+
+expr REWARD_GEM            = 300.0
+expr REWARD_GEM_SPECIAL    = 301.0
+expr REWARD_CRYSTAL        = 200.0
+expr GEM_RED               = 58.0
+expr GEM_GREEN             = 59.0
+expr GEM_PURPLE            = 60.0
+expr GEM_BLUE              = 61.0
+expr GEM_YELLOW            = 62.0
+
+expr DISPLAY_BOUND_Y       = 190.0
+expr DISPLAY_BOUND_LOWER_Y = 102.0
+
+expr DisplayRequestMode      = DisplayStatus
+expr DisplaySlideY           = vecy
+expr DisplayOffsetY          = vecz
+expr BonusTargetY            = vely
+
+expr TextFrame               = yzapproach
+expr MenuButtonIndex         = stalltime
+expr MenuButtonCount         = field_61
+expr MenuLevelNumber         = DisplayFrame
+expr MenuHasLevelNumber      = field_62
+
+expr CompletionPercent       = DisplayVarField
+expr CompletedLevelCount     = DisplayStatus
+expr CrystalCount            = DisplayVar14
+expr TotalGemCount           = DisplayVar15
+expr ExtraCompletionCount    = groundy
+
+expr PauseNameValue          = ActiveDisplayOBJCount
+expr PauseSavedGameFlags     = stalltime
+
+expr DisplayRewardType       = DisplayVar14
+expr CollectedRewardID       = DisplayVar14
+expr CollectedRewardParentID = DisplayVar15
+
+expr TrialTimeLimit          = var0
+expr TrialTriggerZ           = field_61
+expr TrialStartWindow        = vecy
+expr TrialRemainingTime      = vecx
+
+state HUD_Life_Display { // 0
+    code() {
+        LIFEICONTRANSX = 100.0
+        statusb = FLAG_NO_CAMERA_CLIP
+        SetVFX2D()
+        SetScale(3.2, 2.0, 2.0)
+        x = 130.0
+        DisplaySlideY = DISPLAY_BOUND_Y
+        z = 0
+        DisplayFrame = 0
+        DisplayVarField = offsetof(mem2)
+        DisplayRequestMode = 0
+        DisplayOffsetY = 0
+        playanim(0, LIFE_ICON, 0.18s)
+        setfield(self, DisplayVarField, getfield(player, DisplayVarField))
+        changestate(Display_Hidden)
+    }
+}
+
+state HUD_Wumpa_Display { // 1
+    code() {
+        statusb = FLAG_NO_CAMERA_CLIP
+        SetVFX2D()
+        SetScale(1.6, 2.0, 2.0)
+        x = -200.0
+        DisplaySlideY = DISPLAY_BOUND_Y
+        z = 0
+        DisplayFrame = 0
+        DisplayVarField = offsetof(mem1)
+        DisplayRequestMode = 0
+        DisplayOffsetY = 0
+        playanim(0, FRUIT_WUMPA, 0.18s)
+        setfield(self, DisplayVarField, getfield(player, DisplayVarField))
+        changestate(Display_Hidden)
+    }
+}
+
+state HUD_Box_Display { // 2
+    code() {
+        statusb = FLAG_NO_CAMERA_CLIP
+        vfx = (vfx & 0xFFFFFF00) | 14
+        vfx = (vfx & 0xFF00FFFF) | 0x40000
+        SetScale(1.5, 1.2, 1.5)
+        x = -40.0
+        DisplaySlideY = DISPLAY_BOUND_Y
+        z = 0
+        setanim(BOX_DISPLAY)
+        DisplayFrame = 0
+        DisplayVarField = offsetof(mem10)
+        DisplayRequestMode = 0
+        DisplayOffsetY = -10.0
+        rotx = 40deg
+        moda = 4.0
+        SetColor2(-0xDD8, 0x6D7, 0x432)
+        SetColor1(0x80, 0x80, 0x80)
+        playframe(DisplayFrame, 0.18s)
+        setfield(self, DisplayVarField, getfield(player, DisplayVarField))
+        changestate(Display_Hidden)
+    }
+}
+
+inline sub DisplaySleep() {
+    if (spawn == S_WUMPA_DISPLAY || spawn == S_BONUS_WUMPA_DISPLAY) {
+        do {
+            animframe = (animframe + 1.0) % 14.0
+            playframe()
+        } while (1)
+    }
+    else {
+        sleepframe(DisplayFrame)
+    }
+}
+
+state Display_Hidden { // 3
+    statusc 0
+    code() {
+        statusb |= FLAG_INVISIBLE
+        DisplaySleep()
+    }
+    event(e, a) {
+        if (e == Event3 || e == Event32 || e == Event17) {
+            if (DisplayRequestMode != 1) {
+                DisplayRequestMode = 2
+            } 
+            statetime = frametime
+            if (e == Event17) {
+                DisplayRequestMode = 1
+            }
+        }
+    }
+    trans {
+        sendeventif(Event12, child, STATUS_FIRSTFRAME, self)
+        v0 = getfield(player, DisplayVarField)
+        if (!(v0 == getfield(self, DisplayVarField) || spawn == S_BOX_DISPLAY) || (buttonhold(PAD_TRIANGLE) || DisplayRequestMode)) {
+            spawn2(DispC, S_VARIABLE_DISPLAY, 1, 32, -12.0, 16.0 - DisplayOffsetY, 40.0)
+            changestate(Display_Show)
+        }
+    }
+}
+
+state Display_Show { // 4
+    statusc 0
+    event => state Display_Hidden
+    code() {
+        statusb &= ~FLAG_INVISIBLE
+        DisplaySleep()
+    }
+    trans {
+        once {
+            if (spawn == S_BOX_DISPLAY) {
+                settrans(BoxDisplayTrans)
+                BoxDisplayTrans()
+                return
+            }
+        }
+        changestateif(Display_Hide, frametime - statetime >= 1.5s)
+        DisplaySlideY = seek(DisplaySlideY, DISPLAY_BOUND_LOWER_Y, 10.0)
+        if (DisplaySlideY == DISPLAY_BOUND_LOWER_Y) {
+            if (getfield(player, DisplayVarField) > getfield(self, DisplayVarField)) {
+                unless (time(3)) {
+                    statetime = frametime
+                    if (spawn == S_WUMPA_DISPLAY) {
+                        soundpitch(4.0)
+                        soundsetup(0, 0, 11)
+                        sounddecay(2.6s)
+                        soundplay([tal0A], 0.2V)
+                    }
+                    setfield(self, DisplayVarField, getfield(self, DisplayVarField) + 1.0)
+                }
+            }
+            else {
+                setfield(self, DisplayVarField, getfield(player, DisplayVarField))
+            }
+            if (DisplayRequestMode == 1) {
+                interrupter = child
+                spawn2(FruiC, FruiC_S_1UP_GOTO_HUD, 1)
+                if (interrupter == child) {
+                    player -> mem2 += 1.0
+                }
+                DisplayRequestMode = 0
+            }
+            else {
+                DisplayRequestMode = 0
+            }
+        }
+        y = DisplaySlideY + DisplayOffsetY
+    }
+}
+
+sub BoxDisplayTrans() {
+    if (getfield(self, DisplayVarField) < 10.0) {
+        x = -40.0
+    }
+    else if (getfield(self, DisplayVarField) < 100.0) {
+        x = -66.0
+    }
+    else {
+        x = -82.0
+    }
+    roty = spd(roty, 180deg)
+    changestateif(Display_Hide, frametime - statetime >= 1.5s)
+    DisplaySlideY = seek(DisplaySlideY, DISPLAY_BOUND_LOWER_Y, 10.0)
+    setfield(self, DisplayVarField, getfield(player, DisplayVarField))
+    if (DisplaySlideY == DISPLAY_BOUND_LOWER_Y) {
+        DisplayRequestMode = 0
+    }
+    y = DisplaySlideY + DisplayOffsetY
+}
+
+state Display_Hide { // 5
+    statusc 0
+    code => state Display_Show
+    event => state Display_Hidden
+    trans {
+        v0 = getfield(player, DisplayVarField)
+        changestateif(Display_Show, v0 != getfield(self, DisplayVarField) || buttonhold(PAD_TRIANGLE) || DisplayRequestMode)
+        if (DisplaySlideY < DISPLAY_BOUND_Y) {
+            DisplaySlideY += 4.0
+        }
+        else {
+            changestate(Display_Hidden)
+        }
+        y = DisplaySlideY + DisplayOffsetY
+    }
+}
+
+state Variable_Display { // 6
+    stateflag 0x40001
+    event => state Menu_Button
+    code(size, basex, yoff, xoff) {
+        playnull()
+        if (size == 0x10) {
+            invincible = FONT_SMALL
+            TextDefaultScale()
+        }
+        else {
+            invincible = FONT_BIG
+            SetScale(0x146, 0x207, 16.0)
+        }
+        velx = basex + xoff
+        z = parent -> z
+        SetVFX2D()
+        SetRot(0deg)
+        if (parent -> spawn == S_WUMPA_DISPLAY || parent -> spawn == S_BONUS_WUMPA_DISPLAY) {
+            SetColor1(0x1FF, 0x000, 0x000)
+            SetColor2(0x1FF, 0x1FF, 0x000)
+            SetColor3(0x1FF, 0x1FF, 0x000)
+            SetColor4(0x000, 0x17C, 0x000)
+        }
+        else if (parent -> spawn == S_BOX_DISPLAY || parent -> spawn == S_BONUS_BOX_DISPLAY) {
+            SetColor1(0xAC, 0x4E, 0x0C)
+            SetColor2(0x9D, 0x3F, 0x09)
+            SetColor3(0x8E, 0x30, 0x06)
+            SetColor4(0x78, 0x28, 0x06)
+        }
+        else {
+            TextColorDefault()
+        }
+        do {
+            statusb = parent -> statusb
+            x = parent -> x + velx
+            y = parent -> y + yoff
+            var v1 = getfield(parent, parent -> DisplayVarField) >> 8
+            setanim(TEXT)
+            playframe(0)
+        } while (1)
+    }
+}
+
+state HUD_Bonus_Wumpa_Display { // 7
+    stateflag 0x40001
+    code() {
+        movetolist(1.0)
+        SetRot(0deg)
+        statusb = FLAG_NO_CAMERA_CLIP
+        SetVFX2D()
+        SetScale(0.8, 1.0, 1.0)
+        x = -200.0
+        y = -DISPLAY_BOUND_Y
+        BonusTargetY = -DISPLAY_BOUND_LOWER_Y
+        z = 0
+        setanim(FRUIT_WUMPA)
+        DisplayFrame = 0
+        DisplayVarField = offsetof(mem4)
+        spawn(DispC, S_VARIABLE_DISPLAY, 1, 0x10, -8.0, 8.0, 20.0)
+        setfield(self, DisplayVarField, getfield(player, DisplayVarField))
+        changestate(Bonus_Variable_Update)
+    }
+}
+
+state HUD_Bonus_Life_Display { // 8
+    stateflag 0x40001
+    code() {
+        movetolist(1.0)
+        SetRot(0deg)
+        spawn(DispC, S_BONUS_TEXT, 1, 0, 0x7000)
+        statusb = FLAG_NO_CAMERA_CLIP
+        SetVFX2D()
+        SetScale(1.6, 1.0, 1.0)
+        x = 170.0
+        y = -DISPLAY_BOUND_Y
+        BonusTargetY = -DISPLAY_BOUND_LOWER_Y
+        z = 0
+        setanim(LIFE_ICON)
+        DisplayFrame = 0
+        DisplayVarField = offsetof(mem5)
+        spawn(DispC, S_VARIABLE_DISPLAY, 1, 0x10, -8.0, 8.0, 20.0)
+        setfield(self, DisplayVarField, getfield(player, DisplayVarField))
+        changestate(Bonus_Variable_Update)
+    }
+}
+
+state HUD_Bonus_Box_Display { // 9
+    stateflag 0x40001
+    code() {
+        movetolist(1.0)
+        SetRot(0deg)
+        statusb = FLAG_NO_CAMERA_CLIP
+        vfx = (vfx & 0xFFFFFF00) | 14
+        vfx = (vfx & 0xFF00FFFF) | 0x40000
+        moda = 4.0
+        SetColor2(-0xDD8, 0x6D7, 0x432)
+        SetColor1(0x80, 0x80, 0x80)
+        SetScale(1.0, 0.8, 1.0)
+        x = -20.0
+        y = -DISPLAY_BOUND_Y
+        BonusTargetY = -DISPLAY_BOUND_LOWER_Y
+        z = 0
+        setanim(BOX_DISPLAY)
+        DisplayFrame = 0
+        DisplayVarField = offsetof(mem6)
+        spawn(DispC, S_VARIABLE_DISPLAY, 1, 0x10, 4.0, 8.0, 0x1400)
+        setfield(self, DisplayVarField, getfield(player, DisplayVarField))
+        changestate(Bonus_Variable_Update)
+    }
+}
+
+state Bonus_Variable_Update { // 10
+    stateflag 0x40001
+    statusc 0
+    code() {
+        DisplaySleep()
+    }
+    event(e, a) {
+        if (e == Event73) {
+            if (a[0] == BONUS_COMPLETED) {
+                accevcstate(Bonus_Reward_Items)
+            }
+            else {
+                accevcstate(Bonus_Player_Death)
+            }
+        }
+    }
+    trans {
+        y = seek(y, BonusTargetY, 10.0)
+        if (y == BonusTargetY) {
+            if (getfield(player, DisplayVarField) > getfield(self, DisplayVarField)) {
+                if (!time(3)) {
+                    statetime = frametime
+                    if (spawn == S_BONUS_WUMPA_DISPLAY) {
+                        soundpitch(4.0)
+                        soundsetup(0, 0, 11)
+                        sounddecay(2.6s)
+                        soundplay([tal0A], 0.2V)
+                    }
+                    setfield(self, DisplayVarField, getfield(self, DisplayVarField) + 1.0)
+                }
+            }
+            else {
+                setfield(self, DisplayVarField, getfield(player, DisplayVarField))
+            }
+        }
+        if (spawn == S_BONUS_BOX_DISPLAY) {
+            roty = spd(roty, 180deg)
+        }
+    }
+}
+
+inline sub PlayDisplayFrame() {
+    if (spawn == S_WUMPA_DISPLAY || spawn == S_BONUS_WUMPA_DISPLAY) {
+        animframe = (animframe + 1.0) % 14.0
+        playframe()
+    }
+    else {
+        playframe(DisplayFrame)
+    }
+}
+
+state Bonus_Reward_Items { // 11
+    stateflag 0x40001
+    statusc 0
+    trans => state Bonus_Variable_Update
+    code() {
+        while (getfield(self, DisplayVarField) > 0) {
+            if (spawn == S_BONUS_LIFE_DISPLAY) {
+                interrupter = child
+                save (scalex) {
+                    scalex >>= 1
+                    spawn2(FruiC, FruiC_S_1UP_GOTO_HUD, 1)
+                }
+                if (interrupter == child) {
+                    player -> mem2 += 1.0
+                }
+                setfield(player, DisplayVarField, getfield(player, DisplayVarField) - 1.0)
+                v0 = 0.35s
+            }
+            else {
+                if (spawn == S_BONUS_WUMPA_DISPLAY) {
+                    interrupter = child
+                    spawn2(FruiC, FruiC_S_WUMPA_BONUS_GOTO_HUD, 1)
+                    if (interrupter == child) {
+                        player -> mem2 += 1.0
+                    }
+                    setfield(player, DisplayVarField, getfield(player, DisplayVarField) - 1.0)
+                    v0 = 0.15s
+                }
+                else if (spawn == S_BONUS_BOX_DISPLAY) {
+                    sendevent(EventBoxBreak, player, self)
+                    setfield(player, DisplayVarField, getfield(player, DisplayVarField) - 1.0)
+                    interrupter = BOXCOUNTER
+                    sendevent(Event32, interrupter, 0)
+                    v0 = 0.35s
+                }
+            }
+            do (var startframe = frametime) {
+                PlayDisplayFrame()
+            } while (frametime - startframe < v0)
+        }
+        BonusTargetY = -DISPLAY_BOUND_Y
+        do {
+            PlayDisplayFrame()
+        } while (y != BonusTargetY)
+    }
+}
+
+state Bonus_Player_Death { // 12
+    stateflag 0x40001
+    statusc 0
+    trans => state Bonus_Variable_Update
+    code() {
+        while (getfield(self, DisplayVarField) > 0) {
+            if (spawn == S_BONUS_WUMPA_DISPLAY) {
+                spawn(FruiC, FruiC_S_FRUIT_BONUS_DEAD, 1, 76.0)
+            }
+            else if (spawn == S_BONUS_LIFE_DISPLAY) {
+                spawn(FruiC, FruiC_S_FRUIT_BONUS_DEAD, 1, 97.0)
+            }
+            setfield(self, DisplayVarField, getfield(self, DisplayVarField) - 1.0)
+            PlayDisplayFrame()
+            BONUSDEATHTIME = frametime
+        }
+        BonusTargetY = -DISPLAY_BOUND_Y
+        do {
+            BONUSDEATHTIME = frametime
+            PlayDisplayFrame()
+        } while (y != BonusTargetY)
+    }
+}
+
+expr BONUS_B = 2.0
+expr BONUS_BO = 3.0
+expr BONUS_BON = 4.0
+expr BONUS_BONU = 5.0
+expr BONUS_BONUS = 1.0
+
+inline sub DisplayBonusText(frame, t) {
+    setanim(TEXT)
+    playframe(frame, t)
+}
+
+state Bonus_Text { // 13
+    code(px, py) {
+        SetTrans(px, py, 0)
+        SetScale(0x146, 0x207, 0x1000)
+        invincible = FONT_BIG
+        SetColor1(0x000, 0x1F4, 0x000)
+        SetColor2(0x000, 0x1F4, 0x000)
+        SetColor3(0x000, 0x190, 0x096)
+        SetColor4(0x000, 0x190, 0x096)
+        statusb = FLAG_STRING_CENTER
+        zindex = 1000
+        v0 = 0
+        do {
+            SetVFX2D()
+            v0 = (v0 + 1) % 7
+            if (v0 == 0 || v0 == 1) {
+                setanim(TEXT)
+                playframe(BONUS_BONUS, 0.4s)
+                vfx = (vfx & 0xFFFFFF00) | 0x1
+                setanim(TEXT)
+                playframe(BONUS_BONUS, 0.18s)
+            }
+            else if (v0 == 2) DisplayBonusText(BONUS_B, 0.25s);
+            else if (v0 == 3) DisplayBonusText(BONUS_BO, 0.25s);
+            else if (v0 == 4) DisplayBonusText(BONUS_BON, 0.25s);
+            else if (v0 == 5) DisplayBonusText(BONUS_BONU, 0.25s);
+            else if (v0 == 6) DisplayBonusText(BONUS_BONUS, 0.25s);
+            vfx = (vfx & 0xFFFFFF00) | 0x1
+            DisplayBonusText(BONUS_BONUS, 2)
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Display_Kill, e == Event73)
+    }
+}
+
+sub SetLevelID(level) {
+    misc = 0
+    if (level == LEVEL_Intro)          misc = 0;
+    if (level == LEVEL_WarpRoom)       misc = 0;
+ 
+    if (level == LEVEL_TurtleWoods)    misc = 1;
+    if (level == LEVEL_SnowGo)         misc = 2;
+    if (level == LEVEL_HangEight)      misc = 3;
+    if (level == LEVEL_ThePits)        misc = 4;
+    if (level == LEVEL_CrashDash)      misc = 5;
+ 
+    if (level == LEVEL_SnowBiz)        misc = 6;
+    if (level == LEVEL_AirCrash)       misc = 7;
+    if (level == LEVEL_BearIt)         misc = 8;
+    if (level == LEVEL_CrashCrush)     misc = 9;
+    if (level == LEVEL_TheEelDeal)     misc = 10;
+ 
+    if (level == LEVEL_PlantFood)      misc = 11;
+    if (level == LEVEL_SewerOrLater)   misc = 12;
+    if (level == LEVEL_BearDown)       misc = 13;
+    if (level == LEVEL_RoadToRuin)     misc = 14;
+    if (level == LEVEL_Unbearable)     misc = 15;
+
+    if (level == LEVEL_HanginOut)      misc = 16;
+    if (level == LEVEL_DigginIt)       misc = 17;
+    if (level == LEVEL_ColdHardCrash)  misc = 18;
+    if (level == LEVEL_Ruination)      misc = 19;
+    if (level == LEVEL_BeeHaving)      misc = 20;
+
+    if (level == LEVEL_PistonItAway)   misc = 21;
+    if (level == LEVEL_RockIt)         misc = 22;
+    if (level == LEVEL_NightFight)     misc = 23;
+    if (level == LEVEL_PackAttack)     misc = 24;
+    if (level == LEVEL_SpacedOut)      misc = 25;
+
+    if (level == LEVEL_TotallyBear)    misc = 26;
+    if (level == LEVEL_TotallyFly)     misc = 27;
+
+    if (level == LEVEL_BossRipperRoo)  misc = -1;
+    if (level == LEVEL_BossKimodo)     misc = -2;
+    if (level == LEVEL_BossTazTiger)   misc = -3;
+    if (level == LEVEL_BossNGin)       misc = -4;
+    if (level == LEVEL_BossCortex)     misc = -5;
+}
+
+sub SetLevelName(level) {
+    misc = 6.0
+    if (level == LEVEL_Intro)          misc = 7.0;
+    if (level == LEVEL_WarpRoom)       misc = 8.0;
+  
+    if (level == LEVEL_TurtleWoods)    misc = 9.0;
+    if (level == LEVEL_SnowGo)         misc = 10.0;
+    if (level == LEVEL_HangEight)      misc = 11.0;
+    if (level == LEVEL_ThePits)        misc = 12.0;
+    if (level == LEVEL_CrashDash)      misc = 13.0;
+  
+    if (level == LEVEL_SnowBiz)        misc = 14.0;
+    if (level == LEVEL_AirCrash)       misc = 15.0;
+    if (level == LEVEL_BearIt)         misc = 16.0;
+    if (level == LEVEL_CrashCrush)     misc = 17.0;
+    if (level == LEVEL_TheEelDeal)     misc = 18.0;
+  
+    if (level == LEVEL_PlantFood)      misc = 19.0;
+    if (level == LEVEL_SewerOrLater)   misc = 20.0;
+    if (level == LEVEL_BearDown)       misc = 21.0;
+    if (level == LEVEL_RoadToRuin)     misc = 22.0;
+    if (level == LEVEL_Unbearable)     misc = 23.0;
+  
+    if (level == LEVEL_HanginOut)      misc = 24.0;
+    if (level == LEVEL_DigginIt)       misc = 25.0;
+    if (level == LEVEL_ColdHardCrash)  misc = 26.0;
+    if (level == LEVEL_Ruination)      misc = 27.0;
+    if (level == LEVEL_BeeHaving)      misc = 28.0;
+
+    if (level == LEVEL_PistonItAway)   misc = 29.0;
+    if (level == LEVEL_RockIt)         misc = 30.0;
+    if (level == LEVEL_NightFight)     misc = 31.0;
+    if (level == LEVEL_PackAttack)     misc = 32.0;
+    if (level == LEVEL_SpacedOut)      misc = 33.0;
+
+    if (level == LEVEL_TotallyBear)    misc = 34.0;
+    if (level == LEVEL_TotallyFly)     misc = 35.0;
+ 
+    if (level == LEVEL_BossRipperRoo)  misc = 36.0;
+    if (level == LEVEL_BossKimodo)     misc = 37.0;
+    if (level == LEVEL_BossTazTiger)   misc = 38.0;
+    if (level == LEVEL_BossNGin)       misc = 39.0;
+    if (level == LEVEL_BossCortex)     misc = 40.0;
+}
+
+inline sub SetTextLanguage1(german, spanish, italian, french, english) {
+    if (var lang = GLOBAL_151; lang == LANG_DE) {
+        TextFrame = german
+    }
+    else if (lang == LANG_ES) {
+        TextFrame = spanish
+    }
+    else if (lang == LANG_IT) {
+        TextFrame = italian
+    }
+    else if (lang == LANG_FR) {
+        TextFrame = french
+    }
+    else {
+        TextFrame = english
+    }
+}
+
+inline sub SetTextLanguage2(german, spanish, italian, english) {
+    if (var lang = GLOBAL_151; lang == LANG_DE) {
+        TextFrame = german
+    }
+    else if (lang == LANG_ES) {
+        TextFrame = spanish
+    }
+    else if (lang == LANG_IT) {
+        TextFrame = italian
+    }
+    else {
+        TextFrame = english
+    }
+}
+
+inline sub KillDisplayChildren() {
+    if (child) {
+        cascadeevent(Event12, self)
+        playnull()
+    }
+}
+
+state Pause_Menu_Root { // 14
+    stateflag 0x100001
+    code() {
+        KillDisplayChildren()
+        TextColorDefault()
+        zindex = creator -> zindex
+        if (player -> stateflag & 0x20) {
+            MenuButtonCount = 2.0
+        }
+        else {
+            MenuButtonCount = 3.0
+        }
+        SetLevelName(LEVEL)
+        spawn2(DispC, S_MENU_TEXT, 1, getanim(TEXT), misc, x - 80.0, -4.0, 0, 6.0, offsetof(MenuLevelNumber)) // Level name
+        SetLevelID(LEVEL)
+        MenuLevelNumber = misc
+        if (MenuLevelNumber) {
+            MenuHasLevelNumber = MenuLevelNumber > 0
+            if (var lang = GLOBAL_151; lang == LANG_DE) {
+                if (MenuHasLevelNumber) {
+                    TextFrame = 41.0
+                }
+                else {
+                    TextFrame = 42.0
+                }
+            }
+            else if (lang == LANG_ES) {
+                if (MenuHasLevelNumber) {
+                    TextFrame = 43.0
+                }
+                else {
+                    TextFrame = 44.0
+                }                
+            }
+            else if (lang == LANG_IT) {
+                if (MenuHasLevelNumber) {
+                    TextFrame = 44.0
+                }
+                else {
+                    TextFrame = 42.0
+                }                   
+            }
+            else if (lang == LANG_FR) {
+                if (MenuHasLevelNumber) {
+                    TextFrame = 46.0
+                }
+                else {
+                    TextFrame = 47.0
+                }                   
+            }
+            else {
+                if (MenuHasLevelNumber) {
+                    TextFrame = 48.0
+                }
+                else {
+                    TextFrame = 42.0
+                }                   
+            }
+            spawn2(DispC, S_MENU_TEXT, 1, getanim(TEXT), TextFrame, x - 80.0, -23.0, 0, 0, offsetof(MenuLevelNumber)) // Level ID
+            MenuLevelNumber = abs(MenuLevelNumber)
+        }
+        statusb = FLAG_NO_CAMERA_CLIP | FLAG_STRING_CENTER
+        SetTextLanguage1(49.0, 50.0, 51.0, 52.0, 53.0)
+        spawn(DispC, S_MENU_BUTTON, 1, 0, getanim(TEXT), TextFrame, 0, 0, 0) // Resume button
+        SetTextLanguage2(54.0, 55.0, 56.0, 57.0)
+        spawn2(DispC, S_MENU_BUTTON, 1, 1.0, getanim(TEXT), TextFrame, 0, -18.0, 0) // Options button
+        if (MenuButtonCount >= 3.0) {
+            SetTextLanguage1(58.0, 59.0, 60.0, 61.0, 62.0)
+            if (LEVEL == LEVEL_WarpRoom) {
+                spawn2(DispC, S_MENU_BUTTON, 1, 2.0, getanim(TEXT), TextFrame, 0, -36.0, 0) // Quit button
+            }
+            else {
+                spawn2(DispC, S_MENU_BUTTON, 1, 2.0, getanim(TEXT), 8.0, 0, -36.0, 0) // Warp Room button
+            }
+        }
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Display_Kill, interrupter != self && e == Event12)
+    }
+    trans {
+        once {
+            TextDefaultScale()
+            SetRot(0deg)
+            MenuButtonIndex = 0
+            MenuButtonCount = 2.0
+        }
+        unless (STATUS_FIRSTFRAME) {
+            unless (stateflag & 0x400000) {
+                if (dirpress(PAD_UP) && MenuButtonIndex > 0) {
+                    MenuButtonIndex -= 1.0
+                }
+                if (dirpress(PAD_DOWN) && MenuButtonIndex < MenuButtonCount - 1.0) {
+                    MenuButtonIndex += 1.0
+                }
+                if (buttonpress(PAD_X)) {
+                    if (var index = MenuButtonIndex; index == 0) {
+                        sendevent(Event12, parent)
+                    }
+                    else if (index == 1.0) {
+                        changestate(Pause_Menu_Options, 0, 0, 0)
+                    }
+                    else if (index == 2.0) {
+                        LevelExit()
+                    }
+                }
+            }
+        }
+        if (buttonpress(PAD_SELECT) && LEVEL != LEVEL_WarpRoom && MenuButtonCount >= 3.0) {
+            LevelExit()
+        }
+    }
+}
+
+sub LevelExit() {
+    sendevent(Event15, player, 6.0)
+    if (LEVEL == LEVEL_WarpRoom) {
+        GLOBAL_114 = 0
+        GLOBAL_131 = 0
+        GAMEFLAGS &= ~0x2
+        GLOBAL_17 = 6.0
+        loadlevel(LEVEL_Title)
+    }
+    else {
+        loadlevel(LEVEL_WarpRoom)
+    }
+}
+
+state Pause_Menu_Options { // 15
+    stateflag 0x100001
+    event => state Pause_Menu_Root
+    code(FlightControlOBJ, arg, CTR_OBJ) {
+        KillDisplayChildren()
+        SetVec(-100)
+        field_63 = -100
+        FlightControlOBJ = 0
+        SetTextLanguage1(63.0, 64.0, 65.0, 66.0, 67.0)
+        spawn2(DispC, S_MENU_BUTTON, 1, 0, getanim(TEXT), TextFrame, 0, 36.0, 0) // Sound options button
+        MenuButtonCount = 1.0
+        if (LEVEL == LEVEL_RockIt || LEVEL == LEVEL_PackAttack || LEVEL == LEVEL_BossCortex) {
+            spawn2(DispC, S_MENU_BUTTON, 1, MenuButtonCount, getanim(TEXT), 68.0, 0, 18.0, 0) // Flight control button
+            FlightControlOBJ = objectspawned
+            vecx = MenuButtonCount
+            MenuButtonCount += 1.0
+        }
+        if (var lang = GLOBAL_151; lang == LANG_DE) {
+            TextFrame = 69.0
+        }
+        else if (lang == LANG_IT) {
+            TextFrame = 70.0
+        }
+        else {
+            TextFrame = 71.0
+        }
+        spawn2(DispC, S_MENU_BUTTON, 1, MenuButtonCount, getanim(TEXT), TextFrame, 0, ((MenuButtonCount >> 8) - 2) * -18.0, 0) // Screen centering button
+        CTR_OBJ = objectspawned
+        field_63 = MenuButtonCount
+        MenuButtonCount += 1.0
+        SetTextLanguage1(72.0, 73.0, 74.0, 75.0, 76.0)
+        spawn2(DispC, S_MENU_BUTTON, 1, MenuButtonCount, getanim(TEXT), TextFrame, 0, ((MenuButtonCount >> 8) - 2) * -18.0, 0) // Calibrate button
+        vecy = MenuButtonCount
+        MenuButtonCount += 1.0
+        SetTextLanguage1(77.0, 78.0, 79.0, 80.0, 81.0)
+        spawn2(DispC, S_MENU_BUTTON, 1, MenuButtonCount, getanim(TEXT), TextFrame, 0, ((MenuButtonCount >> 8) - 2) * -18.0, 0) // Done button
+        MenuButtonCount += 1.0
+        UpdateOptionValue()
+        sleepnull()
+    }
+    trans {
+        once {
+            TextDefaultScale()
+            SetRot(0deg)
+            MenuButtonIndex = 0
+            MenuButtonCount = 2.0
+        }
+        unless (STATUS_FIRSTFRAME) {
+            unless (stateflag & 0x400000) {
+                if (dirpress(PAD_UP) && MenuButtonIndex > 0) {
+                    MenuButtonIndex -= 1.0
+                }
+                if (dirpress(PAD_DOWN) && MenuButtonIndex < MenuButtonCount - 1.0) {
+                    MenuButtonIndex += 1.0
+                }
+                if (buttonpress(PAD_X)) {
+                    if (MenuButtonIndex == 0) {
+                        changestate(Pause_Menu_Sound_Options, 0, 0, 0)
+                    }
+                    else if (MenuButtonIndex == vecx) {
+                        GLOBAL_32 = GLOBAL_32 ^ 1
+                    }
+                    else if (MenuButtonIndex == vecz) {
+                        GLOBAL_32 = GLOBAL_32 ^ 2
+                    }
+                    else if (MenuButtonIndex == vecy) {
+                        changestate(Pause_Menu_Calibrate)
+                    }
+                    else {
+                        changestateif(Pause_Menu_Root, MenuButtonIndex == MenuButtonCount - 1.0)
+                    }
+                }
+            }
+        }
+        if (MenuButtonIndex == field_63) {
+            if (dirhold(PAD_W) && GLOBAL_91 > -15) {
+                GLOBAL_91 -= 1
+            }
+            if (dirhold(PAD_E) && GLOBAL_91 < 15) {
+                GLOBAL_91 += 1
+            }
+        }
+        unless (STATUS_FIRSTFRAME) {
+            UpdateOptionValue()
+        }
+    }
+}
+
+sub UpdateOptionValue(FlightControlOBJ, arg, CTR_OBJ) __trans {
+    interrupter = FlightControlOBJ
+    field_62 = GLOBAL_32 & 1
+    if (var lang = GLOBAL_151; lang == LANG_DE) {
+        if (field_62) {
+            interrupter -> animframe = 82.0
+        }
+        else {
+            interrupter -> animframe = 68.0
+        }
+    }
+    else if (lang == LANG_ES) {
+        if (field_62) {
+            interrupter -> animframe = 83.0
+        }
+        else {
+            interrupter -> animframe = 84.0
+        }
+    }
+    else if (lang == LANG_IT) {
+        if (field_62) {
+            interrupter -> animframe = 85.0
+        }
+        else {
+            interrupter -> animframe = 86.0
+        }
+    }
+    else if (lang == LANG_FR) {
+        if (field_62) {
+            interrupter -> animframe = 87.0
+        }
+        else {
+            interrupter -> animframe = 88.0
+        }
+    }
+    else {
+        if (field_62) {
+            interrupter -> animframe = 89.0
+        }
+        else {
+            interrupter -> animframe = 68.0
+        }
+    }
+    interrupter = CTR_OBJ
+    interrupter -> v0 = GLOBAL_91
+}
+
+state Pause_Menu_Sound_Options { // 16
+    stateflag 0x100001
+    event => state Pause_Menu_Root
+    code(MonoStereoOBJ, MusicVolOBJ, SFXVolOBJ) {
+        KillDisplayChildren()
+        if (MONOSOUND) {
+            animframe = 90.0
+        }
+        else {
+            animframe = 91.0
+        }
+        spawn2(DispC, S_MENU_BUTTON, 1, 0, getanim(TEXT), animframe, 0, 54.0, 0) // Mono/Stereo button
+        MonoStereoOBJ = objectspawned
+        spawn2(DispC, S_MENU_BUTTON, 1, 1.0, getanim(TEXT), 92.0, 0, 18.0, 0) // Music volume value
+        MusicVolOBJ = objectspawned
+        spawn2(DispC, S_MENU_BUTTON, 1, 2.0, getanim(TEXT), 92.0, 0, -18.0, 0) // Sound effects volume value
+        SFXVolOBJ = objectspawned
+        UpdateSoundOptionValue()
+        if (var lang = GLOBAL_151; lang == LANG_DE) {
+            TextFrame = 93.0
+        }
+        else if (lang == LANG_FR) {
+            TextFrame = 94.0
+        }
+        else if (lang == LANG_ES || lang == LANG_IT) {
+            TextFrame = 95.0
+        }
+        else {
+            TextFrame = 96.0
+        }
+        spawn2(DispC, S_MENU_BUTTON, 1, -1.0, getanim(TEXT), TextFrame, 0, 36.0, 0) // Music volume label
+        SetTextLanguage1(97.0, 98.0, 99.0, 100.0, 101.0)
+        spawn2(DispC, S_MENU_BUTTON, 1, -1.0, getanim(TEXT), TextFrame, 0, 0, 0) // Sound effects volume label
+        SetTextLanguage1(77.0, 78.0, 79.0, 80.0, 81.0)
+        spawn2(DispC, S_MENU_BUTTON, 1, 3.0, getanim(TEXT), TextFrame, 0, -36.0, 0) // Done button
+        sleepnull()
+    }
+    trans {
+        once {
+            TextDefaultScale()
+            SetRot(0deg)
+            MenuButtonIndex = 0
+            MenuButtonCount = 4.0
+        }
+        unless (STATUS_FIRSTFRAME) {
+            unless (stateflag & 0x400000) {
+                if (dirpress(PAD_UP) && MenuButtonIndex > 0) {
+                    MenuButtonIndex -= 1.0
+                }
+                if (dirpress(PAD_DOWN) && MenuButtonIndex < MenuButtonCount - 1.0) {
+                    MenuButtonIndex += 1.0
+                }
+                if (buttonpress(PAD_X)) {
+                    if (var index = MenuButtonIndex; index == 0) {
+                        MONOSOUND = !MONOSOUND
+                    }
+                    else {
+                        changestateif(Pause_Menu_Root, index == 3.0)
+                    }
+                }
+            }
+        }
+        unless (STATUS_FIRSTFRAME) {
+            if (var index = MenuButtonIndex; index == 0) {
+                if (dirpress(PAD_W) || dirpress(PAD_E)) {
+                    MONOSOUND = !MONOSOUND
+                }
+            }
+            else if (index == 1.0) {
+                if (dirhold(PAD_W) && MUSVOL > 0) {
+                    MUSVOL -= 4
+                }
+                if (dirhold(PAD_E) && MUSVOL < 0xFF) {
+                    MUSVOL += 4
+                }
+            }
+            else if (index == 2.0) {
+                if (dirhold(PAD_W) && SFXVOL > 0) {
+                    SFXVOL -= 4
+                }
+                if (dirhold(PAD_E) && SFXVOL < 0xFF) {
+                    SFXVOL += 4
+                }
+            }
+            UpdateSoundOptionValue()
+        }
+    }
+}
+
+sub UpdateSoundOptionValue(MonoStereoOBJ, MusicVolOBJ, SFXVolOBJ) __trans {
+    interrupter = MonoStereoOBJ
+    if (!MONOSOUND) {
+        if (var lang = GLOBAL_151; lang == LANG_ES) {
+            interrupter -> animframe = 102.0
+        }
+        else {
+            interrupter -> animframe = 91.0
+        }
+    }
+    else {
+        interrupter -> animframe = 90.0
+    }
+    interrupter = MusicVolOBJ
+    interrupter -> v0 = MUSVOL * 100 / 255
+    interrupter = SFXVolOBJ
+    interrupter -> v0 = SFXVOL * 100 / 255
+}
+
+state Pause_Menu_Calibrate { // 17
+    stateflag 0x100001
+    event => state Pause_Menu_Root
+    code() {
+        KillDisplayChildren()
+        trotx = x
+        troty = y
+        statusb = FLAG_NO_CAMERA_CLIP
+        SetVFX2D()
+        x -= 88.0
+        y += 37.0
+        {
+            var joy_min_x = 1.0
+            var joy_min_y = 1.0
+            var joy_max_x = -1
+            var joy_max_y = -1
+            var joy_center_x = 0.5
+            var joy_center_y = 0.5
+            var step = 0.0
+            do {
+                if (var lang = GLOBAL_151; lang == LANG_DE) {
+                    setanim(TEXT)
+                    playframe(103.0)
+                }
+                else if (lang == LANG_FR) {
+                    setanim(TEXT)
+                    playframe(104.0)
+                }
+                else if (lang == LANG_IT) {
+                    setanim(TEXT)
+                    playframe(105.0)
+                }
+                else if (lang == LANG_ES) {
+                    setanim(TEXT)
+                    playframe(106.0)
+                }
+                else {
+                    setanim(TEXT)
+                    playframe(107.0)
+                }
+                if (buttonpress(PAD_SELECT)) {
+                    GLOBAL_152 = 0.5
+                    GLOBAL_153 = 0.5
+                    GLOBAL_154 = 0.0
+                    GLOBAL_155 = 0.0
+                    GLOBAL_156 = 1.0
+                    GLOBAL_157 = 1.0
+                    y = troty
+                    if (var lang = GLOBAL_151; lang == LANG_DE) {
+                        setanim(TEXT)
+                        playframe(108.0, 1.7s)
+                    }
+                    else if (lang == LANG_FR) {
+                        setanim(TEXT)
+                        playframe(109.0, 1.7s)
+                    }
+                    else if (lang == LANG_ES) {
+                        setanim(TEXT)
+                        playframe(110.0, 1.7s)
+                    }
+                    else {
+                        setanim(TEXT)
+                        playframe(111.0, 1.7s)
+                    }
+                    goto finish
+                }
+
+            } until (buttonpress(PAD_X))
+
+            unless (miscfunc(joy_center_x, player, 20, 12) >= 83) { goto finish }
+
+            while (step < 4.0) {
+                playnull()
+                do {
+                    if (step == 0.0) {
+                        if (var lang = GLOBAL_151; lang == LANG_DE) {
+                            setanim(TEXT)
+                            playframe(112.0)
+                        }
+                        else if (lang == LANG_FR) {
+                            setanim(TEXT)
+                            playframe(113.0)
+                        }
+                        else if (lang == LANG_IT) {
+                            setanim(TEXT)
+                            playframe(114.0)
+                        }
+                        else if (lang == LANG_ES) {
+                            setanim(TEXT)
+                            playframe(115.0)
+                        }
+                        else {
+                            setanim(TEXT)
+                            playframe(116.0)
+                        }
+                    }
+                    else if (step == 1.0) {
+                        if (var lang = GLOBAL_151; lang == LANG_DE) {
+                            setanim(TEXT)
+                            playframe(117.0)
+                        }
+                        else if (lang == LANG_FR) {
+                            setanim(TEXT)
+                            playframe(118.0)
+                        }
+                        else if (lang == LANG_IT) {
+                            setanim(TEXT)
+                            playframe(119.0)
+                        }
+                        else if (lang == LANG_ES) {
+                            setanim(TEXT)
+                            playframe(120.0)
+                        }
+                        else {
+                            setanim(TEXT)
+                            playframe(121.0)
+                        }
+                    }
+                    else if (step == 2.0) {
+                        if (var lang = GLOBAL_151; lang == LANG_DE) {
+                            setanim(TEXT)
+                            playframe(122.0)
+                        }
+                        else if (lang == LANG_FR) {
+                            setanim(TEXT)
+                            playframe(123.0)
+                        }
+                        else if (lang == LANG_IT) {
+                            setanim(TEXT)
+                            playframe(124.0)
+                        }
+                        else if (lang == LANG_ES) {
+                            setanim(TEXT)
+                            playframe(125.0)
+                        }
+                        else {
+                            setanim(TEXT)
+                            playframe(126.0)
+                        }
+                    }
+                    else {
+                        if (var lang = GLOBAL_151; lang == LANG_DE) {
+                            setanim(TEXT)
+                            playframe(127.0)
+                        }
+                        else if (lang == LANG_FR) {
+                            setanim(TEXT)
+                            playframe(128.0)
+                        }
+                        else if (lang == LANG_IT) {
+                            setanim(TEXT)
+                            playframe(129.0)
+                        }
+                        else if (lang == LANG_ES) {
+                            setanim(TEXT)
+                            playframe(130.0)
+                        }
+                        else {
+                            setanim(TEXT)
+                            playframe(131.0)
+                        }
+                    }
+                } until (buttonpress(PAD_X))
+
+                unless (miscfunc(joy_center_x, player, 20, 12) >= 83) { goto finish }
+
+                if (vecx < joy_min_x) joy_min_x = vecx;
+                if (vecy < joy_min_y) joy_min_y = vecy;
+                if (vecx > joy_max_x) joy_max_x = vecx;
+                if (vecy > joy_max_y) joy_max_y = vecy;
+                step += 1.0
+            }
+            y = troty
+            if (joy_max_x - joy_center_x > 64 && joy_center_x - joy_min_x > 64 && joy_max_y - joy_center_y > 64 && joy_center_y - joy_min_y > 64) {
+                GLOBAL_152 = joy_center_x
+                GLOBAL_153 = joy_center_y
+                GLOBAL_154 = joy_min_x
+                GLOBAL_155 = joy_min_y
+                GLOBAL_156 = joy_max_x
+                GLOBAL_157 = joy_max_y
+                if (var lang = GLOBAL_151; lang == LANG_DE) {
+                    setanim(TEXT)
+                    playframe(132.0, 1.7s)
+                }
+                else if (lang == LANG_FR) {
+                    setanim(TEXT)
+                    playframe(133.0, 1.7s)
+                }
+                else if (lang == LANG_IT) {
+                    setanim(TEXT)
+                    playframe(134.0, 1.7s)
+                }
+                else if (lang == LANG_ES) {
+                    setanim(TEXT)
+                    playframe(135.0, 1.7s)
+                }
+                else {
+                    setanim(TEXT)
+                    playframe(136.0, 1.7s)
+                }
+            }
+            else if (var lang = GLOBAL_151; lang == LANG_DE) {
+                setanim(TEXT)
+                playframe(137.0, 1.7s)
+            }
+            else if (lang == LANG_FR) {
+                setanim(TEXT)
+                playframe(138.0, 1.7s)
+            }
+            else if (lang == LANG_IT) {
+                setanim(TEXT)
+                playframe(139.0, 1.7s)
+            }
+            else if (lang == LANG_ES) {
+                setanim(TEXT)
+                playframe(140.0, 1.7s)
+            }
+            else {
+                setanim(TEXT)
+                playframe(141.0, 1.7s)
+            }
+        }
+        finish :
+        y = troty
+        x = trotx
+        statusb = FLAG_STRING_CENTER | FLAG_NO_CAMERA_CLIP
+        changestate(Pause_Menu_Root)
+    }
+}
+
+state Pause_Menu_Init { // 18
+    stateflag 0x100001
+    code() {
+        PauseSavedGameFlags = GAMEFLAGS
+        do {
+            GLOBAL_73 = seek(GLOBAL_73, 8, 1)
+            playnull()
+        } until (GLOBAL_73 == 8)
+        playnull()
+        playnull()
+        GAMEFLAGS &= ~0x8042001
+        playnull()
+        GLOBAL_73 = 0
+        playnull()
+        spawn2(DispC, S_PAUSE_BACKGROUND, 1)
+        playnull()
+        while (child -> stateflag & 0x8000) {
+            playnull()
+        }
+        TextColorDefault()
+        zindex = 100
+        TextDefaultScale()
+        PauseNameValue = GLOBAL_23
+        if (PauseNameValue) {
+            misc = 142.0
+        }
+        else {
+            misc = 143.0
+        }
+        spawn2(DispC, S_MENU_TEXT, 1, getanim(TEXT), misc, 84.0, 118.0, 0, 0, offsetof(PauseNameValue)) // Name / CRASH B text
+        spawn2(DispC, S_MENU_TEXT, 1, getanim(TEXT), 144.0, 100.0, 85.0, 0, 0, offsetof(CrystalCount)) // Crystal count
+        spawn2(DispC, S_INVENTORY, 1, REWARD_CRYSTAL, 190.0, 67.0, 0)
+        do (var v1 = SAVEDGEMPOOL1, v2 = SAVEDGEMPOOL2, i = 0) {
+            CheckItemPool(58 + (i >> 8), v1, v2)
+            if (misc) { misc = 4 }
+            else { misc = 2 }
+            spawn2(DispC, S_INVENTORY, 1, 358.0 + i, 84.0 + (i * 36) - 5.0, 23.0, misc)
+            i += 1.0
+        } while (i < 5.0)
+        spawn2(DispC, S_MENU_TEXT, 1, getanim(TEXT), 145.0, 86.0, 11.0, 0, 0, offsetof(ClearGemCount)) // Clear gem count / Gems label
+        spawn2(DispC, S_INVENTORY, 1, REWARD_GEM, 172.0, 0, 0)
+        spawn2(DispC, S_MENU_TEXT, 1, getanim(TEXT), 146.0, 84.0, -17.0, 0, 0, offsetof(TotalGemCount)) // Gem count / total
+        x = -144.0
+        y = -61.0
+        spawn2(DispC, S_PAUSE_MENU_ROOT, 1)
+        creator = objectspawned
+        SetScale(0x146, 0x207, 0x1000)
+        {
+            var v1 = SAVEDCRYSTALPOOL1
+            var v2 = SAVEDCRYSTALPOOL2
+            misc = 0
+            CountPoolBits(GLOBAL_27)
+            CountPoolBits(GLOBAL_28)
+            CompletedLevelCount = misc 
+            misc = 0 
+            CountPoolBits(v1)
+            CountPoolBits(v2)
+            CrystalCount = misc 
+            v1 = SAVEDGEMPOOL1
+            v2 = SAVEDGEMPOOL2
+            misc = 0
+            CountPoolBits(v1)
+            CountPoolBits(v2)
+            TotalGemCount = misc
+            v2 &= ~0x3FFFFFF
+            misc = 0
+            CountPoolBits(v2)
+            ClearGemCount = TotalGemCount - misc
+            misc = 0
+            CountPoolBits(GLOBAL_150 & 31)
+            ExtraCompletionCount = misc
+            CompletionPercent = (CrystalCount << 1) + (TotalGemCount + ExtraCompletionCount)
+            if (GLOBAL_27 & 0x80) { CompletionPercent += 3 }
+        }
+        spawn2(DispC, S_MENU_TEXT, 1, getanim(TEXT), 147.0, 148.0, -75.0, 6, 5.0, offsetof(CompletionPercent)) // Game completion percentage
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Pause_Menu_Close, e == Event12 && interrupter != self)
+    }
+}
+
+state Pause_Menu_Close { // 19
+    stateflag 0x100001
+    statusc 0x3
+    code() {
+        cascadeevent(Event12, 0)
+        WaitChildNull()
+        GLOBAL_73 = 8
+        GAMEFLAGS = PauseSavedGameFlags
+        playnull()
+        playnull()
+        do {
+            playnull()
+            GLOBAL_73 = seek(GLOBAL_73, 0, 1)
+        } while (GLOBAL_73)
+        GLOBAL_12 = 0
+    }
+}
+
+state HUD_Collectable_Display { // 20
+    statusc 0
+    code(reward, px, hide) {
+        SetRewardAttributes(reward)
+        if (hide) {
+            if (animseq == getanim(GEM_1)) {
+                animseq = 0
+            }
+            statusb = FLAG_INVISIBLE
+            y = -DISPLAY_BOUND_LOWER_Y
+            v0 = 0
+        }
+        else {
+            y = -DISPLAY_BOUND_Y
+            v0 = getfield(player, DisplayVarField)
+        }
+        x = px
+        changestate(HUD_Collectable_Display_Show)
+    }
+}
+
+state HUD_Collectable_Display_Show { // 21
+    statusc 0
+    code() {
+        sleepframe(DisplayFrame)
+    }
+    trans {
+        changestateif(HUD_Collectable_Display_Hide, frametime - statetime >= 1.5s)
+        y = seek(y, -DISPLAY_BOUND_LOWER_Y, 10.0)
+        roty = spd(roty, 180deg)
+        if (DisplayRewardType >= REWARD_CRYSTAL && getfield(player, DisplayVarField) > v0) {
+            statusb &= ~FLAG_INVISIBLE
+            if (DisplayRewardType >= REWARD_GEM) {
+                SetGemColor(getfield(player, DisplayVarField))
+            }
+        }
+    }
+}
+
+state HUD_Collectable_Display_Hide { // 22
+    statusc 0
+    code() {
+        do {
+            y = seek(y, -DISPLAY_BOUND_Y, 4.0)
+            playframe(DisplayFrame)
+        } until (y == -DISPLAY_BOUND_Y)
+        sendevent(Event1, parent)
+    }
+    trans {
+        changestateif(HUD_Collectable_Display_Show, buttonhold(PAD_TRIANGLE) && v0 == getfield(player, DisplayVarField))
+        roty = spd(roty, 180deg)
+    }
+}
+
+sub SetGemColor(reward) {
+    if (reward == GEM_RED) {
+        SetColor1(0x6C, 0x08, 0x08)
+        setanim(GEM_1)
+    }
+    else if (reward == GEM_GREEN) {
+        SetColor1(0x08, 0x6C, 0x08)
+        setanim(GEM_2)
+    }
+    else if (reward == GEM_PURPLE) {
+        SetColor1(0x6C, 0x08, 0x6C)
+        setanim(GEM_3)
+    }
+    else if (reward == GEM_BLUE) {
+        SetColor1(0x00, 0x00, 0x80)
+        if (animseq != getanim(GEM_1)) {
+            scalex = scalex * 1.2 >> 8
+            scaley = scaley * 0.6 >> 8
+            scalez = scalez * 1.2 >> 8
+        }
+        setanim(GEM_1)
+    }
+    else if (reward == GEM_YELLOW) {
+        SetColor1(0x80, 0x80, 0x00)
+        if (animseq != getanim(GEM_1)) {
+            scalex = scalex * 0.9 >> 8
+            scaley = scaley * 1.2 >> 8
+            scalez = scalez * 0.9 >> 8
+        }
+        setanim(GEM_1)
+    }
+    else {
+        SetColor1(0x5A, 0x5A, 0x6C)
+        setanim(GEM_1)
+    }
+    moda = 4.0
+    SetColor2(0x00, 0xE77, 0x6D7)
+}
+
+sub SetRewardAttributes(reward) {
+    DisplayRewardType = reward
+    SetScale(0x147, 0x147, 0x147)
+    vfx = (vfx & 0xFFFFFF00) | 11
+    vfx = (vfx & 0xFF00FFFF) | 0x40000
+    if (reward == REWARD_CRYSTAL) {
+        SetColorC2Obj(4.0, 0x80, 0x80, 0x80, -0xCCC, -0x800, 0x00)
+        setanim(CRYSTAL)
+        DisplayFrame = 0
+        DisplayVarField = offsetof(mem7)
+        if (!child) {
+            spawn2(9, 47, 1, 0)
+        } 
+    }
+    else if (reward == REWARD_GEM) {
+        animseq = 0
+        DisplayFrame = 0
+        DisplayVarField = offsetof(mem8)
+        SetGemColor(player -> mem8)
+    }
+    else if (reward == REWARD_GEM_SPECIAL) {
+        animseq = 0
+        DisplayFrame = 0
+        DisplayVarField = offsetof(mem9)
+        SetGemColor(player -> mem9)
+    }
+}
+
+sub CheckPlayerInventory(reward, px, hide) {
+    var item = 0
+    var prev = child
+    if (hide) {
+        x = px
+        item = 1.0
+    }
+    else if (reward == REWARD_CRYSTAL) {
+        item = player -> mem7
+    }
+    else if (reward == REWARD_GEM) {
+        item = player -> mem8
+    }
+    else if (reward == REWARD_GEM_SPECIAL) {
+        item = player -> mem9
+    }
+    if (item) {
+        spawn2(DispC, S_COLLECTABLE_DISPLAY, 1, reward, px, hide)
+        if (prev != child) {
+            ActiveDisplayOBJCount += 1.0
+        }
+    }
+}
+
+state Collectable_Manager_Init { // 23
+    code() {
+        statusb = FLAG_INVISIBLE | FLAG_NO_CAMERA_CLIP
+        SetVFX2D()
+        x = 0
+        z = 0
+        DisplayStatus = 0
+        ActiveDisplayOBJCount = 0
+        changestate(Collectable_Manager)
+    }
+}
+
+state Collectable_Manager { // 24
+    code() {
+        statusb |= FLAG_INVISIBLE
+        y = DISPLAY_BOUND_Y
+        sleepframe(DisplayFrame)
+    }
+    event(e, a) {
+        if (e == Event32) {
+            CollectedRewardID = a[0]
+            CollectedRewardParentID = a[1.0]
+            if (ActiveDisplayOBJCount == 0) {
+                if (CollectedRewardID == REWARD_CRYSTAL) {
+                    CheckPlayerInventory(REWARD_CRYSTAL, 0, 1.0)
+                }
+                else if (CollectedRewardID == REWARD_GEM) {
+                    CheckPlayerInventory(REWARD_GEM, -40.0, 1.0)
+                }
+                else if (CollectedRewardID == REWARD_GEM_SPECIAL) {
+                    CheckPlayerInventory(REWARD_GEM_SPECIAL, 40.0, 1.0)
+                }
+            }
+            accevret()
+        }
+        if (e == Event1) {
+            ActiveDisplayOBJCount -= 1.0
+        }
+    }
+    trans {
+        if (buttonhold(PAD_TRIANGLE)) {
+            if (ActiveDisplayOBJCount == 0 && !(GLOBAL_119 & 0x2000 && BONUSSTATE != BONUS_COMPLETED)) {
+                CheckPlayerInventory(REWARD_CRYSTAL, 0, 0)
+                CheckPlayerInventory(REWARD_GEM, -40.0, 0)
+                CheckPlayerInventory(REWARD_GEM_SPECIAL, 40.0, 0)
+            }
+        }
+    }
+}
+
+state Demo_Text { // 25
+    stateflag 0x40001
+    code(px, py) {
+        statusb = FLAG_STRING_CENTER
+        SetVFX2D()
+        zindex = 100
+        DEMOTEXTOBJ = self
+        SetTrans(px, py, 0)
+        TextDefaultScale()
+        TextColorDefault()
+        do {
+            setanim(TEXT)
+            playframe(148.0, 0.4s)
+            playnull(0.4s)
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Demo_Text_Sleep, e == Event14)
+    }
+}
+
+state Demo_Text_Sleep { // 26
+    code() {
+        if (LEVEL == LEVEL_WarpRoom) {
+            sleepnull()
+        }
+        GAMEFLAGS &= ~0x2
+        GLOBAL_17 = 6.0
+        loadlevel(LEVEL_Title)
+        sleepnull()
+    }
+}
+
+state Display_Kill { // 27
+    stateflag 0x100020
+    statusc 0
+    code() {}
+}
+
+state Box_Counter { // 28
+    code() {
+        vfx = (vfx & 0xFFFFFF00) | 5
+        y += 1.5m
+        statusb = FLAG_STRING_CENTER
+        TextColorDefault()
+        SetScale(8.0)
+        invincible = FONT_BIG
+        if (var v1 = SAVEDGEMPOOL1 | GEMPOOL1, v2 = SAVEDGEMPOOL2 | GEMPOOL2; LEVEL == LEVEL_TurtleWoods) {
+            unless (0x20000000 & v2) {
+                if (BOXCOUNT == 0) {
+                    changestate(Box_Counter_Reward, 300.0 + GEM_BLUE)
+                }
+                else if (field_61) {
+                    field_61 = 0
+                    GLOBAL_148 = 0
+                }
+            }
+        }
+        else if (LEVEL == LEVEL_HangEight) {
+            changestateif(Box_Counter_Reward, !(frametime - GLOBAL_66 >= 75s) && !(2 & v1), REWARD_GEM_SPECIAL)
+        }
+        else if (LEVEL == LEVEL_PlantFood) {
+            changestateif(Box_Counter_Reward, !(frametime - GLOBAL_66 >= 85s) && !(0x40000000 & v2), 300.0 + GEM_YELLOW)
+        }
+        playnull()
+        spawn2(DispC, S_HOLOGRAM, 1, x, y - 1m, z)
+        do {
+            var total = GLOBAL_148 >> 8
+            var broken = BOXCOUNT >> 8
+            setanim(TEXT)
+            playframe(149.0)
+        } while (1)
+    }
+    trans {
+        once {
+            CheckItemPool(LEVEL >> 8, SAVEDGEMPOOL1, SAVEDGEMPOOL2)
+            field_61 = misc
+            CheckItemPool(LEVEL >> 8, GEMPOOL1, GEMPOOL2)
+            field_61 = field_61 || misc
+        }
+        changestateif(Box_Counter_Reward, (BOXCOUNT == GLOBAL_148 || entitygetstate(3) || field_61) && !STATUS_FIRSTFRAME, REWARD_GEM + LEVEL)
+    }
+}
+
+state Box_Counter_Reward { // 29
+    code(reward) {
+        calcpath(0)
+        cascadeevent(Event12, self)
+        CheckItemPool((reward - REWARD_GEM) >> 8, SAVEDGEMPOOL1, SAVEDGEMPOOL2)
+        field_61 = misc
+        CheckItemPool((reward - REWARD_GEM) >> 8, GEMPOOL1, GEMPOOL2)
+        field_61 = field_61 || misc
+        if (entitygetstate(3) || field_61) {
+            KillEntity()
+        }
+        else {
+            spawn2(FruiC, FruiC_S_FRUIT_HOP, 1, reward, id)
+            creator = objectspawned
+            do {
+                playnull(1.7s)
+            } until (entitygetstate(3))
+        }
+    }
+}
+
+state River_TimeTrial { // 30
+    stateflag 0x40001
+    code() { 
+        SetVFX2D()
+        SetScale(0x146, 0x207, 0x1000)
+        invincible = FONT_BIG
+        TextColorDefault()
+        zindex = 0x64
+        {
+            var v1 = SAVEDGEMPOOL1 | GEMPOOL1
+            var v2 = SAVEDGEMPOOL2 | GEMPOOL2
+            if (LEVEL == LEVEL_HangEight) {
+                vecz = 1
+                TrialTimeLimit = 75s
+                TrialTriggerZ = 408.84m
+                TrialStartWindow = 25s
+            }
+            else if (LEVEL == LEVEL_PlantFood) {
+                vecz = 62
+                TrialTimeLimit = 85s
+                TrialTriggerZ = 507.1575m
+                TrialStartWindow = 30s
+            }
+            CheckItemPool(vecz, v1, v2)
+            if (misc) { return }
+        }
+        if (player -> z < TrialTriggerZ) { return }
+        do { playnull() } until (frametime - GLOBAL_66 >= TrialTimeLimit || player -> z < TrialTriggerZ && !(frametime - GLOBAL_66 >= TrialStartWindow))
+        SetTrans(100.0, -82.0, 0.0)
+        do {
+            TrialRemainingTime = TrialTimeLimit - (frametime - GLOBAL_66)
+            var s = (TrialRemainingTime / 25) % 60
+            var m = TrialRemainingTime / 1500
+            setanim(TEXT)
+            playframe(150.0)
+            if (var itemoffs = vecz; vecz < 32) {
+                misc = (GEMPOOL1 & 1) << itemoffs
+            }
+            else {
+                misc = (GEMPOOL2 & 1) << itemoffs - 32
+            }
+        } while (!misc && !(GLOBAL_119 & 0x2000) && !(frametime - GLOBAL_66 >= TrialTimeLimit))
+        creator = objectget(50.0)
+        if (creator) {
+            interrupter = creator -> creator
+            sendevent(Event14, interrupter, 100.0)
+        }
+    }
+    event(e, a) {
+        accevcstate(Display_Kill, e == Event19)
+    }
+}
+
+state Menu_Button { // 31
+    stateflag 0x120001
+    __transargs
+    code(index, anim, frame, xoff, yoff, obj) {
+        statusb = creator -> statusb
+        zindex = creator -> zindex
+        unless (creator -> stateflag & 0x100000) {
+            stateflag &= ~0x100000
+        }
+        SetVFX2D()
+        invincible = FONT_SMALL
+        animseq = anim
+        animframe = frame
+        var value = v0
+        do {
+            value = v0
+            playframe()
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Display_Kill, e == Event12 || e == Event1)
+    }
+    trans {
+        x = parent -> x + xoff
+        if (obj == 1) {
+            TextFlashFast()
+            return
+        }
+        y = parent -> y + yoff
+        if (parent -> MenuButtonIndex == index) {
+            if (obj) {
+                interrupter = obj
+                interrupter -> y = y
+            }
+            TextFlashFast()
+        }
+        else if (index < 0) {
+            TextFlashSlow()
+        }
+        else {
+            SetTextColor(0xA0, 0x8B, 0x60, 0xA0, 0x60, 0x06)
+        }
+    }
+}
+
+state Menu_Text { // 32
+    stateflag 0x100001
+    event => state Menu_Button
+    code(anim, frame, xoff, yoff, flags, mode, field) {
+        if (mode == 0) {
+            TextColorDefault()
+        }
+        else if (mode == 2.0) {
+            SetTextColor(0xFF, 0xFF, 0xFF, 0x40, 0x40, 0x40)
+        }
+        else if (mode == 5.0) {
+            SetTextColor(0x1FF, 0x190, 0x00, 0x1FF, 0x00, 0x00)
+            settrans(TextFlashSlow)
+        }
+        else if (mode == 6.0) {
+            SetTextColor(0x1FF, 0x190, 0x00, 0x1FF, 0x00, 0x00)
+            settrans(TextFlashMedium)
+        }
+        if (flags & 0x1) {
+            x = parent -> x + xoff
+            y = parent -> y + yoff
+        }
+        else {
+            x = xoff
+            y = yoff
+        }
+        if (flags & 4) {
+            invincible = FONT_BIG
+        }
+        else {
+            invincible = FONT_SMALL
+        }
+        zindex = creator -> zindex
+        if (flags & 0x2) {
+            statusb |= FLAG_STRING_CENTER
+        }
+        else {
+            statusb &= ~FLAG_STRING_CENTER
+        }
+        unless (creator -> stateflag & 0x100000) {
+            stateflag &= ~0x100000
+        }
+        vfx = (vfx & 0xFFFFFF00) | 6
+        animseq = anim
+        do (var v1) {
+            v1 = getfield(creator, field)
+            playframe(frame)
+        } while (1)
+    }
+}
+
+sub TextFlashSlow() {
+    if (frametime & 31) {
+        SetTextColor(0x1FF, 0x190, 0x00, 0x1FF, 0x00, 0x00)
+    }
+    else {
+        SetTextColor(0x1FF, 0x1FF, 0x1FF, 0x1FF, 0x1FF, 0x1FF)
+    }
+} 
+
+sub TextFlashMedium() {
+    if ((frametime & 31) == 15) {
+        SetTextColor(0x1FF, 0x1FF, 0x1FF, 0x1FF, 0x1FF, 0x1FF)
+    }
+    else {
+        SetTextColor(0x1FF, 0x190, 0x00, 0x1FF, 0x00, 0x00)
+    }
+}
+
+sub TextFlashFast() {
+    if (frametime & 3) {
+        SetTextColor(0x1FF, 0x190, 0x00, 0x1FF, 0x00, 0x00)
+    }
+    else {
+        SetTextColor(0x1FF, 0x1FF, 0x1FF, 0x1FF, 0x1FF, 0x1FF)
+    }
+}
+
+state Pause_Menu_Inventory { // 33
+    stateflag 0x100001
+    event => state Menu_Button
+    code(reward, xoff, yoff, flags) {
+        if (flags & 1) {
+            x = parent -> x + xoff
+            y = parent -> y + yoff
+        }
+        else {
+            x = xoff
+            y = yoff
+        }
+        troty = 10deg + rand(10deg)
+        trotx = 0deg
+        statusb = creator -> statusb
+        zindex = creator -> zindex
+        zindex = 0
+        unless (creator -> stateflag & 0x100000) {
+            stateflag &= ~0x100000
+        }
+        vfx = (vfx & 0xFFFFFF00) | 14
+        vfx = (vfx & 0xFF00FFFF) | 0x40000
+        if (reward == 97.0) {
+            tpc = 0
+            setanim(LIFE_ICON)
+            SetScale(0x146, 0x103, 0x1000)
+        }
+        else if (reward >= REWARD_GEM) {
+            if (flags & 8) {
+                SetScale(0x8F, 0x8F, 0x8F)
+            }
+            else if (flags & 4) {
+                SetScale(0xA3, 0xA3, 0xA3)
+            }
+            else {
+                SetScale(0x11E, 0x11E, 0x11E)
+            }
+            SetGemColor(reward - REWARD_GEM)
+            if (flags & 8) {
+                SetColor2(-0x2C1, 0x78B, 0xDD6)
+                SetColor1(0xA0, 0xA0, 0xA0)
+            }
+            else {
+                SetColor2(-0x2C1, 0x78B, 0xDD6)
+            }
+            rotx = 20deg
+            rotz = 0
+            if (flags & 2) {
+                do {
+                    SetScale(40, 40, 40)
+                    do {
+                        playframe(0)
+                    } while (rand(0xC8))
+                    SetScale(0x51, 0x51, 0x51)
+                    playframe(0)
+                    SetScale(0xA3, 0xA3, 0xA3)
+                    playframe(0, 0.08s)
+                    SetScale(0x51, 0x51, 0x51)
+                    playframe(0)
+                } while (1)
+            }
+        }
+        else if (reward >= REWARD_CRYSTAL) {
+            if (flags & 8) {
+                SetScale(0x7A, 0x7A, 0x7A)
+            }
+            else {
+                SetScale(1.0, 1.0, 1.0)
+            }
+            SetColorC2Obj(4.0, 0x80, 0x80, 0x80, -0x8B5, -0x83A, 0xA9B)
+            setanim(CRYSTAL)
+            spawn2(9, 47, 1, 0)
+        }
+        sleepframe(0)
+    }
+    trans {
+        roty = spd(roty, 90deg)
+    }
+}
+
+state Pause_Menu_Background { // 34
+    stateflag 0x108001
+    code() {
+        statusb = FLAG_NO_CAMERA_CLIP
+        SetVFX2D()
+        vfx = (vfx & 0xFFFF00FF) | 0x100
+        SetTrans(0, 0, 0)
+        TextDefaultScale()
+        zindex = -0x3E8
+        moda = 16.0
+        while (moda) {
+            moda = seek(moda, 0, 0x555)
+            playanim(0, PAUSE_BACKGROUND)
+        }
+        stateflag &= ~0x8000
+        sleepanim(0, PAUSE_BACKGROUND)
+    }
+    event(e, a) {
+        accevcstate(Pause_Menu_Background_Kill, e == Event12)
+    }
+}
+
+state Pause_Menu_Background_Kill { // 35
+    stateflag 0x100001
+    code() {
+        while (moda < 16.0) {
+            moda = seek(moda, 16.0, 0x555)
+            playanim(0, PAUSE_BACKGROUND)
+        }
+        playanim(0, PAUSE_BACKGROUND)
+    }
+}
+
+state Box_Hologram { // 36
+    event => state Pause_Menu_Root
+    code(px, py, pz) {
+        SetScale(1.8S)
+        SetTrans(px, py, pz)
+        vfx = (vfx & 0xFF00FFFF) | 0x20000
+        moda = v0
+        zindex = 20
+        sleepanim(0, BOX_PICKUP)
+    }
+    trans {
+        once {
+            v0 = 6.4
+        }
+        unless (rand(10)) {
+            v0 = 1.6 + rand(6.4)
+        }
+        field_61 = abs(z - CAMTRANSZ)
+        if (field_61 < 4m) {
+            if (field_61 <= 1m) {
+                v0 = 16.0
+            }
+            else {
+                v0 = 16.0 - 1.0 / (field_61 * 6.4)
+            }
+        }
+        moda = seek(moda, v0, 0x111)
+        roty = spd(roty, 180deg)
+    }
+}
+
+sub TextColorDefault() {
+    SetTextColor(0x1FF, 0x190, 0, 0x1FF, 0, 0)
+}

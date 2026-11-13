@@ -1,0 +1,221 @@
+#gool RBrOC 63 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_RBrOC.gooc" "C3\Out\C3_RBrOC.nsentry"
+
+#anim RACE_BANNER_START_0   [Bn1kV] [Bn1kG] 16 0 2
+#anim RACE_BANNER_START_1   [Bn1kV] [Bn2kG] 16 0 2
+#anim RACE_BANNER_START_2   [Bn1kV] [Bn3kG] 16 0 2
+#anim RACE_BANNER_START_3   [Bn1kV] [Bn4kG] 16 0 2
+#anim RACE_BANNER_START_4   [Bn1kV] [Bn5kG] 16 0 2
+#anim RACE_BANNER_START_5   [Bn1kV] [Bn6kG] 16 0 2
+#anim RACE_BANNER_START_6   [Bn1kV] [Bn7kG] 16 0 2
+#anim RACE_BANNER_START_7   [Bn1kV] [Bn8kG] 16 0 2
+#anim RACE_BANNER_START_8   [Bn1kV] [Bn9kG] 16 0 2
+#anim RACE_BANNER_START_9   [Bn1kV] [BnakG] 16 0 2
+#anim RACE_BANNER_START_10  [Bn1kV] [BnbkG] 16 0 2
+#anim RACE_BANNER_START_11  [Bn1kV] [BnckG] 16 0 2
+#anim RACE_BANNER_START_12  [Bn1kV] [BndkG] 16 0 2
+#anim RACE_BANNER_START_13  [Bn1kV] [BnekG] 16 0 2
+#anim RACE_BANNER_START_14  [Bn1kV] [BnfkG] 16 0 2
+#anim RACE_BANNER_START_15  [Bn1kV] [BngkG] 16 0 2
+
+#anim RACE_BANNER_FINISH_0  [BF1kV] [BF1kG] 16 0 2
+#anim RACE_BANNER_FINISH_1  [BF1kV] [BF2kG] 16 0 2
+#anim RACE_BANNER_FINISH_2  [BF1kV] [BF3kG] 16 0 2
+#anim RACE_BANNER_FINISH_3  [BF1kV] [BF4kG] 16 0 2
+#anim RACE_BANNER_FINISH_4  [BF1kV] [BF5kG] 16 0 2
+#anim RACE_BANNER_FINISH_5  [BF1kV] [BF6kG] 16 0 2
+#anim RACE_BANNER_FINISH_6  [BF1kV] [BF7kG] 16 0 2
+#anim RACE_BANNER_FINISH_7  [BF1kV] [BF8kG] 16 0 2
+#anim RACE_BANNER_FINISH_8  [BF1kV] [BF9kG] 16 0 2
+#anim RACE_BANNER_FINISH_9  [BF1kV] [BFakG] 16 0 2
+#anim RACE_BANNER_FINISH_10 [BF1kV] [BFbkG] 16 0 2
+#anim RACE_BANNER_FINISH_11 [BF1kV] [BFckG] 16 0 2
+#anim RACE_BANNER_FINISH_12 [BF1kV] [BFdkG] 16 0 2
+#anim RACE_BANNER_FINISH_13 [BF1kV] [BFekG] 16 0 2
+#anim RACE_BANNER_FINISH_14 [BF1kV] [BFfkG] 16 0 2
+#anim RACE_BANNER_FINISH_15 [BF1kV] [BFgkG] 16 0 2
+
+#fraganim RACE_START_LIGHTS [Hi1kT] 6
+#frag 0x808080 0 2 9 3 928 64 32 32 -400 200 0 600
+#frag 0x808080 0 2 9 3 928 64 32 32 0 200 400 600
+#frag 0x808080 0 2 9 3 928 64 32 32 -400 -200 0 200
+#frag 0x808080 0 2 9 3 928 64 32 32 0 -200 400 200
+#frag 0x808080 0 2 10 3 928 32 32 32 -400 -600 0 -200
+#frag 0x808080 0 2 10 3 928 32 32 32 0 -600 400 -200
+
+#frag 0x808080 0 2 8 3 928 96 32 32 -400 200 0 600
+#frag 0x808080 0 2 8 3 928 96 32 32 0 200 400 600
+#frag 0x808080 0 2 9 3 928 64 32 32 -400 -200 0 200
+#frag 0x808080 0 2 9 3 928 64 32 32 0 -200 400 200
+#frag 0x808080 0 2 10 3 928 32 32 32 -400 -600 0 -200
+#frag 0x808080 0 2 10 3 928 32 32 32 0 -600 400 -200
+
+#frag 0x808080 0 2 8 3 928 96 32 32 -400 200 0 600
+#frag 0x808080 0 2 8 3 928 96 32 32 0 200 400 600
+#frag 0x808080 0 2 8 3 928 96 32 32 -400 -200 0 200
+#frag 0x808080 0 2 8 3 928 96 32 32 0 -200 400 200
+#frag 0x808080 0 2 10 3 928 32 32 32 -400 -600 0 -200
+#frag 0x808080 0 2 10 3 928 32 32 32 0 -600 400 -200
+
+#frag 0x808080 0 2 8 3 928 96 32 32 -400 200 0 600
+#frag 0x808080 0 2 8 3 928 96 32 32 0 200 400 600
+#frag 0x808080 0 2 8 3 928 96 32 32 -400 -200 0 200
+#frag 0x808080 0 2 8 3 928 96 32 32 0 -200 400 200
+#frag 0x808080 0 2 7 3 896 32 32 32 -400 -600 0 -200
+#frag 0x808080 0 2 7 3 896 32 32 32 0 -600 400 -200
+
+#spawn S_BANNER  Race_Banner
+#spawn S_LIGHTS  Race_Lights_Init
+
+expr OBJ_HOTRAIL = 100.0
+
+state Race_Banner { // 0
+    statusc 0
+    code() {
+        statusb = 0
+        zindex = 24
+        do {
+            if (GLOBAL_11 >= 1.0) {
+                playanim(0, RACE_BANNER_FINISH_0)
+                playanim(1, RACE_BANNER_FINISH_1)
+                playanim(2, RACE_BANNER_FINISH_2)
+                playanim(3, RACE_BANNER_FINISH_3)
+                playanim(4, RACE_BANNER_FINISH_4)
+                playanim(5, RACE_BANNER_FINISH_5)
+                playanim(6, RACE_BANNER_FINISH_6)
+                playanim(7, RACE_BANNER_FINISH_7)
+                playanim(8, RACE_BANNER_FINISH_8)
+                playanim(9, RACE_BANNER_FINISH_9)
+                playanim(10, RACE_BANNER_FINISH_10)
+                playanim(11, RACE_BANNER_FINISH_11)
+                playanim(12, RACE_BANNER_FINISH_12)
+                playanim(13, RACE_BANNER_FINISH_13)
+                playanim(14, RACE_BANNER_FINISH_14)
+                playanim(15, RACE_BANNER_FINISH_15)
+            }
+            else {
+                playanim(0, RACE_BANNER_START_0)
+                playanim(1, RACE_BANNER_START_1)
+                playanim(2, RACE_BANNER_START_2)
+                playanim(3, RACE_BANNER_START_3)
+                playanim(4, RACE_BANNER_START_4)
+                playanim(5, RACE_BANNER_START_5)
+                playanim(6, RACE_BANNER_START_6)
+                playanim(7, RACE_BANNER_START_7)
+                playanim(8, RACE_BANNER_START_8)
+                playanim(9, RACE_BANNER_START_9)
+                playanim(10, RACE_BANNER_START_10)
+                playanim(11, RACE_BANNER_START_11)
+                playanim(12, RACE_BANNER_START_12)
+                playanim(13, RACE_BANNER_START_13)
+                playanim(14, RACE_BANNER_START_14)
+                playanim(15, RACE_BANNER_START_15)
+            }
+        } while (1)
+    }
+    trans {
+        once {
+            var0 = player -> z < z
+        }
+        field_61 = player -> z < z
+        if (var0 != field_61) {
+            if (field_61) {
+                GLOBAL_11 += 1.0
+            }
+            else {
+                GLOBAL_11 -= 1.0
+            }
+            if (GLOBAL_11 >= 2.0) {
+                interrupter = objectget(OBJ_HOTRAIL)
+                if (interrupter) {
+                    sendevent(Event22, interrupter, self)
+                    if ((interrupter -> stalltime & 1.0) == 1.0) {
+                        sendevent(Event14, player, 0)
+                    }
+                    else {
+                        sendevent(Event22, player, self)
+                    }
+                }
+            }
+            var0 = player -> z < z
+        }
+    }
+}
+
+state Race_Lights_Init { // 1
+    statusc 0
+    code() {
+        vfx = (vfx & 0xFFFFFF00) | 0x6
+        zindex = 80
+        SetRot(0deg)
+        SetScale(1.0)
+        SetTrans(0.0, 237.0, 0.0)
+        changestate(Race_Lights_Descend)
+    }
+}
+
+state Race_Lights_Descend { // 2
+    statusc 0
+    code() {
+        setanim(RACE_START_LIGHTS)
+        sleepframe(0)
+    }
+    trans {
+        y = seek(y, 82.0, 6.2)
+        changestateif(Race_Lights_Countdown, y == 82.0)
+    }
+}
+
+state Race_Lights_Countdown { // 3
+    statusc 0
+    code() {
+        playframe(animframe, 21)
+        setanim(RACE_START_LIGHTS, -1.0)
+        do {
+            animframe += 1.0
+            if (animframe == 1.0) {
+                soundpitch(3.302)
+                soundsetup(7, self, 8)
+                sounddecay(10s)
+                soundplay([Rb1kA], 1V)
+            }
+            else if (animframe == 2.0) {
+                soundpitch(3.302)
+                soundsetup(7, self, 8)
+                sounddecay(10s)
+                soundplay([Rb1kA], 1V)
+            }
+            else if (animframe == 3.0) {
+                soundpitch(2.83)
+                soundsetup(7, self, 8)
+                sounddecay(10s)
+                soundplay([Rb2kA], 1V)
+            }
+            sendevent(Event76, player, animframe)
+            playframe(animframe, 21)
+            
+        } while (animframe + 1.0 <= 3.0)
+        changestate(Race_Lights_Ascend)
+    }
+}
+
+state Race_Lights_Ascend { // 4
+    statusc 0
+    code() {
+        sleep()
+    }
+    trans {
+        y = seek(y, 237.0, 6.2)
+        if (y == 237.0) {
+            KillEntity()
+            changestate(Kill)
+        }
+    }
+}
+
+state Kill { // 5
+    statusc 0
+    code() {}
+}

@@ -1,0 +1,6 @@
+expr BosBC = 67
+
+expr BosBC_S_HEALTH_TICK = 0
+expr BosBC_S_HEALTH = 1
+expr BosBC_S_REWARD_DESC = 2
+expr BosBC_S_BACKGROUND = 3

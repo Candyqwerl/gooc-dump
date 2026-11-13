@@ -1,0 +1,264 @@
+#gool FisCC 21 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_FisCC.gooc" "C3\Out\C3_FisCC.nsentry"
+
+#anim FISH        [CF1cV] [CF1cG] 25 1 2
+#anim FISH_EAT    [CF2cV] [CF1cG] 13 1 2
+#anim FISH_SPIN   [WiBcV] [WiBcG] 10 0 2
+
+#spawn S_CRASH_FISH   Fish_Init
+
+event EventJumpedOn      => state Fish_Squash
+event EventHit           => state Fish_Squash
+event EventSpinHit       => state Fish_Fling
+event EventHitInvincible => state Fish_Fling
+event EventFling         => state Fish_Fling
+event EventSlideHit      => state Fish_Fling
+event EventSlamHit       => state Fish_Squash
+
+var TrackingAngle, TargetOffset, FishVar4, TrackingOffset, BounceCycles, SpinDuration, FacingOffset, SavedX, SavedY
+var SavedZ, SavedSpeed, SavedRotX, SavedStatusB, SavedGroundY
+
+state Fish_Init { // 0
+    stateflag 0x1
+    statusc 0x2
+    code(angle, limit, cycles, duration) {
+        vely -= 0.3m
+        TrackingAngle = angle
+        BounceCycles = cycles - 1.0
+        SpinDuration = duration * 1s / 1.2s
+        BounceCycles = 2.0
+        vfx = (vfx & 0xFFFF00FF) | 0xE00
+        SetVec(x, y, z)
+        pathdist = limit
+        SetZindexField(32)
+        groundy = vecy
+        TrackingOffset = 0
+        FacingOffset = 0
+        changestate(Fish_Track)
+    }
+}
+
+state Fish_Wait { // 1
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        statusb = FLAG_ROT_Y | FLAG_GRAVITY | FLAG_PHYSICS_ENGINE | FLAG_SOLID_GROUND
+        do {
+            if (animseq != getanim(FISH)) {
+                setanim(FISH, -1.0)
+            }
+            playframe((animframe + 1.0) % 25.0)
+            if (animframe == 11.0 || animframe == 24.0) {
+                soundpitch(3.263)
+                sounddecay(8s)
+                soundsetup(6, self, 8)
+                soundplay([CF1cA], 1V)
+            }
+        } while (1)
+    }
+    trans {
+        if (animseq == getanim(FISH) && (animframe == 0 || animframe == 13.0)) {
+            var0 = randi(-30deg, 30deg)
+            trotx = var0 << 1
+            troty += var0
+        }
+        changestateifn(Fish_Track, player -> stateflag & 0x8000000)
+    }
+}
+
+state Fish_Track { // 2
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        statusb = FLAG_ROT_Y | FLAG_COLLIDABLE | FLAG_GRAVITY | FLAG_PHYSICS_ENGINE | FLAG_SOLID_GROUND | FLAG_SOLID_ALL
+        trotx = 360deg
+        do (var cycle = 0) {
+            setanim(FISH, -1.0)
+            do {
+                animframe += 1.0
+                if (animframe == 11.0 || animframe == 24.0) {
+                    soundpitch(3.263)
+                    sounddecay(8s)
+                    soundsetup(6, self, 8)
+                    soundplay([CF1cA], 1V)
+                    spawn(9, 14, 1, -1.0, GLOBAL_118, 3.0, 1m)
+                }
+                playframe()
+            } while (animframe + 1.0 <= 24.0)
+        } while ({ cycle += 1.0 }; cycle < BounceCycles)
+        changestate(Fish_Spin)
+    }
+    trans {
+        once {
+            SetScale(1S)
+            FacingOffset = 0
+        }
+        TrackPlayer()
+    }
+}
+
+sub TrackPlayer() { // S-96
+    sendevent(Event20, collider, 1s)
+    changestateif(Fish_Eat, eventaccepted)
+    changestateif(Fish_Wait, player -> stateflag & 0x8000000)
+    if (animseq == getanim(FISH) && (animframe == 0 || animframe == 13.0)) {
+        FacingOffset = randi(-30deg, 30deg)
+        trotx = abs(FacingOffset << 1)
+    }
+    troty = atan2(player -> trans) + FacingOffset
+    GetTargetOffset()
+    save (troty, speed) {
+        troty = TrackingAngle + 90deg
+        TrackingOffset = seek(TrackingOffset, TargetOffset, spd(1m + ((15m - distance(player, DIST_NO_Y)) >> 1)))
+        if (TrackingOffset > pathdist) {
+            TrackingOffset = pathdist
+        }
+        else if (TrackingOffset < -pathdist) {
+            TrackingOffset = -pathdist
+        }
+        setvel(TrackingOffset, vtrans)
+        x += vecx
+        z += vecz
+    }
+}
+
+sub GetTargetOffset() { // S-145
+    var c, s, dx, dz
+    c = cos(TrackingAngle)
+    s = sin(TrackingAngle)
+    dx = player -> x - vecx
+    dz = vecz - player -> z
+    TargetOffset = ((dz >> 8) * s >> 4) + ((dx >> 8) * c >> 4)
+}
+
+state Fish_Eat { // 3
+    stateflag 0x41
+    statusc 0x0
+    code() {
+        setanim(FISH_EAT, -1.0)
+        do {
+            animframe += 1.0
+            if (animframe == 11.0) {
+                spawn(9, 14, 1, -1.0, y, 7.0, 1m)
+            }
+            playframe()
+        } while (animframe + 1.0 <= 12.0)
+        sleepnull()
+    }
+}
+
+state Fish_Spin { // 4
+    stateflag 0x4004081
+    statusc 0x12
+    code() {
+        soundpitch(3.263)
+        sounddecay(8s)
+        soundsetup(6, self, 8)
+        soundplay([CF3cA], 1V)
+        statusb &= ~FLAG_ROT_Y
+        setanim(FISH_SPIN)
+        SetScale(0x14CC, 0x1333, 0x14CC)
+        SavedX = x
+        SavedY = y
+        SavedZ = z
+        SavedSpeed = speed
+        SavedRotX = rotx
+        SavedStatusB = statusb
+        SavedGroundY = groundy
+        onstateexit(RestoreFields)
+        statusb |= FLAG_SOLID_GROUND
+        troty = roty
+        rotx = 90deg
+        rotz = roty
+        y += 1.2m
+        groundy = y
+        {
+            var dx, dz
+            save (vecx, vecy, vecz) {
+                setvel(-1.2m, vvec)
+                dx = vecx
+                dz = vecz
+            }
+            do (var start = frametime) {
+                x += dx
+                z += dz
+                if (animseq != getanim(FISH_SPIN)) {
+                    setanim(FISH_SPIN, -1.0)
+                }
+                playframe((animframe + 1.0) % 10.0)
+            } while (frametime - start < SpinDuration)
+        }
+        troty = atan2(player -> trans)
+        roty = troty
+        changestate(Fish_Track)
+    }
+    event(e, a) {
+        if ((e == EventSpinHit || e == EventSlideHit) && interrupter == player && player -> statusb & FLAG_DPAD_CONTROL) {
+            save (velx, vely, velz, troty) {
+                troty = atan2(player -> trans)
+                interrupter -> speed = 10m
+                interrupter -> troty = atan2(player -> trans)
+                setvel(10m)
+                interrupter -> velx = velx
+                interrupter -> vely = vely 
+                interrupter -> velz = velz
+                interrupter -> statusb &= ~FLAG_DPAD_CONTROL
+            }
+        }
+    }
+    trans {
+        TrackPlayer()
+    }
+}
+
+sub RestoreFields() { // S-266
+    SetTrans(SavedX, SavedY, SavedZ)
+    speed = SavedSpeed
+    rotx = SavedRotX
+    statusb = SavedStatusB
+    groundy = SavedGroundY
+}
+
+state Fish_Squash { // 5
+    stateflag 0x23
+    statusc 0x32
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        playframe()
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        playframe()
+    }
+}
+
+sub SetParticleColor() { // S-285
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x05, 0xBD, 0xBE)
+    }
+    else if (r == 1) {
+        SetColor1(0x0D, 0x4C, 0x4C)
+    }
+    else if (r == 2) {
+        SetColor1(0xE7, 0x85, 0x81)
+    }
+}
+
+state Fish_Fling { // 6
+    stateflag 0x30
+    statusc 0x32
+    code(h) {
+        KillEntity()
+        health = h + 1.0
+        sendevent(EventCombo, player, h)
+        EnemyFlingSetDir(0x80000)
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    }
+    trans {
+        EnemyFlingTrans(2m, EventFling)
+    }
+}

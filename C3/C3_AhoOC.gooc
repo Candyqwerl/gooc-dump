@@ -1,0 +1,68 @@
+#gool AhoOC 7 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_AhoOC.gooc" "C3\Out\C3_AhoOC.nsentry"
+
+#anim ASS_HOLE [Ah10V] [Ah10G] 59 1 2
+
+#spawn S_ASS_HOLE Ass_Hole
+
+var ZindexDefault, ZindexAlt, ZindexDistance, BouncePropulsion
+
+state Ass_Hole {
+    stateflag 0x1
+    statusc 0x0
+    code(mirror, xoffs, propulsion, zbase, zalt, depth) {
+        ZindexDefault = zbase
+        ZindexAlt = zalt
+        ZindexDistance = depth
+        if (mirror) {
+            scalex = -abs(scalex)
+        }
+        BouncePropulsion = propulsion
+        if (BouncePropulsion > 0) {
+            BouncePropulsion = -BouncePropulsion
+        }
+        x += xoffs
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_SIDES
+        setanim(ASS_HOLE, -1.0)
+        do {
+            if (CAMTRANSZ - z >= depth) {
+                zindex = zalt
+            }
+            else {
+                zindex = zbase
+            }
+            var0 = player -> z - z + 2.5m
+            if (var0 < 0m) {
+                var0 = 0m
+            }
+            if (var0 > 16m) {
+                var0 = 16m
+            }
+            var0 = (58 - ((var0 * 58) / 16m)) << 8
+            if (var0 > animframe) {
+                animframe = var0
+            }
+            playframe()
+        } while (1)
+    }
+    trans {
+        sendevent(EventBounce, collider, BouncePropulsion)
+        changestateif(Ass_Hole_Jumped_On, eventaccepted)
+    }
+}
+
+state Ass_Hole_Jumped_On {
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        soundpitch(3.263)
+        soundplay([Ah1aA], 1V)
+        ins72(0, 0x1000)
+        statusb = 0
+        playframes(ASS_HOLE, 57.0, 55.0)
+        playframes(ASS_HOLE, 56.0, 58.0)
+        sleep()
+    }
+}

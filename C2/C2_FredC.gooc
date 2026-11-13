@@ -1,0 +1,336 @@
+#gool FredC 53 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C2_ShadC.gooh"
+//gooc -c 2 -r pal "C2\C2_FredC.gooc" "C2\Out\C2_FredC.nsentry"
+
+#anim FRED_PATH_RETRACT       [Fr00V] 86 1
+#anim FRED_PATH_EXTENDED      [Fr10V] 22 1
+#anim FRED_PATH_RETRACTED     [Fr20V] 22 1
+#anim FRED_STATIC_RETRACT     [Fr30V] 86 1
+#anim FRED_STATIC_EXTENDED    [Fr40V] 22 1
+#anim FRED_STATIC_RETRACTED   [Fr50V] 22 1
+
+#sprite SPARK[Dy1gT]
+#tex 0xFFFFFF 0 3 8 5 672 96 32 32
+
+#spawn S_FRED   Fred_Init
+#spawn S_SPARK  Spark
+
+event EventHit           => state Fred_Squash
+event EventHitInvincible => state Fred_Squash
+event EventFling         => state Fred_Fling
+
+expr TENTACLE_CYCLE = 0
+expr TENTACLE_EXTENDED = 1
+expr TENTACLE_RETRACTED = 2
+
+var CycleOffset, CycleLength, TurnTime, FredVar4, FredTrackOffset, PathTravelTime, CycleMode,
+    JumpVulnerable, SlideVulnerable, RetractFrameOffset, FredStatic, SlideVulnerableTime, SparkScale
+
+state Fred_Init {
+    statusc 0x12
+    code(limit, cyclelen, cycleoffs, retractoffs, stance, static) {
+        pathdist = limit
+        CycleLength = cyclelen * 1s / 1.2s
+        CycleOffset = cycleoffs * 1s / 1.2s
+        CycleMode = stance
+        RetractFrameOffset = (retractoffs * 1s / 1.2s) & -1.0
+        FredStatic = static
+        soundpitch(3.625)
+        sounddecay(10s)
+        soundplay([DFRgA], 0.2V)
+        FredTrackOffset = 0
+        density = 0.15m
+        zindex = 25
+        FredVar4 = 0
+        spawn(ShadC, ShadC_S_SHADOW_STATIONARY, 1, 0, 1S, 10)
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | 0x20000000
+        do (var vertex = 0) {
+            spawn(FredC, S_SPARK, 1, vertex)
+            vertex += 1.0
+        } while (vertex < 6.0)        
+        if (CycleMode == TENTACLE_CYCLE) {
+            TurnTime = CycleLength - 3.45s >> 1
+            PathTravelTime = 1.75s
+        }
+        else if (CycleMode == TENTACLE_EXTENDED) {
+            TurnTime = CycleLength - 3.55s >> 1
+            PathTravelTime = 1.78s
+        }
+        else if (CycleMode == TENTACLE_RETRACTED) {
+            TurnTime = CycleLength - 3.55s >> 1
+            PathTravelTime = 1.78s
+        }
+        if (FredStatic) {
+            TurnTime = 0s
+            roty = 90deg
+        }
+        changestate(Fred)
+    }
+}
+
+state Fred {
+    stateflag 0x5
+    statusc 0
+    code() {
+        do {
+            if (CycleMode == TENTACLE_CYCLE) {
+                if (FredStatic) {
+                    setanim(FRED_STATIC_RETRACT)
+                }
+                else {
+                    setanim(FRED_PATH_RETRACT)
+                }
+            }
+            else if (CycleMode == TENTACLE_EXTENDED) {
+                if (FredStatic) {
+                    setanim(FRED_STATIC_EXTENDED)
+                }
+                else {
+                    setanim(FRED_PATH_EXTENDED)
+                }
+            }
+            else if (CycleMode == TENTACLE_RETRACTED) {
+                if (FredStatic) {
+                    setanim(FRED_STATIC_RETRACTED)
+                }
+                else {
+                    setanim(FRED_PATH_RETRACTED)
+                }
+            }
+
+            if (CycleMode == TENTACLE_CYCLE) {
+                if (animframe >= 30.0 && animframe <= 78.0) {
+                    JumpVulnerable = false
+                }
+                else {
+                    JumpVulnerable = true
+                }
+                if (animframe >= 34.0 && animframe <= 72.0) {
+                    SlideVulnerable = true
+                    SlideVulnerableTime = frametime
+                }
+                else {
+                    SlideVulnerable = false
+                }
+            }
+            else if (CycleMode == TENTACLE_EXTENDED) {
+                JumpVulnerable = true
+                SlideVulnerable = false
+            }
+            else if (CycleMode == TENTACLE_RETRACTED) {
+                JumpVulnerable = false
+                SlideVulnerable = true
+                SlideVulnerableTime = frametime
+            }
+
+            var cycletime = time(CycleLength, CycleOffset)
+            var frame = 0
+            var prog = 0
+            if (TurnTime > 0 && cycletime >= 0 && cycletime <= TurnTime) {
+                roty = 90deg + ((cycletime * -180deg) / TurnTime)
+            }
+            else if (cycletime >= TurnTime && cycletime <= TurnTime + PathTravelTime) {
+                var travel = cycletime - TurnTime
+                prog = (travel * (pathlen - 1.0)) / PathTravelTime
+                frame = (travel * (44.0 - 1)) / PathTravelTime
+                if (CycleMode == TENTACLE_CYCLE) {
+                    animframe = (frame + RetractFrameOffset) % 86.0
+                }
+                else if (CycleMode == TENTACLE_EXTENDED || CycleMode == TENTACLE_RETRACTED) {
+                    animframe = (animframe + 1.0) % 22.0
+                }
+                if (!FredStatic) {
+                    roty = 270deg
+                }
+                calcpath(prog)
+            }
+            else if (TurnTime > 0 && cycletime >= TurnTime + PathTravelTime && cycletime <= (TurnTime << 1) + PathTravelTime) {
+                var yaw = cycletime - (TurnTime + PathTravelTime)
+                roty = 270deg + ((yaw * 180deg) / TurnTime)
+            }
+            else if (cycletime >= (TurnTime << 1) + PathTravelTime && cycletime <= CycleLength) {
+                var elapsed = cycletime - ((TurnTime << 1) + PathTravelTime)
+                var duration = CycleLength - ((TurnTime << 1) + PathTravelTime)
+                prog = (pathlen - 1.0) + ((elapsed * -(pathlen - 1.0)) / duration)
+                frame = 44.0 + ((elapsed * (42.0 - 1)) / duration)
+                if (CycleMode == TENTACLE_CYCLE) {
+                    animframe = (frame + RetractFrameOffset) % 86.0
+                }
+                else if (CycleMode == TENTACLE_EXTENDED || CycleMode == TENTACLE_RETRACTED) {
+                    animframe = (animframe + 1.0) % 22.0
+                }
+                if (!FredStatic) {
+                    roty = 450deg
+                }
+                calcpath(prog)
+            }
+            playframe()
+        } while (1)
+    }
+    event(e, a) {
+        if (!JumpVulnerable && !SlideVulnerable) {
+            rejevif (e == EventJumpedOn || e == EventSlamHit || e == EventSpinHit || e == EventSlideHit) {
+                sendevent(EventShock2, interrupter, 100.0)
+            }
+        }
+        if (JumpVulnerable) {
+            accevcstate(Fred_Squash, (!(interrupter -> statusa \ FLAG_GROUNDLAND) && e == EventSpinHit) || e == EventJumpedOn || e == EventSlamHit || e == EventHitInvincible)
+            rejevif (e == EventJumpedOn || e == EventSlamHit) {
+                sendevent(EventShock2, interrupter, 100.0)
+            }
+            if (!SlideVulnerable) {
+                rejevif (e == EventSpinHit || e == EventSlideHit) {
+                    sendevent(EventShock2, interrupter, 100.0)
+                }
+            }
+        }
+        if (SlideVulnerable) {
+            accevcstate(Fred_Fling, interrupter -> statusa \ FLAG_GROUNDLAND && (e == EventSpinHit || e == EventSlideHit || e == EventHitInvincible))
+            rejevif (e == EventSpinHit || e == EventSpinHit) {
+                sendevent(EventShock2, interrupter, 100.0)
+            }
+            if (!JumpVulnerable) {
+                rejevif (e == EventJumpedOn || e == EventSlamHit) {
+                    sendevent(EventShock2, interrupter, 100.0)
+                }
+            }
+        }
+    }
+    trans {
+        if (SlideVulnerable) {
+            if (!rand(3 * (frametime - SlideVulnerableTime)) && FRAMETIME < 34) {
+                save (x, y, z, scalex, scaley, scalez) {
+                    getvert(vtrans, self, rand(6.0))
+                    SetScale(0.5S)
+                    spawn(9, 48, 1, 64, 50, 0, 0, 0, 2.0)
+                    unless (rand(2)) {
+                        sounddecay(3.85s)
+                        soundpitch(6.205)
+                        soundplay([sp23A], 0.2V)
+                    }
+                    else {
+                        sounddecay(3.85s)
+                        soundpitch(5.515)
+                        soundplay([sp13A], 0.2V)
+                    }
+                }
+            }
+        }
+        if (pathdist) {
+            var v1 = 0
+            var deg_to_player = 0deg
+            var pathrot = troty
+            save (troty, statusa, statusb, x, y, z, pathprog) {
+                statusb = FLAG_PATH_CALCS | FLAG_TRACK_PATH_SIGN
+                x = player -> x
+                y = player -> y
+                z = player -> z
+                calcpath(0)
+                v1 = troty
+                troty += 90deg
+                setvel(FredTrackOffset, vvel)
+            }
+            x += velx
+            z += velz
+            if (abs(FredTrackOffset - vecy) > 0.1m) {
+                deg_to_player = degdist(troty, atan2(player -> trans))
+                if (abs(deg_to_player) < 60deg) {
+                    if (deg_to_player < -45deg) {
+                        deg_to_player = -45deg
+                    }
+                    else if (deg_to_player > 45deg) {
+                        deg_to_player = 45deg
+                    }
+                    troty += deg_to_player
+                }
+            }
+            FredTrackOffset = seek(FredTrackOffset, vecy, spd(2m))
+            if (FredTrackOffset < -pathdist) {
+                troty = pathrot
+                FredTrackOffset = -pathdist
+            }
+            else if (FredTrackOffset > pathdist) {
+                troty = pathrot
+                FredTrackOffset = pathdist
+            }
+        }
+        sendevent(EventShock, collider, 100.0)
+    }
+}
+
+state Fred_Squash {
+    stateflag 0x23
+    statusc 0x12
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        EnemyDieClearFlags()
+        playframe()
+    }
+}
+
+sub SetParticleColor() {
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x6D, 0x17, 0x00)
+    }
+    else if (r == 1) {
+        SetColor1(0x3F, 0x7F, 0xFF)
+    }
+    else if (r == 2) {
+        SetColor1(0x49, 0x81, 0x88)
+    }
+}
+
+state Fred_Fling {
+    stateflag 0x30
+    statusc 0x12
+    code(h) {
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir()
+        if (troty > 65deg && troty <= 90deg) troty = 65deg;
+        else if (troty > 90deg && troty <= 115deg) troty = 115deg;
+        else if (troty > 245deg && troty <= 270deg) troty = 245deg;
+        else if (troty > 270deg && troty <= 295deg) troty = 295deg;
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    } 
+    trans {
+        EnemyFlingTrans(2m, EventFling)
+    }
+}
+
+state Spark {
+    statusc 0x12
+    code(vertex) {
+        moda = 16.0
+        do {
+            getvert(vtrans, parent, vertex)
+            playanim(0, SPARK)
+        } while (1)
+    }
+    trans {
+        nofirst {
+            if (var r = rand(4); r == 0) {
+                SparkScale = 0.3S
+                SetColor1(0x1E, 0x1E, 0x1E)
+            }
+            else if (r == 1) {
+                SparkScale = 0.3S
+                SetColor1(0x4D, 0x4D, 0x4D)
+            }
+            else if (r == 2) {
+                SparkScale = 0.8S
+                SetColor1(0x32, 0x32, 0x32)
+            }
+            else if (r == 3) {
+                SparkScale = 0.4S
+                SetColor1(0x64, 0x64, 0x64)
+            }
+            SetScale(SparkScale)
+            rotz = rand(360deg)
+        }
+    }
+}

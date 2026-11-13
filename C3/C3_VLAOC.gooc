@@ -1,0 +1,792 @@
+#gool VLAOC 35 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_VLAOC.gooc" "C3\Out\C3_VLAOC.nsentry"
+
+#anim VON_ASS          [VL1jV] [VL1jG] 18 0 2
+#anim VON_ASS_LOW      [VL2jV] [VL2jG] 01 1 2
+#anim VON_ASS_LOWEST   [VL3jV] [VL3jG] 01 1 2
+
+#spawn S_VON_ASS         VonLabAss_Init
+#spawn S_BULLET          Bullet
+#spawn S_VON_ASS_PLANE   VonLabAss_Spawn
+#spawn S_3                __s_3
+
+array ByeByeBlimpsDifficulty = {
+    11,
+    2, 1500, 1, 1125,
+    2, 1500, 1, 1125,
+    2, 1500, 1, 1125,
+    3, 2000, 1, 1500,
+    4, 2500, 1, 1875,
+    5, 3000, 2, 2250,
+    6, 3500, 2, 2625,
+    6, 4000, 3, 3000,
+    7, 4500, 5, 3375,
+    7, 5000, 6, 3750,
+    7, 5500, 7, 4125
+}
+
+array MadBombersDifficulty = {
+    6,
+    1, 1500, 0, 1125,
+    2, 2750, 1, 1875,
+    3, 4000, 2, 2625,
+    4, 5250, 3, 3375,
+    5, 6500, 4, 4125,
+    5, 7750, 5, 4875
+}
+
+var HeightOffset, TargetHeight, TrackedTarget, Reserved4, OrbitRadius, VonVar6, VonVar7, VonVar8, NextHeightChange
+var VonVar10, DescentRollSpeed, FireCycle, LastShotTime, BurstShotsLeft, BurstComplete, PreviousPlayerX, PreviousPlayerZ, PlayerDeltaX
+var PlayerDeltaZ, BulletDamage
+
+expr PlayerDistance    = groundtime
+expr AttackLevel       = groundvel
+expr BankAnim          = invincibletime
+expr ManeuverDistance  = var1
+expr DeathCount        = var0 // Reset
+expr TargetAngleGap    = var0 // FlankTarget
+expr BankTarget        = var0 // Pursue animation
+expr AvoidanceYawDelta = var0 // BreakAway
+
+expr ControllerArg1 = HeightOffset
+expr ControllerArg0 = TargetHeight
+
+inline sub ApplyPlayerMovement() {
+    if (!STATUS_FIRSTFRAME) {
+        PlayerDeltaX = creator -> PlayerDeltaX
+        PlayerDeltaZ = creator -> PlayerDeltaZ
+        x += PlayerDeltaX
+        z += PlayerDeltaZ
+    }
+}
+
+inline sub CalculateFlightTurn(forward, across, height, turn) {
+    var dz = forward
+    var dx = across
+    var angle
+    angle = atan(dx, dz)
+    vecy = angle % 360deg
+    angle = -angle
+    var dist = (((dz >> 8) * cos(angle)) >> 4) - (((dx >> 8) * sin(angle)) >> 4)
+    var pitch = atan(height, dist)
+    vecz = 0
+    vecx = pitch % 360deg
+    turn = degdist(roty, turn) >> 3
+}
+
+inline sub ApplyFlightYaw(turn) {
+    if (abs(turn) > 3.55deg) {
+        if (turn >= 0deg) {
+            turn = 3.55deg
+        }
+        else {
+            turn = -3.55deg
+        }
+    }
+    roty += turn
+    rotz += ((turn * 2.2deg) - rotz) >> 5
+}
+
+inline sub LimitFlightPitch(shift, limit) {
+    vecx = degdist(rotx, vecx) >> shift
+    if (abs(vecx) > limit) {
+        if (vecx >= 0deg) {
+            vecx = limit
+        }
+        else {
+            vecx = -limit
+        }
+    }
+}
+
+inline sub MatchPlayerFlightSpeed() {
+    var delta, target
+    delta = 180deg - abs(degdist(roty, player -> roty))
+    target = 88.0 + ((delta << 12) >> 11)
+    speed = seek(speed, target, 360deg)
+}
+
+state VonLabAss_Init { // 0
+    stateflag 0x1
+    statusc 0x0
+    code(first, second) {
+        statusb = 0
+        ControllerArg1 = first
+        ControllerArg0 = second
+        TrackedTarget = 0
+        playnull()
+        playnull()
+        settrans(UpdateFlightController)
+        playnull()
+        if (!RESPAWNCOUNT) {
+            playnull(31)
+            playnull(31)
+            playnull(31)
+            playnull(10)
+        }
+        playnull(8)
+        if (LEVEL == LEVEL_ByeByeBlimps || LEVEL == LEVEL_MadBombers) {
+            spawn(VLAOC, S_VON_ASS_PLANE, 1, first, second)
+            playnull(31)
+            spawn(VLAOC, S_VON_ASS_PLANE, 1, first, second)
+            if (LEVEL == LEVEL_ByeByeBlimps) {
+                playnull(21)
+                spawn(VLAOC, S_VON_ASS_PLANE, 1, first, second)
+            }
+        }
+        sleepnull()
+    }
+}
+
+sub UpdateFlightController() { // S-46
+    PlayerDeltaX = player -> x - PreviousPlayerX
+    PlayerDeltaZ = player -> z - PreviousPlayerZ
+    PreviousPlayerX = player -> x
+    PreviousPlayerZ = player -> z
+    interrupter = GLOBAL_11
+    TrackedTarget = interrupter -> health
+}
+
+state VonLabAss_Spawn { // 1
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        zindex = -40
+        changestate(VonLabAss_Reset)
+    }
+}
+
+sub PositionNearPlayer() { // S-59
+    var angle, radius
+    angle = 45deg - rand(90deg)
+    if (angle >= 0deg) {
+        if (angle < 10deg) {
+            angle = 10deg
+        }
+    }
+    else {
+        if (angle > -10deg) {
+            angle = -10deg
+        }
+    }
+    angle = (CAMROTY + angle) % 360deg
+    radius = (rand(4m) + 4m) >> 8
+    z = player -> z + ((radius * cos(angle)) >> 4)
+    x = player -> x + ((radius * sin(angle)) >> 4)
+    HeightOffset = 2.5m - rand(5m)
+    y = player -> y + HeightOffset
+    if (y < 16m || y > 41m) {
+        y = player -> y + -HeightOffset
+        HeightOffset = -HeightOffset
+    }
+    rotx = 0deg
+    roty = (CAMROTY + 180deg) % 360deg
+    rotz = 0deg
+}
+
+sub FireAtPlayer() { // S-196
+    var pitch, yaw, px, py, pz
+    if (!(player -> stateflag & 0x20) && !player -> invincible && FireCycle >= 0 && AttackLevel >= 3 && (AttackLevel > 3 || !BurstComplete)) {
+        FireCycle -= 1
+        if (FireCycle <= 0) {
+            FireCycle = -rand(5)
+        }
+        px = player -> x + (player -> velx >> 2)
+        py = player -> y + (player -> vely >> 2)
+        pz = player -> z + (player -> velz >> 2)
+        yaw = atan2(self, px)
+        pitch = atan2_3d(self, px)
+        if (abs(((yaw << 20) - (CAMROTY << 20)) >> 20) <= 45deg) {
+            yaw = ((yaw << 20) - (roty << 20)) >> 20
+            pitch = ((pitch << 20) - (rotx << 20)) >> 20
+            if (abs(yaw) < 30deg + 1) {
+                if (AttackLevel != 3 || PlayerDistance <= 14m) {
+                    if (frametime - LastShotTime >= 2.5s) {
+                        if (AttackLevel == 3) {
+                            BurstShotsLeft = 5
+                        }
+                        else {
+                            BurstShotsLeft = 6
+                        }
+                    }
+                    LastShotTime = frametime
+                    if (pitch < -14.9deg) {
+                        pitch = -15deg
+                    }
+                    if (pitch >= 15deg) {
+                        pitch = 15deg
+                    }
+                    if (yaw < -14.9deg) {
+                        yaw = -15deg
+                    }
+                    if (yaw >= 15deg) {
+                        yaw = 15deg
+                    }
+                    pitch += rotx
+                    yaw += roty
+                    velz = (2.5 * cos(-pitch)) >> 4
+                    vely = (2.5 * sin(-pitch)) >> 4
+                    {
+                        var radius = velz >> 8
+                        velx = (radius * sin(yaw)) >> 4
+                        radius = velz >> 8
+                        velz = (radius * cos(yaw)) >> 4
+                    }
+                    spawn(VLAOC, S_BULLET, 1, 0, velx, vely, velz, BurstShotsLeft, BulletDamage)
+                    if (BurstShotsLeft > 0) {
+                        BurstShotsLeft -= 1
+                        if (!BurstShotsLeft && AttackLevel == 3) {
+                            BurstComplete = 1
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else {
+        FireCycle += 1
+        if (FireCycle >= 0) {
+            FireCycle = rand(2)
+        }
+    }
+}
+
+state VonLabAss_Reset { // 2
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        vfx = (vfx & 0xFFFFFF00) | 0x5
+        playnull()
+        statusb = FLAG_COLLIDABLE
+        {
+            var table, row, count, delay
+            if (var level = LEVEL; level == LEVEL_ByeByeBlimps) {
+                table = ByeByeBlimpsDifficulty[0]
+            }
+            else {
+                table = MadBombersDifficulty[0]
+            }
+            vecx = table[0]
+            row = 0
+            misc = !GLOBAL_105
+            if (misc) {
+                CheckItemPool(LEVEL >> 8, SAVEDCRYSTALPOOL1, SAVEDCRYSTALPOOL2)
+                misc = !misc
+            }
+            if (misc) {
+                row = SECTIONDEATHCOUNT >> 8
+                if (row >= vecx) {
+                    row = vecx - 1
+                }
+            }
+            row = ((row << 2) + 1) << 8
+            count = table[row]
+            delay = table[row + 1.0]
+            if (GLOBAL_160 >> 8 >= count || frametime - GLOBAL_170 >= delay) {
+                AttackLevel = 3
+            }
+            else {
+                count = table[row + 2.0]
+                delay = table[row + 3.0]
+                if (GLOBAL_160 >> 8 >= count || frametime - GLOBAL_170 >= delay) {
+                    AttackLevel = 2
+                }
+                else {
+                    AttackLevel = 1
+                }
+            }
+        }
+        if (LEVEL == LEVEL_MadBombers) {
+            BulletDamage = 2.0
+            misc = !GLOBAL_105
+            if (misc) {
+                CheckItemPool(LEVEL >> 8, SAVEDCRYSTALPOOL1, SAVEDCRYSTALPOOL2)
+                misc = !misc
+            }
+            if (misc) {
+                DeathCount = SECTIONDEATHCOUNT >> 8
+                if (DeathCount > 5) {
+                    DeathCount = 5
+                }
+                BulletDamage = 2.0 - ((DeathCount << 8) / 5)
+            }
+        }
+        else {
+            BulletDamage = 1.0
+        }
+        BurstComplete = 0
+        FireCycle = 0
+        BurstShotsLeft = 0
+        LastShotTime = frametime - 10s
+        BankAnim = 0
+        speed = 0.4m
+        PositionNearPlayer()
+        changestate(VonLabAss_Cruise)
+    }
+}
+    
+state VonLabAss_Cruise { // 3
+    stateflag 0x1
+    statusc 0x0
+    code => state VonLabAss_Pursue
+    event(e, a) {
+        accevcstate(VonLabAss_ShotDown, e == EventHit)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            if (rand(4)) {
+                ManeuverDistance = rand(17m) + 8m
+            }
+            else {
+                ManeuverDistance = rand(8m) + 4m
+            }
+            HeightOffset = y - player -> y
+            TargetHeight = player -> y + HeightOffset
+            NextHeightChange = frametime
+        }
+        ApplyPlayerMovement()
+        TrackedTarget = creator -> TrackedTarget
+        var yaw
+        PlayerDistance = distance(player, DIST_NO_Y)
+        MatchPlayerFlightSpeed()
+        yaw = atan2(player -> trans)
+        if (PlayerDistance >= ManeuverDistance && abs(degdist(roty, yaw)) >= 90deg) {
+            if (TrackedTarget) {
+                changestate(VonLabAss_FlankTarget)
+            }
+            else {
+                changestate(VonLabAss_Pursue)
+            }
+        }
+        yaw = (CAMROTY + 180deg) % 360deg
+        yaw += (14deg * cos((frametime << 4) % 360deg)) >> 12
+        if (!(player -> stateflag & 0x20) && !player -> invincible) {
+            TargetHeight = player -> y + HeightOffset
+            if (frametime >= NextHeightChange || TargetHeight < 16m || TargetHeight > 41m) {
+                NextHeightChange = frametime + (rand(3s) + 1.5s)
+                HeightOffset = 5m - rand(10m)
+                TargetHeight = player -> y + HeightOffset
+                if (TargetHeight < 16m || TargetHeight > 41m) {
+                    HeightOffset = -HeightOffset
+                    TargetHeight = player -> y + HeightOffset
+                }
+            }
+        }
+        /* The weird unequal zx scaling here is probably a typo. Could be for deilberate altitude response tuning, though. TODO */
+        CalculateFlightTurn((player -> z - z) >> 12, (player -> x - x) >> 8, (y - TargetHeight) >> 8, yaw)
+        ApplyFlightYaw(yaw)
+        LimitFlightPitch(3, 2.4deg)
+        rotx += vecx
+        vectransf(vtrans, vtrans, speed, 0, 0)
+        FireAtPlayer()
+    }
+}
+
+state VonLabAss_FlankTarget { // 4
+    stateflag 0x1
+    statusc 0x0
+    code => state VonLabAss_Pursue
+    event(e, a) {
+        accevcstate(VonLabAss_ShotDown, e == EventHit)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            vecx = CAMTRANSX
+            vecz = CAMTRANSZ
+            OrbitRadius = distance(vecx, self, DIST_EXACT | DIST_NO_Y)
+            HeightOffset = y - player -> y
+            TargetHeight = player -> y + HeightOffset
+            NextHeightChange = frametime
+        }
+        ApplyPlayerMovement()
+        TrackedTarget = creator -> TrackedTarget
+        changestateifn(VonLabAss_Pursue, TrackedTarget)
+        var yaw, angle, aim, radius, px, pz
+        vecx = CAMTRANSX
+        vecz = CAMTRANSZ
+        yaw = atan2(self, vecx) + 180deg
+        interrupter = TrackedTarget
+        angle = atan2(interrupter, vecx) + 180deg
+        changestateif(VonLabAss_Pursue, abs(degdist(yaw, CAMROTY + 180deg)) > 30deg)
+        aim = atan2(self, interrupter -> trans)
+        TargetAngleGap = abs(degdist(yaw, aim))
+        changestateif(VonLabAss_Pursue, abs(degdist(angle, CAMROTY + 180deg)) <= 45deg && (TargetAngleGap >= 150deg || TargetAngleGap < 30deg + 1))
+        if (yaw >= angle) {
+            yaw -= 30deg
+        }
+        else {
+            yaw += 30deg
+        }
+        radius = OrbitRadius >> 8
+        px = ((radius * sin(yaw)) >> 4) + player -> x
+        pz = ((radius * cos(yaw)) >> 4) + player -> z
+        if (!(player -> stateflag & 0x20) && !player -> invincible) {
+            TargetHeight = player -> y + HeightOffset
+            if (frametime >= NextHeightChange || TargetHeight < 16m || TargetHeight > 41m) {
+                NextHeightChange = frametime + (rand(2.5s) + 1s)
+                HeightOffset = 5m - rand(10m)
+                if (OrbitRadius <= 4m) {
+                    OrbitRadius += rand(10m)
+                }
+                else if (OrbitRadius >= 18m) {
+                    OrbitRadius -= rand(10m)
+                }
+                else {
+                    OrbitRadius += 5m - rand(10m)
+                }
+                TargetHeight = player -> y + HeightOffset
+                if (TargetHeight < 16m || TargetHeight > 41m) {
+                    HeightOffset = -HeightOffset
+                    TargetHeight = player -> y + HeightOffset
+                }
+            }
+        }
+        CalculateFlightTurn(pz - z, px - x, y - TargetHeight, vecy)
+        ApplyFlightYaw(vecy)
+        LimitFlightPitch(3, 2.4deg)
+        rotx += vecx
+        vectransf(vtrans, vtrans, speed, 0, 0)
+        FireAtPlayer()
+    }
+}
+
+state VonLabAss_Pursue { // 5
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        while (1) {
+            if (PlayerDistance >= 25m) {
+                BankAnim = 0
+                playanim(0, VON_ASS_LOWEST)
+            }
+            else if (PlayerDistance >= 15m) {
+                BankAnim = 0
+                playanim(0, VON_ASS_LOW)
+            }
+            else {
+                BankTarget = degdist(0deg, rotz)
+                if (abs(BankTarget) > 89deg) {
+                    if (BankTarget >= 0deg) {
+                        BankTarget = 89deg
+                    }
+                    else {
+                        BankTarget = -89deg
+                    }
+                }
+                BankAnim += (BankTarget - BankAnim) >> 3
+                animseq = getanim(VON_ASS)
+                animframe = (((-BankAnim * 10) >> 10) + 8) << 8
+                if (animframe < 0) {
+                    animframe = 0
+                }
+                if (animframe > 17.0) {
+                    animframe = 17.0
+                }
+                playframe()
+            }
+        }
+    }
+    event(e, a) {
+        accevcstate(VonLabAss_ShotDown, e == EventHit)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            AttackLevel += 1
+            ManeuverDistance = 4m + rand(2m)
+            TargetHeight = player -> y + ((player -> vely / 25) << 3)
+        }
+        ApplyPlayerMovement()
+        PlayerDistance = distance(player, DIST_NO_Y)
+        var px, pz
+        changestateif(VonLabAss_BreakAway, PlayerDistance <= ManeuverDistance)
+        {
+            var delta, target
+            delta = 180deg - abs(degdist(roty, player -> roty))
+            target = 88.0 + ((delta << 12) >> 11)
+            speed = seek(speed, target, 360deg)
+            px = player -> x + ((player -> velx / 25) << 3)
+            pz = player -> z + ((player -> velz / 25) << 3)
+        }
+        if (!(player -> stateflag & 0x20) && !player -> invincible) {
+            TargetHeight = player -> y + ((player -> vely / 25) << 3)
+        }
+        CalculateFlightTurn(pz - z, px - x, y - TargetHeight, vecy)
+        ApplyFlightYaw(vecy)
+        LimitFlightPitch(2, 2.4deg)
+        rotx = (rotx + vecx) % 360deg
+        vectransf(vtrans, vtrans, speed, 0, 0)
+        FireAtPlayer()
+    }
+}
+
+inline sub SoundVonAssBreakAway(file) {
+    SoundPitchDefault(0.25)
+    sounddecay(8s)
+    soundplay(file, 1V)
+}
+
+state VonLabAss_BreakAway { // 6
+    stateflag 0x1
+    statusc 0x0
+    code => state VonLabAss_Pursue
+    event(e, a) {
+        accevcstate(VonLabAss_ShotDown, e == EventHit)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            ManeuverDistance = rand(3m) + 4m
+            HeightOffset = y - player -> y
+            TargetHeight = player -> y + HeightOffset
+            if (var r = rand(3); r == 0) {
+                SoundVonAssBreakAway([VL3jA])
+            }
+            else if (r == 1) {
+                SoundVonAssBreakAway([VL4jA])
+            }
+            else if (r == 2) {
+                SoundVonAssBreakAway([VL5jA])
+            }
+        }
+        ApplyPlayerMovement()
+        var radius, side, v3, v4, aim, limit, angle, yaw
+        PlayerDistance = distance(player, DIST_NO_Y)
+        MatchPlayerFlightSpeed()
+        aim = atan2(player -> trans)
+        changestateif(VonLabAss_Cruise, PlayerDistance >= ManeuverDistance && abs(degdist(roty, aim)) >= 90deg)
+        radius = 4.688
+        side = (radius * sin(aim)) >> 4
+        radius = (radius * cos(aim)) >> 4
+        limit = abs(degdist(aim, atan((player -> x + radius) - x, (player -> z - side) - z)))
+        angle = atan(CAMTRANSX - x, CAMTRANSZ - z)
+        radius = 12.5
+        side = (radius * sin(angle)) >> 4
+        radius = (radius * cos(angle)) >> 4
+        angle = abs(degdist(aim, atan((CAMTRANSX + radius) - x, (CAMTRANSZ - side) - z)))
+        if (limit < angle) {
+            limit = angle
+        }
+        yaw = roty
+        AvoidanceYawDelta = degdist(aim, roty)
+        if (abs(AvoidanceYawDelta) < limit) {
+            if (AvoidanceYawDelta >= 0) {
+                yaw = aim + limit
+            }
+            else {
+                yaw = aim - limit
+            }
+        }
+        if (!(player -> stateflag & 0x20) && !player -> invincible) {
+            TargetHeight = player -> y + HeightOffset
+            if (TargetHeight < 16m || TargetHeight > 41m) {
+                HeightOffset = 2.5m - rand(5m)
+                TargetHeight = player -> y + HeightOffset
+                if (TargetHeight < 16m || TargetHeight > 41m) {
+                    TargetHeight = player -> y + -HeightOffset
+                    HeightOffset = -HeightOffset
+                }
+            }
+        }
+        CalculateFlightTurn(player -> z - z, player -> x - x, y - TargetHeight, yaw)
+        ApplyFlightYaw(yaw)
+        LimitFlightPitch(2, 2.4deg)
+        rotx += vecx
+        vectransf(vtrans, vtrans, speed, 0, 0)
+        FireAtPlayer()
+    }
+}
+
+state VonLabAss_Weave { // 7
+    stateflag 0x1
+    statusc 0x0
+    code => state VonLabAss_Pursue
+    event(e, a) {
+        accevcstate(VonLabAss_ShotDown, e == EventHit)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            var r = rand(8m) + 4m
+            NextHeightChange = frametime
+            ManeuverDistance = r
+            OrbitRadius = r
+            HeightOffset = y - player -> y
+            TargetHeight = player -> y + HeightOffset
+        }
+        ApplyPlayerMovement()
+        var yaw, radius, px, pz
+        PlayerDistance = distance(player, DIST_NO_Y)
+        changestateif(VonLabAss_Cruise, PlayerDistance >= ManeuverDistance)
+        MatchPlayerFlightSpeed()
+        yaw = -atan2(player -> trans)
+        yaw += degdist(yaw, CAMROTY + 180deg) >> 2
+        radius = OrbitRadius >> 8
+        pz = player -> z + ((radius * cos(yaw)) >> 4)
+        px = player -> x + ((radius * sin(yaw)) >> 4)
+        if (!(player -> stateflag & 0x20) && !player -> invincible) {
+            TargetHeight = player -> y + HeightOffset
+            if (frametime >= NextHeightChange || TargetHeight < 16m || TargetHeight > 41m) {
+                NextHeightChange = frametime + (rand(3s) + 1.5s)
+                HeightOffset = 2.5m - rand(5m)
+                TargetHeight = player -> y + HeightOffset
+                if (TargetHeight < 16m || TargetHeight > 41m) {
+                    TargetHeight = player -> y + -HeightOffset
+                    HeightOffset = -HeightOffset
+                }
+            }
+        }
+        {
+            var dz = pz - z
+            var dx = px - x
+            var angle
+            angle = atan(dx, dz)
+            vecy = angle % 360deg
+            angle = -angle
+            var dist = (((dz >> 8) * cos(angle)) >> 4) - (((dx >> 8) * sin(angle)) >> 4)
+            var pitch = atan(y - TargetHeight, dist)
+            vecz = 0
+            vecx = pitch % 360deg
+        }
+        vecy = degdist(roty, vecy + ((45deg * cos(statetime << 4)) >> 12)) >> 4
+        ApplyFlightYaw(vecy)
+        LimitFlightPitch(3, 1.6deg)
+        rotx += vecx
+        vectransf(vtrans, vtrans, speed, 0, 0)
+        FireAtPlayer()
+    }
+}
+
+inline sub SoundVonAssExplode(file) {
+    SoundPitchDefault(0.25)
+    sounddecay(8s)
+    soundplay(file, 1V)
+}
+
+inline sub SoundVonAssCrash(file) {
+    SoundPitchDefault(0.293)
+    soundplay(file, 1V)
+}
+
+state VonLabAss_ShotDown { // 8
+    stateflag 0x1
+    statusc 0x0
+    code => state VonLabAss_Pursue
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            statusb = 0
+            DescentRollSpeed = 0
+            spawn(9, 4, 1, getins(InitPlaneDebris), 0)
+            SoundVonAssExplode([Zp5jA])
+            if (!rand(2)) {
+                SoundVonAssCrash([VL1jA])
+            }
+            else {
+                SoundVonAssCrash([VL2jA])
+            }
+            rotx -= rand(40deg)
+        }
+        ApplyPlayerMovement()
+        PlayerDistance = distance(player, DIST_NO_Y)
+        speed = seek(speed, 0.4m, 0.004m)
+        vecx = degdist(rotx, 70deg) >> 3
+        if (abs(vecx) > 2.05deg) {
+            if (vecx >= 0deg) {
+                vecx = 2.05deg
+            }
+            else {
+                vecx = -2.05deg
+            }
+        }
+        rotx += vecx
+        DescentRollSpeed += 0.55deg
+        if (DescentRollSpeed > 14.35deg) {
+            DescentRollSpeed = 14.35deg
+        }
+        rotz = (rotz + DescentRollSpeed) % 360deg
+        vectransf(vtrans, vtrans, speed, 0, 0)
+        if (y <= 0m) {
+            SoundVonAssExplode([Zp5jA])
+            changestate(VonLabAss_Reset)
+        }
+        if (!(frametime & 1)) {
+            spawn(9, 21, 1, 0, 0, -4m, 0, 1S, 2.4, 24, 1)
+        }
+    }
+}
+
+sub InitPlaneDebris() { // S-3496
+    if (var r = rand(4); r == 4) {
+        SetColor1(0x1E, 0x00, 0x00)
+    }
+    else if (r == 1) {
+        SetColor1(0x40, 0x10, 0x00)
+    }
+    else if (r == 2) {
+        SetColor1(0x57, 0x57, 0x00)
+    }
+    else if (r == 3) {
+        SetColor1(0x9C, 0x0F, 0x00)
+    }
+    SetScale(2S)
+    velx >>= 2
+    vely >>= 2
+    velz >>= 2
+}
+
+state Bullet { // 9
+    stateflag 0x20001
+    statusc 0x0
+    code(vertex, vx, vy, vz, safe, damage) {
+        zindex = -60
+        soundpitch(3.6 + rand(0.8))
+        sounddecay(2s)
+        soundsetup(7, self, 8)
+        soundplay([VL6jA], 0.7V)
+        getvert(vtrans, parent, vertex)
+        SetColor3(0xFF, 0xFF, 0xFF)
+        velx = vx + rand(-16.0, 16.0)
+        vely = vy + rand(-16.0, 16.0)
+        velz = vz + rand(-16.0, 16.0)
+        do (var start = frametime) {
+            vecx = x + velx
+            vecy = y + vely
+            vecz = z + velz
+            ins81(x, vecx)
+            if (!safe) {
+                var sum, span, dx, dy, dz
+                dx = vecx - player -> x
+                if (abs(dx) <= 10m) {
+                    dy = vecy - player -> y
+                    if (abs(dy) <= 10m) {
+                        dz = vecz - player -> z
+                        if (abs(dz) <= 10m) {
+                            sum = (dx >> 8) * (dx >> 8)
+                                + (dy >> 8) * (dy >> 8)
+                                + (dz >> 8) * (dz >> 8)
+                                + ((x - player -> x) >> 8) * ((x - player -> x) >> 8)
+                                + ((y - player -> y) >> 8) * ((y - player -> y) >> 8)
+                                + ((z - player -> z) >> 8) * ((z - player -> z) >> 8)
+                            dx = (vecx - x) >> 8
+                            dy = (vecy - y) >> 8
+                            dz = (vecz - z) >> 8
+                            span = dx * dx + dy * dy + dz * dz
+                            sendeventif(EventHit, player, sum - span <= 1.5625m, damage)
+                        }
+                    }
+                }
+            }
+            playnull()
+            x += velx
+            y += vely
+            z += velz
+        } while (frametime - start < 0.5s)
+    }
+}
+
+state Kill { // 10
+    stateflag 0x1
+    statusc 0x0
+    code() {}
+}
+
+

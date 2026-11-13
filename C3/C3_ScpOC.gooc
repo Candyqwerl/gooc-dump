@@ -1,0 +1,239 @@
+#gool ScpOC 58 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_ScpOC.gooc" "C3\Out\C3_ScpOC.nsentry"
+
+#anim SCORPION [ScomV] [ScomG] 17 1 2
+
+#spawn S_SCORPION  Scorpion_Init
+
+var LoopPath, CycleLength, HalfCycleLength, TravelDuration, CycleOffset,
+    PauseAtEnds, FlingCenterYaw, FlingYawLimit, FlingStartY
+
+state Scorpion_Init { // 0
+    statusc 0
+    code(loop, cyclelen, cycleoffs, cyclealt, offsetalt, pause, fling, yaw) {
+        LoopPath = loop
+        CycleLength = cyclelen * 1s / 1.2s
+        CycleOffset = cycleoffs
+        PauseAtEnds = pause
+        FlingCenterYaw = fling
+        FlingYawLimit = yaw
+        if (cyclealt >= 0) {
+            CycleLength = cyclealt * 1s / 1.2s
+        }
+        if (offsetalt >= 0) {
+            CycleOffset = offsetalt * 1s / 1.2s
+        }
+        if (!LoopPath) {
+            HalfCycleLength = CycleLength >> 1
+            TravelDuration = HalfCycleLength
+            if (PauseAtEnds) {
+                HalfCycleLength += 18
+            }
+            CycleLength = HalfCycleLength << 1
+        }
+        CycleOffset = (CycleOffset * CycleLength) >> 8
+        if (CycleOffset < 0) {
+            CycleOffset = 0
+        }
+        if (CycleOffset >= CycleLength) {
+            CycleOffset = CycleLength - 1
+        }
+        {
+            var returning
+            pathprog = time(CycleLength, CycleOffset)
+            if (!LoopPath) {
+                if (PauseAtEnds) {
+                    if (pathprog < TravelDuration) {
+                        pathprog = (pathprog * pathlen) / TravelDuration
+                    }
+                    else {
+                        pathprog -= TravelDuration
+                        if (pathprog < 18) {
+                            returning = 1
+                            pathprog = pathlen - 1
+                        }
+                        else {
+                            pathprog -= 18
+                            if (pathprog < TravelDuration) {
+                                returning = 1
+                                pathprog = (pathlen - 1) - ((pathprog * pathlen) / TravelDuration)
+                            }
+                            else {
+                                pathprog -= TravelDuration
+                                pathprog = 0
+                            }
+                        }
+                    }
+                }
+                else {
+                    pathprog = pathprog * (pathlen << 1) / CycleLength
+                    if (pathprog >= pathlen) {
+                        returning = 1
+                        pathprog = ((pathlen << 1) - 1) - pathprog
+                    }
+                }
+            }
+            else {
+                pathprog = (pathprog * pathlen) / CycleLength
+            }
+            statusb = FLAG_TRACK_PATH_SIGN
+            calcpath(pathprog)
+            if (returning) {
+                troty = (troty + 180deg) % 360deg
+            }
+            roty = troty
+        }
+        SetZindexField(24)
+        statusb = FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | FLAG_SOLID_SIDES
+        changestate(Scorpion_Active)
+    }
+}
+
+state Scorpion_Active { // 1
+    statusc 0
+    code() {
+        setanim(SCORPION)
+        do {
+            playframes(0.0, 8.0)
+            soundpitch(3.263)
+            soundplay([Sc1mA], 0.8V)
+            playframes(9.0, 16.0)
+            soundpitch(3.263)
+            soundplay([Sc1mA], 0.8V)
+        } while (1)
+    }
+    event(e, a) {
+        if (interrupter == player) {
+            rejevret(e == EventJumpedOn || e == EventSlamHit || e == EventSlideHit)
+        }
+        accevcstate(Scorpion_Squash, e == EventHit || e == EventFling)
+        accevcstate(Scorpion_Fling, e == EventSpinHit || e == EventHitInvincible)
+    }
+    trans {
+        sendevent(Event74, collider, 100.0)
+        var returning
+        pathprog = time(CycleLength, CycleOffset)
+        if (!LoopPath) {
+            if (PauseAtEnds) {
+                if (pathprog < TravelDuration) {
+                    pathprog = (pathprog * pathlen) / TravelDuration
+                }
+                else {
+                    pathprog -= TravelDuration
+                    if (pathprog < 18) {
+                        returning = 1
+                        pathprog = pathlen - 1
+                    }
+                    else {
+                        pathprog -= 18
+                        if (pathprog < TravelDuration) {
+                            returning = 1
+                            pathprog = (pathlen - 1) - ((pathprog * pathlen) / TravelDuration)
+                        }
+                        else {
+                            pathprog -= TravelDuration
+                            pathprog = 0
+                        }
+                    }
+                }
+            }
+            else {
+                pathprog = pathprog * (pathlen << 1) / CycleLength
+                if (pathprog >= pathlen) {
+                    returning = 1
+                    pathprog = ((pathlen << 1) - 1) - pathprog
+                }
+            }
+        }
+        else {
+            pathprog = (pathprog * (pathlen - 1.0)) / CycleLength
+        }
+        calcpath(pathprog)
+        if (returning) {
+            troty = (troty + 180deg) % 360deg
+        }
+        var0 = degdist(roty, troty) >> 2
+        if (var0 > 14.35deg) {
+            var0 = 14.35deg
+        }
+        if (var0 < -14.35deg) {
+            var0 = -14.35deg
+        }
+        roty = (roty + var0) % 360deg
+    }
+}
+
+state Scorpion_Fling { // 2
+    stateflag 0x30
+    statusc 0x32
+    code() {
+        if (animseq == getanim(SCORPION)) {
+            playframes4(SCORPION, -1.0, 16.0)
+        }
+        sleepframes(SCORPION, 0.0, 16.0)
+    }
+    trans { 
+        once {
+            KillEntity()
+            SoundEnemyFling()
+            vely = 0
+            statusb = 0
+            FlingStartY = y
+            var yaw, delta
+            yaw = atan2(player -> trans) + 180deg
+            delta = degdist(FlingCenterYaw, yaw)
+            if (abs(delta) > FlingYawLimit) {
+                if (delta >= 0) {
+                    delta = FlingYawLimit
+                }
+                else {
+                    delta = -FlingYawLimit
+                }
+                yaw = FlingCenterYaw + delta
+            }
+            velz = 31.25 * cos(yaw) >> 4
+            velx = 31.25 * sin(yaw) >> 4
+            rotz = rand(360deg)
+        }
+        changestateif(Kill, FlingStartY - y >= 20m)
+        vely -= 2m
+        y = spd(y, vely)
+        x = spd(x, vely)
+        z = spd(z, velz)
+        rotx = spd(rotx, 180deg)
+    }
+}
+
+state Scorpion_Squash { // 3
+    stateflag 0x23
+    statusc 0x32
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        playframe()
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        playframe()
+    }
+}
+
+
+sub SetParticleColor() {
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x05, 0xBD, 0xBE)
+    }
+    else if (r == 1) {
+        SetColor1(0x0D, 0x4C, 0x4C)
+    }
+    else if (r == 2) {
+        SetColor1(0xE7, 0x85, 0x81)
+    }
+}
+
+state Kill { // 4
+    statusc 0
+    code() {}
+}

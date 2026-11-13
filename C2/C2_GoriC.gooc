@@ -1,0 +1,184 @@
+#gool GoriC 11 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 2 -r pal "C2\C2_GoriC.gooc" "C2\Out\C2_GoriC.nsentry"
+
+#anim GORILLA_IDLE   [Go1fV] 58 1
+#anim GORILLA_THROW  [Go2fV] 18 1
+#anim GORILLA_FLING  [Go3fV] 17 1
+#anim BOULDER        [Gb1fV] 1 1
+
+event EventHit           => state Gorilla_Squash
+event EventSpinHit       => state Gorilla_Fling
+event EventHitInvincible => state Gorilla_Squash
+event EventFling         => state Gorilla_Fling
+
+#spawn S_GORILLA  Gorilla_Init
+#spawn S_BOULDER  Boulder
+
+array Script0 = { 0x500, 0xA00, 0xF00, 0x1400, 0x1900, 0x3E700 }
+array Script1 = { 0x600, 0xB00, 0x1000, 0x1500, 0x1A00, 0x3E700 }
+array Script2 = { 0x700, 0xC00, 0x1100, 0x1600, 0x1B00, 0x3E700 }
+array Script3 = { 0x700, 0xC00, 0x1100, 0x1600, 0x1C00, 0x3E700 }
+array Script4 = { 0x900, 0x1000, 0x1700, 0x1D00, 0x2200, 0x3E700 }
+array Script5 = { 0xB00, 0x1200, 0x1800, 0x1D00, 0x2100, 0x3E700 }
+
+var BoulderYOff, BoulderSpeed, BoulderScript, ScriptPointer, NextBoulderSoundPathprog
+
+state Gorilla_Init {
+    code(delay, speed, script) {
+        BoulderSpeed = speed
+        if (script == 0) {
+            BoulderScript = Script0
+        }
+        else if (script == 1) {
+            BoulderScript = Script1
+        }
+        else if (script == 2) {
+            BoulderScript = Script2
+        }
+        else if (script == 3) {
+            BoulderScript = Script3
+        }
+        else if (script == 4) {
+            BoulderScript = Script4
+        }
+        else {
+            BoulderScript = Script5
+        }
+        zindex = 24
+        statusb = FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | FLAG_SOLID_SIDES
+        calcpath(0)
+        y -= 4.75m
+        roty = troty
+        do {
+            spawn(GoriC, S_BOULDER, 1)
+            playframes(GORILLA_THROW, 0.0, 8.0)
+            FlipRand()
+            do (var start = frametime) { 
+                playanim(8, GORILLA_THROW)
+            } while (frametime - start < (delay * 1s / 1.2s) - 3s)
+            playframes(GORILLA_THROW, 9.0, 17.0)
+            sounddelay(0.5s)
+            sounddecay(6.4s)
+            SoundPitchDefault(0.23)
+            soundplay([LGrrA], 0.8V)
+            if (var r = rand(3); r == 0) {
+                sounddelay(1.85s)
+                SoundPitchDefault(0.122)
+                soundplay([Go2rA], 0.6V)
+            }
+            else if (r == 1) {
+                sounddelay(2.35s)
+                sounddecay(6.4s)
+                SoundPitchDefault(0.122)
+                soundplay([Go3rA], 0.6V)
+            }
+            else if (r == 2) {
+                sounddelay(2.35s)
+                sounddecay(6.4s)
+                SoundPitchDefault(0.122)
+                soundplay([Go4rA], 0.6V)
+            }
+            playframes(GORILLA_IDLE, 0.0, 57.0)
+        } while (1)
+    }
+}
+
+state Boulder {
+    code() {
+        BoulderScript = creator -> BoulderScript
+        ScriptPointer = 0
+        NextBoulderSoundPathprog = -999.0
+        zindex = 35
+        trotx = 360deg
+        BoulderYOff = 0
+        vely = 0m
+        BoulderSpeed = creator -> BoulderSpeed
+        CopyParentPath()
+        pathprog = 0
+        statusb = FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        changestate(Boulder_Roll)
+    }
+}
+
+state Boulder_Roll {
+    stateflag 0x80
+    code() {
+        do {
+            playanim(0, BOULDER)
+        } until (STATUS_PATH_END)
+    }
+    trans {
+        pathprog = spd(pathprog, BoulderSpeed)
+        if (pathprog >= pathlen) {
+            pathprog = pathlen - 1
+        }
+        calcpath(pathprog)
+        y += BoulderYOff
+        rotz = roty
+        rotx = spd(rotx, trotx)
+        sendevent(EventHit, collider, 100.0)
+        if (pathprog >= NextBoulderSoundPathprog) {
+            if (NextBoulderSoundPathprog >= 0) {
+                SoundPitchDefault(0.23)
+                soundplay([LLarA], 0.8V)
+            }
+            NextBoulderSoundPathprog = BoulderScript[ScriptPointer]
+            ScriptPointer += 1.0
+        }
+    }
+}
+
+state Gorilla_Fling {
+    stateflag 0x30
+    statusc 0x12
+    code(h) {
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir()
+        EnemyFlingSetVel(3m)
+        if (spawn == S_GORILLA) {
+            settrans(FadeGorillaFling)
+            playframes(GORILLA_FLING, 0.0, 16.0)
+        }
+        else {
+            EnemyFlingWaitScale()
+        }
+    } 
+    trans {
+        EnemyFlingTrans(2m, EventFling)
+        if (spawn == S_BOULDER) {
+            roty += 30deg
+        }
+    }
+}
+
+sub FadeGorillaFling() {
+    if (frametime - statetime >= 0.4s) {
+        moda = seek(moda, 16.0, 0x266)
+    }
+}
+
+state Gorilla_Squash {
+    stateflag 0x21
+    statusc 0x32
+    code(h) {
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        playframe()
+    }
+}
+
+sub SetParticleColor() {
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x30, 0x30, 0x7B)
+    }
+    else if (r == 1) {
+        SetColor1(0xCC, 0x95, 0x2F)
+    }
+    else if (r == 2) {
+        SetColor1(0xAA, 0xAA, 0xF0)
+    }
+}

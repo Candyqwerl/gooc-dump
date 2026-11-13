@@ -1,0 +1,423 @@
+#gool ScrbC 13 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C2_ShadC.gooh"
+//gooc -c 2 -r pal "C2\C2_ScrbC.gooc" "C2\Out\C2_ScrbC.nsentry"
+
+#anim SCRUBBER_1       [Sc1aV] 27 1
+#anim SCRUBBER_2       [Sc2aV] 6 1
+#anim SCRUBBER_SHADOW  [Sc3aV] 1 1
+
+#spawn S_SCRUBBER                  Scrubber_Init
+#spawn S_1                         __s_1
+#spawn S_SCRUBBER_SPAWNER          Scrubber_Fan_Breaker_Spawner
+#spawn S_SCRUBBER_FAN_BREAKER      Scrubber_Init
+#spawn S_SCRUBBER_SHADOW           Scrubber_Shadow
+#spawn S_SCRUBBER_PATH             Scrubber_Path_Init
+#spawn S_SCRUBBER_CIRCLE           Scrubber_Init
+#spawn S_SCRUBBER_SHADOW_2         Scrubber_Shadow_2
+#spawn S_SCRUBBER_TUNNEL_RING      Scrubber_Init
+#spawn S_SCRUBBER_RING_CHILD       Scrubber_Init
+#spawn S_SCRUBBER_TUNNEL           Scrubber_Init
+#spawn S_SCRUBBER_TUNNEL_CHILD     Scrubber_Init
+
+event EventJumpedOn       => state Scrubber_Squash
+event EventHit            => state Scrubber_Fling
+event EventSpinHit        => state Scrubber_Fling
+event EventHitInvincible  => state Scrubber_Fling
+event Event12             => state Scrubber_Kill
+event EventFling          => state Scrubber_Fling
+event EventSlideHit       => state Scrubber_Fling
+event EventSlamHit        => state Scrubber_Squash
+
+var CycleLength, CycleOffset, ScrubberRadius, PathSpeed, ScrubberTrackOffset,
+    TunnelCenterX, TunnelCenterY, TunnelCenterZ, FanBreakerFlag
+
+state Scrubber_Fan_Breaker_Spawner { // 0
+    statusc 0x22
+    code(yaw, cyclelen, cycleoffs, speed, radius) {
+        movetolist(4.0)
+        FanBreakerFlag = true
+        do {
+            spawn(ScrbC, S_SCRUBBER_FAN_BREAKER, 1, yaw, cyclelen * 1s / 1.2s, cycleoffs * 1s / 1.2s, speed, radius)
+            playnull()
+            WaitChildNull()
+            playnull(1.25s)
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Scrubber_Kill, e == Event12)
+    }
+}
+
+state Scrubber_Init { // 1
+    statusc 0x32
+    code(yaw, cyclelen, cycleoffs, speed, radius) {
+        CycleLength = cyclelen * 1s / 1.2s
+        CycleOffset = cycleoffs * 1s / 1.2s
+        ScrubberRadius = radius
+        PathSpeed = speed
+        SetZindexField(24)
+        density = 0.1m
+        statusb = FLAG_COLLIDABLE | FLAG_TRACK_PATH_SIGN | FLAG_SOLID_ALL
+        SetTRot(0deg, yaw, 0deg)
+        SetVec(x, y, z)
+        if (spawn == S_SCRUBBER_CIRCLE || spawn == S_SCRUBBER_TUNNEL_RING) {
+            spawn2(ScrbC, S_SCRUBBER_RING_CHILD, 1, yaw, cyclelen, cycleoffs + (cyclelen >> 1), speed, radius)
+            spawn2(ScrbC, S_SCRUBBER_RING_CHILD, 1, yaw, cyclelen, cycleoffs, speed, radius)
+            statusb = 0
+            WaitChildNull()
+            KillEntity()
+            return
+        }
+        if (spawn == S_SCRUBBER_RING_CHILD) {
+            pathlen = creator -> pathlen
+            entity = creator -> entity
+            spawn = creator -> spawn
+        }
+        if (spawn == S_SCRUBBER_FAN_BREAKER) {
+            spawn(ScrbC, S_SCRUBBER_SHADOW_2, 1)
+            changestate(Scrubber_Fan_Breaker_Appear)
+        }
+        else if (spawn == S_SCRUBBER_CIRCLE) {
+            spawn(ScrbC, S_SCRUBBER_SHADOW_2, 1)
+            changestate(Scrubber_Circle)
+        }
+        else if (spawn == S_SCRUBBER_TUNNEL_RING) {
+            calcpath(pathlen >> 1, vvec)
+            TunnelCenterX = vecx
+            TunnelCenterY = vecy
+            TunnelCenterZ = vecz
+            spawn(ScrbC, S_SCRUBBER_SHADOW_2, 1)
+            changestate(Scrubber_Tunnel_Ring)
+        }
+        else if (spawn == S_SCRUBBER_TUNNEL) {
+            do {
+                statusb = 0
+                if (!time(CycleLength, CycleOffset) && distance(player, DIST_NO_Y) > 8m) {
+                    spawn2(ScrbC, S_SCRUBBER_TUNNEL_CHILD, 1, yaw, cyclelen, cycleoffs, speed, radius)
+                }
+                playnull()
+            } while (1)
+        }
+        else if (spawn == S_SCRUBBER_TUNNEL_CHILD) {
+            pathlen = creator -> pathlen
+            entity = creator -> entity
+            spawn(ScrbC, S_SCRUBBER_SHADOW, 1)
+            changestate(Scrubber_Tunnel_Child)
+        }
+        else {
+            spawn(ScrbC, S_SCRUBBER_SHADOW, 1)
+            changestate(Scrubber_Tunnel)
+        }
+    }
+}
+
+state Scrubber_Fan_Breaker_Appear { // 2
+    statusc 0
+    code() {
+        trotz += 90deg
+        vectransf2(vvec, vtrans, 0, 0, ScrubberRadius)
+        roty = trotz
+        rotz = roty
+        rotx = 180deg + trotx
+        SetScale(0S)
+        while (scalex < 1S) {
+            scalex = seek(scalex, 1S, 0xCC)
+            scaley = scalex
+            scalez = scalex
+            playanim(1, SCRUBBER_1)
+        }
+        CycleOffset = (CycleLength - time(CycleLength)) % CycleLength
+        statusb &= ~(FLAG_SOLID_GROUND | FLAG_PHYSICS_ENGINE | FLAG_GRAVITY)
+        changestate(Scrubber_Tunnel)
+    }
+}
+
+sub ScrubberAnimCycle() {
+    sounddelay(0.35s)
+    sounddecay(6.4s)
+    SoundPitchDefault(0.23)
+    soundplay([ScrSA], 0.3V)
+    do {
+        playframes(SCRUBBER_1, 0.0, 6.0)
+        unless (rand(4)) {
+            playanim(0, SCRUBBER_2)
+            playanim(1, SCRUBBER_2)
+            playanim(2, SCRUBBER_2)
+            playanim(3, SCRUBBER_2)
+            playanim(3, SCRUBBER_2)
+            playanim(4, SCRUBBER_2)
+        }
+        else {
+            playframes(7.0, 12.0)
+        }
+        playframes(SCRUBBER_1, 13.0, 26.0)
+    } while (1)
+}
+
+state Scrubber_Tunnel { // 3
+    statusc 0
+    code => sub ScrubberAnimCycle
+    trans { 
+        if (pathlen > 1.0) {
+            calcpath(loopseek(pathprog, pathlen + spd(PathSpeed) - 1.0, spd(PathSpeed)), vvec)
+        }
+        TunnelTrans(-((time(CycleLength, CycleOffset) << 12) / CycleLength))
+    }
+}
+
+inline sub SpawnBubbleParticle() {
+    if (!rand(4) && FRAMETIME < 36) {
+        spawn(9, 8, 1, -1.0, vecx, vecy, vecz, 0.2S, 0.5S, 100.0)
+    }
+}
+
+sub TunnelTrans(angle) { 
+    trotx = angle
+    trotz = troty + 90deg
+    vectransf2(vvec, vtrans, 0, 0, ScrubberRadius)
+    rotx = 180deg + trotx
+    roty = trotz
+    rotz = trotz
+    sendeventif(EventHit, collider, player -> statusa \ FLAG_GROUNDLAND, 100.0)
+    SpawnBubbleParticle()
+}
+
+state Scrubber_Tunnel_Child { // 4
+    statusc 0
+    code => state Scrubber_Tunnel
+    trans {
+        once {
+            var0 = 0
+        }
+        pathprog = spd(pathprog, PathSpeed)
+        var angle = 0
+        if (pathprog < pathlen - 8.0) {
+            angle = sin(loopseek(var0, 60deg, 3deg), 57deg) + 150deg
+        }
+        else {
+            var0 = abs(var0)
+            var0 = degseek(var0, 210deg, 270deg)
+            angle = var0 + 150deg
+        }
+        if (pathprog >= pathlen || STATUS_PATH_END) {
+            pathprog = pathlen - 1
+            changestate(Scrubber_Kill)
+        }
+        calcpath(pathprog, vvec)
+        TunnelTrans(angle)
+        roty = troty
+    }
+}
+
+state Scrubber_Die { // 5
+    statusc 0
+    code => state Scrubber_Tunnel
+    trans {
+        once {
+            var0 = 180deg
+        }
+        var0 = degseek(var0, 0deg, 180deg)
+        changestateifn(Scrubber_Kill, var0)
+        TunnelTrans(var0)
+    }
+}
+
+state Scrubber_Circle { // 6
+    statusc 0
+    code => state Scrubber_Tunnel
+    trans { 
+        if (pathlen > 1.0) {
+            calcpath(loopseek(pathprog, pathlen + spd(PathSpeed) - 1.0, spd(PathSpeed)), vvec)
+        }
+        troty = -((time(CycleLength, CycleOffset) << 12) / CycleLength)
+        vectransf2(vvec, vtrans, ScrubberRadius, 0, 0)
+        roty = troty - 90deg
+        sendeventif(EventHit, collider, player -> statusa \ FLAG_GROUNDLAND, 100.0)
+        SpawnBubbleParticle()
+    }
+}
+
+state Scrubber_Tunnel_Ring { // 7
+    statusc 0
+    code => state Scrubber_Tunnel
+    trans { 
+        var cycletime = time(CycleLength, CycleOffset)
+        var angle = (cycletime << 12) / CycleLength
+        calcpath((((sin(angle) * ((pathlen >> 1) - 1)) >> 12) + (pathlen >> 1)), vvec)
+        trotz = troty + 90deg
+        trotx = 180deg + ((cos(angle) * 40deg) / -360deg)
+        vectransf2(vvec, vtrans, 0, 0, ScrubberRadius)
+        rotx = 180deg + trotx
+        roty = atan2(self, TunnelCenterX) + 90deg
+        rotz = trotz
+        sendeventif(EventHit, collider, player -> statusa \ FLAG_GROUNDLAND, 100.0)
+        SpawnBubbleParticle()
+    }
+}
+
+state Scrubber_Fling { // 8
+    stateflag 0x30
+    statusc 0x12
+    code(h) {
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir()
+        if (spawn == S_SCRUBBER_FAN_BREAKER) {
+            interrupter = creator -> creator
+            troty = degseek(troty, atan2(interrupter -> trans), 900deg)
+        }
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    }
+    trans {
+        EnemyFlingTrans(2.5m, EventFling)
+    }
+}
+
+state Scrubber_Squash { // 9
+    stateflag 0x23
+    statusc 0x12
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        EnemyDieClearFlags()
+        playframe()
+    }
+}
+
+sub SetParticleColor() {
+    if (var r = rand(3); r == 0) {
+        SetColor1(0xCE, 0xBB, 0xA0)
+    }
+    else if (r == 1) {
+        SetColor1(0xFF, 0x97, 0x00)
+    }
+    else if (r == 2) {
+        SetColor1(0xFF, 0x32, 0x32)
+    }
+}
+
+state Scrubber_Kill { // 10
+    stateflag 0
+    statusc 0
+    code() {
+        KillEntity()
+    }
+}
+
+state Scrubber_Shadow { // 11
+    statusc 0x22
+    code() {
+        zindex = 40
+        sleepanim(0, SCRUBBER_SHADOW)
+    }
+    trans {
+        x = parent -> x
+        z = parent -> z
+        y = parent -> vecy - abs(parent -> vecy - parent -> y)
+        if (parent -> vecy - parent -> y < 0) {
+            rotx = 180deg - parent -> rotx
+            statusb = 0
+        }
+        else {
+            statusb = FLAG_INVISIBLE
+        }
+        roty = parent -> roty
+        rotz = roty
+    }
+}
+
+state Scrubber_Shadow_2 { // 12
+    statusc 0x22
+    code => state Scrubber_Shadow
+    trans { 
+        x = parent -> x
+        y = parent -> y
+        z = parent -> z
+        rotx = parent -> rotx
+        roty = parent -> roty
+        rotz = parent -> rotz
+    }
+}
+
+state Scrubber_Path_Init { // 13
+    statusc 0x12
+    code(limit, speed) {
+        pathdist = limit
+        PathSpeed = speed
+        health = 0
+        ScrubberTrackOffset = 0m
+        density = 0.15m
+        zindex = 25
+        statusb = FLAG_ROT_Y | FLAG_TRACK_PATH_ROT | FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | 0x800 | 0x2000 | FLAG_SOLID_ALL | 0x20000000
+        changestate(Scrubber_Path)
+    }
+}
+
+state Scrubber_Path { // 14
+    stateflag 0x5
+    statusc 0
+    code() {
+        trotx = 180deg
+        yzapproach = 120deg
+        ScrubberAnimCycle()
+    }
+    event(e, a) {
+        rejevret(e == EventFling)
+    }
+    trans {
+        if (STATUS_PATH_END) {
+            if (STATUS_REACHED_TROT) {
+                trotx = 180deg
+                statusb |= 0x20000000
+                statusa &= ~FLAG_PATH_END
+            }
+        }
+        else {
+            calcpath(loopseek(pathprog, pathlen + spd(PathSpeed) - 1.0, spd(PathSpeed)))
+            if (STATUS_PATH_END) {
+                trotx = 720deg
+                statusb &= ~0x20000000
+            }
+            var v1 = 0
+            var deg_to_player = 0deg
+            var pathrot = troty
+            save (troty, statusa, statusb, x, y, z, pathprog) {
+                statusb = FLAG_PATH_CALCS | FLAG_TRACK_PATH_SIGN
+                x = player -> x
+                y = player -> y
+                z = player -> z
+                calcpath(0)
+                v1 = troty
+                troty += 90deg
+                setvel(ScrubberTrackOffset, vvel)
+            }
+            x += velx
+            z += velz
+            if (abs(ScrubberTrackOffset - vecy) > 0.1m) {
+                deg_to_player = degdist(troty, atan2(player -> trans))
+                if (abs(deg_to_player) < 60deg) {
+                    if (deg_to_player < -45deg) {
+                        deg_to_player = -45deg
+                    }
+                    else if (deg_to_player > 45deg) {
+                        deg_to_player = 45deg
+                    }
+                    troty += deg_to_player
+                }
+            }
+            ScrubberTrackOffset = seek(ScrubberTrackOffset, vecy, spd(2m))
+            if (ScrubberTrackOffset < -pathdist) {
+                troty = pathrot
+                ScrubberTrackOffset = -pathdist
+            }
+            else if (ScrubberTrackOffset > pathdist) {
+                troty = pathrot
+                ScrubberTrackOffset = pathdist
+            }
+        }
+        sendeventif(EventHit, collider, player -> statusa \ FLAG_GROUNDLAND, 100.0)
+    }
+}

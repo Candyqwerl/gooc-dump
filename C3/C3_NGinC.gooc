@@ -1,0 +1,2052 @@
+#gool NGinC 68 3
+#interruptcount 83
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C3_FruiC.gooh"
+#include "..\\Includes\\C3_BosBC.gooh"
+#include "..\\Includes\\C3_ShadC.gooh"
+#include "..\\Includes\\C3_WEfOC.gooh"
+//gooc -c 3 -r pal -l 6 "C3\C3_NGinC.gooc" "C3\Out\C3_NGinC.nsentry"
+
+#anim NGIN_STANCE            [Ns15V] [Ns15G] 10 0 2
+#anim NGIN_FIRE_RIGHT_START  [Ns25V] [Ns15G] 30 1 2
+#anim NGIN_FIRE_RIGHT_HOLD   [Ns35V] [Ns15G] 20 1 2
+#anim NGIN_FIRE_RIGHT_STOP   [Ns45V] [Ns15G] 29 1 2
+#anim NGIN_FIRE_LEFT_START   [Ns55V] [Ns15G] 30 1 2
+#anim NGIN_FIRE_LEFT_HOLD    [Ns65V] [Ns15G] 20 1 2
+#anim NGIN_FIRE_LEFT_STOP    [Ns75V] [Ns15G] 29 1 2
+ 
+#anim NGIN_RIGHT_BREAK       [Ns95V] [Ns15G] 30 1 2
+#anim NGIN_LEFT_BREAK        [Nsa5V] [Ns15G] 30 1 2
+#anim NGIN_MECH_TRANS_1      [Ns85V] [Ns15G] 91 1 2
+#anim NGIN_MECH_TRANS_2      [Nsb5V] [Ns15G] 10 1 2
+#anim NGIN_MECH_TRANS_3      [Nsc5V] [Ns15G] 79 1 2
+ 
+#anim NGIN_MECH_BOOSTER_1    [Nb15V] [Nb15G] 10 0 2
+#anim NGIN_MECH_BOOSTER_2    [Nb25V] [Nb15G] 30 1 2
+#anim NGIN_MECH_BOOSTER_3    [Nb35V] [Nb15G] 20 1 2
+#anim NGIN_MECH_BOOSTER_4    [Nb45V] [Nb15G] 29 1 2
+#anim NGIN_MECH_BOOSTER_5    [Nb55V] [Nb15G] 30 1 2
+#anim NGIN_MECH_BOOSTER_6    [Nb65V] [Nb15G] 20 1 2
+#anim NGIN_MECH_BOOSTER_7    [Nb75V] [Nb15G] 29 1 2
+#anim NGIN_MECH_BOOSTER_8    [Nb95V] [Nb15G] 30 1 2
+#anim NGIN_MECH_BOOSTER_9    [Nba5V] [Nb15G] 30 1 2
+#anim NGIN_MECH_BOOSTER_0    [Nb85V] [Nb15G] 91 1 2
+#anim NGIN_MECH_BOOSTER_A    [NB15V] [NB15G] 1 0 2
+
+#anim NGIN_SHIP_DOCK         [Nd15V] [Nd15G] 11 1 2
+#anim NGIN_SHIP_DOCK_LOCK    [Nd25V] [Nd15G] 15 1 2
+#anim NGIN_SHIP_BODY         [Nm15V] [Nm15G] 10 0 2
+
+#anim PART_BREAK_EXPLOSION   [NX15V] [NX15G] 20 0 2
+
+#anim PLASMA_LAUNCHER_OPEN   [Ng15V] [Ng15G] 16 1 2
+#anim PLASMA_LAUNCHER_FIRE   [Ng25V] [Ng15G] 18 1 2
+#anim PLASMA_LAUNCHER_BREAK  [Ng45V] [Ng45G] 18 0 2
+#anim PLASMA_BALL            [Ng35V] [Ng25G] 11 1 2
+
+#anim MACHINE_GUN_ARM        [Na15V] [Na15G] 15 0 2
+#anim MACHINE_GUN_ARM_BREAK  [Na45V] [Na45G] 18 0 2
+#anim MACHINE_GUN            [Na25V] [Na25G] 1 0 2
+#anim BULLET                 [Na35V] [Na35G] 21 0 2
+#anim CORE_HITBOX            [Nc15V] [Nc15G] 1 0 2
+
+#anim ORB_LAUNCHER_OPEN      [Nx15V] [Nx15G] 16 1 2
+#anim ORB_LAUNCHER_FIRE      [Nx45V] [Nx15G] 15 1 2
+#anim ORB_LAUNCHER_BREAK     [Nx55V] [Nx55G] 18 0 2
+#anim ORB                    [Nx25V] [Nx25G] 61 1 2
+#anim ORB_EXPLODE            [Nx35V] [Nx35G] 30 1 2
+
+#anim ROCKET_LAUNCHER_OPEN   [Nr15V] [Nr15G] 11 0 2
+#anim ROCKET_LAUNCHER_FIRE   [Nr25V] [Nr15G] 20 0 2
+#anim ROCKET_LAUNCHER_CLOSE  [Nr35V] [Nr15G] 9 0 2
+#anim ROCKET                 [Nr45V] [Nr25G] 10 0 2
+#anim ROCKET_LAUNCHER_BREAK  [Nr55V] [Nr35G] 15 0 2
+
+#anim NGIN_MECH_DYING_1      [Ne15V] [Ne15G] 55 1 2
+#anim MECH_SPARKS_1          [Ne25V] [Ne25G] 55 1 2
+#anim NGIN_MECH_DYING_2      [Ne35V] [Ns15G] 40 1 2
+#anim MECH_EXPLOSION         [Ne45V] [Ne45G] 30 1 2
+#anim NGIN_BOSS_DYING        [Ne55V] [Ne55G] 15 1 2
+#anim MECH_SPARKS_2          [Ne65V] [Ne65G] 22 1 2
+
+#anim NGIN_MECH_PART_1       [Np15V] [Np15G] 1 1 2
+#anim NGIN_MECH_PART_2       [Np25V] [Np25G] 1 1 2
+#anim NGIN_MECH_PART_3       [Np35V] [Np35G] 1 1 2
+#anim NGIN_MECH_PART_4       [Np45V] [Np45G] 1 1 2
+#anim NGIN_MECH_PART_5       [Np55V] [Np55G] 1 1 2
+#anim NGIN_MECH_PART_6       [Np65V] [Np65G] 1 1 2
+#anim NGIN_MECH_PART_7       [Np75V] [Np75G] 1 1 2
+#anim NGIN_MECH_PART_BREAK   [Np85V] [Np85G] 18 1 2
+
+#anim NGIN_SHIP_PART_1       [ND15V] [ND15G] 1 1 2
+#anim NGIN_SHIP_PART_2       [ND25V] [ND25G] 1 1 2
+#anim NGIN_SHIP_PART_3       [ND35V] [ND35G] 1 1 2
+#anim NGIN_SHIP_PART_4       [ND45V] [ND45G] 1 1 2
+#anim NGIN_SHIP_PART_5       [ND55V] [ND55G] 1 1 2
+#anim NGIN_SHIP_PART_6       [ND65V] [ND65G] 1 1 2
+#anim NGIN_SHIP_PART_7       [ND75V] [ND75G] 1 1 2
+#anim NGIN_SHIP_PART_8       [ND85V] [ND85G] 1 1 2
+
+#spawn S_BOSS                Boss_Init
+#spawn S_PLASMA_LAUNCHER     PlasmaLauncher_Init
+#spawn S_MACHINE_GUN_ARM     MachineGunArm_Init
+#spawn S_MACHINE_GUN         MachineGun_Follow
+#spawn S_ROCKET_LAUNCHER     RocketLauncher_Init
+#spawn S_ROCKET              Rocket_Fly
+#spawn S_MECH_BOOSTERS       MechBoosters_Follow
+#spawn S_MACHINE_GUN_BULLETS MachineGunBullets_Fire
+#spawn S_DETACHED_BOOSTER    MechBooster_Detach
+#spawn S_SHIP_DOCK           ShipDock_Wait
+#spawn S_ORB_LAUNCHER        OrbLauncher_Init
+#spawn S_CORE_LAUNCHER       CoreLauncher_Init
+#spawn S_ORB                 Orb_Fly
+#spawn S_PLASMA_BALL         PlasmaBall_Fly
+#spawn S_MECH_SPARKS_FIRST   MechSparks_First
+#spawn S_MECH_DAMAGE_SMOKE   MechDamageSmoke_Emit
+#spawn S_MECH_EXPLOSION      MechExplosion_Play
+#spawn S_NGIN_EJECT          NGin_Eject
+#spawn S_MECH_DEBRIS         MechDebris_Fly
+#spawn S_MECH_SPARKS_SECOND  MechSparks_Second
+#spawn S_SHIP_DEBRIS         ShipDebris_Fly
+#spawn S_MECH_EXPLOSION_BODY MechExplosion_Body
+#spawn S_PART_EXPLOSION      PartExplosion_Play
+
+event EventHit => sub IgnoreHitEvent
+
+var SavedTrans, NGinVar2, NGinVar3, NGinVar4, AttackIndex, PartIndex, ActiveParts, OffsetX, OffsetY
+var OffsetZ, FightPhase, RecoilY, RecoilSpeed, RecoilRoll, NGinSpeechOBJ, LastBrokenVertex, EngineVoice
+
+expr PART_BOOSTERS          = 0x2
+expr PART_LEFT_GUN          = 0x4
+expr PART_RIGHT_GUN         = 0x8
+expr PART_MECH_ROCKET_1     = 0x10
+expr PART_MECH_ROCKET_2     = 0x20
+expr PART_PLASMA_1          = 0x100
+expr PART_PLASMA_2          = 0x200
+expr PART_SHIP_ROCKET_1     = 0x400
+expr PART_SHIP_ROCKET_2     = 0x800
+expr PART_SHIP_ROCKET_3     = 0x1000
+expr PART_SHIP_ROCKET_4     = 0x2000
+expr PART_ORB               = 0x4000
+expr PART_CORE_ROCKET       = 0x8000
+expr PART_MECH_ALL          = 0x803E
+expr PART_MECH_WEAPONS      = 0x803C
+expr PART_MECH_ROCKETS      = 0x8030
+expr PART_MACHINE_GUNS      = 0xC
+expr PART_PLASMA_LAUNCHERS  = 0x300
+expr PART_SHIP_ROCKETS      = 0x3C00
+expr PART_SHIP_WEAPONS      = 0x7F00
+
+expr PathSpeed        = NGinVar2
+expr PathEnd          = NGinVar3
+expr PathStart        = NGinVar4
+expr AttachmentVertex = NGinVar2
+expr AimVertex        = NGinVar3
+expr AimYawOffset     = NGinVar4
+expr RemainingParts   = yzapproach
+expr OrbHealth        = yzapproach
+expr ActiveRockets    = field_63
+expr FollowDistance   = groundy
+expr DockAttached     = var0
+expr PowerID          = var0
+expr FireAgain        = var0
+expr HitConfirmed     = var0
+expr SmokeDirection   = var0
+expr DebrisSpin       = var0
+expr MotorVoice       = field_60
+
+inline sub PlayPartHitSound() {
+    if (!rand(2)) {
+        SoundPitchDefault()
+        soundsetup(7, self, 8)
+        soundplay([CB2jA], 1V)
+    }
+    else {
+        SoundPitchDefault()
+        soundsetup(7, self, 8)
+        soundplay([CB3jA], 1V)
+    }
+}
+
+inline sub TakePartDamage(damage) {
+    unless (stateflag & 0x2) {
+        SavedTrans = tpc
+        settrans(BeginDamageFlash)
+        stateflag |= 0x2
+        health -= damage
+        if (interrupter) {
+            interrupter -> HitConfirmed = true
+        }
+        PlayPartHitSound()
+    }
+}
+
+inline sub HandleMachineGunHit(e, a) {
+    if (e == EventHit, parent -> animseq == getanim(NGIN_FIRE_LEFT_HOLD) || parent -> animseq == getanim(NGIN_FIRE_RIGHT_HOLD)) {
+        accev()
+        TakePartDamage(a[0])
+    }
+}
+
+inline sub TryDestoryPart(e, a, hp) {
+    accevcstate(Part_Destroy, hp <= 0 || (e == Event12 ? ((1 << PartIndex) & a[0]) : 0))
+}
+
+inline sub CheckMechWeapons() {
+    if (!FightPhase) {
+        unless (ActiveParts & PART_MECH_WEAPONS) {
+            FightPhase += 1.0
+            AttackIndex = 0
+            changestate(Boss_SelectAttack)
+        }
+    }
+}
+
+inline sub FaceCamera() {
+    vecx = CAMTRANSX
+    vecy = CAMTRANSY
+    vecz = CAMTRANSZ
+    roty = atan2(self, vecx)
+}
+
+inline sub FollowLauncherVertices() {
+    zindex = parent -> zindex
+    CopyParentRot()
+    getvert(vtrans, parent, AttachmentVertex)
+    getvert(vvec, parent, AimVertex)
+}
+
+inline sub PlayExplosionSound(sound) {
+    soundsetup(7, self, 8)
+    sounddecay(10.16s)
+    SoundPitchDefault()
+    soundsetup(0, self, 5)
+    soundplay(sound, 1V)
+}
+
+state Boss_Init { // 0
+    stateflag 0x2001
+    statusc 0x0
+    code() {
+        soundpitch(4.715)
+        soundsetup(7, self, 8)
+        sounddecay(10.2s)
+        soundplay([Ng45A], 0.5V)
+        EngineVoice = voice
+        GLOBAL_126 = self
+        GLOBAL_150 |= 0x80000
+        if (GLOBAL_27 & 0x20) {
+            SECTIONDEATHCOUNT = 0
+        }
+        RemainingParts = 5.0
+        spawn2(BosBC, BosBC_S_HEALTH_TICK, 1, RemainingParts, 0)
+        PartIndex = 0
+        FightPhase = 0
+        AttackIndex = 0
+        OffsetX = 0
+        OffsetY = 0
+        OffsetZ = 0
+        statusb = FLAG_NO_CAMERA_CLIP | 0x100000
+        health = 0
+        RecoilY = 0
+        RecoilSpeed = 0m
+        RecoilRoll = 0deg
+        vfx = (vfx & 0xFFFFFF00) | 0x5
+        ActiveRockets = 0
+        zindex = -60
+        SetColor1(0x80, 0x80, 0x80)
+        FollowDistance = 25m
+        if (!RESPAWNCOUNT) {
+            NGinSpeechOBJ = 0
+            if (SFXVOL) {
+                if (var lang = GLOBAL_151; lang == LANG_FR) {
+                    spawn2(9, 44, 1, [F005O], [F015O], 2.0, 0s, 8.0)
+                    NGinSpeechOBJ = objectspawned
+                }
+                else if (lang == LANG_DE) {
+                    spawn2(9, 44, 1, [G005O], [G015O], 2.0, 0s, 8.0)
+                    NGinSpeechOBJ = objectspawned
+                }
+                else if (lang == LANG_IT) {
+                    spawn2(9, 44, 1, [I005O], [I015O], 2.0, 0s, 8.0)
+                    NGinSpeechOBJ = objectspawned
+                }
+                else if (lang == LANG_ES) {
+                    spawn2(9, 44, 1, [S005O], [S015O], 2.0, 0s, 8.0)
+                    NGinSpeechOBJ = objectspawned
+                }
+                else {
+                    spawn2(9, 44, 1, [E005O], [E015O], 2.0, 0s, 8.0)
+                    NGinSpeechOBJ = objectspawned
+                }
+            }
+        }
+        changestate(Mech_Init)
+    }
+}
+
+sub HandlePartEvent(e, a) {
+    if (e == EventHit) {
+        accev()
+        unless (stateflag & 0x2) {
+            SavedTrans = tpc
+            settrans(BeginDamageFlash)
+            stateflag |= 0x2
+            health -= a[0]
+            if (interrupter) {
+                interrupter -> HitConfirmed = true
+            }
+            unless (rand(2)) {
+                SoundPitchDefault()
+                soundsetup(7, self, 8)
+                soundplay([CB2jA], 1V)
+            }
+            else {
+                SoundPitchDefault()
+                soundsetup(7, self, 8)
+                soundplay([CB3jA], 1V)
+            }
+        }
+    }
+    TryDestoryPart(e, a, health)
+}
+
+
+state Mech_Init { // 1
+    stateflag 0x3
+    statusc 0x0
+    code() {
+        ActiveParts = PART_MECH_ALL
+        spawn2(NGinC, S_MECH_BOOSTERS)
+        spawn2(NGinC, S_CORE_LAUNCHER, 1, 15, 8.0)
+        spawn2(NGinC, S_MACHINE_GUN_ARM, 1, 2, 0.0, 1.0)
+        spawn2(NGinC, S_MACHINE_GUN_ARM, 1, 3, 2.0, 3.0)
+        spawn2(NGinC, S_ROCKET_LAUNCHER, 1, 4, 4.0, 6.0)
+        spawn2(NGinC, S_ROCKET_LAUNCHER, 1, 5, 5.0, 7.0)
+        PathStart = 0
+        PathEnd = 30.0
+        PathSpeed = 4.0
+        playanim(0, NGIN_STANCE)
+        playanim(0, NGIN_STANCE)
+        playanim(0, NGIN_STANCE)
+        changestate(Boss_SelectAttack)
+    }
+    event(e, a) {
+        accevif (e == Event7) {
+            RemainingParts -= 1.0
+            ActiveParts &= ~a[0]
+            LastBrokenVertex = interrupter -> AttachmentVertex
+        }
+    }
+}
+
+sub ClearDamageFlash() { 
+    moda = 0 
+}
+
+sub BeginDamageFlash() {
+    moda = 16.0
+    onstateexit(ClearDamageFlash)
+    call(SavedTrans)
+    tpc = pc + 8
+}
+
+sub EndDamageFlash() {
+    moda = 0
+    hpc = 0
+    call(SavedTrans)
+    tpc = SavedTrans
+    stateflag &= ~0x2
+}
+
+sub FollowLoopingPath() {
+    save (vecx, vecy, vecz, groundy) {
+        pathprog = spd(pathprog, PathSpeed)
+        if (pathprog >= PathEnd) {
+            pathprog = pathprog - (PathEnd - PathStart)
+        }
+        calcpath(pathprog, vvec)
+        OffsetX = vecx
+        OffsetY = vecy
+        OffsetZ = vecz
+    }
+}
+
+sub FollowClampedPath() {
+    save (vecx, vecy, vecz, groundy) {
+        pathprog = spd(pathprog, PathSpeed)
+        if (pathprog >= PathEnd) {
+            pathprog = PathEnd
+        }
+        calcpath(pathprog, vvec)
+        OffsetX = vecx
+        OffsetY = vecy
+        OffsetZ = vecz
+    }
+}
+
+sub ApplyBossMotion() {
+    x += OffsetX
+    y += OffsetY
+    z += OffsetZ
+    RecoilSpeed = spd(RecoilSpeed, 40m)
+    RecoilY = spd(RecoilY, RecoilSpeed)
+    if (RecoilY >= 0) {
+        RecoilY = 0
+        RecoilSpeed = 0
+    }
+    y += RecoilY
+    rotz = degseek(rotz, RecoilRoll, 45deg)
+    if (rotz == RecoilRoll) {
+        RecoilRoll = 0
+    }
+    misc = EngineVoice > 0
+    if (misc) {
+        sp = EngineVoice
+        soundcheck(sp)
+        misc = misc != -1
+    }
+    if (misc) {
+        voice = EngineVoice
+        soundfadev(0.5V, voice, 0)
+    }
+    else {
+        soundpitch(4.715)
+        soundsetup(7, self, 8)
+        sounddecay(10.2s)
+        soundplay([Ng45A], 0.5V)
+        EngineVoice = voice
+    }
+}
+
+sub FollowPlayerFlight() {
+    x = player -> vecx
+    y = player -> vecy
+    z = player -> vecz
+    z -= FollowDistance
+    unless (stateflag & 0x2000) {
+        y += cos(GAMETICK << 7) << 4
+    }
+}
+
+sub FireMechRockets(period, limit) {
+    if (ActiveRockets >= limit) {
+        return
+    }
+    unless (time(period)) {
+        if (ActiveParts & PART_MECH_ROCKET_1) {
+            cascadeevent(Event81, self, PART_MECH_ROCKET_1)
+        }
+        else if (ActiveParts & PART_MECH_ROCKET_2) {
+            cascadeevent(Event81, self, PART_MECH_ROCKET_2)
+        }
+        else if (ActiveParts & PART_CORE_ROCKET) {
+            cascadeevent(Event81, self, PART_CORE_ROCKET)
+        }  
+    }
+    else unless (time(period, period / 3)) {
+        if (ActiveParts & PART_MECH_ROCKET_2) {
+            cascadeevent(Event81, self, PART_MECH_ROCKET_2)
+        }
+        else if (ActiveParts & PART_CORE_ROCKET) {
+            cascadeevent(Event81, self, PART_CORE_ROCKET)
+        }
+        else if (ActiveParts & PART_MECH_ROCKET_1) {
+            cascadeevent(Event81, self, PART_MECH_ROCKET_1)
+        }
+    }
+    else unless (time(period, (period << 1) / 3)) {
+        if (ActiveParts & PART_CORE_ROCKET) {
+            cascadeevent(Event81, self, PART_CORE_ROCKET)
+        }
+        else if (ActiveParts & PART_MECH_ROCKET_1) {
+            cascadeevent(Event81, self, PART_MECH_ROCKET_1)
+        }
+        else if (ActiveParts & PART_MECH_ROCKET_2) {
+            cascadeevent(Event81, self, PART_MECH_ROCKET_2)
+        }
+    }
+}
+
+state Boss_SelectAttack { // 2
+    stateflag 0x3
+    statusc 0x0
+    event => state Mech_Init
+    code() {
+        do {
+            if (var phase = FightPhase; phase == 0) {
+                if (var attack = AttackIndex % 7.0; attack == 0) {
+                    changestate(Mech_Move, PART_MECH_ROCKETS, -6m, -6m, 0)
+                }
+                else if (attack == 1.0) {
+                    changestate(Mech_Move, PART_MECH_ROCKETS, 6m, -6m, 0)
+                }
+                else if (attack == 2.0) {
+                    changestate(Mech_Move, PART_MECH_ROCKETS, 6m, 0, 0)
+                }
+                else if (attack == 3.0) {
+                    changestate(Mech_Move, PART_MACHINE_GUNS, -5m, 0, 0)
+                }
+                else if (attack == 4.0) {
+                    changestate(Mech_FireMachineGun, 0)
+                }
+                else if (attack == 5.0) {
+                    changestate(Mech_Move, PART_MACHINE_GUNS, 5m, -6m, 0)
+                }
+                else {
+                    changestateif(Mech_FireMachineGun, attack == 6.0, 1.0)
+                }
+            }
+            else if (phase == 1.0) {
+                if (var attack = AttackIndex % 2.0; attack == 0) {
+                    changestate(Mech_Move, 0, 0, 0, 0)
+                }
+                else {
+                    changestateif(Mech_Transform, attack == 1.0)
+                }
+            }
+            else if (phase == 2.0) {
+                if (var attack = AttackIndex % 5.0; attack == 0) {
+                    changestate(Ship_FirePlasma, 0)
+                }
+                else if (attack == 1.0) {
+                    changestate(Ship_FireOrb, 0)
+                }
+                else if (attack == 2.0) {
+                    changestate(Ship_FirePlasma, 1)
+                }
+                else if (attack == 3.0) {
+                    changestate(Ship_FireRockets)
+                }
+                else {
+                    changestateif(Ship_FireOrb, attack == 4.0, 1)
+                }
+            }
+            else if (phase == 3.0) {
+                var attack = AttackIndex % 1.0
+                changestateifn(Boss_Defeated, attack)
+            }
+        } while (1)
+    }
+}
+
+state Mech_Move { // 3
+    stateflag 0x3
+    statusc 0x0
+    event => state Mech_Init
+    code(mask, tx, ty, tz) {
+        if (mask && !(ActiveParts & mask)) {
+            AttackIndex += 1.0
+            changestate(Boss_SelectAttack)
+        }
+        velx = tx - OffsetX
+        vely = ty - OffsetY
+        velz = tz - OffsetZ
+        misc5(velx, 6m)
+        settrans(UpdateMechMove)
+        do {
+            {
+                var limit = 2.0
+                unless (ActiveParts & PART_RIGHT_GUN) {
+                    limit += 1.0
+                }
+                unless (ActiveParts & PART_LEFT_GUN) {
+                    limit += 1.0
+                }
+                FireMechRockets(3s, limit)
+            }
+            if (animseq != getanim(NGIN_STANCE)) {
+                setanim(NGIN_STANCE, -1.0)
+            }
+            playframe((animframe + 1.0) % 10.0)
+        } until (OffsetX == tx && OffsetY == ty && OffsetZ == tz)
+        AttackIndex += 1.0
+        changestate(Boss_SelectAttack)
+    }
+}
+
+sub UpdateMechMove(mask, tx, ty, tz) __trans {
+    if (buttonpress(PAD_R2) && DEBUG) {
+        cascadeevent(Event12, self, PART_MECH_WEAPONS)
+    }
+    CheckMechWeapons()
+    FollowPlayerFlight()
+    OffsetX = seek(OffsetX, tx, spd(velx))
+    OffsetY = seek(OffsetY, ty, spd(vely))
+    OffsetZ = seek(OffsetZ, tz, spd(velz))
+    ApplyBossMotion()
+}
+
+state Mech_FireMachineGun { // 4
+    stateflag 0x1
+    statusc 0x0
+    event => state Mech_Init
+    trans => sub UpdateMechIdle
+    code(left) {
+        CheckMechWeapons()
+        if (left) {
+            SetVel(-7m, 0m, 0m)
+        }
+        else {
+            SetVel(7m, 0m, 0m)
+        }
+        if ((left || !(ActiveParts & PART_RIGHT_GUN)) && (ActiveParts & PART_LEFT_GUN)) {
+            playframes(NGIN_FIRE_LEFT_START, 0.0, 29.0)
+            cascadeevent(Event81, self, PART_LEFT_GUN)
+            do (var loops = 0) { playframes(NGIN_FIRE_LEFT_HOLD, 0.0, 19.0) } while ({ loops += 1.0 }; loops < 3.0)
+            settrans(UpdateMechStrafe)
+            do (var loops = 0) { playframes(NGIN_FIRE_LEFT_HOLD, 0.0, 19.0) } while ({ loops += 1.0 }; loops < 3.0)
+            cascadeevent(Event82, self, PART_LEFT_GUN)
+            settrans(UpdateMechIdle)
+            do (var loops = 0) { playframes(NGIN_FIRE_LEFT_HOLD, 0.0, 19.0) } while ({ loops += 1.0 }; loops < 3.0)
+            playframes(NGIN_FIRE_LEFT_STOP, 0.0, 28.0)
+        }
+        else if ((!left || !(ActiveParts & PART_LEFT_GUN)) && (ActiveParts & PART_RIGHT_GUN)) {
+            playframes(NGIN_FIRE_RIGHT_START, 0.0, 29.0)
+            cascadeevent(Event81, self, PART_RIGHT_GUN)
+            do (var loops = 0) { playframes(NGIN_FIRE_RIGHT_HOLD, 0.0, 19.0) } while ({ loops += 1.0 }; loops < 3.0)
+            settrans(UpdateMechStrafe)
+            do (var loops = 0) { playframes(NGIN_FIRE_RIGHT_HOLD, 0.0, 19.0) } while ({ loops += 1.0 }; loops < 3.0)
+            cascadeevent(Event82, self, PART_RIGHT_GUN)
+            settrans(UpdateMechIdle)
+            do (var loops = 0) { playframes(NGIN_FIRE_RIGHT_HOLD, 0.0, 19.0) } while ({ loops += 1.0 }; loops < 3.0)
+            playframes(NGIN_FIRE_RIGHT_STOP, 0.0, 28.0)
+        }
+        AttackIndex += 1.0
+        changestate(Boss_SelectAttack)
+    }
+}
+
+sub UpdateMechIdle() {
+    FollowPlayerFlight()
+    ApplyBossMotion()
+    unless (stateflag & 0x2) {
+        changestateif(Mech_ArmDestroyed, animseq == getanim(NGIN_FIRE_LEFT_HOLD) && !(ActiveParts & PART_LEFT_GUN))
+        changestateif(Mech_ArmDestroyed, animseq == getanim(NGIN_FIRE_RIGHT_HOLD) && !(ActiveParts & PART_RIGHT_GUN))
+    }
+}
+
+sub UpdateMechStrafe() {
+    FollowPlayerFlight()
+    OffsetX = spd(OffsetX, velx)
+    OffsetY = spd(OffsetY, vely)
+    OffsetZ = spd(OffsetZ, velz)
+    ApplyBossMotion()
+    FireMechRockets(5s, 2.0)
+    changestateif(Mech_ArmDestroyed, animseq == getanim(NGIN_FIRE_LEFT_HOLD) && !(ActiveParts & PART_LEFT_GUN))
+    changestateif(Mech_ArmDestroyed, animseq == getanim(NGIN_FIRE_RIGHT_HOLD) && !(ActiveParts & PART_RIGHT_GUN))
+}
+
+state Mech_ArmDestroyed { // 5
+    stateflag 0x3
+    statusc 0x0
+    event => state Mech_Init
+    trans => sub UpdateMechIdle
+    code() {
+        if (animseq == getanim(NGIN_FIRE_LEFT_START) || animseq == getanim(NGIN_FIRE_LEFT_HOLD) || animseq == getanim(NGIN_FIRE_LEFT_STOP)) {
+            playframes(NGIN_LEFT_BREAK, 0.0, 29.0)
+        }
+        else {
+            playframes(NGIN_RIGHT_BREAK, 0.0, 29.0)
+        }
+        AttackIndex += 1.0
+        changestate(Boss_SelectAttack)
+    }
+}
+
+state Mech_Transform { // 6
+    stateflag 0x2003
+    statusc 0x0
+    code() {
+        spawn2(NGinC, S_SHIP_DOCK)
+        voice = EngineVoice
+        soundfadet(2s, voice)
+        soundfadev(1V, voice, 2)
+        soundpitch(4.895)
+        soundsetup(0, self, 8)
+        soundplay([Ng95A], 1V)
+        setanim(NGIN_MECH_TRANS_1, 91.0)
+        do {
+            animframe -= 1.0
+            if (animframe == 84.0 || animframe == 79.0 || animframe == 74.0) {
+                soundpitch(6.528)
+                soundsetup(0, self, 8)
+                soundplay([Ng95A], 1V)
+            }
+            if (animframe == 64.0) {
+                soundpitch(1.45)
+                soundsetup(0, self, 8)
+                soundplay([Nga5A], 1V)
+                soundpitch(1.45)
+                soundsetup(0, self, 8)
+                soundplay([Nga5A], 1V)
+            }
+            playframe()
+        } while (animframe - 1.0 >= 0)
+        cascadeevent(Event12, self, PART_BOOSTERS)
+        spawn2(NGinC, S_DETACHED_BOOSTER, 1, 0x7, 0)
+        spawn2(NGinC, S_DETACHED_BOOSTER, 1, 0x6, 1.0)
+        sendevent(Event58, player)
+        do { playframesback(9.0, 0.0) } until (pathprog >= 22.0)        
+        voice = EngineVoice
+        soundfadet(1s, voice)
+        soundfadev(0.5V, voice, 2)
+        ins72(0x100, 0x200)
+        playframesback(NGIN_MECH_TRANS_3, 78.0, 0.0)
+        soundpitch(4.0)
+        soundsetup(0, self, 8)
+        sounddecay(7.96s)
+        soundplay([Tl15A], 1V)
+        soundpitch(4.0)
+        soundsetup(0, self, 8)
+        sounddecay(7.96s)
+        soundplay([Tl15A], 1V)
+        do { playframe() } until (DockAttached)
+        RemainingParts = 7.0
+        spawn2(BosBC, BosBC_S_HEALTH_TICK, 1, RemainingParts, 0)
+        statusb &= ~0x100000
+        spawn2(NGinC, S_PLASMA_LAUNCHER, 1, 9, 0, 1.0, -90deg, 1)
+        spawn2(NGinC, S_PLASMA_LAUNCHER, 1, 8, 2.0, 3.0, -90deg, -1)
+        spawn2(NGinC, S_ROCKET_LAUNCHER, 1, 10, 4.0, 5.0)
+        spawn2(NGinC, S_ROCKET_LAUNCHER, 1, 11, 6.0, 7.0)
+        spawn2(NGinC, S_ROCKET_LAUNCHER, 1, 12, 8.0, 9.0)
+        spawn2(NGinC, S_ROCKET_LAUNCHER, 1, 13, 10.0, 11.0)
+        spawn2(NGinC, S_ORB_LAUNCHER, 1, 14, 12.0, 13.0)
+        ActiveParts |= PART_SHIP_WEAPONS
+        ActiveRockets = 0
+        FightPhase += 1.0
+        AttackIndex = 0
+        changestate(Boss_SelectAttack)
+    }
+    event(e, a) {
+        accevif (e == EventTriggered) {
+            DockAttached = true
+        }
+    }
+    trans {
+        once {
+            PathSpeed = 5.0
+            PathEnd = 35.0
+            PathStart = 0
+            pathprog = PathStart
+            vely = 0s
+        }
+        FollowPlayerFlight()
+        FollowClampedPath()
+        vely = spd(vely, 30m)
+        if (vely > 40m) {
+            vely = 40m
+        }
+        player -> vecy = seek(player -> vecy, 120m, spd(vely))
+        ApplyBossMotion()
+    }
+}
+
+state ShipDock_Wait { // 7
+    stateflag 0x2003
+    statusc 0x0
+    code() {
+        playnull(25)
+        changestate(ShipDock_Attach)
+    }
+}
+
+state ShipDock_Attach { // 8
+    stateflag 0x2003
+    statusc 0x0
+    code() {
+        SetRot(0deg)
+        do { playframes(NGIN_SHIP_DOCK, 0.0, 10.0) } until (pathprog == PathEnd)
+        soundpitch(2.54)
+        soundsetup(0, self, 8)
+        sounddecay(8s)
+        soundplay([Ng75A], 1V)
+        soundpitch(2.54)
+        soundsetup(0, self, 8)
+        sounddecay(8s)
+        soundplay([Ng75A], 1V)
+        playframes(NGIN_SHIP_DOCK_LOCK, 0.0, 14.0)
+        sendevent(EventTriggered, parent)
+        playframe()
+    }
+    trans {
+        once {
+            PathSpeed = 5.0
+            PathEnd = 65.0
+            PathStart = 36.0
+            pathprog = PathStart
+            groundy = parent -> groundy
+            entity = parent -> entity
+            pathlen = parent -> pathlen
+            zindex = parent -> zindex
+            OffsetX = 0
+            OffsetY = 0
+            OffsetZ = 0
+            RecoilY = 0
+            RecoilSpeed = 0
+            RecoilRoll = 0
+        }
+        FollowPlayerFlight()
+        FollowClampedPath()
+        ApplyBossMotion()
+    }
+}
+
+state Ship_FireRockets { // 9
+    stateflag 0x3
+    statusc 0x0
+    event => state Mech_Init
+    code() {
+        if (ActiveParts & PART_SHIP_ROCKETS) {
+            do (var start = frametime) {
+                FireShipRockets(5s)
+                UpdateShipAttack()
+            } while (frametime - start < 10s)
+        }
+        AttackIndex += 1.0
+        changestate(Boss_SelectAttack)
+    }
+    trans {
+        FollowPlayerFlight()
+        OffsetX = seek(OffsetX, cos(GAMETICK << 5) * 0x60, spd(10m))
+        rotz = degseek(rotz, -((sin(GAMETICK << 5) * 0x60) >> 10), 180deg)
+        ApplyBossMotion()
+    }
+}
+
+sub FireShipRockets(period) {
+    unless (time(period)) {
+        if (ActiveParts & PART_SHIP_ROCKET_1) {
+            cascadeevent(Event81, self, PART_SHIP_ROCKET_1)
+        }
+        else if (ActiveParts & PART_SHIP_ROCKET_2) {
+            cascadeevent(Event81, self, PART_SHIP_ROCKET_2)
+        }
+        else if (ActiveParts & PART_SHIP_ROCKET_3) {
+            cascadeevent(Event81, self, PART_SHIP_ROCKET_3)
+        } 
+        else if (ActiveParts & PART_SHIP_ROCKET_4) {
+            cascadeevent(Event81, self, PART_SHIP_ROCKET_4)
+        } 
+    }
+    else unless (time(period, period >> 2)) {
+        if (ActiveParts & PART_SHIP_ROCKET_2) {
+            cascadeevent(Event81, self, PART_SHIP_ROCKET_2)
+        }
+        else if (ActiveParts & PART_SHIP_ROCKET_3) {
+            cascadeevent(Event81, self, PART_SHIP_ROCKET_3)
+        }
+        else if (ActiveParts & PART_SHIP_ROCKET_4) {
+            cascadeevent(Event81, self, PART_SHIP_ROCKET_4)
+        } 
+        else if (ActiveParts & PART_SHIP_ROCKET_1) {
+            cascadeevent(Event81, self, PART_SHIP_ROCKET_1)
+        }
+    }
+    else unless (time(period, period >> 1)) {
+        if (ActiveParts & PART_SHIP_ROCKET_3) {
+            cascadeevent(Event81, self, PART_SHIP_ROCKET_3)
+        }
+        else if (ActiveParts & PART_SHIP_ROCKET_4) {
+            cascadeevent(Event81, self, PART_SHIP_ROCKET_4)
+        }
+        else if (ActiveParts & PART_SHIP_ROCKET_1) {
+            cascadeevent(Event81, self, PART_SHIP_ROCKET_1)
+        } 
+        else if (ActiveParts & PART_SHIP_ROCKET_2) {
+            cascadeevent(Event81, self, PART_SHIP_ROCKET_2)
+        }
+    }
+    else unless (time(period, (period * 3) >> 2)) {
+        if (ActiveParts & PART_SHIP_ROCKET_4) {
+            cascadeevent(Event81, self, PART_SHIP_ROCKET_4)
+        }
+        else if (ActiveParts & PART_SHIP_ROCKET_1) {
+            cascadeevent(Event81, self, PART_SHIP_ROCKET_1)
+        }
+        else if (ActiveParts & PART_SHIP_ROCKET_2) {
+            cascadeevent(Event81, self, PART_SHIP_ROCKET_2)
+        } 
+        else if (ActiveParts & PART_SHIP_ROCKET_3) {
+            cascadeevent(Event81, self, PART_SHIP_ROCKET_3)
+        }
+    }
+}
+
+sub FireShipPlasma(side) {
+    if (side == 1) {
+        if (ActiveParts & PART_PLASMA_1) {
+            cascadeevent(Event81, self, PART_PLASMA_1)
+        }
+        else if (ActiveParts & PART_PLASMA_2) {
+            cascadeevent(Event81, self, PART_PLASMA_2)
+        }
+    }
+    else if (side == 2) {
+        if (ActiveParts & PART_PLASMA_2) {
+            cascadeevent(Event81, self, PART_PLASMA_2)
+        }
+        else if (ActiveParts & PART_PLASMA_1) {
+            cascadeevent(Event81, self, PART_PLASMA_1)
+        }
+    }
+}
+
+sub FireShipOrb(period) {
+    unless (time(period)) {
+        cascadeevent(Event81, self, PART_ORB)
+    }
+}
+
+sub UpdateShipAttack() {
+    if (buttonpress(PAD_R2) && DEBUG) {
+        cascadeevent(Event12, self, ActiveParts)
+    }
+    unless (ActiveParts & PART_SHIP_WEAPONS) {
+        FightPhase += 1.0
+        AttackIndex = 0
+        changestate(Boss_SelectAttack)
+    }
+    if (animseq != getanim(NGIN_SHIP_BODY)) {
+        setanim(NGIN_SHIP_BODY, -1.0)
+    }
+    playframe((animframe + 1.0) % 10.0)
+}
+
+state Ship_FirePlasma { // 10
+    stateflag 0x3
+    statusc 0x0
+    event => state Mech_Init
+    trans => state Ship_FireRockets
+    code(repeat) {
+        if ((ActiveParts & PART_PLASMA_LAUNCHERS) && (!repeat || SECTIONDEATHCOUNT < 3.0)) {
+            UpdateShipAttack()
+            FireShipPlasma(2)
+            do (var start = frametime) {
+                UpdateShipAttack()
+            } while (frametime - start < 1s)
+            FireShipPlasma(1)
+            do (var start = frametime) {
+                UpdateShipAttack()
+            } while (frametime - start < 1s)
+        }
+        AttackIndex += 1.0
+        changestate(Boss_SelectAttack)
+    }
+}
+
+state Ship_FireOrb { // 11
+    stateflag 0x3
+    statusc 0x0
+    event => state Mech_Init
+    trans => state Ship_FireRockets
+    code(repeat) {
+        if ((ActiveParts & PART_ORB) && (!repeat || SECTIONDEATHCOUNT < 2.0)) {
+            cascadeevent(Event81, self, PART_ORB)
+            do (var start = frametime) {
+                FireShipRockets(20s)
+                UpdateShipAttack()
+            } while (frametime - start < 8s)
+        }
+        AttackIndex += 1.0
+        changestate(Boss_SelectAttack)
+    }
+}
+
+state Boss_Defeated { // 12
+    stateflag 0x23
+    statusc 0x0
+    code() {
+        GAMEFLAGS |= -0x80000000
+        spawn2(NGinC, S_MECH_SPARKS_FIRST)
+        spawn2(NGinC, S_MECH_DAMAGE_SMOKE, 1, LastBrokenVertex)
+        playframes(NGIN_MECH_DYING_1, 0.0, 54.0)
+        spawn2(NGinC, S_SHIP_DEBRIS, 1, 14.0, -0x2B551, 0x206E1, 0x2D000)
+        spawn2(NGinC, S_SHIP_DEBRIS, 1, 15.0, 0x3513D, 0x1540A, 0x2BE8F)
+        spawn2(NGinC, S_SHIP_DEBRIS, 1, 16.0, 0x12551, 0x38D14, -0x11C3D)
+        spawn2(NGinC, S_SHIP_DEBRIS, 1, 17.0, 0x2877A, -0x25285, -0x1677A)
+        spawn2(NGinC, S_SHIP_DEBRIS, 1, 18.0, -0x1D551, -0x32CE1, 0x7FD7)
+        spawn2(NGinC, S_SHIP_DEBRIS, 1, 19.0, -0x3A033, 0xDB51, -0x6E1)
+        spawn2(NGinC, S_SHIP_DEBRIS, 1, 20.0, -0x8DAE, -0x34E7A, 0x1FA51)
+        spawn2(NGinC, S_SHIP_DEBRIS, 1, 21.0, 0x22A7A, -0x29ACC, 0x2D000)
+        statusb |= 0x100000
+        health = 31
+        vfx = (vfx & 0xFFFFFF00) | 0x1
+        spawn(NGinC, S_MECH_EXPLOSION)
+        spawn(NGinC, S_MECH_EXPLOSION_BODY)
+        playframe()
+        vfx &= 0xFFFFFF00
+        soundsetup(0, self, 8)
+        soundpitch(6.528)
+        soundplay([Ng95A], 1V)
+        soundsetup(0, self, 8)
+        soundpitch(4.895)
+        soundplay([Ng95A], 1V)
+        setanim(NGIN_MECH_DYING_2, 0.0)
+        do {
+            animframe += 1.0
+            if (animframe == 9.0) {
+                soundpitch(3.263)
+                soundsetup(0, self, 8)
+                soundplay([Ng95A], 1V)
+            }
+            playframe()
+        } while (animframe + 1.0 <= 17.0)
+        spawn2(NGinC, S_MECH_SPARKS_SECOND)
+        playframes(18.0, 39.0)
+        statusb &= ~0x100000
+        spawn2(NGinC, S_NGIN_EJECT, 1, 0)
+        spawn2(NGinC, S_MECH_DEBRIS, 1, 1.0, -0x1FF7A, -0x2BEB, 0x3751)
+        spawn2(NGinC, S_MECH_DEBRIS, 1, 2.0, 0x1A6AE, -0x13C3D, 0x11951)
+        spawn2(NGinC, S_MECH_DEBRIS, 1, 3.0, 0x17CEB, -0x21270, -0x16D3D)
+        spawn2(NGinC, S_MECH_DEBRIS, 1, 4.0, -0x10685, -0x28C00, -0x134C2)
+        spawn2(NGinC, S_MECH_DEBRIS, 1, 5.0, -0x23F66, -0x116E1, -0x33DC2)
+        spawn2(NGinC, S_MECH_DEBRIS, 1, 6.0, 0x1E60A, -0x617A, -0x2B9F5)
+        spawn2(NGinC, S_MECH_DEBRIS, 1, 7.0, -0x1400, 0x3C00, -0x31814)
+        spawn2(NGinC, S_MECH_DEBRIS, 1, 8.0, 0, 0xC800, 0)
+        vfx = (vfx & 0xFFFFFF00) | 0x1
+        playframe()
+        playnull()
+        NGinSpeechOBJ = 0
+        if (SFXVOL) {
+            if (var lang = GLOBAL_151; lang == LANG_FR) {
+                spawn2(9, 44, 1, [F105O], [F115O], 2.0, 0s, 8.0)
+                NGinSpeechOBJ = objectspawned
+            }
+            else if (lang == LANG_DE) {
+                spawn2(9, 44, 1, [G105O], [G115O], 2.0, 0s, 8.0)
+                NGinSpeechOBJ = objectspawned
+            }
+            else if (lang == LANG_IT) {
+                spawn2(9, 44, 1, [I105O], [I115O], 2.0, 0s, 8.0)
+                NGinSpeechOBJ = objectspawned
+            }
+            else if (lang == LANG_ES) {
+                spawn2(9, 44, 1, [S105O], [S115O], 2.0, 0s, 8.0)
+                NGinSpeechOBJ = objectspawned
+            }
+            else {
+                spawn2(9, 44, 1, [E105O], [E115O], 2.0, 0s, 8.0)
+                NGinSpeechOBJ = objectspawned
+            }
+        }
+        playnull(42)
+        playnull(42)
+        if (GLOBAL_160 & 0x8) {
+            PowerID = 0
+        }
+        else {
+            PowerID = 703.0
+            spawn2(FruiC, FruiC_S_FRUIT_AUTO, 1, 703.0, 0)
+        }
+        interrupter = player -> field_63
+        sendevent(Event12, interrupter, 0)
+        playnull(42)
+        if (PowerID) {
+            spawn2(BosBC, BosBC_S_REWARD_DESC, 1, PowerID)
+            do { playnull() } until (buttonbuffer(PAD_TRIANGLE))
+        }
+        if (!(PREVBOXCOUNT & 0x2000), SFXVOL) {
+            GLOBAL_190 = 0x200
+            GLOBAL_191 = 17
+        }
+        sendevent(EventWarp, player, PowerID)
+        sleepnull()
+    }
+    trans {
+        FollowPlayerFlight()
+        ApplyBossMotion()
+    }
+}
+
+state MechSparks_First { // 13
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        statusb = FLAG_NO_CAMERA_CLIP
+        setanim(MECH_SPARKS_1)
+        while (parent -> animseq == getanim(NGIN_MECH_DYING_1)) {
+            CopyParentRot()
+            CopyParentTrans()
+            zindex = parent -> zindex + 50
+            playframe(parent -> animframe)
+        }
+    }
+}
+
+state MechSparks_Second { // 14
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        statusb = FLAG_NO_CAMERA_CLIP
+        setanim(MECH_SPARKS_2, -1.0)
+        do {
+            animframe += 1.0
+            CopyParentRot()
+            CopyParentTrans()
+            zindex = parent -> zindex + 50
+            playframe()
+        } while (animframe + 1.0 <= 21.0)
+    }
+}
+
+state MechExplosion_Play { // 15
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        GLOBAL_101 = 50
+        GLOBAL_100 = 0xFF
+        soundpitch(2.903)
+        soundsetup(0, self, 8)
+        sounddecay(10.16s)
+        soundplay([Nga5A], 1V)
+        statusb = FLAG_NO_CAMERA_CLIP
+        playframes(MECH_EXPLOSION, 0.0, 29.0)
+    }
+    trans {
+        CopyParentRot()
+        CopyParentTrans()
+        zindex = parent -> zindex + 50
+        if (frametime - statetime >= 12) {
+            moda = seek(moda, 16.0, 0x147)
+        }
+    }
+}
+
+state MechExplosion_Body { // 16
+    stateflag 0x1
+    statusc 0x0
+    trans => state MechExplosion_Play
+    code() {
+        statusb = FLAG_NO_CAMERA_CLIP | 0x100000
+        health = 31
+        playanim(0, NGIN_MECH_DYING_2)   
+    }
+}
+
+state MechDamageSmoke_Emit { // 17
+    stateflag 0x1
+    statusc 0x0
+    code(vertex) {
+        soundpitch(1.45)
+        soundsetup(0, self, 8)
+        sounddecay(10.16s)
+        soundplay([Nga5A], 1V)
+        while (parent -> animseq == getanim(NGIN_MECH_DYING_1)) {
+            getvert(vtrans, creator, vertex)
+            if (x < CAMTRANSX) {
+                SmokeDirection = -1
+            }
+            else {
+                SmokeDirection = 1
+            }
+            spawn(9, 21, 1, -1.0, (3m + rand(1m)) * SmokeDirection, 3m + rand(1m), randi(-1m, 1m), 2S, 0x266, 24, 63)
+            playnull()
+        }
+    }
+}
+
+state NGin_Eject { // 18
+    stateflag 0x1
+    statusc 0x0
+    code(vertex) {
+        soundpitch(3.263)
+        soundsetup(7, self, 8)
+        sounddecay(8.40001s)
+        soundplay([Ngg5A], 1V)
+        soundpitch(1.45)
+        soundsetup(7, self, 8)
+        sounddecay(10.16s)
+        soundplay([Nga5A], 1V)
+        statusb = FLAG_PHYSICS_ENGINE | FLAG_NO_CAMERA_CLIP
+        vfx = (vfx & 0xFFFFFF00) | 0x5
+        getvert(vtrans, creator, vertex)
+        vely = -4m
+        velz = -12m
+        do { playframes(NGIN_BOSS_DYING, 0.0, 14.0) } until (z > CAMTRANSZ)
+        tpc = 0
+        WaitChildNull()
+    }
+    trans {
+        if (time(2)) {
+            spawn(9, 21, 1, 0, (3m + rand(1m)) * SmokeDirection, 3m + rand(1m), -14m, 1S, 0x266, -50, 46)
+        }
+        rotz = spd(rotz, 360deg)
+    }
+}
+
+state ShipDebris_Fly { // 19
+    stateflag 0x1
+    statusc 0x0
+    code(vertex, vx, vy, vz) {
+        statusb = FLAG_PHYSICS_ENGINE | FLAG_NO_CAMERA_CLIP
+        vfx = (vfx & 0xFFFFFF00) | 0x5
+        getvert(vtrans, creator, vertex)
+        spawn(9, 4, 1, 0, 6)
+        PlayPartExplosionSound()
+        velx = vx << 2
+        vely = vy << 2
+        if (var part = vertex; part == 14.0) {
+            sleepanim(0, NGIN_SHIP_PART_1)
+        }
+        else if (part == 15.0) {
+            sleepanim(0, NGIN_SHIP_PART_2)
+        }
+        else if (part == 16.0) {
+            sleepanim(0, NGIN_SHIP_PART_3)
+        }
+        else if (part == 17.0) {
+            sleepanim(0, NGIN_SHIP_PART_4)
+        }
+        else if (part == 18.0) {
+            sleepanim(0, NGIN_SHIP_PART_5)
+        }
+        else if (part == 19.0) {
+            sleepanim(0, NGIN_SHIP_PART_6)
+        }
+        else if (part == 20.0) {
+            sleepanim(0, NGIN_SHIP_PART_7)
+        }
+        else if (part == 21.0) {
+            sleepanim(0, NGIN_SHIP_PART_8)
+        }
+    }
+    trans {
+        once {
+            if (!rand(2)) {
+                DebrisSpin = 180deg
+            }
+            else {
+                DebrisSpin = -180deg
+            }
+        }
+        z = parent -> z
+    }
+}
+
+sub PlayPartExplosionSound() {
+    if (var r = rand(4); r == 0) {
+        PlayExplosionSound([Ngc5A])
+    }
+    else if (r == 1) {
+        PlayExplosionSound([Ngd5A])
+    }
+    else if (r == 2) {
+        PlayExplosionSound([Nge5A])
+    }
+    else if (r == 3) {
+        PlayExplosionSound([Ngf5A])
+    }
+}
+
+state MechDebris_Fly { // 20
+    stateflag 0x1
+    statusc 0x0
+    code(vertex, vx, vy, vz) {
+        statusb = FLAG_PHYSICS_ENGINE | FLAG_NO_CAMERA_CLIP
+        vfx = (vfx & 0xFFFFFF00) | 0x5
+        getvert(vtrans, creator, vertex)
+        if (!!rand(2)) {
+            spawn(9, 4, 1, 0, 6)
+        }
+        spawn(NGinC, S_PART_EXPLOSION)
+        velx = vx << 2
+        vely = vy << 2
+        PlayPartExplosionSound()
+        if (var part = vertex; part == 1.0) {
+            sleepanim(0, NGIN_MECH_PART_1)
+        }
+        else if (part == 2.0) {
+            sleepanim(0, NGIN_MECH_PART_2)
+        }
+        else if (part == 3.0) {
+            sleepanim(0, NGIN_MECH_PART_3)
+        }
+        else if (part == 4.0) {
+            sleepanim(0, NGIN_MECH_PART_4)
+        }
+        else if (part == 5.0) {
+            sleepanim(0, NGIN_MECH_PART_5)
+        }
+        else if (part == 6.0) {
+            sleepanim(0, NGIN_MECH_PART_6)
+        }
+        else if (part == 7.0) {
+            sleepanim(0, NGIN_MECH_PART_7)
+        }
+        else if (part == 8.0) {
+            playframes(NGIN_MECH_PART_BREAK, 0.0, 17.0)
+        }
+    }
+    trans {
+        once {
+            if (!rand(2)) {
+                DebrisSpin = 180deg
+            }
+            else {
+                DebrisSpin = -180deg
+            }
+        }
+        z = parent -> z
+        rotz = spd(rotz, DebrisSpin)
+    }
+}
+
+state MechBoosters_Follow { // 21
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        PartIndex = 1
+        vfx = parent -> vfx
+        do {
+            CopyParentRot()
+            CopyParentTrans()
+            zindex = parent -> zindex
+            zindex -= 30
+            if (parent -> animseq == getanim(NGIN_FIRE_RIGHT_START)) {
+                setanim(NGIN_MECH_BOOSTER_2)
+            }
+            else if (parent -> animseq == getanim(NGIN_FIRE_RIGHT_HOLD)) {
+                setanim(NGIN_MECH_BOOSTER_3)
+            }
+            else if (parent -> animseq == getanim(NGIN_FIRE_RIGHT_STOP)) {
+                setanim(NGIN_MECH_BOOSTER_4)
+            }
+            else if (parent -> animseq == getanim(NGIN_FIRE_LEFT_START)) {
+                setanim(NGIN_MECH_BOOSTER_5)
+            }
+            else if (parent -> animseq == getanim(NGIN_FIRE_LEFT_HOLD)) {
+                setanim(NGIN_MECH_BOOSTER_6)
+            }
+            else if (parent -> animseq == getanim(NGIN_FIRE_LEFT_STOP)) {
+                setanim(NGIN_MECH_BOOSTER_7)
+            }
+            else if (parent -> animseq == getanim(NGIN_LEFT_BREAK)) {
+                setanim(NGIN_MECH_BOOSTER_9)
+            }
+            else if (parent -> animseq == getanim(NGIN_RIGHT_BREAK)) {
+                setanim(NGIN_MECH_BOOSTER_8)
+            }
+            else if (parent -> animseq == getanim(NGIN_STANCE)) {
+                setanim(NGIN_MECH_BOOSTER_1)
+            }
+            else if (parent -> animseq == getanim(NGIN_MECH_TRANS_1)) {
+                setanim(NGIN_MECH_BOOSTER_0)
+            }
+            playframe(parent -> animframe)
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Part_Destroy, (e == Event12 ? ((1 << PartIndex) & a[0]) : 0))
+    }
+}
+
+state MechBooster_Detach { // 22
+    stateflag 0x1
+    statusc 0x0
+    code(part, vertex) {
+        PartIndex = part
+        vfx = parent -> vfx
+        zindex = parent -> zindex
+        zindex -= 30
+        roty += 180deg
+        getvert(vtrans, parent, vertex)
+        statusb = FLAG_PHYSICS_ENGINE
+        velx = 3m
+        vely = 3m
+        velz = player -> speed
+        if (!vertex) {
+            scalex = -scalex
+            velx = -velx
+        }
+        playanim(0, NGIN_MECH_BOOSTER_A, 42)
+        playanim(0, NGIN_MECH_BOOSTER_A, 42)
+        playanim(0, NGIN_MECH_BOOSTER_A, 42)
+        playanim(0, NGIN_MECH_BOOSTER_A, 42)
+        changestate(Part_Destroy)
+    }
+}
+
+state CoreLauncher_Init { // 23
+    stateflag 0x2001
+    statusc 0x0
+    code(part, vertex) {
+        PartIndex = part
+        AttachmentVertex = vertex
+        health = 10
+        vfx = (vfx & 0xFFFFFF00) | 0x1 
+        changestate(CoreLauncher_Idle)
+    }
+}
+
+state CoreLauncher_Idle { // 24
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepanim(0, CORE_HITBOX)
+    }
+    event(e, a) {
+        accevif (e == EventHit) {
+            TakePartDamage(a[0])
+            spawn(9, 46, 1, 20, 45, 2, 0, 0)
+            parent -> health = 30
+        }
+        TryDestoryPart(e, a, health)
+        accevcstate(CoreLauncher_Fire, (e == Event81 ? ((1 << PartIndex) & a[0]) : 0))
+    }
+    trans {
+        unless (stateflag & 0x2) {
+            parent -> health = time(16)
+        }
+        getvert(vtrans, parent, AttachmentVertex)
+    }
+}
+
+state CoreLauncher_Fire { // 25
+    stateflag 0x1
+    statusc 0x0
+    trans => state CoreLauncher_Idle
+    code() {
+        spawn2(NGinC, S_ROCKET, 1, 0)
+        playanim(0, CORE_HITBOX)
+        changestate(CoreLauncher_Idle)
+    }
+    event(e, a) {
+        accevif (e == EventHit) {
+            TakePartDamage(a[0])
+            spawn(9, 46, 1, 20, 45, 2, 0, 0)
+        }
+        TryDestoryPart(e, a, health)
+    }
+}
+
+state RocketLauncher_Init { // 26
+    stateflag 0x2001
+    statusc 0x0
+    code(part, base, tip) {
+        PartIndex = part
+        AttachmentVertex = base
+        AimVertex = tip
+        SetColor1(0x80, 0x80, 0x80)
+        health = 20
+        changestate(RocketLauncher_Idle)
+    }
+}
+
+state RocketLauncher_Idle { // 27
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepanim(0, ROCKET_LAUNCHER_OPEN)
+    }
+    event(e, a) {
+        TryDestoryPart(e, a, health)
+        accevcstate(RocketLauncher_Fire, (e == Event81 ? ((1 << PartIndex) & a[0]) : 0))
+    }
+    trans {
+        FollowLauncherVertices()
+        rotz = atan2(self, vecx)
+        roty = rotz - 90deg
+        rotx = atan2_3d(self, vecx)
+    }
+}
+
+state RocketLauncher_Fire { // 28
+    stateflag 0x1
+    statusc 0x0
+    trans => state RocketLauncher_Idle
+    code() {
+        FireAgain = false
+        playframes(ROCKET_LAUNCHER_OPEN, 0.0, 10.0)
+        do {
+            spawn2(NGinC, S_ROCKET, 1, 0)
+            playframes(ROCKET_LAUNCHER_FIRE, 0.0, 19.0)
+            playframe(animframe, 21)
+            if (!FireAgain) { goto exit }
+            FireAgain = false
+        } while (1)
+        exit :
+        playframes(ROCKET_LAUNCHER_CLOSE, 0.0, 8.0)
+        changestate(RocketLauncher_Idle)
+    }
+    event(e, a) {
+        accevif (e == EventHit) {
+            TakePartDamage(a[0])
+        }
+        TryDestoryPart(e, a, health)
+        accevif ((e == Event81 ? ((1 << PartIndex) & a[0]) : 0)) {
+            FireAgain = true
+        }
+    }
+}
+
+state Rocket_Fly { // 29
+    stateflag 0x1
+    statusc 0x0
+    event => sub HandlePartEvent
+    code(vertex) {
+        interrupter = GLOBAL_126
+        interrupter -> ActiveRockets += 1.0
+        soundpitch(4.0)
+        sounddecay(8s)
+        soundsetup(8, self, 8)
+        soundplay([Ng35A], 1V)
+        SetColor1(0x80, 0x80, 0x80)
+        getvert(vtrans, parent, vertex)
+        velx = 0
+        vely = 0
+        vfx = (vfx & 0xFFFFFF00) | 0x5
+        velz = 6m
+        if (x > parent -> x + 1m) {
+            velx = 15m
+        }
+        if (x < parent -> x - 1m) {
+            velx = -15m
+        }
+        health = 4 - (SECTIONDEATHCOUNT >> 9)
+        if (health < 2) {
+            health = 2
+        }
+        trotz = 0x177000
+        SetRot(0deg)
+        setanim(ROCKET)
+        do {
+            var vx = player -> x - x
+            var vy = player -> y - y
+            var vz = 0
+            changestateif(Rocket_HitPlayer, z > player -> z - 2m && abs(vx) < 1m && abs(vy) < 1m, 10.0)
+            misc5(vx, 6m)
+            velx = seek(velx, vx, spd(15m))
+            x = spd(x, velx)
+            vely = seek(vely, vy, spd(15m))
+            y = spd(y, vely)
+            z = spd(z, velz + player -> speed)
+            animframe = (animframe + 1.0) % 10.0
+            playframe()
+        } until (z > player -> z + 0.5m)
+        do (var start = frametime) {
+            x = spd(x, velx)
+            y = spd(y, vely)
+            z = spd(z, velz + player -> speed)
+            animframe = (animframe + 1.0) % 10.0
+            playframe()
+        } while (frametime - start < 5)
+        interrupter = GLOBAL_126
+        interrupter -> ActiveRockets -= 1.0
+    }
+}
+
+state Rocket_HitPlayer { // 30
+    stateflag 0x20
+    statusc 0x0
+    code(damage) {
+        interrupter = GLOBAL_126
+        interrupter -> ActiveRockets -= 1.0
+        sendevent(EventHit, player, damage)
+        statusb = 0
+        spawn(9, 40, 1, 0, 6)
+        WaitChildNull()
+    }
+}
+
+state OrbLauncher_Init { // 31
+    stateflag 0x2001
+    statusc 0x0
+    code(part, base, tip) {
+        PartIndex = part
+        vfx = (vfx & 0xFFFFFF00) | 0x5
+        AttachmentVertex = base
+        AimVertex = tip
+        SetColor1(0x80, 0x80, 0x80)
+        health = 20
+        changestate(OrbLauncher_Idle)
+    }
+}
+
+state OrbLauncher_Idle { // 32
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepanim(0, ORB_LAUNCHER_OPEN)
+    }
+    event(e, a) {
+        accevif (e == EventHit) {
+            TakePartDamage(a[0])
+        }
+        TryDestoryPart(e, a, health)
+        accevcstate(OrbLauncher_Open, (e == Event81 ? ((1 << PartIndex) & a[0]) : 0))
+    }
+    trans {
+        FollowLauncherVertices()
+        rotx = 0deg
+        roty = atan2(self, vecx) - 90deg
+        rotz = atan2_3d(self, vecx)
+    }
+}
+
+state OrbLauncher_Open { // 33
+    stateflag 0x41
+    statusc 0x0
+    event => sub HandlePartEvent
+    trans => state OrbLauncher_Idle
+    code() {
+        playframes(ORB_LAUNCHER_OPEN, 0.0, 15.0)
+        changestate(OrbLauncher_Fire)
+    }
+}
+
+state OrbLauncher_Fire { // 34
+    stateflag 0x41
+    statusc 0x0
+    event => sub HandlePartEvent
+    trans => state OrbLauncher_Idle
+    code() {
+        spawn(NGinC, S_ORB, 1, 0)
+        playframes(ORB_LAUNCHER_FIRE, 0.0, 14.0)
+        changestate(OrbLauncher_Close)
+    }
+}
+
+state OrbLauncher_Close { // 35
+    stateflag 0x1
+    statusc 0x0
+    event => sub HandlePartEvent
+    trans => state OrbLauncher_Idle
+    code() {
+        playframesback(ORB_LAUNCHER_OPEN, 15.0, 0.0)
+        changestate(OrbLauncher_Idle)
+    }
+}
+
+state Orb_Fly { // 36
+    stateflag 0x41
+    statusc 0x0
+    code(vertex) {
+        soundpitch(4.0)
+        sounddecay(8s)
+        soundsetup(8, self, 8)
+        soundplay([Ng65A], 1V)
+        getvert(vtrans, parent, vertex)
+        velx = 0
+        vely = 0
+        vfx = (vfx & 0xFFFFFF00) | 0x5
+        velz = 2m + player -> speed
+        statusb = FLAG_PHYSICS_ENGINE | 0x100000
+        OrbHealth = 10
+        SetRot(0deg)
+        stalltime = 0
+        var0 = 32
+        do {
+            {
+                var vx = player -> x - x
+                var vy = player -> y - y
+                var vz = 0
+                misc5(vx, 1m)
+                velx = seek(velx, vx, spd(10m))
+                x = spd(x, velx)
+                vely = seek(vely, vy, spd(10m))
+                y = spd(y, vely)
+                stalltime = (stalltime + 1) % var0
+            }
+            unless (GAMETICK % 8) {
+                var0 -= 1
+                if (var0 < 1) {
+                    var0 = 1
+                }
+            }
+            changestateif(Part_Destroy, parent -> stateflag & 0x20)
+            if (animseq != getanim(ORB)) {
+                setanim(ORB, -1.0)
+            }
+            animframe = (animframe + 1.0) % 61.0
+            playframe()
+        } until (z > player -> z)
+        changestate(Orb_Explode)
+    }
+    event(e, a) {
+        accevif (e == EventHit) {
+            unless (stateflag & 0x2) {
+                OrbHealth -= a[0]
+                if (interrupter) {
+                    interrupter -> HitConfirmed = true
+                }
+                PlayPartHitSound()
+            }
+        }
+        TryDestoryPart(e, a, OrbHealth)
+    }
+}
+
+state Orb_Explode { // 37
+    stateflag 0x41
+    statusc 0x0
+    code() {
+        var radius
+        statusb = FLAG_NO_CAMERA_CLIP
+        SetRot(0deg)
+        GLOBAL_101 = 25
+        GLOBAL_100 = 0x99
+        setanim(ORB_EXPLODE, -1.0)
+        do {
+            animframe += 1.0
+            z = player -> z
+            FaceCamera()
+            radius = spd(radius, 8m)
+            if (radius > 4m) {
+                radius = 4m
+            }
+            sendeventif(EventHit, player, abs(x - player -> x) + abs(y - player -> y) < radius, 1.0)
+            playframe()
+        } while (animframe + 1.0 <= 29.0)
+    }
+}
+
+state PlasmaLauncher_Init { // 38
+    stateflag 0x2001
+    statusc 0x0
+    code(part, base, tip, yaw, side) {
+        PartIndex = part
+        AimYawOffset = yaw
+        vfx = (vfx & 0xFFFFFF00) | 0x5
+        AttachmentVertex = base
+        AimVertex = tip
+        SetColor1(0x80, 0x80, 0x80)
+        health = 20 - (SECTIONDEATHCOUNT * 3.0)
+        if (health < 10) {
+            health = 10
+        }
+        if (parent -> FightPhase == 2.0) {
+            SetScale(1.25S)
+        }
+        scalex *= side
+        changestate(PlasmaLauncher_Idle)
+    }
+}
+
+state PlasmaLauncher_Idle { // 39
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepanim(0, PLASMA_LAUNCHER_OPEN)
+    }
+    event(e, a) {
+        accevcstate(PlasmaLauncher_Open, (e == Event81 ? ((1 << PartIndex) & a[0]) : 0))
+        accevcstate(Part_Destroy, (e == Event12 ? ((1 << PartIndex) & a[0]) : 0))
+    }
+    trans {
+        FollowLauncherVertices()
+        rotx = degseek(0deg, atan2_3d(self, player -> x), 375deg)
+        roty = degseek(atan2(self, vecx) + AimYawOffset, atan2(player -> trans), 750deg)
+        rotz = atan2_3d(self, vecx)
+    }
+}
+
+state PlasmaLauncher_Open { // 40
+    stateflag 0x41
+    statusc 0x0
+    trans => state PlasmaLauncher_Idle
+    code() {
+        playframes(PLASMA_LAUNCHER_OPEN, 0.0, 15.0)
+        changestate(PlasmaLauncher_Fire)
+    }
+    event(e, a) {
+        accevcstate(Part_Destroy, (e == Event12 ? ((1 << PartIndex) & a[0]) : 0))
+    }
+}
+
+state PlasmaLauncher_Fire { // 41
+    stateflag 0x41
+    statusc 0x0
+    event => sub HandlePartEvent
+    trans => state PlasmaLauncher_Idle
+    code() {
+        spawn(NGinC, S_PLASMA_BALL, 1, 0)
+        playframes(PLASMA_LAUNCHER_FIRE, 0.0, 17.0)
+        playanim(15, PLASMA_LAUNCHER_OPEN, 42)
+        playframe(animframe, 42)
+        changestate(PlasmaLauncher_Close)
+    }
+}
+
+state PlasmaLauncher_Close { // 42
+    stateflag 0x1
+    statusc 0x0
+    event => state PlasmaLauncher_Open
+    trans => state PlasmaLauncher_Idle
+    code() {
+        playframesback(PLASMA_LAUNCHER_OPEN, 15.0, 0.0)
+        changestate(PlasmaLauncher_Idle)
+    }
+}
+
+state PlasmaBall_Fly { // 43
+    stateflag 0x41
+    statusc 0x0
+    code(vertex) {
+        soundpitch(2.54)
+        sounddecay(8s)
+        soundsetup(8, self, 8)
+        soundplay([Ng55A], 1V)
+        SetScale(1S)
+        getvert(vtrans, parent, vertex)
+        vfx = (vfx & 0xFFFFFF00) | 0x5
+        velx = player -> x - x
+        vely = player -> y - y
+        velz = player -> z - z
+        misc5(velx, 20m)
+        statusb = FLAG_PHYSICS_ENGINE
+        velz += player -> speed
+        do {
+            FaceCamera()
+            if (animseq != getanim(PLASMA_BALL)) {
+                setanim(PLASMA_BALL, -1.0)
+            }
+            animframe = (animframe + 1.0) % 11.0
+            playframe()
+        } until (z > player -> z + 4m)
+    }
+    trans {
+        changestateif(PlasmaBall_HitPlayer, distance(player) < 2m, 6.0)
+    }
+}
+
+state PlasmaBall_HitPlayer { // 44
+    stateflag 0x20
+    statusc 0x0
+    code(damage) {
+        sendevent(EventHit, player, damage)
+        statusb = 0
+        spawn(9, 40, 1, 0, 6)
+        WaitChildNull()
+    }
+}
+
+state MachineGunArm_Init { // 45
+    stateflag 0x2001
+    statusc 0x0
+    code(part, base, tip) {
+        PartIndex = part
+        vfx = (vfx & 0xFFFFFF00) | 0x5
+        AttachmentVertex = base
+        AimVertex = tip
+        SetColor1(0x80, 0x80, 0x80)
+        health = 15
+        spawn2(NGinC, S_MACHINE_GUN, 1, 0)
+        changestate(MachineGunArm_Idle)
+    }
+}
+
+state MachineGunArm_Idle { // 46
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepanim(0, MACHINE_GUN_ARM)
+    }
+    event(e, a) {
+        accevcstate(MachineGunArm_Fire, (e == Event81 ? ((1 << PartIndex) & a[0]) : 0))
+        accevcstate(Part_Destroy, (e == Event12 ? ((1 << PartIndex) & a[0]) : 0))
+    }
+    trans {
+        zindex = parent -> zindex
+        getvert(vtrans, parent, AttachmentVertex)
+        getvert(vvec, parent, AimVertex)
+        rotx = atan2_3d(self, vecx)
+        if (abs(rotx) > 45deg) {
+            roty = parent -> roty
+        }
+        else {
+            roty = atan2(self, vecx)
+        }
+        rotz = 0deg
+    }
+}
+
+state MachineGunArm_Fire { // 47
+    stateflag 0x1
+    statusc 0x0
+    trans => state MachineGunArm_Idle
+    code() {
+        trotx = 0deg
+        soundpitch(0.653)
+        soundfadet(2s, self)
+        soundpitch(3.263, self, 2)
+        soundcount(0xFFFF, self, 2)
+        sounddecay(9.6s, self, 2)
+        soundsetup(7, self, 2, 8)
+        soundplay([Ng15A], 0.6V)
+        MotorVoice = voice
+        do {
+            trotx = seek(trotx, 720deg, spd(360deg))
+            trotz = spd(trotz, trotx)
+            playanim(0, MACHINE_GUN_ARM)
+        } until (trotx == 720deg)
+        stateflag |= 0x40
+        spawn2(NGinC, S_MACHINE_GUN_BULLETS, 1, 1.0)
+        do {
+            trotz = spd(trotz, trotx)
+            if (animseq != getanim(MACHINE_GUN_ARM)) {
+                setanim(MACHINE_GUN_ARM, -1.0)
+            }
+            playframe((animframe + 1.0) % 15.0)
+        } while (1)
+    }
+    event(e, a) {
+        HandleMachineGunHit(e, a)
+        TryDestoryPart(e, a, health)
+        accevcstate(MachineGunArm_Stop, (e == Event82 ? ((1 << PartIndex) & a[0]) : 0))
+    }
+}
+
+
+state MachineGunArm_Stop { // 48
+    stateflag 0x1
+    statusc 0x0
+    trans => state MachineGunArm_Idle
+    code() {
+        soundfadet(3s, MotorVoice)
+        soundpitch(3.2, MotorVoice, 3)
+        soundfadev(0V, MotorVoice, 3)
+        do {
+            trotx = seek(trotx, 0deg, spd(180deg))
+            trotz = spd(trotz, trotx)
+            playanim(0, MACHINE_GUN_ARM)
+        } until (trotx == 0deg)
+        changestate(MachineGunArm_Idle)
+    }
+    event(e, a) {
+        HandleMachineGunHit(e, a)
+        TryDestoryPart(e, a, health)
+    }
+}
+
+state MachineGun_Follow { // 49
+    stateflag 0x1
+    statusc 0x0
+    code(vertex) {
+        movetolist(5.0, self)
+        SetColor1(0, 0, 0)
+        do {
+            rotx = creator -> rotx
+            roty = creator -> roty
+            zindex = creator -> zindex
+            vfx = creator -> vfx
+            rotz = creator -> trotz
+            moda = creator -> moda
+            getvert(vtrans, creator, vertex)
+            playanim(0, MACHINE_GUN)
+        } until (creator -> stateflag & 0x20)
+    }
+}
+
+state MachineGunBullets_Fire { // 50
+    stateflag 0x41
+    statusc 0x0
+    __transargs
+    code(vertex) {
+        movetolist(5.0, self)
+        soundpitch(5.805)
+        soundcount(0xFFFF)
+        sounddecay(9.6s)
+        soundsetup(8, self, 8)
+        soundplay([Ng25A], 1V)
+        playframes(BULLET, 0.0, 8.0)
+        while (creator -> stateflag & 0x40) {
+            playanim(9, BULLET)
+            playanim(10, BULLET)
+        }
+        soundfadet(0.2s, voice)
+        soundfadev(0V, voice, 2)
+        playframes(BULLET, (animframe + 1.0) - 1.0, 20.0)
+    }
+    trans {
+        getvert(vtrans, creator, vertex)
+        sendeventif(EventHit, player, abs(x - player -> x) < 2m && abs(y - player -> y) < 2m, 2.0)
+    }
+}
+
+state PartExplosion_Play { // 51
+    stateflag 0x41
+    statusc 0x0
+    code() {
+        movetolist(3.0, self)
+        PlayPartExplosionSound()
+        soundsetup(0, voice, 5)
+        GLOBAL_101 = 2
+        GLOBAL_100 = 0xFF
+        statusb = FLAG_NO_CAMERA_CLIP
+        SetRot(0deg)
+        SetScale(1S)
+        playframes(PART_BREAK_EXPLOSION, 0.0, 19.0)
+    }
+    trans {
+        if (frametime - statetime >= 8) {
+            moda = seek(moda, 16.0, 0x1EB)
+        }
+    }
+}
+
+state Part_Destroy { // 52
+    stateflag 0x20
+    statusc 0x0
+    code() {
+        if (spawn == S_MACHINE_GUN_ARM || spawn == S_ROCKET_LAUNCHER || spawn == S_PLASMA_LAUNCHER || spawn == S_CORE_LAUNCHER || spawn == S_ORB_LAUNCHER) {
+            spawn(NGinC, S_PART_EXPLOSION)
+            sendevent(Event7, creator, 1 << PartIndex)
+        }
+        statusb = 0
+        spawn(9, 40, 1, getins(SetDebrisAppearance), 6)
+        if (spawn == S_ROCKET_LAUNCHER) {
+            parent -> RecoilSpeed = -20m
+            if (var part = PartIndex; part == 12) {
+                parent -> RecoilRoll = 8deg
+            }
+            else if (part == 11) {
+                parent -> RecoilRoll = -8deg
+            }
+            else if (part == 4 || part == 13) {
+                parent -> RecoilRoll = 15deg
+            }
+            else {
+                parent -> RecoilRoll = -15deg
+            }
+            playframes(ROCKET_LAUNCHER_BREAK, 0.0, 14.0)
+        }
+        else if (spawn == S_MACHINE_GUN_ARM) {
+            playframes(MACHINE_GUN_ARM_BREAK, 0.0, 17.0)
+        }
+        else if (spawn == S_ORB_LAUNCHER) {
+            playframes(ORB_LAUNCHER_BREAK, 0.0, 17.0)
+        }
+        else if (spawn == S_PLASMA_LAUNCHER) {
+            playframes(PLASMA_LAUNCHER_BREAK, 0.0, 17.0)
+        }
+        else if (spawn == S_CORE_LAUNCHER) {
+            parent -> health = 31
+        }
+        else if (spawn == S_ROCKET) {
+            GLOBAL_101 = 2
+            GLOBAL_100 = 0x7F
+            interrupter = GLOBAL_126
+            interrupter -> ActiveRockets -= 1.0
+        }
+        else if (spawn == S_ORB) {
+            GLOBAL_101 = 5
+            GLOBAL_100 = 0x99
+        }
+        WaitChildNull()
+    }
+}
+
+sub SetDebrisAppearance() {
+    if (spawn == 0x9002B) {
+        SetColor1(0x80, 0x32, 0x00)
+        rotx = 90deg
+        vecx = CAMTRANSX
+        vecy = CAMTRANSY
+        vecz = CAMTRANSZ
+        rotz = atan2(self, vecx)
+    }
+}
+
+sub IgnoreHitEvent() {}

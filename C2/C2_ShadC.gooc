@@ -1,0 +1,150 @@
+#gool ShadC 29 1
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 2 -r pal "C2\C2_ShadC.gooc" "C2\Out\C2_ShadC.nsentry"
+
+#anim SHADOW          [Sha0V] 10 0
+#anim NIGHT_SHADOW    [ShacV] 10 0
+
+#spawn S_SHADOW                  Shadow_Init
+#spawn S_SHADOW_STATIONARY       Shadow_Stationary
+#spawn S_2                       __s_2
+#spawn S_SHADOW_GROUND           Shadow_Stationary_Ground
+#spawn S_NIGHT_SHADOW            Shadow_Init
+#spawn S_NIGHT_SHADOW_GROUND     Shadow_Stationary_Ground
+
+var mem1, mem2, mem3, mem4, mem5, mem6, mem7, mem8, mem9, mem10, mem11,
+    mem12, mem13, ShadowLastY, ShadowBaseY, ShadowScale, ShadowZMod, mem18,
+    ShadowScaleMax, ShadowMinY
+
+state Shadow_Init {
+    code(hdif, maxsize, zdif) {
+        ShadowZMod = zdif
+        SetScale(maxsize)
+        ShadowScaleMax = maxsize
+        SetRot(0deg)
+        parent -> field_60 = 0
+        groundy = hdif
+        ShadowMinY = -0x7FFFFFFF
+        statusb = 0x400 | FLAG_HAS_SHADOW
+        changestate(Shadow)
+    }
+}
+
+inline sub SleepShadowFrame() {
+    do {
+        ShadowPlayFrame()
+    } while (1)
+}
+
+state Shadow {
+    code() {
+        if (spawn == S_NIGHT_SHADOW) {
+            setanim(NIGHT_SHADOW)
+        }
+        else {
+            setanim(SHADOW)
+        }
+        SleepShadowFrame()
+    }
+    trans {
+        zindex = parent -> zindex + ShadowZMod
+        ShadowLastY = y
+        vfx &= 0xFFFFFF00
+        x = parent -> x
+        y = parent -> y + groundy
+        z = parent -> z
+        projectobjshadow(v0)
+        projectzoneshadow(v0)
+        if (eventaccepted && parent -> statusb \ FLAG_HAS_SHADOW) {
+            if (abs(ShadowLastY - vecy) > 0.5m) {
+                y = vecy
+            }
+            else {
+                y = seek(ShadowLastY, vecy, 0.1m)
+            }
+            parent -> field_63 = y
+        }
+        else {
+            parent -> field_63 = -0x7FFFFFFF
+            vfx = (vfx & 0xFFFFFF00) | 1
+        }
+        if (parent -> field_63 < ShadowMinY && parent -> y > ShadowMinY) {
+            parent -> field_63 = ShadowMinY
+            y = ShadowMinY
+            vfx &= 0xFFFFFF00
+        }
+        if (parent -> statusa \ FLAG_GROUNDLAND) {
+            y = parent -> y
+        }
+        x = parent -> x
+        z = parent -> z
+        roty = parent -> roty
+        scaley = ShadowScaleMax - (abs(y - parent -> y) >> 8)
+        if (scaley < 0.5S) {
+            scaley = 0.5S
+        }
+        scalez = scaley
+        scalex = scaley
+    }
+}
+
+state Shadow_Stationary {
+    code(hdif, maxsize, zdif) {
+        if (spawn == S_NIGHT_SHADOW_GROUND || spawn == S_NIGHT_SHADOW) {
+            setanim(NIGHT_SHADOW)
+        }
+        else {
+            setanim(SHADOW)
+        }
+        ShadowBaseY = hdif
+        parent -> field_60 = 0
+        ShadowScale = maxsize
+        ShadowZMod = zdif
+        SleepShadowFrame()
+    }
+    event(e, a) {
+        accevif (e == Event21) {
+            ShadowBaseY = a[0]
+        }
+    }
+    trans {
+        nofirst {
+            zindex = parent -> zindex + ShadowZMod
+            x = parent -> x
+            y = parent -> y + ShadowBaseY
+            z = parent -> z
+            rotx = degseek(0, parent -> rotx, 300deg)
+            roty = parent -> roty
+            rotz = parent -> rotz
+            scalex = parent -> scalex * ShadowScale >> 12
+            scaley = parent -> scaley * ShadowScale >> 12
+            scalez = parent -> scalez * ShadowScale >> 12
+            if (parent -> statusb \ 0x4000000) {
+                statusb = 0
+            }
+            else {
+                statusb = FLAG_INVISIBLE
+            }
+        }
+    }
+}
+
+state Shadow_Stationary_Ground {
+    code => state Shadow_Stationary
+    event => state Shadow_Stationary
+    trans {
+        nofirst {
+            zindex = parent -> zindex + ShadowZMod
+            x = parent -> x
+            y = ShadowBaseY
+            z = parent -> z
+            rotx = degseek(0, parent -> rotx, 300deg)
+            roty = parent -> roty
+            rotz = parent -> rotz
+            scalex = parent -> scalex * ShadowScale >> 12
+            scaley = parent -> scaley * ShadowScale >> 12
+            scalez = parent -> scalez * ShadowScale >> 12
+        }
+    }
+}

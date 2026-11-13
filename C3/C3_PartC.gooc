@@ -1,0 +1,2024 @@
+#gool PartC 9 9
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal -l o "C3\C3_PartC.gooc" "C3\Out\C3_PartC.nsentry"
+//gooc -c 3 -r pal -l b -h "Includes\C3_PartC.gooh" "C3\C3_PartC.gooc" "C3\Out\C3_PartC.nsentry"
+
+#sprite SMOKE [Cr10T]
+#tex 0x3C3C3C 0 3 14 7 672 64 32 32
+#tex 0x3C3C3C 0 3 15 7 672 32 32 32
+#tex 0x3C3C3C 0 3 0 8 704 96 32 32
+#tex 0x3C3C3C 0 3 1 8 704 64 32 32
+#tex 0x3C3C3C 0 3 2 8 704 32 32 32
+#tex 0x3C3C3C 0 3 3 8 736 96 32 32
+#tex 0x3C3C3C 0 3 4 8 736 64 32 32
+#tex 0x3C3C3C 0 3 5 8 736 32 32 32
+#tex 0x3C3C3C 0 3 6 8 768 96 32 32
+#tex 0x3C3C3C 0 3 7 8 768 64 32 32
+#tex 0x3C3C3C 0 3 14 7 768 32 32 32
+#tex 0x3C3C3C 0 3 8 8 800 96 32 32
+#tex 0x3C3C3C 0 3 9 8 800 64 32 32
+#tex 0x3C3C3C 0 3 10 8 640 16 32 16
+#tex 0x3C3C3C 0 3 11 8 672 16 32 16
+#tex 0x3C3C3C 0 3 11 8 672 16 32 16
+
+#sprite EXHAUST_SMOKE [Cr10T]
+#tex 0x00FFFF 0 3 14 7 672 64 32 32
+#tex 0x00BFFF 0 3 15 7 672 32 32 32
+#tex 0x009FFF 0 3 5 8 736 32 32 32
+#tex 0x005FFF 0 3 1 8 704 64 32 32
+#tex 0x003FFF 0 3 2 8 704 32 32 32
+#tex 0x0000FF 0 3 3 8 736 96 32 32
+#tex 0x2020DF 0 3 4 8 736 64 32 32
+#tex 0x4040BF 0 3 5 8 736 32 32 32
+#tex 0x60609F 0 3 6 8 768 96 32 32
+#tex 0x808080 0 3 7 8 768 64 32 32
+#tex 0x606060 0 3 14 7 768 32 32 32
+#tex 0x505050 0 3 8 8 800 96 32 32
+#tex 0x404040 0 3 9 8 800 64 32 32
+#tex 0x202020 0 3 10 8 640 16 32 16
+#tex 0x101010 0 3 11 8 672 16 32 16
+
+#sprite BURN_SMOKE [Cr10T]
+#tex 0x1E1E1E 0 3 14 7 672 64 32 32
+#tex 0x1E1E1E 0 3 15 7 672 32 32 32
+#tex 0x1E1E1E 0 3 0 8 704 96 32 32
+#tex 0x1E1E1E 0 3 1 8 704 64 32 32
+#tex 0x1E1E1E 0 3 2 8 704 32 32 32
+#tex 0x1E1E1E 0 3 3 8 736 96 32 32
+#tex 0x1E1E1E 0 3 4 8 736 64 32 32
+#tex 0x1E1E1E 0 3 5 8 736 32 32 32
+#tex 0x1E1E1E 0 3 6 8 768 96 32 32
+#tex 0x1E1E1E 0 3 7 8 768 64 32 32
+#tex 0x1E1E1E 0 3 14 7 768 32 32 32
+#tex 0x191919 0 3 8 8 800 96 32 32
+#tex 0x141414 0 3 9 8 800 64 32 32
+#tex 0x0F0F0F 0 3 10 8 640 16 32 16
+#tex 0x0A0A0A 0 3 11 8 672 16 32 16
+#tex 0x050505 0 3 11 8 672 16 32 16
+
+#sprite BAZOOKA_SMOKE [Cr10T]
+#tex 0x323232 0 3 7 9 864 64 32 32
+#tex 0x323232 0 3 7 9 864 64 32 32
+#tex 0x323232 0 3 7 9 864 64 32 32
+#tex 0x323232 0 3 7 9 864 64 32 32
+#tex 0x323232 0 3 7 9 864 64 32 32
+#tex 0x323232 0 3 7 9 864 64 32 32
+#tex 0x323232 0 3 7 9 864 64 32 32
+#tex 0x2D2D2D 0 3 7 9 864 64 32 32
+#tex 0x282828 0 3 7 9 864 64 32 32
+#tex 0x232323 0 3 7 9 864 64 32 32
+#tex 0x1E1E1E 0 3 7 9 864 64 32 32
+#tex 0x191919 0 3 7 9 864 64 32 32
+#tex 0x141414 0 3 7 9 864 64 32 32
+#tex 0x0F0F0F 0 3 7 9 864 64 32 32
+#tex 0x0A0A0A 0 3 7 9 864 64 32 32
+#tex 0x050505 0 3 7 9 864 64 32 32
+
+#anim SHOCKWAVE [EX10V] [EX10G] 8 1 2
+#anim EXPLOSION [EX20V] [EX20G] 12 1 2
+#anim FIREWORK  [EX30V] [EX30G] 25 1 2
+
+#sprite EXPLOSION_SMOKE [Cr10T]
+#tex 0x00C0C0 0 3 14 7 672 64 32 32
+#tex 0x008FC0 0 3 15 7 672 32 32 32
+#tex 0x005FC0 0 3 0 8 704 96 32 32
+#tex 0x002FC0 0 3 1 8 704 64 32 32
+#tex 0x0000C0 0 3 2 8 704 32 32 32
+#tex 0x0000C0 0 3 3 8 736 96 32 32
+#tex 0x0000C0 0 3 4 8 736 64 32 32
+#tex 0x0000C0 0 3 5 8 736 32 32 32
+#tex 0x0000C0 0 3 6 8 768 96 32 32
+#tex 0x0000C0 0 3 7 8 768 64 32 32
+#tex 0x2F2F8F 0 3 14 7 768 32 32 32
+#tex 0x606060 0 3 8 8 800 96 32 32
+#tex 0x484848 0 3 9 8 800 64 32 32
+#tex 0x2F2F2F 0 3 10 8 640 16 32 16
+#tex 0x181818 0 3 11 8 672 16 32 16
+#tex 0x0C0C0C 0 3 11 8 672 16 32 16
+
+#iflev G
+#fraganim PROJECTILE_SHOCKWAVE [End3T] 4
+#frag 0x105080 1 3 0 2 0 32 64 16 -200 100 200 200
+#frag 0x105080 1 3 0 2 0 48 64 16 -200 0 200 100
+#frag 0x105080 1 3 0 2 0 48 64 16 { 63 63 0 63 63 48 0 48 } -200 -100 200 0
+#frag 0x105080 1 3 0 2 0 32 64 16 { 63 47 0 47 63 32 0 32 } -200 -200 200 -100
+#else
+#fraganim PROJECTILE_SHOCKWAVE [Cr30T] 4
+#frag 0x105080 0 3 1 8 128 16 64 16 -200 100 200 200
+#frag 0x105080 1 3 0 6 0 48 64 16 -200 0 200 100
+#frag 0x105080 1 3 0 6 0 48 64 16 { 63 63 0 63 63 48 0 48 } -200 -100 200 0
+#frag 0x105080 0 3 1 8 128 16 64 16 { 191 31 128 31 191 16 128 16 } -200 -200 200 -100
+#endif
+
+#sprite FIRE [Cr10T]
+#tex 0x00CEFF 0 3 14 7 672 64 32 32
+#tex 0x00A7FF 0 3 15 7 672 32 32 32
+#tex 0x006DFF 0 3 0 8 704 96 32 32
+#tex 0x004FF4 0 3 1 8 704 64 32 32
+#tex 0x003ADF 0 3 2 8 704 32 32 32
+#tex 0x0020CC 0 3 3 8 736 96 32 32
+#tex 0x001AB0 0 3 4 8 736 64 32 32
+#tex 0x001A90 0 3 5 8 736 32 32 32
+#tex 0x001A63 0 3 6 8 768 96 32 32
+#tex 0x001A44 0 3 7 8 768 64 32 32
+#tex 0x001333 0 3 14 7 768 32 32 32
+
+#iflev bft
+#sprite WATER_RIPPLE [Md5bT]
+#tex 0xF3CD05 0 3 6 0 832 96 32 32
+#tex 0xCBCD05 0 3 6 0 832 64 32 32
+#tex 0xCBCD05 0 3 6 0 832 32 32 32
+#tex 0xCBCD05 0 3 6 0 864 96 32 32
+#tex 0xCBCD05 0 3 6 0 864 64 32 32
+#eliflev cg
+#sprite WATER_RIPPLE [Pr1cT]
+#tex 0xF3CD05 0 3 14 4 768 64 32 32
+#tex 0xCBCD05 0 3 14 4 768 32 32 32
+#tex 0xCBCD05 0 3 14 4 800 96 32 32
+#tex 0xCBCD05 0 3 14 4 800 64 32 32
+#tex 0xCBCD05 0 3 14 4 800 32 32 32
+#else
+#sprite WATER_RIPPLE [Eg2iT]
+#tex 0xF3CD05 0 3 1 13 832 32 32 32
+#tex 0xCBCD05 0 3 1 13 864 96 32 32
+#tex 0xCBCD05 0 3 1 13 864 64 32 32
+#tex 0xCBCD05 0 3 1 13 864 32 32 32
+#tex 0xCBCD05 0 3 1 13 896 96 32 32
+#endif
+
+#sprite WATER_SPLASH [Cr10T]
+#tex 0x404040 0 3 11 7 976 112 16 16
+
+#iflev bft
+#sprite WATER_WAKE [Md5bT]
+#tex 0x646464 0 3 6 0 768 32 32 32
+#tex 0x646464 0 3 6 0 800 96 32 32
+#tex 0x646464 0 3 6 0 800 64 32 32
+#tex 0x646464 0 3 6 0 800 32 32 32
+#eliflev cg
+#sprite WATER_WAKE [Pr1cT]
+#tex 0x646464 0 3 14 4 736 96 32 32
+#tex 0x646464 0 3 14 4 736 64 32 32
+#tex 0x646464 0 3 14 4 736 32 32 32
+#tex 0x646464 0 3 14 4 768 96 32 32
+#else
+#sprite WATER_WAKE [Eg2iT]
+#tex 0x646464 0 3 0 13 800 64 32 32
+#tex 0x646464 0 3 0 13 800 32 32 32
+#tex 0x646464 0 3 0 13 832 96 32 32
+#tex 0x646464 0 3 0 13 832 64 32 32
+#endif
+
+#iflev dpxD
+#sprite BUBBLE [Wat0T]
+#tex 0x808080 0 3 15 6 480 16 16 16
+#tex 0x808080 0 3 0 7 496 16 16 16
+#eliflev es
+#sprite BUBBLE [At1eT]
+#tex 0x808080 0 3 1 0 64 32 32 32
+#tex 0x808080 0 3 2 0 96 32 32 32
+#else
+#sprite BUBBLE [Eg3iT]
+#tex 0x808080 0 3 0 11 784 16 16 16
+#tex 0x808080 0 3 1 11 800 16 16 16
+#endif
+
+#sprite PARTICLE [Cr10T]
+#tex 0xFFFFFF 0 2 2 9 800 32 32 32
+
+#sprite ANIM_0x1DC00 [1039I]
+#tex 0x808080 0 2 14 7 672 64 1 1
+#tex 0x808080 0 2 14 7 672 64 1 1
+
+#sprite ANIM_0x1E600 [1041I]
+#tex 0x000080 0 3 14 7 672 64 1 1
+
+#iflev cguA
+#anim ELEVATOR_1 [El1cV] [El1cG] 1 0 2
+#eliflev qy
+#anim ELEVATOR_1 [El1qV] [El1qG] 1 0 2
+#eliflev rz
+#anim ELEVATOR_1 [El1rV] [El1rG] 1 0 2
+#eliflev 2
+#anim ELEVATOR_1 [El12V] [El12G] 1 0 2
+#eliflev m
+#anim ELEVATOR_1 [El1mV] [El1mG] 1 0 2
+#else
+#anim ELEVATOR_1 [El1uV] [El1uG] 1 0 2
+#endif
+
+#iflev bft
+#anim ELEVATOR_2 [El2bV] [El2bG] 1 0 2
+#eliflev iou
+#anim ELEVATOR_2 [El2iV] [El2iG] 1 0 2
+#eliflev mqy
+#anim ELEVATOR_2 [El2mV] [El2mG] 1 0 2
+#eliflev cg
+#anim ELEVATOR_2 [El2cV] [El2cG] 1 0 2
+#eliflev rz
+#anim ELEVATOR_2 [El2rV] [El2rG] 1 0 2
+#else
+#anim ELEVATOR_2 [El2AV] [El2AG] 1 0 2
+#endif
+
+#iflev u
+#anim ELEVATOR_3 [El3iV] [El3iG] 1 0 2
+#else
+#anim ELEVATOR_3 [El1cV] [El1cG] 1 0 2
+#endif
+
+#iflev cguzA
+#anim ELEVATOR_4 [El30V] [El30G] 1 0 2
+#else
+#anim ELEVATOR_4 [El3uV] [El3uG] 1 0 2
+#endif
+
+#anim ELEVATOR_5 [1056I] [1055I] 10 1 2
+#anim ELEVATOR_6 [HG2bV] [HG2bG] 10 1 2
+#anim ELEVATOR_7 [1064I] [1063I] 8 0 2
+#anim ELEVATOR_8 [1067I] [1066I] 1 1 2
+
+#sprite EXHAUST_PARTICLE [Cr10T]
+#tex 0x008080 0 3 11 7 976 112 16 16
+
+#iflev EJKLM
+#sprite SPARKS [Int1T]
+#tex 0xFF6400 0 3 8 3 0 32 64 32
+#tex 0xFF6400 0 3 8 3 64 32 64 32
+#tex 0xFF6400 0 3 8 3 128 32 64 32
+#tex 0xFF6400 0 3 8 3 192 32 64 32
+#tex 0xFF6400 0 3 8 3 256 32 64 32
+#tex 0xFF6400 0 3 8 3 320 32 64 32
+#tex 0xFF6400 0 3 8 3 384 32 64 32
+#tex 0xFF6400 0 3 8 3 448 96 64 32
+#tex 0xFF6400 0 3 8 3 448 64 64 32
+#eliflev es
+#sprite SPARKS [At3eT]
+#tex 0x505050 0 3 3 4 256 32 64 32
+#tex 0x505050 0 3 4 4 320 32 64 32
+#tex 0x505050 0 3 5 4 384 32 64 32
+#tex 0x505050 0 3 6 4 448 96 64 32
+#tex 0x505050 0 3 7 4 448 64 64 32
+#tex 0x505050 0 3 8 4 448 32 64 32
+#tex 0x505050 0 3 9 4 512 96 64 32
+#tex 0x505050 0 3 10 4 512 64 64 32
+#tex 0x505050 0 3 11 4 512 32 64 32
+#else
+#sprite SPARKS [Ft3rT]
+#tex 0x505050 0 3 15 0 0 32 64 32
+#tex 0x505050 0 3 0 1 64 32 64 32
+#tex 0x505050 0 3 1 1 128 32 64 32
+#tex 0x505050 0 3 2 1 192 32 64 32
+#tex 0x505050 0 3 3 1 256 32 64 32
+#tex 0x505050 0 3 4 1 320 32 64 32
+#tex 0x505050 0 3 5 1 384 32 64 32
+#tex 0x505050 0 3 6 1 448 32 64 32
+#tex 0x505050 0 3 7 1 512 32 64 32
+#endif
+
+#anim SHOES [Cdf0V] [Cdf0G] 45 1 2
+#anim YOYO  [Cy00V] [Cy00G] 8 1 2
+
+#spawn S_BURN_SMOKE                 Burn_Smoke
+#spawn S_SMOKE_PUFF                 Smoke_Puff
+#spawn S_SMOKE_BURST                Smoke_Burst
+#spawn S_SMOKE_BURST_PARTICLE       Smoke_BurstParticle
+#spawn S_EXPLOSION_MASTER           Explosion_Master
+#spawn S_EXPLOSION_SMOKE            Explosion_Smoke
+#spawn S_ELEVATOR                   Elevator_Init
+#spawn S_WATER                      Water_Master
+#spawn S_BUBBLE                     Bubble
+#spawn S_BUBBLE_SOUND               Bubble
+#spawn S_EXPLOSION_AT_VERTEX        Explosion_AtVertex
+#spawn S_WAKE                       Water_Wake
+#spawn S_SPLASH                     Water_Splash
+#spawn S_RIPPLE                     Water_Ripple
+#spawn S_SPLASH_MASTER              Water_Splash_Master
+#spawn S_FIRE                       Fire
+#spawn S_POSITION_MARKER            Position_Marker
+#spawn S_PATH_MARKER                Path_Marker
+#spawn S_VERTEX_MARKER              Vertex_Marker
+#spawn S_EXHAUST_SMOKE              Exhaust_Smoke
+#spawn S_20                         __s_20
+#spawn S_SMOKE_GENERIC              Smoke_Generic
+#spawn S_EXHAUST_PARTICLE           Exhaust_Particle
+#spawn S_FIELD_MARKER               Field_Marker
+#spawn S_SPARK                      Spark
+#spawn S_SPARK_CRAWL                Spark_Crawl
+#spawn S_26                         __s_26
+#spawn S_27                         __s_27
+#spawn S_PROJECTILE_SHOCKWAVE       Projectile_Shockwave
+#spawn S_29                         __s_29
+#spawn S_30                         __s_30
+#spawn S_ELEVATOR_BONUS             Elevator_Init
+#spawn S_ELEVATOR_CATCH             ElevatorCatch_Init
+#spawn S_HOLEGATE                   __s_33
+#spawn S_CATCH_BONUS_ALT            __s_34
+#spawn S_CATCH_BONUS                ElevatorCatch_Init
+#spawn S_36                         __s_36
+#spawn S_37                         __s_37
+#spawn S_BONUS_RETURN               Bonus_Return
+#spawn S_39                         __s_39
+#spawn S_EXPLOSION_MASTER_SOUND     Explosion_Master
+#spawn S_41                         __s_41
+#spawn S_42                         __s_42
+#spawn S_SHOCKWAVE                  Shockwave
+#spawn S_AUDIO                      Audio_Streamer
+#spawn S_45                         __s_45
+#spawn S_EXPLOSION                  Explosion
+#spawn S_47                         __s_47
+#spawn S_EXPLOSION_FAST             Explosion_Fast
+#spawn S_ELEVATOR_HARD              __s_49
+#spawn S_CATCH_HARD                 __s_50
+#spawn S_ELEVATOR_WIRE              __s_51
+#spawn S_EXPLOSION_DOUBLE_SIDED     Explosion_DoubleSided
+#spawn S_VERTEX_MARKER_COLOR        Vertex_MarkerColor
+#spawn S_FIRE_TRAIL                 Fire_Trail
+#spawn S_LINE                       Line
+#spawn S_56                         __s_56
+#spawn S_57                         __s_57
+#spawn S_58                         __s_58
+#spawn S_SHOES                      Shoes
+#spawn S_VECTOR_MARKER              Vector_Marker
+#spawn S_61                         __s_61
+#spawn S_YOYO                       Yoyo
+#spawn S_FIREWORK                   Firework
+
+var ParticleVar1, ElevatorZindex
+
+inline sub SetVertex(vertex) {
+    if (vertex != -1.0) {
+        getvert(vtrans, creator, vertex)
+    }
+}
+
+state Burn_Smoke { // 0
+    stateflag 0x20040
+    statusc 0x2
+    code(vertex, scale, flags) {
+        SetVertex(vertex)
+        SetScale(scale)
+        vecx = 0x51
+        SetRot(0deg, 0deg, rand(360deg))
+        zindex = 24
+        if (creator -> statusb & 0x2000000 || creator == player) {
+            statusb = FLAG_PHYSICS_ENGINE | 0x2000000
+        }
+        else {
+            statusb = FLAG_PHYSICS_ENGINE
+        }
+        velx = -rand(0.4m)
+        vely = 0.4m + rand(0.4m)
+        velz = randi(-0.2m, 0.2m)
+        if (flags & 0x2) {
+            if (!rand(2)) {
+                setanim(BURN_SMOKE)
+            }
+            else {
+                setanim(SMOKE)
+            }
+        }
+        else if (flags & 0x1) {
+            setanim(BURN_SMOKE)
+        }
+        else {
+            setanim(SMOKE)
+        }
+        if (flags & 0x4) {
+            zindex = (sin(90deg - abs(degdist(CAMROTY, parent -> roty + 90deg))) >> 4) + 50
+            if (vertex) {
+                zindex = -zindex
+            }
+            vely = 0.8m + rand(0.4m)
+            velx += parent -> velx
+            velz += parent -> velz
+            playframes(0.0, 15.0)
+        }
+        else {
+            playframesdur(0.0, 15.0, 6)
+        }
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event19 || e == Event14)
+    }
+    trans {
+        scaley = scalex + vecx
+        scalex = scaley
+        if (frametime - statetime >= 50) {
+            moda = seek(moda, 16.0, 0x199)
+        }
+    }
+}
+
+state Smoke_Puff { // 1
+    stateflag 0x20040
+    statusc 0x22
+    code(vertex) {
+        var0 = false
+        if (vertex == -1.0) {
+            x += randi(-0.2m, 0.2m)
+            y += randi(-0.2m, 0.2m)
+            z += randi(-0.2m, 0.2m)
+        }
+        else {
+            getvert(vtrans, creator, vertex)
+        }
+        scalex = !rand(2) ? 0.4S + rand(0.4S) : -(0.4S + rand(0.4S))
+        scaley = scalex
+        SetRot(0deg, 0deg, rand(360deg))
+        zindex = 24
+        ExplodeParticleSetSpeed(0.3m, 0.3m, 0.04m, 0.6m)
+        statusb = FLAG_PHYSICS_ENGINE | 0x2000000
+        setanim(SMOKE, 3.0)
+        do {
+            animframe += 1.0
+            if (var0) { return }
+            playframe()
+        } while (animframe + 1.0 <= 15.0)
+    }
+    event(e, a) {
+        accevif (e == Event19 || e == Event14) {
+            var0 = true
+        }
+    }
+}
+
+state Smoke_Burst { // 2
+    stateflag 0x20040
+    statusc 0x22
+    event => state Smoke_Puff
+    code(vertex, count, v) {
+        var0 = 0
+        SetVertex(vertex)
+        unless (FRAMETIME < 34) {
+            count >>= 1
+            unless (FRAMETIME < 36) { return }
+        }
+        field_61 = 360deg / (count >> 8)
+        roty = rand(360deg)
+        do (var i = 0) {
+            spawn(9, 3, 1, roty, v)
+            roty += field_61
+        } while ({ i += 1.0 }; i < count)
+        WaitNullUntil(!child || var0)
+    }
+}
+
+state Smoke_BurstParticle { // 3
+    stateflag 0x20040
+    statusc 0x22
+    code(yaw, v) {
+        SetRot(0deg, 0deg, rand(360deg))
+        zindex = 48
+        trotz = 2m
+        troty = yaw + randi(-15deg, 15deg)
+        speed = v + randi(-0.7m, 0.7m)
+        scalex = !rand(2) ? 0.4S + rand(0.4S) : -(0.4S + rand(0.4S))
+        if (scalex < 0S) {
+            scalex -= abs(speed) >> 8
+        }
+        else {
+            scalex += abs(speed) >> 8
+        }
+        scaley = abs(scalex)
+        statusb = FLAG_PHYSICS_ENGINE | 0x1000 | 0x2000000
+        vely = rand(0.4m)
+        playframes(SMOKE, 0.0, 15.0)
+    }
+    trans {
+        unless (STATUS_FIRSTFRAME) {
+            speed = seek(speed, 0m, 0.7m)
+            setvel(speed)
+            vely = spd(vely, 2m)
+        }
+    }
+}
+
+state Exhaust_Smoke { // 4
+    stateflag 0x20040
+    statusc 0x22
+    code(vertex, vx, vy, vz) {
+        SetVertex(vertex)
+        SetRot(0deg)
+        zindex = 24
+        SetVel(vx, vy, vz)
+        scalex = !rand(2) ? 0.4S + rand(0.1S) : -(0.4S + rand(0.1S))
+        scaley = abs(scalex)
+        scalez = 0
+        statusb = FLAG_PHYSICS_ENGINE | 0x2000000
+        playframes(EXHAUST_SMOKE, 3.0, time(3) << 8, 14.0)
+    }
+}
+
+state Smoke_Generic { // 5
+    stateflag 0x20040
+    statusc 0x22
+    code(vertex, vx, vy, vz, scale, alpha, depth, flags) {
+        rotx = 0deg
+        roty = 0deg
+        if (flags & 0x4) {
+            rotz = rand(360deg)
+        }
+        else {
+            rotz = 0deg
+        }
+        if (flags & 0x11) {
+            if (flags & 0x10) {
+                field_61 = 0x10C
+            }
+            else {
+                field_61 = 0xF3
+            }
+            settrans(SmokeScaleUpdate)
+        }
+        if (flags & 0x2) {
+            setanim(SMOKE)
+        }
+        else {
+            setanim(BURN_SMOKE)
+        }
+        SetVertex(vertex)
+        if (alpha > 0) {
+            moda = alpha
+            SetColor1(0xFF, 0xFF, 0xFF)
+        }
+        else if (alpha < 0) {
+            moda = -alpha
+            SetColor1(0, 0, 0)
+        }
+        zindex = depth
+        SetVel(vx, vy, vz)
+        SetScale(scale + rand(0.1S), abs(scalex), 0S)
+        statusb = FLAG_PHYSICS_ENGINE | 0x2000000
+        if (flags & 0x20) {
+            if (flags & 0x8) {
+                setanim(EXHAUST_SMOKE)
+                playframesdur(0.0, 14.0, 6)
+            }
+            else {
+                playframesdur(0.0, 15.0, 6)
+            }
+        }
+        else if (flags & 0x8) {
+            playframes(EXHAUST_SMOKE, 3.0, time(3) << 8, 14.0)
+        }
+        else if (flags & 0x40) {
+            CopyParentRot()
+            vfx = (vfx & 0xFFFFFF00) | 0x5
+            playframes(BAZOOKA_SMOKE, 0.0, 15.0)
+        }
+        else {
+            playframes(0.0, 15.0)
+        }
+    }
+}
+
+sub SmokeScaleUpdate() { // S-893
+    var scale = (scalex * field_61) >> 8
+    scaley = abs(scale)
+    scalex = scale
+}
+
+state Exhaust_Particle { // 6
+    stateflag 0x20040
+    statusc 0x22
+    code(vx, vy, vz, depth) {
+        SetColor1(0, 0, 0)
+        zindex = depth
+        vfx = (vfx & 0xFFFFFF00) | 0x2
+        velx = vx + randi(-2m, 2m)
+        vely = vy + randi(-2m, 2m)
+        velz = vz + randi(-2m, 2m)
+        SetScale(0.08S + rand(0.02S), scalex, 0S)
+        statusb = FLAG_PHYSICS_ENGINE | 0x2000000
+        setanim(EXHAUST_PARTICLE)
+        playframe(0, 10)
+    }
+    trans {
+        moda = seek(moda, 16.0, 1.28)
+        scaley = scalex - 19
+        scalex = scaley
+    }
+}
+
+state Explosion_Master { // 7
+    stateflag 0x40
+    statusc 0x22
+    code(func, flags) {
+        movetolist(3.0, self)
+        if (spawn == S_EXPLOSION_MASTER_SOUND) {
+            SoundPitchDefault(0.23)
+            sounddecay(7.7s)
+            soundplay([tnt0A], 1V)
+            soundsetup(0, voice, 5)
+        }
+        var0 = pushfunc(creator, self)
+        if (flags & 0x2) { spawn(PartC, S_SHOCKWAVE, 1, 0.5m, 0x80, 50, 0, 1S, func, var0) }
+        if (flags & 0x4) { spawn(PartC, S_EXPLOSION, 1, 20, 45, 2, 0, 0) }
+        spawn(PartC, S_EXPLOSION_SMOKE, 2, 1, func, var0)
+        unless (flags & 0x1 || FRAMETIME > 36) { spawn(PartC, S_EXPLOSION_SMOKE, 3, 0, func, var0) }
+        playnull()
+        if (FRAMETIME < 32) {
+            spawn(PartC, S_EXPLOSION_SMOKE, 2, 1, func, var0)
+            unless (flags & 0x1) {
+                spawn(PartC, S_EXPLOSION_SMOKE, 2, 0, func, var0)
+            }
+        }
+        else {
+            spawn(PartC, S_EXPLOSION_SMOKE, 1, 1, func, var0)
+        }
+        playnull()
+        spawn(PartC, S_EXPLOSION_SMOKE, 1, 1, func, var0)
+        WaitChildNull()
+    }
+}
+
+state Explosion_AtVertex { // 8
+    stateflag 0x40
+    statusc 0x22
+    code(vertex, func, flags) {
+        getvert(vtrans, creator, vertex)
+        changestate(Explosion_Master, func, flags)
+    }
+}
+
+state Explosion_Smoke { // 9
+    stateflag 0x20040
+    statusc 0x2
+    code(mode, func, source) {
+        movetolist(3.0, self)
+        if (mode == 0) {
+            SetScale(0.5S)
+            FlipRand2()
+            ExplodeParticleSetSpeed(10m, 5m, 0m, 4m)
+        }
+        else if (mode == 1) {
+            SetScale(1.5S)
+            FlipRand2()
+            x += randi(-0.5m, 0.5m)
+            z += randi(-0.5m, 0.5m)
+            ExplodeParticleSetSpeed(0m, 2m, 2m, 2m)
+        }
+        if (func) {
+            moda = 16.0
+            pushfunc(self, self)
+            setfunc(source, self)
+            setfunc(call(func), self)
+            setanim(SMOKE)
+        }
+        else {
+            setanim(EXPLOSION_SMOKE)
+        }
+        zindex = 50
+        SetRot(0deg, 0deg, rand(360deg))
+        y += 0.75m
+        statusb = FLAG_PHYSICS_ENGINE
+        if (creator -> statusb & 0x2000000) {
+            statusb |= 0x2000000
+        }
+        if (mode == 0) {
+            animframe = 0
+            playframes(0.0, 15.0)
+        }
+        else if (mode == 1) {
+            animframe = rand(3) << 8
+            while (animframe < 15.0) {
+                playframe()
+                animframe += 1.0
+            }
+        }
+    }
+}
+
+state Shockwave { // 10
+    stateflag 0x1
+    statusc 0x32
+    code(yoff, cr, cg, cb, scale, func, source) {
+        zindex = 24
+        moda = 16.0
+        SetScale(scale)
+        field_61 = getins(ShockwaveHit)
+        if (func == 1) {
+            settrans(ShockwaveHit)
+        }
+        else if (func) {
+            pushfunc(self, self)
+            setfunc(source, self)
+            setfunc(call(func), self)
+            cr = colr1
+            cg = colg1
+            cb = colb1
+        }
+        else {
+            SetColor1(cr, cg, cb)
+        }
+        y += yoff
+        roty = rand(360deg)
+        playframes(SHOCKWAVE, 0.0, 3.0)
+        settrans(ShockwaveFade)
+        playframes(SHOCKWAVE, 4.0, 7.0)
+    }
+}
+
+sub ShockwaveFade(yoff, cr, cg, cb, func, source) __trans { // S-1235
+    once {
+        var0 = 4
+    }
+    var0 -= 1
+    SetColor1(cr * var0 >> 2, cg * var0 >> 2, cb * var0 >> 2)
+    if (var0 <= 0) {
+        tpc = 0
+    }
+    if (source == 1) {
+        ShockwaveHit()
+    }
+}
+
+sub ShockwaveHit() { // S-1255
+    broadcastevent(EventSlamHit, 4, 0)
+}
+
+state Explosion { // 11
+    stateflag 0x20001
+    statusc 0x32
+    code(cr, cg, cb, func, source) {
+        zindex = 24
+        moda = 16.0
+        roty = rand(360deg)
+        vfx = creator -> vfx
+        vfx = (vfx & 0xFFFF00FF) | 0x600
+        vfx &= 0xFF00FFFF
+        if (func) {
+            pushfunc(self, self)
+            setfunc(source, self)
+            setfunc(call(func), self)
+        }
+        else {
+            SetColor1(cr, cg, cb)
+        }
+        playframes(EXPLOSION, 0.0, 11.0)
+    }
+}
+
+state Explosion_Fast { // 12
+    stateflag 0x1
+    statusc 0x32
+    code(cr, cg, cb, func, source, speed) {
+        zindex = 24
+        moda = 16.0
+        roty = rand(360deg)
+        vfx = creator -> vfx
+        vfx = (vfx & 0xFFFF00FF) | 0x600
+        vfx &= 0xFF00FFFF
+        if (func) {
+            pushfunc(self, self)
+            setfunc(source, self)
+            setfunc(call(func), self)
+        }
+        else {
+            SetColor1(cr, cg, cb)
+        }
+        playframes(EXPLOSION, speed, 0.0, 11.0)
+    }
+}
+
+state Explosion_DoubleSided { // 13
+    stateflag 0x1
+    statusc 0x32
+    code(cr, cg, cb, speed, scale) {
+        rotx = 0deg
+        roty = rand(360deg)
+        SetScale(scale)
+        vfx = creator -> vfx
+        spawn(PartC, S_EXPLOSION_FAST, 1, cr, cg, cb, 0, 0, speed)
+        rotx += 180deg
+        spawn(PartC, S_EXPLOSION_FAST, 1, cr, cg, cb, 0, 0, speed)
+        WaitChildNull()
+    }
+}
+
+expr GEM_RED    = 58.0
+expr GEM_GREEN  = 59.0
+expr GEM_PURPLE = 60.0
+expr GEM_BLUE   = 61.0
+expr GEM_YELLOW = 62.0
+
+sub SetElevatorColor(gem) { // S-1337
+    SetColor2(-0x725, 0x988, 0xAAF)
+    if (gem == GEM_RED) {
+        SetColor1(0x6C, 0x08, 0x08)
+        SetColor2(-0x5F0, 0xEC8, -0x17D)
+    }
+    else if (gem == GEM_GREEN) {
+        SetColor1(0x08, 0x6C, 0x08)
+    }
+    else if (gem == GEM_PURPLE) {
+        SetColor1(0x6C, 0x08, 0x6C)
+    }
+    else if (gem == GEM_BLUE) {
+        SetColor1(0x00, 0x46, 0xFE)
+    }
+    else if (gem == GEM_YELLOW) {
+        SetColor1(0x80, 0x80, 0x00)
+        SetScale(1.3S, 1S, 1.3S)
+    }
+    else {
+        SetColor1(0x5A, 0x5A, 0x6C)
+    }
+    moda = 4.0
+}
+
+state Firework { // 14
+    stateflag 0x1
+    statusc 0x32
+    code(vertex, roll, yoff, scale, depth, item) {
+        if (roll == 0deg) {
+            SetVertex(vertex)
+            y += yoff
+            movetolist(3.0, self)
+            vecx = CAMTRANSX 
+            vecy = CAMTRANSY
+            vecz = CAMTRANSZ
+            roty = atan2(self, vecx)
+            rotx = 0deg
+            SetScale(scale)
+            {
+                var mode
+                mode = item & 0xF
+                item &= 0xFFFFFF00
+                if (item == 358.0) {
+                    item = 0
+                }
+                else if (item == 359.0) {
+                    item = 1
+                }
+                else if (item == 361.0) {
+                    item = 2
+                }
+                else if (item == 362.0 || item == 363.0) {
+                    item = 3
+                }
+                else if (item == 360.0 || (item >= 200.0 && item < 300.0)) {
+                    item = 4
+                }
+                else {
+                    item = 5
+                }
+                if (mode == 0) {
+                    soundpitch(3.263)
+                    sounddecay(9.6s)
+                    soundsetup(0, self, 8)
+                    soundplay([Pb10A], 1V)
+                }
+                else if (mode == 1) {
+                    SoundPitchDefault(0.23)
+                    sounddecay(9.6s)
+                    soundplay([tnt0A], 1V)
+                }
+            }
+            spawn(PartC, S_FIREWORK, 1, vertex, roll + 90deg, 0, 0, depth, item)
+            spawn(PartC, S_FIREWORK, 1, vertex, roll + 180deg, 0, 0, depth, item)
+            spawn(PartC, S_FIREWORK, 1, vertex, roll + 270deg, 0, 0, depth, item)
+        }
+        zindex = depth
+        rotz = roll
+        vfx = (vfx & 0xFFFFFF00) | 0x5
+        statusb = 0x100000
+        stalltime = item
+        playframes(FIREWORK, 0.0, 24.0)
+    }
+}
+
+state Projectile_Shockwave { // 15
+    stateflag 0x1
+    statusc 0x32
+    code(vertex, yoff, scale, depth, flags) {
+        SetVertex(vertex)
+        y += yoff
+        zindex = depth
+        SetRot(0deg)
+        movetolist(3.0, self)
+        if (flags & 0x1) {
+            spawn(PartC, S_SHOCKWAVE, 1, var0, 0x80, 0x50, 0x10, scale / 6, getins(InitShockwave), pushfunc(self, self))
+        }
+        SetScale(0S)
+        do (var i = 0) {
+            scalex += scale >> 2
+            scaley = scalex
+            scalez = scalex
+            playanim(0, PROJECTILE_SHOCKWAVE)
+        } while ({ i += 1.0 }; i < 4.0)
+        do (var i = 0) {
+            scalex -= scale / 5
+            scaley = scalex
+            scalez = scalex
+            playanim(0, PROJECTILE_SHOCKWAVE)
+        } while ({ i += 1.0 }; i < 6.0)
+    }
+}
+
+sub InitShockwave() {
+    SetColor1(0x80, 0x50, 0x10)
+    rotx = 90deg
+    vecx = CAMTRANSX 
+    vecy = CAMTRANSY
+    vecz = CAMTRANSZ
+    rotz = atan2(self, vecx)
+    zindex = 60
+}
+
+expr ElevatorResetMode      = field_63
+expr ElevatorFlags          = yzapproach
+expr ElevatorCatcher        = stalltime
+expr ElevatorHomeEntity     = trotx
+expr ElevatorHomePathLength = trotz
+expr ElevatorInitCount      = density
+
+state Elevator_Init { // 16
+    stateflag 0x1
+    statusc 0x80002
+    event => state ElevatorCatch_Init
+    __transargs
+    code(unused, evt, catcher, pointer, flags, tx, ty, tz, hide) {
+        troty = 0deg
+        ElevatorResetMode = 0
+        ElevatorFlags = flags
+        ElevatorCatcher = catcher
+        SetVec(tx, ty, tz)
+        if (!ElevatorInitCount) {
+            ElevatorHomeEntity = entity
+            ElevatorHomePathLength = pathlen
+        }
+        ElevatorInitCount += 1.0
+        if (flags >= 0x10000) {
+            if ((flags >> 8 & 0xFFFFFF00) == 1.0) {
+                if (LEVEL == LEVEL_GoneTomorrow) {
+                    spawn = S_ELEVATOR_HARD
+                }
+                if (GLOBAL_139 & 0x4 && !entitygetstate(3)) {
+                    spawn = S_ELEVATOR_WIRE
+                    catcher = 0
+                }
+            }
+            else if ((flags >> 8 & 0xFFFFFF00) == 2.0) {
+                spawn = S_ELEVATOR_HARD
+            }
+            else if ((flags >> 8 & 0xFFFFFF00) == 3.0) {
+                start :
+                {
+                    var low = GLOBAL_175 | GLOBAL_177
+                    var high = GLOBAL_176 | GLOBAL_178
+                    misc = 0
+                    CountPoolBits(low)
+                    CountPoolBits(high)
+                    if (misc < 5 || GLOBAL_109) {
+                        playnull()
+                        goto start
+                    }
+                }
+                ElevatorResetMode = 1.0
+            }
+            else if ((flags >> 8 & 0xFFFFFF00) == 4.0) {
+                ElevatorResetMode = 2
+            }
+            else {
+                if (LEVEL == LEVEL_GoneTomorrow) {
+                    spawn = S_ELEVATOR_HARD
+                }
+                SetElevatorColor((flags >> 8) & 0xFFFFFF00)
+                CheckItemPool(flags >> 16, SAVEDGEMPOOL1, SAVEDGEMPOOL2)
+                if (misc) {
+                    vfx = (vfx & 0xFFFFFF00) | 0xA
+                    vfx = (vfx & 0xFF00FFFF) | 0x30000
+                    troty = 90deg
+                }
+                else {
+                    moda = 14.4
+                    spawn = S_ELEVATOR_WIRE
+                    catcher = 0
+                }
+            }
+        }
+        SetZindexField(32)
+        ElevatorZindex = zindex
+        if (hide && GLOBAL_119 & 0x20000000) {
+            sleepnull()
+        }
+        while (player -> stateflag \ 0x10800) {
+            if (player -> stateflag & 0x100000 && BONUSSTATE == BONUS_COMPLETED) {
+                KillEntity()
+                return
+            }
+            playnull()
+        }
+        if (GLOBAL_173 && (spawn == S_ELEVATOR_BONUS || (flags & 0xFF00FFFF) == 0x10000)) {
+            KillEntity()
+            return
+        }
+        if (!catcher) {
+            tpc = 0
+        }
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | 0x6000000
+        if (spawn == S_ELEVATOR_HARD) {
+            sleepanim(0, ELEVATOR_3)
+        }
+        else if (spawn == S_ELEVATOR_WIRE) {
+            statusb = 0
+            sleepanim(0, ELEVATOR_4)
+        }
+        else if (spawn == S_ELEVATOR_BONUS) {
+            sleepanim(0, ELEVATOR_2)
+        }
+        else {
+            sleepanim(0, ELEVATOR_1)
+        }
+    }
+    trans {
+        if (collider, statusa & 0x4000, !(player -> stateflag & 0x2000000), spawn != S_ELEVATOR_BONUS || BONUSSTATE != BONUS_COMPLETED) {
+            sendevent(evt, player, catcher, pointer, flags & 0xFFFF, tx, ty, tz, self)
+            changestateif(Elevator_Depart, eventaccepted, flags)
+        }
+        if (ElevatorResetMode == 2, player -> stateflag \ 0x10800) {
+            statusb = 0
+            vfx = (vfx & 0xFFFFFF00) | 0x1
+            tpc = 0
+        }
+        roty = spd(roty, troty)
+    }
+}
+
+state Elevator_Depart { // 17
+    stateflag 0x41
+    statusc 0x80002
+    code(flags) {
+        statusb &= ~FLAG_SOLID_SIDES
+        if ((flags >> 8 & 0xFFFFFF00) == 1.0) {
+            entitysetstate(5)
+        }
+        if (var mode = flags & 0xFFFF; mode == 0) {
+            WaitFrameUntil(pathprog >= pathlen)
+            sendevent(EventTriggered, player)
+        }
+        else if (mode == 1.0 || mode == 2.0) {
+            playframe()
+            playframe()
+            sendevent(EventTriggered, player)
+            WaitFrameUntil(pathprog >= pathlen)
+            pathprog = pathlen - 1.0
+            sendevent(EventTriggered, player)
+            if (ElevatorResetMode) {
+                statetime = frametime
+                settrans(ElevatorResetWhenVacant)
+            }
+            else {
+                tpc = 0
+            }
+            statusb |= FLAG_SOLID_SIDES
+            sleep()
+        }
+    }
+    trans {
+        zindex = GLOBAL_192 + ElevatorZindex
+        pathprog = spd(pathprog, 30.0)
+        if (pathprog < pathlen) {
+            calcpath(pathprog)
+        }
+    }
+}
+
+state ElevatorCatch_Init { // 18
+    stateflag 0x1
+    statusc 0x80002
+    code(flags) {
+        SetZindexField(32)
+        ElevatorZindex = zindex
+        ElevatorResetMode = 0
+        if (flags) {
+            vfx = (vfx & 0xFFFFFF00) | 0xA
+            vfx = (vfx & 0xFF00FFFF) | 0x30000
+            SetElevatorColor(flags)
+        }
+        if (flags == 1.0) {
+            spawn = S_CATCH_BONUS
+        }
+        else if (flags == 2.0) {
+            spawn = S_CATCH_HARD
+        }
+        sleepnull()
+    }
+    event(e, a) {
+        if (e == EventTriggered) {
+            pathprog = pathlen - 1.0
+            calcpath(pathprog)
+            accevcstate(ElevatorCatch_Arrive)
+        }
+    }
+}
+
+state ElevatorCatch_Arrive { // 19
+    stateflag 0x1
+    statusc 0x80002
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | FLAG_CARRY_COLLIDER
+        if (spawn == S_CATCH_HARD || spawn == S_ELEVATOR_HARD) {
+            setanim(ELEVATOR_3)
+        }
+        else if (spawn == S_CATCH_BONUS_ALT) {
+            SetScale(1.4S)
+            setanim(ELEVATOR_2)
+        }
+        else if (spawn == S_CATCH_BONUS || spawn == S_ELEVATOR_BONUS) {
+            setanim(ELEVATOR_2)
+        }
+        else if (spawn == S_HOLEGATE) {
+            SetScale(0.8S)
+            setanim(ELEVATOR_1)
+        }
+        else {
+            setanim(ELEVATOR_1)
+        }
+        do {
+            if (spawn == S_ELEVATOR || spawn == S_ELEVATOR_BONUS || spawn == S_ELEVATOR_HARD) {
+                if (pathprog <= 0) {
+                    playframe(pathprog)
+                }
+                else {
+                    playframe(0)
+                }
+            }
+            else {
+                playframe(0)
+            }
+        } while (1)
+    }
+    trans {
+        nofirst {
+            zindex = GLOBAL_192 + ElevatorZindex
+            pathprog = spd(pathprog, -30.0)
+            if (pathprog >= 0) {
+                calcpath(pathprog)
+            }
+            else {
+                pathprog = 0
+                sendevent(EventTriggered, player)
+                if (ElevatorResetMode) {
+                    statetime = frametime
+                    if (id == 200.0 && LEVEL == LEVEL_WarpRoom) {
+                        ins72(0, 0x4000)
+                        ins72(0x400, 0x100)
+                    }
+                    settrans(ElevatorResetWhenVacant)
+                }
+                else {
+                    tpc = 0
+                }
+            }
+        }
+    }
+}
+
+sub ElevatorResetWhenVacant() {
+    if (collider) {
+        statetime = frametime
+    }
+    else if (frametime - statetime >= 0.5s) {
+        if (ElevatorResetMode == 2) {
+            if (entity == ElevatorHomeEntity) {
+                interrupter = objectget(abs(ElevatorCatcher))
+                if (interrupter) {
+                    entity = interrupter -> entity
+                    pathlen = interrupter -> pathlen
+                    pathprog = interrupter -> pathprog
+                }
+            }
+            else {
+                entity = ElevatorHomeEntity
+                pathlen = ElevatorHomePathLength
+                pathprog = 0
+            }
+        }
+        changestate(Elevator_Init, 640.0, Event47, ElevatorCatcher, 16.0, ElevatorFlags, vecx, vecy, vecz, 0)
+    }
+}
+
+state Bonus_Return { // 20
+    stateflag 0x1
+    statusc 0x80002
+    __transargs
+    code(mode) {
+        if (BONUSSTATE == BONUS_UNVISITED) {
+            sleepnull()
+        }
+        KillEntity()
+    }
+    trans {
+        nofirst {
+            misc = false
+            if (mode == 1.0) {
+                if (player -> y <= y && player -> y > y - 4m) {
+                    misc = true
+                }
+            }
+            else if (mode == 2.0) {
+                if (player -> x >= x - 4m && player -> x < x + 4m) {
+                    misc = 1.0
+                }
+            }
+            else if (mode == 3.0) {
+                if (player -> x <= x + 4m && player -> x >= x - 4m) {
+                    misc = true
+                }
+            }
+            else if (mode == 4.0) {
+                if (player -> y >= y && player -> y < y + 4m) {
+                    misc = true
+                }
+            }
+            else if (mode == 5.0) {
+                if (player -> z <= z + 4m && player -> z > z - 4m) {
+                    misc = true
+                }
+            }
+            else if (mode == 6.0) {
+                if (player -> z >= z - 4m && player -> z < z + 4m) {
+                    misc = true
+                }
+            }
+            if (misc) {
+                save (CHECKPOINTID) {
+                    CHECKPOINTID = id
+                    SPAWNTRANSX = x
+                    SPAWNTRANSY = y
+                    SPAWNTRANSZ = z
+                    savecheckpoint(1.0)
+                    if (BONUSSTATE == BONUS_UNVISITED) {
+                        BONUSSTATE = 4.0
+                    }
+                }
+                KillEntity()
+                changestate(Kill)
+            }
+        }
+    }
+}
+
+expr WaterUpdateRoutine = stalltime
+expr SubmergedTime     = field_61
+
+state Water_Master { // 21
+    stateflag 0x10001
+    statusc 0x2
+    __transargs
+    code(yoff) {
+        vfx = (vfx & 0xFFFFFF00) | 0x3
+        SetRot(90deg, 0deg, 0deg)
+        SetScale(0.85S)
+        GLOBAL_194 = 0
+        WaterUpdateRoutine = 0
+        if (LEVEL == LEVEL_TombWader || LEVEL == LEVEL_DinoMight || LEVEL == LEVEL_BoneYard || LEVEL == LEVEL_DoubleHeader || LEVEL == LEVEL_GeeWiz || LEVEL == LEVEL_ToadVillage) {
+            if (LEVEL == LEVEL_TombWader) {
+                WaterUpdateRoutine = getins(WaterUpdateSubmerged)
+            }
+            else {
+                WaterUpdateRoutine = getins(WaterUpdateWake)
+            }
+            do {
+                playanim(0, WATER_RIPPLE, 0.15s)
+                playanim(1, WATER_RIPPLE, 0.15s)
+                playanim(2, WATER_RIPPLE, 0.15s)
+                playanim(3, WATER_RIPPLE, 0.15s)
+                playanim(4, WATER_RIPPLE, 0.15s)
+            } while (1)
+        }
+        else {
+            sleepnull()
+        }
+    }
+    event(e, a) {
+        accevif (e == Event19) {
+            SubmergedTime = 0s
+            y = -1000m
+            GLOBAL_118 = y
+            GLOBAL_194 = 0
+        }
+    }
+    trans {
+        if (LEVEL == LEVEL_TombWader) {
+            GLOBAL_60 = 0
+            if (GLOBAL_194 % 250 >= 100 || !(player -> invincible == 5)) {
+                GLOBAL_194 += 1
+            }
+        }
+        if (creator -> statusa & 0x800000 && GLOBAL_119 & 0x2) {
+            x = creator -> x
+            z = creator -> z
+            zindex = creator -> zindex - 30
+            y = GLOBAL_118
+            if (creator -> statusa & 0x40000 && creator -> y < y - yoff && GLOBAL_119 & 0x100000 && !(player -> stateflag & 0x20)) {
+                statetime = frametime
+                sendevent(Event18, creator)
+            }
+            else if (frametime - statetime >= 0.1s) {
+                creator -> statusa |= 0x1000000
+            }
+            call(WaterUpdateRoutine)
+            statusb = 0
+            unless (rand(10)) { trotx = 0.75S + rand(0.5S) }
+            scalex = seek(scalex, trotx, 0.025S)
+            unless (rand(10)) { troty = 0.75S + rand(0.5S) }
+            scaley = seek(scaley, troty, 0.025S)
+        }
+        else {
+            if (!statusb) {
+                SoundPitchDefault()
+                sounddecay(3.2s)
+                #iflev bfot
+                soundplay([Sp2bA], 0.5V)
+                #else
+                soundplay([Sp2cA], 0.5V)
+                #endif
+            }
+            statusb = FLAG_INVISIBLE
+            creator -> statusa |= 0x1000000
+            SubmergedTime = frametime
+        }
+    }
+}
+
+sub WaterUpdateWake() {
+    if (statusb & FLAG_INVISIBLE && creator -> vely <= 0 && !(creator -> stateflag & 0x20)) {
+        spawn(PartC, S_SPLASH_MASTER, 1, -1.0, GLOBAL_118, 5.0, 2m)
+    }
+    if (!(abs(creator -> speed) & ~3) || y > player -> y + 2m) {
+        if (creator -> stateflag & 0x100000 || y > player -> y + 2m) {
+            moda = seek(moda, 16.0, 3.2)
+        }
+        else {
+            moda = seek(moda, 0, 3.2)
+        }
+    }
+    else {
+        unless (time(0.2s) || (!(LEVEL == LEVEL_TombWader || LEVEL == LEVEL_DoubleHeader || LEVEL == LEVEL_GeeWiz || LEVEL == LEVEL_ToadVillage) || FRAMETIME > 34)) {
+            spawn(PartC, S_WAKE, 1, y, creator -> troty, 2)
+        }
+        moda = seek(moda, 11.2, 3.2)
+    }
+}
+
+sub WaterUpdateSubmerged() {
+    WaterUpdateWake()
+    if (y <= player -> y + 2.25m || player -> stateflag & 0x2000 || !SubmergedTime) {
+        SubmergedTime = frametime
+    }
+    else {
+        sendeventif(Event33, player, frametime - SubmergedTime >= 0.1s, y)
+    }
+    if (y > player -> y + 1.8m && time(0.1s) && FRAMETIME < 32) {
+        spawn(PartC, S_BUBBLE_SOUND, 1, 1.0, player, player -> x + randi(-0.4m, 0.4m), y, player -> z + randi(-0.4m, 0.4m), 0.1S, 3.2, 1m)
+    }
+}
+
+
+state Water_Wake { // 22
+    stateflag 0x30001
+    statusc 0x2
+    code(base, yaw, mode) {
+        y = base
+        vfx = (vfx & 0xFFFFFF00) | 0x3
+        playnull(0.15s)
+        scalex = 1S + rand(0.4S)
+        scaley = scalex
+        SetRot(90deg, rot, rot)
+        if (LEVEL == 0x2700 || LEVEL == 0x2100 || LEVEL == 0xD00 || LEVEL == 0x1900) {
+            zindex = 10
+            settrans(WakeShrinkOnWaves)
+        }
+        else {
+            settrans(WakeShrink)
+        }
+        if (mode == 2) {
+            do {
+                playanim(0, WATER_WAKE, 2)
+                playanim(1, WATER_WAKE, 2)
+                playanim(2, WATER_WAKE, 2)
+                playanim(3, WATER_WAKE, 2)
+            } while (1)
+        }
+        else {
+            do {
+                playanim(0, WATER_WAKE, 2)
+                playanim(1, WATER_WAKE, 2)
+                playanim(2, WATER_WAKE, 2)
+                playanim(3, WATER_WAKE, 2)
+            } while (1)
+        }
+    }
+}
+
+sub WakeShrink() {
+    scalex = seek(scalex, 0, 61)
+    scaley = seek(scaley, 0, 61)
+    changestateifn(Kill, scalex)
+}
+
+sub WakeShrinkOnWaves() {
+    scalex = seek(scalex, 0, 61)
+    scaley = seek(scaley, 0, 61)
+    changestateifn(Kill, scalex)
+    y = ins79(x, null)
+}
+
+state Kill { // 23
+    stateflag 0x20
+    statusc 0x0
+    code() {}
+}
+
+state Water_Splash_Master { // 24
+    stateflag 0x20040
+    statusc 0x22
+    code(vertex, base, count, v) {
+        SoundPitchDefault()
+        sounddecay(3.2s)
+        #iflev bfot
+        soundplay([SplbA], 0.5V)
+        #else
+        soundplay([SplcA], 0.5V)
+        #endif
+        if (FRAMETIME > 36) {
+            soundsetup(0, voice, 5)
+            return
+        }
+        SetVertex(vertex)
+        roty = 0deg
+        field_61 = 360deg / (count >> 8)
+        do (var i = 0) {
+            spawn(PartC, S_SPLASH, 1, base, roty + randi(-15deg, 15deg), v, 1.0)
+            roty += field_61
+        } while ({ i += 1.0 }; i < count)
+
+        if (FRAMETIME < 28) {
+            do (var i = 0) {
+                spawn(PartC, S_SPLASH, 1, base, roty + randi(-15deg, 15deg), v, 0)
+                roty += field_61
+            } while ({ i += 1.0 }; i < count)
+        }
+        WaitNullUntil(!child || FRAMETIME > 36)
+        soundsetup(0, voice, 5)
+    }
+}
+
+state Water_Splash { // 25
+    stateflag 0x10
+    statusc 0x2
+    code(base, yaw, v, ripple) {
+        y = base
+        groundy = base
+        SetRot(0deg)
+        SetRot(0deg)
+        SetScale(0.1S + rand(0.05S), scalex, 1S)
+        troty = yaw
+        setvel(v)
+        if (v) {
+            vely = 8M + rand(2m)
+        }
+        statusb = FLAG_PHYSICS_ENGINE | FLAG_GRAVITY | FLAG_SOLID_GROUND
+        WaitAnimUntil(0, WATER_SPLASH, statusa & FLAG_GROUNDLAND && vely < 0m)
+        changestateif(Water_Ripple, ripple, 0.4S)
+    }
+}
+
+state Water_Ripple { // 26
+    stateflag 0x20010
+    statusc 0x2
+    code(scale) {
+        statusb = 0
+        vfx = (vfx & 0xFFFFFF00) | 0x3
+        SetRot(90deg, rand(360deg), roty)
+        SetScale(scale + rand(0.9S), scalex, 1S)
+        FlipRand()
+        playanim(0, WATER_RIPPLE, 3)
+        playanim(1, WATER_RIPPLE, 3)
+        playanim(2, WATER_RIPPLE, 3)
+        settrans(RippleFade)
+        playanim(3, WATER_RIPPLE, 3)
+        playanim(4, WATER_RIPPLE, 3)
+    }
+}
+
+sub RippleFade() {
+    moda = seek(moda, 16.0, 2.135)
+}
+
+state Bubble { // 27
+    stateflag 0x20000
+    statusc 0x2
+    __transargs
+    code(vertex, obj, tx, ty, tz, scale, spread, v) {
+        if (obj) {
+            creator = obj
+        }
+        movetolist(3.0, self)
+        SetVertex(vertex)
+        zindex = 60
+        SetRot(0deg)
+        scalex = scale + rand(spread)
+        scaley = scalex
+        trotx = scalex
+        troty = scaley
+        var0 = 0.8s + rand(0.5s)
+        if (!rand(6)) {
+            if (!rand(2)) {
+                SoundPitchDefault(0.09)
+                sounddecay(0.8s)
+                soundplay([Bu10A], 0.4V)
+            }
+            else {
+                SoundPitchDefault(0.09)
+                sounddecay(0.8s)
+                soundplay([Bu10A], 0.4V)
+            }
+        }
+        WaitFrame(0, BUBBLE, var0, 0.1s)
+        changestate(Bubble_Pop)
+    }
+    trans {
+        unless (STATUS_FIRSTFRAME) {
+            x = seek(x, tx + rand(1m), spd(v))
+            y = seek(y, ty, spd(v))
+            z = seek(z, tz, spd(v))
+            changestateif(Bubble_Pop, spawn == S_BUBBLE_SOUND && y >= GLOBAL_118)
+        }
+    }
+}
+
+state Bubble_Pop { // 28
+    stateflag 0x20000
+    statusc 0x2
+    code() {
+        soundpitch((9.28 + rand(9.28)) * 0.122 >> 8)
+        sounddecay(0.4s)
+        soundplay([PopRA], 0.1V + rand(0.05V))
+        playanim(1, BUBBLE, 0.1s)
+    }
+    trans {
+        moda = seek(moda, 16.0, 6.4)
+    }
+}
+
+state Fire { // 29
+    stateflag 0x20040
+    statusc 0x22
+    __transargs
+    code(vertex, yaw, angle, v, scale) {
+        getvert(vtrans, creator, vertex)
+        vely = (-5m * sin(angle)) >> 12
+        SetScale(scale)
+        SetRot(0deg, 0deg, randi(-45deg, 45deg))
+        zindex = 40
+        if (time(3)) {
+            statusb = FLAG_PHYSICS_ENGINE
+        }
+        else {
+            statusb = FLAG_PHYSICS_ENGINE | FLAG_COLLIDABLE
+        }
+        troty = yaw
+        playframes(FIRE, 0.0, 10.0)
+    }
+    trans {
+        scalez = scalex + 0.1S
+        scaley = scalez
+        scalex = scalez
+        v = (v * 0x133) >> 8
+        setvel(v)
+        sendeventif(EventBurn, collider, statusb & FLAG_COLLIDABLE, 100.0)
+    }
+}
+
+state Fire_Trail { // 30
+    stateflag 0x20040
+    statusc 0x22
+    code(vertex, vx, vy, vz, scale) {
+        SetVertex(vertex)
+        SetVel(vx, vy, vz)
+        SetScale(scale)
+        SetRot(0deg)
+        zindex = 40
+        statusb = FLAG_PHYSICS_ENGINE
+        setanim(FIRE)
+        playframesdur(0.0, 10.0, 2)
+        changestate(Fire_TrailSmoke)
+    }
+    trans {
+        scalez = scalex + 0x51
+        scaley = scalez
+        scalex = scalez
+    }
+}
+
+state Fire_TrailSmoke { // 31
+    stateflag 0x20040
+    statusc 0x22
+    code() {
+        playframes(SMOKE, 0.0, 15.0)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            vely = 2m
+        }
+        velx = (velx * 0xE6) >> 8
+        velz = (velz * 0xE6) >> 8
+    }
+}
+
+state Line { // 32
+    stateflag 0x1
+    statusc 0x22
+    code(ax, ay, az, bx, by, bz, cr, cg, cb) {
+        SetColor1(cr, cg, cb)
+        SetColor3(cr >> 1, cg >> 1, cb >> 1)
+        do {
+            ins81(ax, bx)
+            playnull()
+        } while (1)
+    }
+}
+
+state Position_Marker { // 33
+    stateflag 0x1
+    statusc 0x22
+    code(px, py, pz) {
+        statusb = 0x2000000
+        SetRot(0deg)
+        SetScale(0.25S)
+        zindex = 24
+        SetTrans(px, py, pz)
+        sleepanim(0, PARTICLE)
+    }
+}
+
+state Vector_Marker { // 34
+    stateflag 0x1
+    statusc 0x22
+    code(ptr) {
+        statusb = 0x2000000
+        SetRot(0deg)
+        SetScale(0.25S)
+        zindex = 24
+        do {
+            SetTrans(ptr[0], ptr[1.0], ptr[2.0])
+            playanim(0, PARTICLE)
+        } while (1)
+    }
+}
+
+state Path_Marker { // 35
+    stateflag 0x1
+    statusc 0x22
+    code(point) {
+        statusb = 0x2000000
+        SetRot(0deg)
+        SetScale(0.25S)
+        zindex = 24
+        pathlen = parent -> pathlen
+        entity = parent -> entity
+        if (point == -1.0) {
+            do (var node = 0) {
+                calcpath(node, vtrans)
+                spawn(9, 16, 1, x, y, z)
+            } while ({ node += 1.0 }; node < pathlen)
+            sleepnull()
+        }
+        else {
+            calcpath(point)
+            sleepanim(0, PARTICLE)
+        }
+    }
+}
+
+state Vertex_Marker { // 36
+    stateflag 0x1
+    statusc 0x0
+    __transargs
+    code(vertex) {
+        statusb = 0x2000000
+        SetScale(0.25S)
+        zindex = 24
+        SetRot(0deg)
+        sleepanim(0, PARTICLE)
+    }
+    trans {
+        getvert(vtrans, parent, vertex)
+    }
+}
+
+state Vertex_MarkerColor { // 37
+    stateflag 0x1
+    statusc 0x0
+    __transargs
+    code(vertex, cr, cg, cb) {
+        statusb = 0x2000000
+        SetColor1(cr, cg, cb)
+        moda = 16.0
+        SetScale(0.25S)
+        zindex = 24
+        SetRot(0deg)
+        sleepanim(0, PARTICLE)
+    }
+    trans {
+        getvert(vtrans, parent, vertex)
+    }
+}
+
+state Field_Marker { // 38
+    stateflag 0x1
+    statusc 0x0
+    __transargs
+    code(field, shift, a, b, c) {
+        statusb = 0x2000000
+        SetScale(0.25S)
+        zindex = 24
+        SetRot(0deg)
+        do {
+            playnull()
+            playanim(0, PARTICLE)
+        } while (1)
+    }
+    trans {
+        CopyCreatorTrans()
+        if (field) {
+            x += getfield(creator, field) << shift
+            y += getfield(creator, field + 1.0) << shift
+            z += getfield(creator, field + 2.0) << shift
+        }
+    }
+}
+
+state Spark { // 39
+    stateflag 0x20001
+    statusc 0x12
+    __transargs
+    code(vertex) {
+        SetScale(1.5S, 0.75S, 0.75S)
+        playnull()
+        zindex = 24
+        while (!vertex || !(frametime - statetime >= vertex)) {
+            statusb = FLAG_INVISIBLE
+            setanim(SPARKS)
+            playframe(0, 0.5s)
+            if (LEVEL != LEVEL_IntroEN) {
+                if (!rand(2)) {
+                    sounddecay(3.85s)
+                    SoundPitchDefault(12.8, 0.43)
+                    soundplay([sp23A], 0.5V + rand(0.1V))
+                }
+                else {
+                    sounddecay(3.85s)
+                    SoundPitchDefault(12.8, 0.43)
+                    soundplay([sp13A], 0.5V + rand(0.1V))
+                }
+            }
+            statusb = 0
+            if (sibling, sibling -> spawn == S_SPARK) {
+                rotz = sibling -> rotz + 90deg
+            }
+            else {
+                rotz = rand(360deg)
+            }
+            playframes(SPARKS, 0.0, 8.0)
+        }
+    }
+    event(e, a){
+        accevif (e == Event14) {
+            tpc = 0
+        }
+        accevif (e == Event20) {
+            scalex = a[0]
+            scaley = scalex >> 1
+            scalez = scaley
+        }
+    }
+    trans {
+        SetVertex(vertex)
+    }
+}
+
+state Spark_Crawl { // 40
+    stateflag 0x20001
+    statusc 0x12
+    event => state Spark
+    __transargs
+    code(v1, v2) {
+        pathprog = randi(-0.99, 0.99)
+        zindex = 40
+        rotx = 0deg
+        roty = 0deg
+        SetScale(1.3S, 0.5S, 0.5S)
+        sounddecay(3.85s)
+        SoundPitchDefault(6.4, 0.43)
+        soundplay([sp13A], 0.3V + rand(0.3V))
+        do (var start = frametime) {
+            if (!rand(5)) {
+                statusb = FLAG_INVISIBLE
+                setanim(SPARKS)
+                playframe(0, 2)
+                if (!rand(2)) {
+                    sounddecay(3.85s)
+                    SoundPitchDefault(6.4, 0.43)
+                    soundplay([sp23A], 0.3V + rand(0.3V))
+                }
+                else {
+                    sounddecay(3.85s)
+                    SoundPitchDefault(6.4, 0.43)
+                    soundplay([sp13A], 0.3V + rand(0.3V))
+                }
+            }
+            statusb = 0
+            rotz = rand(360deg)
+            playframes(SPARKS, 0.0, 8.0)
+        } while (frametime - start < 1.55s)
+    }
+    trans {
+        nofirst {
+            getvert(vtrans, creator, loopseek(pathprog, 1.0, 12)) // TODO: More getvert params? Not sure how loopseek is pushed here.
+            getvert(vvec, creator, v2)
+            x += (vecx - x) * abs(pathprog) >> 8
+            y += (vecy - y) * abs(pathprog) >> 8
+            z += (vecz - z) * abs(pathprog) >> 8
+        }
+    }
+}
+
+expr FileCount          = field_61
+expr FileStarted        = stalltime
+expr AudioVoice         = groundy
+expr CurrentFile        = vecx
+expr NextFile           = vecy
+expr AudioTriggered     = health
+expr Elapsed            = pathprog
+
+state Audio_Streamer { // 41
+    stateflag 0x48001
+    statusc 0x2
+    code(file, count, delay, pitch) {
+        movetolist(1.0, self)
+        if (!SFXVOL) {
+            stateflag |= 0x20
+            AudioVoice = 0
+            playnull(1.7s)
+            playnull(1.7s)
+            playnull(1.7s)
+            playnull(1.7s)
+        }
+        else {
+            field_62 = GLOBAL_74
+            field_63 = -1
+            GLOBAL_74 = 0
+            SetVFX2D()
+            FileCount = &count
+            FileCount -= (count >> 8) << 2
+            FileStarted = false
+            AudioVoice = 0
+            CurrentFile = field_61[0]
+            NextFile = 0
+            loadfile(CurrentFile)
+            sounddecay(10.2s)
+            soundplay(CurrentFile, 0V)
+            WaitNullUntil(CurrentFile)
+            stateflag |= 0x100000
+            WaitNullUntil(FileStarted || (frametime - statetime >= delay))
+            field_63 = MUSVOL
+            MUSVOL >>= 1
+            {
+                var idx
+                FileStarted = true
+                sounddecay(10.2s)
+                soundpitch(pitch)
+                soundsetup(0, self, 8)
+                soundplay(CurrentFile, 1.28V)
+                AudioVoice = voice
+                statetime = frametime
+                Elapsed = 0
+                playnull()
+                while (idx < count) {
+                    idx += 1.0
+                    if (idx < count) {
+                        NextFile = field_61[idx]
+                        loadfile(NextFile)
+                        sounddecay(10.2s)
+                        soundplay(NextFile, 0V)
+                        soundsetup(NextFile, AudioVoice, 13)
+                        while (!misc) {
+                            playnull()
+                            soundcheck(AudioVoice)
+                        }
+                        deloadfile(CurrentFile)
+                        NextFile = NextFile
+                        NextFile = 0
+                    }
+                }
+                while (misc == -1) {
+                    playnull()
+                    soundcheck(AudioVoice)
+                }
+            }
+            deloadfile(CurrentFile)
+            CurrentFile = 0
+            GLOBAL_74 = field_62
+            if (field_63 != -1) {
+                MUSVOL = field_63
+            }
+            stateflag |= 0x20
+            AudioVoice = 0
+            playnull(0.85s)
+        }
+    }
+    event(e, a) {
+        accevif (e == EventTriggered) {
+            AudioTriggered = 1.0
+        }
+        if (e == Event12 || e == EventDespawn || e == Event67) {
+            if (AudioVoice) {
+                soundsetup(0, AudioVoice, 5)
+                soundfadet(0.15s, AudioVoice)
+                soundfadev(0V, AudioVoice, 3)
+            }
+            if (CurrentFile) { deloadfile(CurrentFile) }
+            if (NextFile) { deloadfile(NextFile) }
+            GLOBAL_74 = field_62
+            if (field_63 != -1) {
+                MUSVOL = field_63
+            }
+            accevcstate(Kill)
+        }
+    }
+    trans {
+        if (AudioTriggered) {
+            Elapsed = frametime - statetime
+        }
+        else {
+            Elapsed = 0
+        }
+    }
+}
+
+state Shoes { // 42
+    stateflag 0x0
+    statusc 0x3C02
+    code(px, py, pz) {
+        SetTrans(px, py, pz)
+        playframes(SHOES, 0.0, 44.0)
+    }
+}
+
+state Yoyo { // 43
+    stateflag 0x1
+    statusc 0x3C02
+    code(start, end, height) {
+        SetColor1(0x40, 0x40, 0x40)
+        SetColor3(0x40, 0x40, 0x40)
+        setanim(YOYO, 0)
+        vfx = (vfx & 0xFFFF00FF) | 0x600
+        do {
+            getvert(vvec, parent, height)
+            scalex = ((vecy - parent -> y) << 12) / 1m
+            scaley = scalex
+            scalez = scalex
+            if (scalex) {
+                getvert(vvec, parent, start)
+                getvert(vtrans, parent, end)
+                zindex -= 50
+                ins81(vecx, x)
+                zindex = parent -> zindex
+            }
+            playframe()
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event19 || e == Event14)
+        accevif (e == EventTriggered) {
+            settrans(DrawYoyoSegments)
+        }
+    }
+}
+
+sub DrawYoyoSegments() {
+    SetColor1(0x60, 0x60, 0x60)
+    SetColor3(0x60, 0x60, 0x60)
+    CopyParentTrans()
+    SetScale(1S)
+    do (var vertex = 0) {
+        getvert(vvec, self, vertex)
+        getvert(vtrot, self, vertex + 1.0)
+        ins81(vecx, trotx)
+    } while ({ vertex += 1.0 }; vertex < 15.0)
+    animframe = seek(animframe, 7.0, 1.0)
+    SetColor1(0x40, 0x40, 0x40)
+    SetColor3(0x40, 0x40, 0x40)
+    zindex += 50
+}
+
+
+
+

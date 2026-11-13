@@ -1,0 +1,211 @@
+#gool GullC 44 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_GullC.gooc" "C3\Out\C3_GullC.nsentry"
+
+#anim GULL_PERCH    [SG1dV] [SG1dG] 33 1 2
+#anim GULL_FLY_UP   [SG2dV] [SG1dG] 12 1 2
+#anim GULL_FLY      [SG3dV] [SG1dG] 13 1 2
+#anim GULL_LAND     [SG4dV] [SG1dG] 16 1 2
+#anim GULL_ATTACK_1 [SG5dV] [SG1dG] 03 1 2
+#anim GULL_ATTACK_2 [SG6dV] [SG1dG] 08 0 2
+#anim GULL_FLAP     [SG7dV] [SG1dG] 12 1 2
+#anim FEATHER       [Sg1dV] [Sg1dG] 01 1 2
+
+#spawn S_GULL      Gull_Init
+#spawn S_FEATHER   Feather
+
+event EventHitInvincible => state Gull_Die
+
+var BoxOBJ, GullVar2, PerchDuration, HoverDuration
+
+state Gull_Init { // 0
+    stateflag 0x1
+    statusc 0x2
+    code(obj, arg, perch, hover) {
+        BoxOBJ = obj
+        GullVar2 = arg
+        PerchDuration = perch * 1s / 1.2s
+        HoverDuration = hover * 1s / 1.2s
+        do {
+            playnull()
+            creator = objectget(BoxOBJ)
+        } until (creator)
+        movetolist(creator, parent)
+        zindex = 96
+        trotx = 360deg
+        statusb = FLAG_ROT_Y | FLAG_COLLIDABLE
+        changestate(Gull_Perch)
+    }
+}
+
+state Gull_Perch { // 1
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        soundpitch(3.263)
+        soundsetup(6, self, 8)
+        soundplay([Sg1dA], 1V)
+        playframes(GULL_LAND, 0.0, 15.0)
+        do {
+            if (!rand(20) && frametime - statetime < (PerchDuration - 16)) {
+                playframes(GULL_PERCH, 0.0, 32.0)
+                playframesback(GULL_PERCH, 31.0, 0.0)
+            }
+            playanim(0, GULL_PERCH)
+        } until (frametime - statetime >= PerchDuration)
+        playframes(GULL_FLY_UP, 0.0, 11.0)
+        changestate(Gull_Ascend, y + 4m)
+    }
+    trans {
+        y = parent -> y + 1.6m
+        GullTransCommon()
+        if (parent -> stateflag & 0x2) {
+            sendevent(EventHit, player, 100.0)
+            changestate(Gull_Attack)
+        }
+    }
+}
+
+sub GullTransCommon() {
+    sendevent(EventHit, collider, 100.0)
+    changestateif(Gull_Attack, eventaccepted)
+    troty = atan2(player -> trans)
+}
+
+state Gull_Attack { // 2
+    stateflag 0x41
+    statusc 0x32
+    code() {
+        movetolist(4.0, self)
+        KillEntity()
+        soundpitch(3.263)
+        soundsetup(6, self, 8)
+        soundplay([Sg2dA], 1V)
+        playanim(0, GULL_ATTACK_1)
+        playanim(1, GULL_ATTACK_1)
+        playanim(2, GULL_ATTACK_1)
+        do {
+            if (!rand(2)) {
+                soundpitch(3.263)
+                soundsetup(6, self, 8)
+                soundplay([Sg2dA], 1V)
+            }
+            playanim(0, GULL_ATTACK_2)
+            playanim(1, GULL_ATTACK_2)
+            playanim(2, GULL_ATTACK_2)
+            playanim(3, GULL_ATTACK_2)
+            playanim(4, GULL_ATTACK_2)
+            playanim(4, GULL_ATTACK_2)
+            playanim(5, GULL_ATTACK_2)
+            playanim(6, GULL_ATTACK_2)
+        } while (1)
+    }
+    trans {
+        once {
+            statusb = 0
+        }
+        if (!time(7) && FRAMETIME < 38) {
+            spawn(GullC, S_FEATHER)
+        }
+        y = seek(y, player -> y + 0.5m, spd(1m))
+    }
+}
+
+state Gull_Ascend { // 3
+    stateflag 0x1
+    statusc 0x0
+    __transargs
+    code(target) {
+        soundpitch(3.263)
+        soundsetup(6, self, 8)
+        soundplay([Sg2dA], 1V)
+        sleepframes(GULL_FLY, 0.0, 12.0)
+    }
+    trans {
+        changestateif(Gull_Hover, y == target)
+        y = seek(y, target, spd(2m))
+        GullTransCommon()
+    }
+}
+
+state Gull_Hover { // 4
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepframe((animframe + 1.0) % 13.0, 1)
+    }
+    trans {
+        GullTransCommon()
+        changestateif(Gull_Decend, frametime - statetime >= HoverDuration && !(parent -> stateflag & 0x2))
+    }
+}
+
+state Gull_Decend { // 5
+    stateflag 0x1
+    statusc 0x0
+    code => state Gull_Hover
+    trans {
+        changestateif(Gull_Ascend, parent -> stateflag & 0x2)
+        y = seek(y, parent -> y + 1.6m, spd(4m))
+        changestateif(Gull_Perch, y == parent -> y + 1.6m)
+        GullTransCommon()
+    }
+}
+
+state Gull_Die { // 6
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        soundpitch(3.263)
+        soundsetup(6, self, 8)
+        soundplay([Sg2dA], 1V)
+        KillEntity()
+        movetolist(3.0, self)
+        statusb = FLAG_ROT_Y | FLAG_PHYSICS_ENGINE
+        /* the fuck??
+        RAND   (-0x64000),(0x64001)             # rand((-0x64000),(0x64001))
+        SETF   [sp],(0x64000)                   # [sp] = (0x64000)
+        RAND   (-0x64000),(0x64001)             # rand((-0x64000),(0x64001))
+        RAND   (-0x64000),(0x64001)             # rand((-0x64000),(0x64001))
+        RAND   (-0x64000),(0x64001)             # rand((-0x64000),(0x64001))
+        SETF   [sp],(0x64000)                   # [sp] = (0x64000)
+        */
+        troty = atan2(self, velx, 1)
+        trotx = 720deg
+        playframes(GULL_FLY, 0.0, 12.0)
+        playframes(GULL_FLY, 0.0, 12.0)
+    }
+}
+
+state Feather { // 7
+    stateflag 0x40
+    statusc 0x22
+    code() {
+        SetScale(1.8S)
+        x += randi(-0.8m, 0.8m)
+        z += randi(-0.8m, 0.8m)
+        y += 0.5m + rand(1m)
+        rotx = 0deg
+        roty = rand(360deg)
+        rotz = roty + 90deg
+        trotx = randi(-100deg, 100deg)
+        velx = randi(-0.7m, 0.7m)
+        vely = -0.6m - rand(0.8m)
+        velz = randi(-0.7m, 0.7m)
+        statusb = FLAG_PHYSICS_ENGINE
+        while (scaley > 0S) {
+            playanim(0, FEATHER)
+        }
+    }
+    trans {
+        nofirst {
+            rotx = sin(loopseek(trotx, 190deg, spd(180deg)), 190deg - spd(180deg)) - 130deg
+            if (y < parent -> y) {
+                scalex = seek(scalex, 0S, spd(1S))
+                scaley = seek(scaley, 0S, spd(1S))
+                scalez = seek(scalez, 0S, spd(1S))
+            }
+        }
+    }
+}

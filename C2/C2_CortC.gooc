@@ -1,0 +1,351 @@
+#gool CortC 22 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C2_ShadC.gooh"
+#include "..\\Includes\\C2_BosBC.gooh"
+//gooc -c 2 -r pal "C2\C2_CortC.gooc" "C2\Out\C2_CortC.nsentry"
+
+#anim CORTEX_FLY[Co07V] 50 1
+#anim CORTEX_LOOK_BACK[Co17V] 38 1
+#anim CORTEX_ATTACKED[Co57V] 84 1
+#anim MINE[Co37V] 1 0
+#anim ASTEROID[Co47V] 1 0
+#anim FORCEFIELD[Co77V] 25 0
+
+#sprite GLOW[Cr20T]
+#tex 0x6464C0 0 3 5 0 928 32 32 32
+#tex 0xC03232 0 3 5 0 928 32 32 32
+
+#spawn S_CORTEX_BOSS   Cortex_Init
+#spawn S_1             __s_1
+#spawn S_ASTEROID      Asteroid
+#spawn S_MINE          Mine
+#spawn S_GLOW          Exhaust_Glow
+#spawn S_5             __s_5
+#spawn S_6             __s_6
+#spawn S_7             __s_7
+#spawn S_OBJ_SPAWNER   Cortex_Spawner
+#spawn S_9             __s_9
+#spawn S_FORCEFIELD    Cortex_Forcefield
+
+var CortexVar1, PlayerPathScale, AsteroidHit, PlayerPathDistance, CortexVar5, CortexGlowObj, CortexVar7
+
+expr FRA = 2.0
+expr GER = 3.0
+expr SPA = 1.0
+expr ITA = 4.0
+
+state Cortex_Init {
+    code() {
+        GLOBAL_54 = player
+        GLOBAL_120 = 0
+        GLOBAL_55 = 1.0
+        GLOBAL_50 = 0
+        GLOBAL_51 = 0x404040
+        pathprog = 5.0
+        vfx = (vfx & 0xFFFF00FF) | 0x100
+        zindex = 0
+        health = 0
+        spawn(BosBC, BosBC_S_HEALTH, 1, 3.0, 1)
+        setanim(CORTEX_FLY)
+        roty += 180deg
+        speed = 0
+        trotx = 180deg
+        yzapproach = 180deg
+        PlayerPathScale = (player -> pathlen << 8) / pathlen
+        statusb = FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | 0x800 | 0x2000
+        density = 0.05m
+        spawn(CortC, S_GLOW, 1, 0)
+        CortexGlowObj = objectspawned
+        changestate(Cortex_Chase)
+    }
+}
+
+state Cortex_Chase {
+    code() {
+        do {
+            if (PlayerPathDistance >= 90.0) {
+                if (animseq != getanim(CORTEX_LOOK_BACK)) {
+                    setanim(CORTEX_LOOK_BACK, -1.0)
+                }
+                playframe(seek(animframe, 19.0, 1.0))
+            }
+            else {
+                if (animseq == getanim(CORTEX_LOOK_BACK) && animframe <= 36.0) {
+                    playframe(seek(animframe, 37.0, 1.0))
+                }
+                else {
+                    if (animseq != getanim(CORTEX_FLY)) {
+                        setanim(CORTEX_FLY, -1.0)
+                    }
+                    playframe((animframe + 1.0) % 50.0)
+                }
+            }
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Cortex_Attacked, e == EventSpinHit)
+    }
+    trans {
+        nofirst {
+            if (PlayerPathDistance > 92.0) {
+                speed = 6.0
+            }
+            else if (z > player -> z) {
+                speed = seek(speed, 200.0, 20.0)
+            }
+            else {
+                speed = seek(speed, 92.0 - PlayerPathDistance, 20.0)
+            }
+            pathprog = spd(pathprog, 2.0 + (speed / 3))
+            UpdateCortexPathprog()
+        }
+    }
+}
+
+sub UpdateCortexPathprog() {
+    changestateif(Cortex_Escape, pathprog >= pathlen - 8.0 && !(stateflag & 0x20))
+    if (pathprog >= pathlen) {
+        pathprog = pathlen - 1
+    }
+    calcpath(pathprog)
+    PlayerPathDistance = abs(player -> pathprog - (pathprog + 4.0 >> 8) * PlayerPathScale)
+    if (FRAMETIME < 36) {
+        spawn(9, 19, 1, time(2) << 8, 0, 0, -1m)
+    }
+}
+
+state Cortex_Attacked {
+    trans => sub CortexPathFling
+    code() {
+        health += 1
+        changestateif(Cortex_Defeated, health >= 3)
+        spawn(9, 40, 1, 0, 4)
+        playframes(CORTEX_ATTACKED, 0.0, 83.0)
+        changestate(Cortex_Chase)
+    }
+}
+
+sub CortexPathFling() {
+    speed = seek(speed, 60.0, 30.0)
+    pathprog = spd(pathprog, 2.0 + (speed / 3))
+    UpdateCortexPathprog()
+}
+
+state Cortex_Defeated {
+    stateflag 0x21
+    statusc 0x22
+    code() {
+        if (var lang = GLOBAL_151; lang == FRA) {
+            spawn2(9, 44, 1, [Cl0FO], [Cl1FO], 2.0, 62, 8.0)
+            creator = objectspawned
+        }
+        else if (lang == GER) {
+            spawn2(9, 44, 1, [Cl0GO], [Cl1GO], 2.0, 62, 8.0)
+            creator = objectspawned
+        }
+        else if (lang == SPA) {
+            spawn2(9, 44, 1, [Cl0SO], [Cl1SO], 2.0, 62, 8.0)
+            creator = objectspawned
+        }
+        else if (lang == ITA) {
+            spawn2(9, 44, 1, [Cl0IO], [Cl1IO], 2.0, 62, 8.0)
+            creator = objectspawned
+        }
+        else {
+            spawn2(9, 44, 1, [Cl0EO], [Cl1EO], 2.0, 62, 8.0)
+            creator = objectspawned
+        }
+        GAMEFLAGS &= ~0x10000
+        setanim(CORTEX_ATTACKED, -1.0)
+        do {
+            animframe += 1.0
+            spawn(9, 40, 1, 0, 4)
+            playframe()
+        } while (animframe + 1.0 <= 83.0)
+        do { playnull() } until (creator -> stateflag & 0x20)
+        FadeToBlack()
+        WaitFadeNull()
+        sendevent(Event15, player, 5.0)
+        GLOBAL_131 = 0
+        GLOBAL_27 |= 0x80
+        loadlevel(LEVEL_GameEnd)
+        sleep()
+    }
+    trans {
+        unless (player -> stateflag & 0x10) {
+            sendevent(Event18, player)
+            settrans(CortexPathFling)
+        }
+        CortexPathFling()
+    }
+}
+
+state Cortex_Escape {
+    stateflag 0x21
+    statusc 0x22
+    code() {
+        if (var lang = GLOBAL_151; lang == FRA) {
+            spawn2(9, 44, 1, [CL0FO], [CL1FO], 2.0, 62, 8.0)
+            creator = objectspawned
+        }
+        else if (lang == GER) {
+            spawn2(9, 44, 1, [CL0GO], [CL1GO], 2.0, 62, 8.0)
+            creator = objectspawned
+        }
+        else if (lang == SPA) {
+            spawn2(9, 44, 1, [CL0SO], [CL1SO], 2.0, 62, 8.0)
+            creator = objectspawned
+        }
+        else if (lang == ITA) {
+            spawn2(9, 44, 1, [CL0IO], [CL1IO], 2.0, 62, 8.0)
+            creator = objectspawned
+        }
+        else {
+            spawn2(9, 44, 1, [CL0EO], [CL1EO], 2.0, 62, 8.0)
+            creator = objectspawned
+        }
+        GAMEFLAGS &= ~0x10000
+        statusb = FLAG_PHYSICS_ENGINE
+        SetVel(0m, 0m, -40m)
+        setanim(CORTEX_ATTACKED, -1.0)
+        do {
+            animframe += 1.0
+            spawn(9, 21, 1, -1.0, 0m, 0m, -5m, 1S, 0, 0, 0x13)
+            playframe()
+        } while (animframe + 1.0 <= 83.0)
+        do { playnull() } until (creator -> stateflag & 0x20)
+        sendevent(Event38, player, 100.0)
+        sleep()
+    }
+}
+
+state Exhaust_Glow {
+    code(vertex) {
+        zindex = 32
+        do {
+            getvert(vtrans, parent, vertex)
+            SetScale(1S + ((parent -> PlayerPathDistance / 100) << 4))
+            if (distance(player) < 1.5m) {
+                playanim(1, GLOW)
+            }
+            else {
+                playanim(0, GLOW)
+            }
+        } while (1)
+    }
+}
+
+state Asteroid {
+    code(px, py, pz) {
+        SetTrans(px, py, pz)
+        moda = 16.0
+        SetScale(0S)
+        while (scalex < 1S) {
+            SetScale(seek(scalex, 1S, 0x333))
+            moda -= 0x333
+            playanim(0, ASTEROID)
+        }
+        statusb = FLAG_COLLIDABLE
+        AsteroidHit = false
+        speed = 0
+        vfx = (vfx & 0xFFFF00FF) | 0x100
+        while (!AsteroidHit) {
+            playanim(0, ASTEROID)
+        }
+        soundpitch(0x343)
+        soundplay([Ah17A], 1V)
+        EnemyFlingSetDir()
+        speed = 10m
+        setvel(10m)
+        statusb = FLAG_COLLIDABLE | FLAG_PHYSICS_ENGINE
+        do {
+            rotx += spd(180deg)
+            roty += spd(75deg)
+            playanim(0, ASTEROID)
+        } while (1)
+    }
+    event(e, a) {
+        rejevif (e == EventJumpedOn || e == EventSpinHit || e == EventSlideHit || e == EventSlamHit) {
+            AsteroidHit = true
+            sendevent(Event18, player)
+        }
+    }
+    trans {
+        nofirst {
+            if (collider) {
+                AsteroidHit = true
+                sendevent(Event18, player)
+            }
+        }
+    }
+}
+
+state Mine {
+    statusc 0
+    code(px, py, pz) {
+        SetTrans(px, py, pz)
+        vfx = (vfx & 0xFFFF00FF) | 0x100
+        statusb = FLAG_COLLIDABLE
+        sleepanim(0, MINE)
+    }
+    event(e, a) {
+        accevcstate(Mine_Explode, e == EventHit || e == EventHitInvincible || e == EventSpinHit)
+    }
+    trans {
+        changestateif(Mine_Explode, collider)
+    }
+}
+
+state Mine_Explode {
+    statusc 0x12
+    code() {
+        sendevent(Event18, player)
+        statusb = 0
+        vfx = (vfx & 0xFFFF00FF) | 0x100
+        spawn(9, 40, 1, 0, 6)
+        WaitChildNull()
+        KillEntity()
+    }
+}
+
+state Kill_Player {
+    statusc 0
+    code() {
+        sendevent(Event38, player)
+    }
+}
+
+inline sub SpawnCortexObstacle(type, yoff, zoff) {
+    vectransf(vtrans, vvec, 0, yoff, zoff)
+    if (type == 1.0 || type == 1) {
+        spawn(CortC, S_ASTEROID, 1, vecx, vecy, vecz)
+    }
+    else if (type == 2.0 || type == 2) {
+        spawn(CortC, S_MINE, 1, vecx, vecy, vecz)
+    }
+}
+
+state Cortex_Spawner {
+    statusc 0
+    code(pzo, nzo, pyo, nyo) {
+        roty = fieldval(0x11800)
+        rotz = roty
+        rotx = fieldval(0x27700)
+        SpawnCortexObstacle(pzo, 0m, 2.5m)
+        SpawnCortexObstacle(nzo, 0m, -2.5m)
+        SpawnCortexObstacle(pyo, 2.5m, 0m)
+        SpawnCortexObstacle(nyo, -2.5m, 0m)
+        sleepnull()
+    }
+}
+
+state Cortex_Forcefield {
+    statusc 0
+    code() {
+        vfx = (vfx & 0xFFFFFF00) | 0x3
+        vfx = (vfx & 0xFFFF00FF) | 0x100
+        statusb = FLAG_NO_CAMERA_CLIP
+        sleepframes(FORCEFIELD, 0.0, 24.0)
+    }
+}

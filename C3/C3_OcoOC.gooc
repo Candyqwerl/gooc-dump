@@ -1,0 +1,1149 @@
+#gool OcoOC 15 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C3_DispC.gooh"
+//gooc -c 3 -r pal "C3\C3_OcoOC.gooc" "C3\Out\C3_OcoOC.nsentry"
+
+#sprite WATER_SPRAY [Cr10T]
+#tex 0x808080 0 3 11 7 976 112 16 16
+
+#anim JETSKI                    [je1dV] [je1dG] 01 1 2
+#anim JETSKI_MOUNT              [je2dV] [je1dG] 34 1 2
+#anim JETSKI_DESTROYED          [je3dV] [je2dG] 18 1 2
+#anim JETSKI_EXPLODE            [je4dV] [je3dG] 24 1 2
+#anim SMOKE                     [sm1xV] [sm1xG] 125 0 2
+#anim SPLASH                    [sp1dV] [sp1dG] 13 1 2
+#anim JETSKI_SHADOW             [Sh1dV] [Sh1dG] 01 1 2
+
+#anim PALM_ISLAND_LARGE_HIGH    [IA1dV] [IA1dG] 01 1 2
+#anim PALM_ISLAND_LARGE_MID     [IA2dV] [IA2dG] 01 1 2
+#anim PALM_ISLAND_LARGE_LOW     [IA3dV] [IA3dG] 01 1 2
+#anim DUNE_LARGE_HIGH           [IB1dV] [IB1dG] 01 1 2
+#anim DUNE_LARGE_MID            [IB2dV] [IB2dG] 01 1 2
+#anim DUNE_LARGE_LOW            [IB3dV] [IB3dG] 01 1 2
+
+#iflev Dx
+#anim VOLCANO_LAVA_STREAM_HIGH  [Vo1xV] [Vo1xG]  01 1 2
+#anim VOLCANO_LAVA_STREAM_LOW   [Vo2xV] [Vo2xG]  01 1 2
+#anim VOLCANO_SIDE_1_HIGH       [Vo3xV] [Vo3xG]  01 1 2
+#anim VOLCANO_SIDE_1_LOW        [Vo4xV] [Vo4xG]  01 1 2
+#anim VOLCANO_SIDE_2_HIGH       [Vo5xV] [Vo5xG]  01 1 2
+#anim VOLCANO_SIDE_2_LOW        [Vo6xV] [Vo6xG]  01 1 2
+#anim VOLCANO_SIDE_3_HIGH       [Vo7xV] [Vo7xG]  01 1 2
+#anim VOLCANO_SIDE_3_LOW        [Vo8xV] [Vo8xG]  01 1 2
+#else
+#anim VOLCANO_LAVA_STREAM_HIGH  [Vo1pV] [Vo1pG]  01 1 2
+#anim VOLCANO_LAVA_STREAM_LOW   [Vo2pV] [Vo2pG]  01 1 2
+#anim VOLCANO_SIDE_1_HIGH       [Vo3pV] [Vo3pG]  01 1 2
+#anim VOLCANO_SIDE_1_LOW        [Vo4pV] [Vo4pG]  01 1 2
+#anim VOLCANO_SIDE_2_HIGH       [Vo5pV] [Vo5pG]  01 1 2
+#anim VOLCANO_SIDE_2_LOW        [Vo6pV] [Vo6pG]  01 1 2
+#anim VOLCANO_SIDE_3_HIGH       [Vo7pV] [Vo7pG]  01 1 2
+#anim VOLCANO_SIDE_3_LOW        [Vo8pV] [Vo8pG]  01 1 2
+#endif
+
+#iflev Dx
+#anim DUNE_MEDIUM_HIGH  [Is4xV] [Is4xG] 01 1 2
+#anim DUNE_MEDIUM_LOW   [Ia4xV] [Ia4xG] 01 1 2
+#anim DUNE_MINI_HIGH    [Is5xV] [Is5xG] 01 1 2
+#anim DUNE_MINI_LOW     [Ia5xV] [Ia5xG] 01 1 2
+#anim DUNE_MINI_90_HIGH [Is6xV] [Is6xG] 01 1 2
+#anim DUNE_STATUE_HIGH  [Is7xV] [Is7xG] 01 1 2
+#anim DUNE_STATUE_LOW   [Ia7xV] [Ia7xG] 01 1 2
+#anim DUNE_PALM_HIGH    [Is8xV] [Is8xG] 01 1 2
+#else
+#anim DUNE_MEDIUM_HIGH  [Is4dV] [Is4dG] 01 1 2
+#anim DUNE_MEDIUM_LOW   [Ia4dV] [Ia4dG] 01 1 2
+#anim DUNE_MINI_HIGH    [Is5dV] [Is5dG] 01 1 2
+#anim DUNE_MINI_LOW     [Ia5dV] [Ia5dG] 01 1 2
+#anim DUNE_MINI_90_HIGH [Is6dV] [Is6dG] 01 1 2
+#anim DUNE_STATUE_HIGH  [Is7dV] [Is7dG] 01 1 2
+#anim DUNE_STATUE_LOW   [Ia7dV] [Ia7dG] 01 1 2
+#anim DUNE_PALM_HIGH    [Is8dV] [Is8dG] 01 1 2
+#endif
+
+#anim SHIP_HIGH         [Sp1dV] [Sp1dG] 01 1 2
+#anim SHIP_SAIL_HIGH    [Sp9dV] [Sp9dG] 01 1 2
+#anim SHIP_MID          [Sp2dV] [Sp2dG] 01 1 2
+#anim SHIP_LOW          [Sp3dV] [Sp3dG] 01 1 2
+#anim SHIP_VERY_LOW     [Sp4dV] [Sp4dG] 01 1 2
+
+#anim SHIP_90_HIGH      [Sp5dV] [Sp5dG] 01 1 2
+#anim SHIP_90_SAIL_HIGH [SpadV] [SpadG] 01 1 2
+#anim SHIP_90_MID       [Sp6dV] [Sp6dG] 01 1 2
+#anim SHIP_90_LOW       [Sp7dV] [Sp7dG] 01 1 2
+#anim SHIP_90_VERY_LOW  [Sp8dV] [Sp8dG] 01 1 2
+
+#anim RAMP_1   [Ju1dV] [Ju1dG] 01 1 2
+#anim RAMP_2   [Ju1dV] [Ju2dG] 01 1 2
+#anim RAMP_3   [Ju1dV] [Ju3dG] 01 1 2
+#anim RAMP_4   [Ju1dV] [Ju4dG] 01 1 2
+#anim RAMP_5   [Ju1dV] [Ju5dG] 01 1 2
+#anim RAMP_6   [Ju1dV] [Ju6dG] 01 1 2
+#anim RAMP_7   [Ju1dV] [Ju7dG] 01 1 2
+#anim RAMP_8   [Ju1dV] [Ju8dG] 01 1 2
+#anim RAMP_9   [Ju1dV] [Ju9dG] 01 1 2
+#anim RAMP_10  [Ju1dV] [JuadG] 01 1 2
+#anim RAMP_11  [Ju1dV] [JubdG] 01 1 2
+#anim RAMP_12  [Ju1dV] [JucdG] 01 1 2
+#anim RAMP_13  [Ju1dV] [JuddG] 01 1 2
+#anim RAMP_14  [Ju1dV] [JuedG] 01 1 2
+#anim RAMP_15  [Ju1dV] [JufdG] 01 1 2
+#anim RAMP_16  [Ju1dV] [Ju0dG] 01 1 2
+
+#iflev D
+#anim SKYBOX   [Sk1DV] [Sk1DG] 01 1 2
+#eliflev p 
+#anim SKYBOX   [Sk1pV] [Sk1pG] 01 1 2
+#eliflev x 
+#anim SKYBOX   [Sk1xV] [Sk1xG] 01 1 2
+#else
+#anim SKYBOX   [Sk1dV] [Sk1dG] 01 1 2
+#endif
+
+#spawn S_0                    __s_0
+#spawn S_1                    __s_1
+#spawn S_2                    __s_2
+#spawn S_CAMERA               Ocean_Camera_Init
+#spawn S_SKYBOX               SkyBox
+#spawn S_5                    __s_5
+#spawn S_6                    __s_6
+#spawn S_7                    __s_7
+#spawn S_SHADOW               Jetski_Shadow
+#spawn S_PALM_ISLAND_LARGE    Island_Volcano
+#spawn S_DUNE_STATUE          Dune_Decorated
+#spawn S_DUNE_PALM            Dune_Decorated
+#spawn S_DUNE_MEDIUM          Dune_Empty
+#spawn S_DUNE_MINI            Dune_Empty
+#spawn S_DUNE_MINI_90         Dune_Empty
+#spawn S_DUNE_LARGE           Dune_Empty
+#spawn S_SHIP                 Ship
+#spawn S_RAMP                 Ocean_Jump
+#spawn S_SHIP_90              Ship_90
+#spawn S_SHIP_SAIL            Sail
+#spawn S_20                   __s_20
+#spawn S_21                   __s_21
+#spawn S_SPLASH               Splash
+#spawn S_VOLCANO_LAVA         Island_Volcano
+#spawn S_VOLCANO_SIDE_1       Island_Volcano
+#spawn S_VOLCANO_SIDE_2       Island_Volcano
+#spawn S_VOLCANO_SIDE_3       Island_Volcano
+#spawn S_JETSKI_DRIFT         Jetski_Drift
+#spawn S_JETSKI_MOUNT         Jetski_Mount
+#spawn S_WATER_SPRAY          Water_Spray
+#spawn S_SPLASH_FAST          Splash
+#spawn S_JETSKI_DESTROYED     Jetski_Drift
+#spawn S_SMOKE                Smoke
+#spawn S_VOLCANO_LAVA_STATIC  Island_Volcano
+#spawn S_VOLCANO_SIDE_1_ALT   Island_Volcano
+#spawn S_VOLCANO_SIDE_2_ALT   Island_Volcano
+#spawn S_VOLCANO_SIDE_3_ALT   Island_Volcano
+#spawn S_JETSKI_EXPLODE       Jetski_Explode
+
+var OceanY, OceanVar2, WaterDefaultColor, OceanVar4, OceanVar5, OceanVar6, OceanVar7, OceanVar8, OceanVar9
+var OceanVar10, OceanVar11, OceanVar12, OceanVar13, OceanVar14, OceanVar15
+
+expr CameraYaw            = OceanVar8
+expr CameraTargetYaw      = OceanVar10
+expr CameraFollowDistance = OceanVar11
+expr CameraTurnSign       = OceanVar15
+expr ViewDistance         = OceanVar11
+expr PlayerDistance       = OceanVar11
+expr IslandNearDistance   = OceanVar12
+expr IslandMidDistance    = OceanVar13
+expr DuneFadeDistance     = OceanVar12
+expr DuneDetailDistance   = OceanVar14
+expr SurfSoundDistance    = OceanVar13
+expr DecoratedLodDistance = OceanVar12
+expr RampReady            = OceanVar12
+expr RampSolidSides       = OceanVar14
+expr RampCollisionRoutine = OceanVar15
+expr RampContact          = field_61
+expr SailSpawned          = var0
+expr CannonIndex          = stalltime
+
+state Null { // 0
+    stateflag 0x1
+    statusc 0x0
+    code() {}
+}
+
+state Ocean_Camera_Init { // 1
+    stateflag 0x10001
+    statusc 0x0
+    code() {
+        ins72(0xA00, self)
+        GLOBAL_97 = self
+        statusb = 0
+        trotx = 180deg
+        yzapproach = 30deg
+        CameraTurnSign = 0
+        speed = parent -> speed
+        CameraFollowDistance = 5m
+        rotx = -23deg
+        roty = GLOBAL_164 + 180deg
+        rotz = 0deg
+        troty = roty
+        CameraYaw = GLOBAL_164
+        CameraTargetYaw = CameraYaw
+        if (!RESPAWNCOUNT) {
+            if (LEVEL != LEVEL_HotCoco) {
+                spawn(DispC, DispC_S_ARROW, 1, 0, 100.0, 0)
+            }
+        }
+        else {
+            playnull()
+            rotx = -23deg
+            roty = GLOBAL_164 + 180deg
+            rotz = 0deg
+            troty = roty
+            CameraYaw = GLOBAL_164
+            CameraTargetYaw = CameraYaw
+        }
+        changestate(Ocean_Camera_Follow)
+    }
+}
+
+state Ocean_Camera_Follow { // 2
+    stateflag 0x10001
+    statusc 0x0
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Ocean_Camera_Track, e == Event7)
+        accevif (e == Event76) {
+            CameraTargetYaw = parent -> roty + 180deg
+            CameraYaw = CameraTargetYaw 
+            troty = atan2(parent -> trans)
+            roty = troty
+            interrupter = GLOBAL_110
+            sendevent(Event21, interrupter, degdist(roty + 180deg, GLOBAL_164))
+        }
+        accevcstate(Ocean_Camera_Init, e == Event19)
+    }
+    trans {
+        {
+            CameraFollowDistance = seek(CameraFollowDistance, 3.25m + (parent -> speed * 3 / 20), spd(1.5m))
+            var delta = degdist(CameraYaw, player -> roty + 180deg)
+            if (abs(delta) < 45deg) {
+                if (delta < 0deg) {
+                    CameraTurnSign = -1.0
+                }
+                else if (delta > 0deg) {
+                    CameraTurnSign = 1.0
+                }
+                else {
+                    CameraTurnSign = 0.0
+                }
+            }
+            else if (!((CameraTurnSign ^ delta) >= 0deg)) {
+                if (delta < 0deg) {
+                    delta = 360deg + delta
+                }
+                else {
+                    delta = -360deg + delta
+                }
+            }
+            CameraTargetYaw = CameraYaw + ((delta * (parent -> speed >> 3)) / 2.5m)
+            CameraYaw += degdist(CameraYaw, CameraTargetYaw) >> 3
+        }
+        save (y, trotx, troty, trotz, vecx, vecy, vecz) {
+            SetTRot(0deg, CameraYaw, 0deg)
+            vecx = player -> x
+            vecy = player -> y
+            vecz = player -> z
+            vectransf2(vvec, vtrans, CameraFollowDistance, 0, 0)
+        }
+        var0 = ins79(x, null) + 3m
+        if (var0 > y) {
+            y = seek(y, var0, spd(8m))
+        }
+        else {
+            y = seek(y, var0, spd(0.5m))
+        }
+        speed = seek(speed, parent -> speed, spd(8m))
+        save (trotx, troty, trotz) {
+            SetTRot(0deg, player -> roty, 0deg)
+            vecx = player -> x
+            vecy = player -> y
+            vecz = player -> z
+            vectransf2(vvec, vvec, speed >> 2, 0, 0)
+        }
+        troty = roty + ((degdist(roty, atan2(self, vecx)) << 1) >> 2)
+        roty = troty
+        save (vecy) {
+            vecy += 1.6m
+            trotz = -atan2_3d(self, vecx)
+            if (trotz < -30deg) {
+                trotz = -30deg
+            }
+        }
+        rotx += degdist(rotx, trotz) >> 2
+        UpdateOceanHeading()
+    }
+}
+
+sub UpdateOceanHeading() {
+    interrupter = GLOBAL_110
+    sendevent(Event15, interrupter, degdist(roty + 180deg, GLOBAL_164))
+}
+
+state Ocean_Camera_Track { // 3
+    stateflag 0x10001
+    statusc 0x0
+    __transargs
+    code(dist) {
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Ocean_Camera_Init, e == Event19)
+    }
+    trans {
+        save (trotx, troty, trotz) {
+            SetTRot(0deg, atan2(player, x), 0deg)
+            vecx = player -> x
+            vecy = player -> y
+            vecz = player -> z
+            vectransf2(vvec, vvec, dist, 0, 0)
+        }
+        vecy = player -> y + 1.5m
+        if (vecy < 1.5m) {
+            vecy = 1.5m
+        }
+        x += (vecx - x) / 25
+        y += (vecy - y) / 25
+        z += (vecz - z) / 25
+        vecx = player -> x
+        vecy = player -> y
+        vecz = player -> z
+        troty = roty + ((degdist(roty, atan2(self, vecx)) << 1) >> 2)
+        roty = troty
+        save (vecy) {
+            trotz = -atan2_3d(self, vecx)
+            if (trotz < -30deg) {
+                trotz = -30deg
+            }
+        }
+        rotx += degdist(rotx, trotz) >> 2
+    }
+}
+
+state SkyBox { // 4
+    stateflag 0x10001
+    statusc 0x0
+    code() {
+        movetolist(1.0, self)
+        statusb = FLAG_NO_CAMERA_CLIP
+        SetScale(0x199, 0x7A, 0x199)
+        zindex = -4000
+        sleepanim(0, SKYBOX)
+    }
+    trans {
+        x = CAMTRANSX
+        y = CAMTRANSY
+        z = CAMTRANSZ
+    }
+}
+
+state Jetski_Shadow { // 5
+    stateflag 0x10001
+    statusc 0x0
+    code() {
+        zindex = 30
+        SetColor1(0x00, 0x00, 0x00)
+        sleepanim(0, JETSKI_SHADOW)
+    }
+    trans {
+        x = parent -> x
+        z = parent -> z
+        roty = parent -> roty
+        y = parent -> groundy
+        var0 = getfield(parent, 84.0)
+        rotz = degseek(rotz, var0[1.0], 60deg)
+        rotx = degseek(rotx, var0[0.0], 60deg)
+        var0 = (parent -> y - (y + 0.1m) >> 8) * 6.4 / 1.563
+        if (var0 < 0) {
+            var0 = 0
+        }
+        else if (var0 > 6.4) {
+            var0 = 6.4
+        }
+        moda = 16.0 - var0
+    }
+}
+
+inline sub SetVolcanoScale() {
+    scalez = 0x1028
+    scalex = 0x1028
+    scaley = 0x1000
+}
+
+state Island_Volcano { // 6
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        zindex = 500
+        field_63 = -55
+        vfx = (vfx & 0xFF00FFFF) | 0x60000
+        var near, mid, far
+        IslandNearDistance = 58m
+        IslandMidDistance = 80m
+        if (spawn == S_PALM_ISLAND_LARGE) {
+            troty = 0
+            near = getanim(PALM_ISLAND_LARGE_HIGH)
+            mid = getanim(PALM_ISLAND_LARGE_MID)
+            far = getanim(PALM_ISLAND_LARGE_LOW)
+            zindex = 45
+            field_63 = -55
+        }
+        else if (spawn == S_VOLCANO_LAVA || spawn == S_VOLCANO_LAVA_STATIC) {
+            troty = 225deg
+            if (spawn == S_VOLCANO_LAVA) { spawn(OcoOC, S_SMOKE) }
+            near = getanim(VOLCANO_LAVA_STREAM_HIGH)
+            mid = getanim(VOLCANO_LAVA_STREAM_LOW)
+            far = getanim(VOLCANO_LAVA_STREAM_LOW)
+            SetVolcanoScale()
+            IslandNearDistance = 80m
+            IslandMidDistance = 112m
+        }
+        else if (spawn == S_VOLCANO_SIDE_1 || spawn == S_VOLCANO_SIDE_1_ALT) {
+            troty = 135deg
+            near = getanim(VOLCANO_SIDE_1_HIGH)
+            mid = getanim(VOLCANO_SIDE_1_LOW)
+            far = getanim(VOLCANO_SIDE_1_LOW)
+            SetVolcanoScale()
+            IslandNearDistance = 80m
+            IslandMidDistance = 112m
+        }
+        else if (spawn == S_VOLCANO_SIDE_2 || spawn == S_VOLCANO_SIDE_2_ALT) {
+            troty = 45deg
+            near = getanim(VOLCANO_SIDE_2_HIGH)
+            mid = getanim(VOLCANO_SIDE_2_LOW)
+            far = getanim(VOLCANO_SIDE_2_LOW)
+            SetVolcanoScale()
+            IslandNearDistance = 80m
+            IslandMidDistance = 112m
+        }
+        else if (spawn == S_VOLCANO_SIDE_3 || spawn == S_VOLCANO_SIDE_3_ALT) {
+            troty = 315deg
+            near = getanim(VOLCANO_SIDE_3_HIGH)
+            mid = getanim(VOLCANO_SIDE_3_LOW)
+            far = getanim(VOLCANO_SIDE_3_LOW)
+            SetVolcanoScale()
+            IslandNearDistance = 80m
+            IslandMidDistance = 112m
+        }
+        do {
+            interrupter = GLOBAL_97
+            ViewDistance = distance(interrupter)
+            if (ViewDistance > 160m) {
+                animseq = far
+                vfx = (vfx & 0xFFFF00FF) | 0x600
+                playframe(0)
+            }
+            else if (ViewDistance > IslandMidDistance) {
+                animseq = mid
+                vfx = (vfx & 0xFFFF00FF) | 0x600
+                playframe(0)
+            }
+            else if (ViewDistance > IslandNearDistance) {
+                animseq = near
+                vfx = (vfx & 0xFFFF00FF) | 0x1A00
+                playframe(0)
+            }
+            else {
+                if (!time(100) && !rand(2)) {
+                    soundpitch(((11.2 + rand(6.4)) * 0.293) >> 8)
+                    sounddecay(8s)
+                    soundplay([Sf2dA], 0.4V + rand(0.3V))
+                }
+                animseq = near
+                vfx = (vfx & 0xFFFF00FF) | 0x1A00
+                playframe(0)
+            }
+        } while (1)
+    }
+}
+
+sub SetOceanColor() {
+    if (var level = LEVEL; level == LEVEL_MakinWaves) {
+        SetColor1(0x01, 0x87, 0xA2)
+    }
+    else if (level == LEVEL_SkiCrazed || level == LEVEL_HotCoco) {
+        SetColor1(0x55, 0x1C, 0x8B)
+    }
+    else {
+        SetColor1(0x0B, 0x3E, 0xFF)
+    }
+}
+
+state Dune_Empty { // 7
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        zindex = 45
+        field_63 = -55
+        vfx = (vfx & 0xFF00FFFF) | 0x60000
+        SetOceanColor()
+        var near, mid, far
+        DuneFadeDistance = 70m
+        SurfSoundDistance = 15m
+        DuneDetailDistance = 36m
+        if (spawn == S_DUNE_MEDIUM) {
+            near = getanim(DUNE_MEDIUM_HIGH)
+            mid = getanim(DUNE_MEDIUM_LOW)
+            far = getanim(DUNE_MEDIUM_LOW)
+        }
+        else if (spawn == S_DUNE_MINI) {
+            near = getanim(DUNE_MINI_HIGH)
+            mid = getanim(DUNE_MINI_LOW)
+            far = getanim(DUNE_MINI_LOW)
+        }
+        else if (spawn == S_DUNE_MINI_90) {
+            near = getanim(DUNE_MINI_90_HIGH)
+            mid = getanim(DUNE_MINI_90_HIGH)
+            far = getanim(DUNE_MINI_90_HIGH)
+        }
+        else if (spawn == S_DUNE_LARGE) {
+            near = getanim(DUNE_LARGE_HIGH)
+            mid = getanim(DUNE_LARGE_MID)
+            far = getanim(DUNE_LARGE_LOW)
+            DuneFadeDistance = 180m
+            DuneDetailDistance = 41m
+            SurfSoundDistance = 41m
+        }
+        do {
+            interrupter = GLOBAL_97
+            ViewDistance = distance(interrupter, DIST_NO_Y)
+            moda = 0
+            scaley = 1S
+            if (ViewDistance > DuneFadeDistance + 20m) {
+                playnull()
+            }
+            else if (ViewDistance > DuneFadeDistance) {
+                moda = (((ViewDistance - DuneFadeDistance) >> 8) << 12) / 31.25
+                scaley = ((((DuneFadeDistance + 20m) - ViewDistance) >> 8) << 12) / 31.25
+                animseq = far
+                vfx &= 0xFFFF00FF
+                playframe(0)
+            }
+            else if (ViewDistance > DuneDetailDistance) {
+                animseq = mid
+                vfx &= 0xFFFF00FF
+                playframe(0)
+            }
+            else if (ViewDistance > SurfSoundDistance) {
+                animseq = near
+                vfx &= 0xFFFF00FF
+                playframe(0)
+            }
+            else {
+                if (!time(75) && !rand(2)) {
+                    SoundPitchDefault(0.293)
+                    sounddecay(8s)
+                    soundplay([Sf2dA], 0.4V + rand(0.2V))
+                }
+                animseq = near
+                vfx = (vfx & 0xFFFF00FF) | 0x1A00
+                playframe(0)
+            }
+        } while (1)
+    }
+}
+
+state Dune_Decorated { // 8
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        zindex = 45
+        field_63 = -55
+        vfx = (vfx & 0xFF00FFFF) | 0x60000
+        var near, far
+        DecoratedLodDistance = 80m
+        if (spawn == S_DUNE_STATUE) {
+            near = getanim(DUNE_STATUE_HIGH)
+            far = getanim(DUNE_STATUE_LOW)
+        }
+        else if (spawn == S_DUNE_PALM) {
+            near = getanim(DUNE_PALM_HIGH)
+            far = getanim(DUNE_PALM_HIGH)
+        }
+        do {
+            interrupter = GLOBAL_97
+            ViewDistance = distance(interrupter, DIST_NO_Y)
+            moda = 0
+            scalex = 1S
+            scalez = 1S
+            if (ViewDistance > 200m) {
+                playnull()
+            }
+            else if (ViewDistance > 190m) {
+                scalez = (((200m - ViewDistance) >> 8) * 0x666) / 15.625
+                scalex = scalez
+                animseq = far
+                vfx &= 0xFFFF00FF
+                playframe(0)
+            }
+            else if (ViewDistance > 100m) {
+                scalez = 0x666 + ((((190m - ViewDistance) >> 8) * 0x999) / 0x8CA0)
+                scalex = scalez
+                animseq = far
+                vfx &= 0xFFFF00FF
+                playframe(0)
+            }
+            else if (ViewDistance > DecoratedLodDistance) {
+                animseq = far
+                vfx &= 0xFFFF00FF
+                playframe(0)
+            }
+            else if (ViewDistance > 15m) {
+                animseq = near
+                vfx &= 0xFFFF00FF
+                playframe(0)
+            }
+            else {
+                if (!time(75) && !rand(2)) {
+                    SoundPitchDefault(0.293)
+                    sounddecay(8s)
+                    soundplay([Sf2dA], 0.4V + rand(0.2V))
+                }
+                animseq = near
+                vfx = (vfx & 0xFFFF00FF) | 0x1A00
+                playframe(0)
+            }
+        } while (1)
+    }
+}
+
+state Ship { // 9
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        zindex = 250
+        field_63 = 0
+        vfx = (vfx & 0xFF00FFFF) | 0x60000
+        troty = 0deg
+        SailSpawned = false
+        CannonIndex = 0
+        do {
+            PlayerDistance = distance(player, DIST_NO_Y)
+            if (PlayerDistance > 180m) {
+                vfx &= 0xFFFF00FF
+                playanim(0, SHIP_VERY_LOW)
+                SailSpawned = false
+            }
+            else if (PlayerDistance > 120m) {
+                vfx &= 0xFFFF00FF
+                playanim(0, SHIP_LOW)
+                SailSpawned = false
+            }
+            else if (PlayerDistance > 70m) {
+                vfx &= 0xFFFF00FF
+                FireShipCannon()
+                playanim(0, SHIP_MID)
+                SailSpawned = false
+            }
+            else {
+                if (!time(75)) {
+                    SoundPitchDefault(11.2, 0.205)
+                    sounddecay(6.4s)
+                    soundsetup(8, self, 8)
+                    soundplay([Sp1dA], 1V)
+                }
+                if (!SailSpawned) {
+                    spawn(OcoOC, S_SHIP_SAIL)
+                    SailSpawned = true
+                }
+                FireShipCannon()
+                vfx = (vfx & 0xFFFF00FF) | 0x1A00
+                playanim(0, SHIP_HIGH)
+            }
+        } while (1)
+    }
+}
+
+expr OcMiC = 42
+expr OcMiC_S_CANNON = 2
+
+sub FireShipCannon() {
+    if (!time(37)) {
+        var side
+        if (abs(degdist(troty + 90deg, atan2(player -> trans))) < 90deg) {
+            side = 5.0
+        }
+        else {
+            side = 0.0
+        }
+        spawn(OcMiC, OcMiC_S_CANNON, 1, side + (CannonIndex % 5.0))
+        CannonIndex += 1.0
+    }
+}
+
+state Ship_90 { // 10
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        zindex = 250
+        field_63 = 0
+        vfx = (vfx & 0xFF00FFFF) | 0x60000
+        troty = 90deg
+        SailSpawned = 0
+        CannonIndex = 0
+        do {
+            PlayerDistance = distance(player, DIST_NO_Y)
+            if (PlayerDistance > 160m) {
+                vfx &= 0xFFFF00FF
+                playanim(0, SHIP_90_VERY_LOW)
+                SailSpawned = false
+            }
+            else if (PlayerDistance > 120m) {
+                vfx &= 0xFFFF00FF
+                playanim(0, SHIP_90_LOW)
+                SailSpawned = false
+            }
+            else if (PlayerDistance > 70m) {
+                vfx &= 0xFFFF00FF
+                FireShipCannon()
+                playanim(0, SHIP_90_MID)
+                SailSpawned = false
+            }
+            else {
+                if (!time(75)) {
+                    SoundPitchDefault(11.2, 0.205)
+                    sounddecay(6.4s)
+                    soundsetup(8, self, 8)
+                    soundplay([Sp1dA], 1V)
+                }
+                if (!SailSpawned) {
+                    spawn(OcoOC, S_SHIP_SAIL)
+                    SailSpawned = true
+                }
+                FireShipCannon()
+                vfx = (vfx & 0xFFFF00FF) | 0x1A00
+                playanim(0, SHIP_90_HIGH)
+            }
+        } while (1)
+    }
+}
+
+state Sail { // 11
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        zindex = 0
+        do {
+            if (parent -> animseq == getanim(SHIP_HIGH)) {
+                playanim(0, SHIP_SAIL_HIGH)
+            }
+            else if (parent -> animseq == getanim(SHIP_90_HIGH)) {
+                playanim(0, SHIP_90_SAIL_HIGH)
+            }
+            else {
+                return
+            }
+        } while (1)
+    }
+}
+
+state Ocean_Jump { // 12
+    stateflag 0x1
+    statusc 0x0
+    code(yaw, solid) {
+        zindex = 45
+        SetOceanColor()
+        statusb = FLAG_COLLIDABLE
+        RampContact = false
+        RampSolidSides = solid
+        roty = yaw
+        if (var turn = yaw; turn == 0deg) {
+            RampCollisionRoutine = getins(CollideRampYaw0)
+        }
+        else if (turn == 90deg) {
+            RampCollisionRoutine = getins(CollideRampYaw90)
+        }
+        else if (turn == 180deg) {
+            RampCollisionRoutine = getins(CollideRampYaw180)
+        }
+        else if (turn == 270deg) {
+            RampCollisionRoutine = getins(CollideRampYaw270)
+        }
+        do {
+            y = ins79(x, null)
+            PlayerDistance = distance(player, DIST_NO_Y)
+            moda = 0
+            scaley = 1S
+            if (PlayerDistance > 80m) {
+                playnull()
+                continue
+            }
+            if (PlayerDistance > 70m) {
+                moda = ((PlayerDistance - 70m) >> 8 << 12) / 15.625
+                scaley = ((80m - PlayerDistance) >> 8 << 12) / 15.625
+                vfx &= 0xFFFF00FF
+                playanim(0, RAMP_1)
+                continue
+            }
+            if (PlayerDistance > 40m) {
+                vfx &= 0xFFFF00FF
+                playanim(0, RAMP_1)
+                continue
+            }
+            if (player, abs(player -> x - x) < 2.54m, abs(player -> z - z) < 2.54m) {
+                RampReady = 0
+                call(RampCollisionRoutine)
+                troty = roty + 180deg
+                if (RampReady) {
+                    stateflag |= 0x40
+                }
+                else {
+                    stateflag &= ~0x40
+                }
+                if (RampReady && abs(degdist(player -> roty, troty)) < 45deg && player -> speed > 10m) {
+                    if (player -> speed < 25m) {
+                        soundpitch(4.0)
+                        soundplay([Ju1dA], 1V)
+                    }
+                    setvel(30m, vvec)
+                    player -> velx = vecx
+                    player -> vely = vecy
+                    player -> velz = vecz
+                    player -> vely = 0x15A690
+                    GLOBAL_75 = 12
+                    GLOBAL_65 = 0x33333333
+                }
+                RampContact = true
+            }
+            else {
+                RampContact = false
+            }
+            vfx = (vfx & 0xFFFF00FF) | 0x1A00
+            if (var frame = time(16); frame == 0) {
+                playanim(0, RAMP_1)
+            }
+            else if (frame == 1) {
+                playanim(0, RAMP_2)
+            }
+            else if (frame == 2) {
+                playanim(0, RAMP_3)
+            }
+            else if (frame == 3) {
+                playanim(0, RAMP_4)
+            }
+            else if (frame == 4) {
+                playanim(0, RAMP_5)
+            }
+            else if (frame == 5) {
+                playanim(0, RAMP_6)
+            }
+            else if (frame == 6) {
+                playanim(0, RAMP_7)
+            }
+            else if (frame == 7) {
+                playanim(0, RAMP_8)
+            }
+            else if (frame == 8) {
+                playanim(0, RAMP_9)
+            }
+            else if (frame == 9) {
+                playanim(0, RAMP_10)
+            }
+            else if (frame == 10) {
+                playanim(0, RAMP_11)
+            }
+            else if (frame == 11) {
+                playanim(0, RAMP_12)
+            }
+            else if (frame == 12) {
+                playanim(0, RAMP_13)
+            }
+            else if (frame == 13) {
+                playanim(0, RAMP_14)
+            }
+            else if (frame == 14) {
+                playanim(0, RAMP_15)
+            }
+            else if (frame == 15) {
+                playanim(0, RAMP_16)
+            }
+        } while (1)
+    } 
+}
+
+
+sub CollideRampYaw0() {
+    unless (RampContact || player -> y > y + 2m) {
+        if (player -> z < z + 1.27m) {
+            if (player -> x >= x - 2.54m && player -> velx > 0m) {
+                statetime = frametime
+            }
+            else if (player -> x <= x + 2.54m && player -> velx < 0m) {
+                statetime = frametime
+            }
+        }
+        if (player -> z >= z - 2.54m && player -> velz > 0m) {
+            if (RampSolidSides) {
+                player -> velz = -2m - player -> velz
+                if (player -> velz > -4m) {
+                    player -> velz = -4m
+                }
+            }
+            statetime = frametime
+        }
+    }
+    else if (frametime - statetime >= 0.1s) {
+        player -> field_63 = y + (0.1m + ((((z + 2.56m) - player -> z) * 50) >> 7))
+        player -> velz = spd(player -> velz, 2m)
+        RampReady = true
+    }
+}
+
+sub CollideRampYaw180() {
+    unless (RampContact || player -> y > y + 2m) {
+        if (player -> z > z - 1.27m) {
+            if (player -> x >= x - 2.54m && player -> velx > 0m) {
+                statetime = frametime
+            }
+            else if (player -> x <= x + 2.54m && player -> velx < 0m) {
+                statetime = frametime
+            }
+        }
+        if (player -> z <= z + 2.54m && player -> velz < 0m) {
+            if (RampSolidSides) {
+                player -> velz = -2m - player -> velz
+                if (player -> velz < 4m) {
+                    player -> velz = 4m
+                }
+            }
+            statetime = frametime
+        }
+    }
+    else if (frametime - statetime >= 0.1s) {
+        player -> field_63 = y + (0.1m + ((((z - 2.56m) - player -> z) * 50) >> 7))
+        player -> velz = spd(player -> velz, -2m)
+        RampReady = true
+    }
+}
+
+sub CollideRampYaw90() {
+    unless (RampContact || player -> y > y + 2m) {
+        if (player -> x < x + 1.27m) {
+            if (player -> z >= z - 2.54m && player -> velz > 0m) {
+                statetime = frametime
+            }
+            else if (player -> z <= z + 2.54m && player -> velz < 0m) {
+                statetime = frametime
+            }
+        }
+        if (player -> x >= x - 2.54m && player -> velx > 0m) {
+            if (RampSolidSides) {
+                player -> velx = -2m - player -> velx
+                if (player -> velx > -4m) {
+                    player -> velx = -4m
+                }
+            }
+            statetime = frametime
+        }
+    }
+    else if (frametime - statetime >= 0.1s) {
+        player -> field_63 = y + (0.1m + ((((x + 2.56m) - player -> x) * 50) >> 7))
+        player -> velx = spd(player -> velx, 2m)
+        RampReady = true
+    }
+}
+
+sub CollideRampYaw270() {
+    unless (RampContact || player -> y > y + 2m) {
+        if (player -> x > x - 1.27m) {
+            if (player -> z >= z - 2.54m && player -> velz > 0m) {
+                statetime = frametime
+            }
+            else if (player -> z <= z + 2.54m && player -> velz < 0m) {
+                statetime = frametime
+            }
+        }
+        if (player -> x <= x + 2.54m && player -> velx < 0m) {
+            if (RampSolidSides) {
+                player -> velx = -2m - player -> velx
+                if (player -> velx < 4m) {
+                    player -> velx = 4m
+                }
+            }
+            statetime = frametime
+        }
+    }
+    else if (frametime - statetime >= 0.1s) {
+        player -> field_63 = y + (0.1m + (((player -> x - (x - 2.56m)) * 50) >> 7))
+        player -> velx = spd(player -> velx, -2m)
+        RampReady = true
+    }
+}
+
+state Splash { // 13
+    stateflag 0x20001
+    statusc 0x0
+    code(impact) {
+        rotx = 0
+        rotz = 0
+        y = ins79(x, null)
+        scaley = abs(impact) >> 8
+        if (scaley > 1S) {
+            scaley = 1S
+        }
+        soundpitch(4.0)
+        sounddecay(7.6s)
+        soundsetup(0, self, 5)
+        soundplay([sp1dA], scaley << 2)
+        if (spawn == S_SPLASH_FAST) {
+            scalez = 1S
+            scalex = 1S
+            setanim(SPLASH, -2.0)
+            do {
+                playframe(animframe + 2.0)
+            } while (animframe + 2.0 <= 12.0)
+        }
+        else {
+            setanim(SPLASH, -1.0)
+            do {
+                playframe(animframe + 1.0)
+            } while (animframe + 1.0 <= 12.0)
+        }
+    }
+}
+
+sub InitJetskiWaterFX() {
+    vfx = (vfx & 0xFFFF00FF) | 0xA00
+    field_61 = &OceanY
+    zindex = 0
+    OceanVar2 = 2
+    WaterDefaultColor = 0x3F3F3F
+    OceanVar4 = 0
+    OceanVar5 = &OceanVar8
+    OceanVar6 = 56
+    OceanVar7 = -36
+    OceanY = 0
+    OceanVar8 = 0
+    OceanVar9 = 0
+    OceanVar10 = 0
+}
+
+state Jetski_Drift { // 14
+    stateflag 0x1
+    statusc 0x0
+    code(speed, pitch, yaw, roll) {
+        vfx = (vfx & 0xFFFFFF00) | 0x5
+        SetRot(pitch, yaw, roll)
+        InitJetskiWaterFX()
+        statusb = FLAG_PHYSICS_ENGINE
+        troty = roty
+        setvel(speed)
+        if (spawn == S_JETSKI_DESTROYED) {
+            playanim(0, JETSKI, 6)
+            playframes(JETSKI_DESTROYED, 0.0, 17.0)
+        }
+        else {
+            sleepanim(0, JETSKI)
+        }
+    }
+    trans {
+        rotx = degseek(rotx, 0deg, 180deg)
+        rotz = degseek(rotz, 0deg, 180deg)
+        y = ins79(x, vecx)
+        OceanY = y
+        ins80(vecx, OceanVar8)
+        velx = (velx * 235) >> 8
+        velz = (velz * 235) >> 8
+    }
+}
+
+state Jetski_Explode { // 15
+    stateflag 0x10001
+    statusc 0x22
+    code() {
+        rotx = 0deg
+        rotz = 0deg
+        setanim(JETSKI_EXPLODE, -1.0)
+        do {
+            animframe += 1.0
+            if (animframe == 12.0) {
+                save (x, y, z) {
+                    getvert(vtrans, self, 0.0)
+                    spawn(OcoOC, S_SPLASH, 1, 1m)
+                }
+            }
+            if (animframe == 13.0) {
+                save (x, y, z) {
+                    getvert(vtrans, self, 1.0)
+                    spawn(OcoOC, S_SPLASH, 1, 1m)
+                    getvert(vtrans, self, 2.0)
+                    spawn(OcoOC, S_SPLASH, 1, 1m)
+                }
+            }
+            playframe()
+        } while (animframe + 1.0 <= 23.0)
+        WaitChildNull()
+    }
+}
+
+state Jetski_Mount { // 16
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        vfx = (vfx & 0xFFFFFF00) | 0x5
+        InitJetskiWaterFX()
+        statusb = -0x80000000
+        setanim(JETSKI_MOUNT)
+        do { playframe(0) } until (parent -> stateflag & 0x100000)
+        while (parent -> stateflag & 0x2000) { playframe(parent -> animframe) }  
+    }
+    trans {
+        OceanY = ins79(x, vecx)
+        ins80(vecx, OceanVar8)
+    }
+}
+
+state Water_Spray { // 17
+    stateflag 0x20040
+    statusc 0x22
+    code(vertex, yaw, speed, rise, depth) {
+        if (vertex != -1.0) {
+            getvert(vtrans, creator, vertex)
+        }
+        troty = yaw
+        setvel(speed)
+        sp = rise + rand(2m)
+        SetColor1(0, 0, 0)
+        vely = sp
+        zindex = depth
+        vfx = (vfx & 0xFFFFFF00) | 2
+        sp = 0x147 + rand(0x51)
+        scalez = 0
+        scaley = sp
+        scalex = scaley
+        statusb = 0x2000040
+        playanim(0, WATER_SPRAY, 10)
+    }
+    trans {
+        moda = seek(moda, 16.0, 0x147)
+        scaley = scalex - 19
+        scalex = scaley
+        vely += spd(-5m)
+    }
+}
+
+state Smoke { // 18
+    stateflag 0x10001
+    statusc 0x22
+    code() {
+        y += 54m
+        statusb = 0x100000
+        setanim(SMOKE, 0.0)
+        do {
+            animframe = (animframe + 1.0) % 125.0
+            stalltime = (animframe >> 8) >> 2
+            playframe()
+        } while (1)
+    }
+}
+
+

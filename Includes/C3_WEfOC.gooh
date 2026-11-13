@@ -1,0 +1,13 @@
+expr WEfOC = 30
+
+expr WEfOC_S_WARP_ROOM = 0
+expr WEfOC_S_ORB = 1
+expr WEfOC_S_ORB_LIGHT = 2
+expr WEfOC_S_ORB_GLOW = 3
+expr WEfOC_S_SPARK_1 = 4
+expr WEfOC_S_SPARK_2 = 5
+expr WEfOC_S_SPARK_3 = 6
+expr WEfOC_S_ORB_FLASH = 7
+expr WEfOC_S_WARP_OUT = 8
+expr WEfOC_S_WARP_IN = 9
+expr WEfOC_S_WARP_OUT_ALT = 10

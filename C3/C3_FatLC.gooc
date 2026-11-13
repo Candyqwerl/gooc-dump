@@ -1,0 +1,393 @@
+#gool FatLC 74 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_FatLC.gooc" "C3\Out\C3_FatLC.nsentry"
+
+#anim LADY_PEEK    [FL1mV] [FL1mG] 60 1 2
+#anim LADY_THROW   [FT1mV] [FL1mG] 23 1 2
+#anim WINDOW       [FW1mV] [FW1mG] 01 0 2
+#anim BOMB_THROW   [TB1mV] [TB1mG] 12 0 2
+#anim BOMB         [Bo1mV] [Bo1mG] 01 1 2
+#anim FLAMES       [FFimV] [FFimG] 27 1 2
+
+#spawn S_LADY    Lady_Init
+#spawn S_WINDOW  Window
+#spawn S_BOMB    Bomb_Init
+#spawn S_FLAME   Flame_Init
+
+event Event19 => sub KillVoice
+event Event26 => sub KillVoice
+
+var LadyVar1, PeekWaitDuration, CycleOffset, LadyVar4, LadyVar5, BombYaw, BombVelocity, BombGroundY,
+    BombGravity, FlameAxis, CanThrowBomb, TriggerRangeX, TriggerRangeZ, FlameRange
+
+expr ThrowWaitDuration    = LadyVar1
+expr CycleLength          = LadyVar4
+expr BombPitch            = LadyVar5
+expr LadyPhaseTime        = var0
+expr LadyFadeAmount       = var0
+expr BombFallAcceleration = LadyVar1
+expr BombFlameAxis        = LadyVar4
+expr BombFlameRange       = LadyVar5
+expr BombLandingY         = groundy
+expr FlameFadeLevel       = LadyVar1
+
+state Lady_Init { // 0
+    statusc 0
+    code(yaw, throwwait, peekwait, cycleoffs, pitch, yawoffs, speed, ground, gravity, axis, rangex, rangez, reach) {
+        roty = yaw
+        BombPitch = pitch
+        BombYaw = yawoffs + yaw
+        BombVelocity = speed
+        BombGroundY = ground
+        BombGravity = gravity
+        FlameAxis = axis
+        FlameRange = reach
+        TriggerRangeX = rangex
+        if (rangex <= 0) {
+            TriggerRangeX = 200m
+        }
+        TriggerRangeZ = rangez
+        if (rangez <= 0) {
+            TriggerRangeZ = 200m
+        }
+        ThrowWaitDuration = throwwait * 1s / 1.2s
+        if (ThrowWaitDuration <= 0) {
+            ThrowWaitDuration = 1
+        }
+        PeekWaitDuration = peekwait * 1s / 1.2s
+        if (PeekWaitDuration <= 0) {
+            PeekWaitDuration = 1
+        }
+        CycleLength = 23 + (ThrowWaitDuration + (60 + PeekWaitDuration))
+        CycleOffset = (cycleoffs * CycleLength) >> 8
+        if (CycleOffset < 0) {
+            CycleOffset = 0
+        }
+        if (CycleOffset >= CycleLength) {
+            CycleOffset = CycleLength - 1
+        }
+        SetZindexField(26)
+        if ((abs(x - player -> x) <= TriggerRangeX && abs(z - player -> z) <= TriggerRangeZ) && !(player -> stateflag & 0x20) && !player -> invincible) {
+            CanThrowBomb = 1
+        }
+        else {
+            CanThrowBomb = 0
+        }
+        spawn(FatLC, S_WINDOW, 1)
+        changestateif(Lady_Die, entitygetstate(2))
+        LadyPhaseTime = time(CycleLength, CycleOffset)
+        changestateif(Lady_Throw, LadyPhaseTime < 23)
+        LadyPhaseTime -= 23
+        changestateif(Lady_Throw_Wait, LadyPhaseTime < ThrowWaitDuration)
+        LadyPhaseTime -= ThrowWaitDuration
+        changestateif(Lady_Peek, LadyPhaseTime < 60)
+        LadyPhaseTime -= 60
+        changestate(Lady_Peek)
+    }
+}
+
+state Lady_Throw { // 1
+    statusc 0
+    code() {
+        statusb = FLAG_COLLIDABLE
+        setanim(LADY_THROW)
+        do {
+            animframe = time(CycleLength, CycleOffset)
+            changestateif(Lady_Throw_Wait, animframe >= 23)
+            if (CanThrowBomb) {
+                animframe <<= 8
+                if (!animframe) {
+                    spawn(FatLC, S_BOMB, 1, BombPitch, BombYaw, BombVelocity, BombGravity, BombGroundY, FlameAxis, FlameRange)
+                }
+                if (!animframe || (animframe >= 21.0 && animframe <= 22.0)) {
+                    moda = 16.0
+                }
+                else if (animframe >= 1.0 && animframe <= 5.0) {
+                    LadyFadeAmount = animframe * 16.0 / 6.0
+                    moda = 16.0 - LadyFadeAmount
+                }
+                else if (animframe >= 16.0 && animframe <= 20.0) {
+                    moda = (animframe - 16.0) * 16.0 / 5.0
+                }
+                else {
+                    moda = 0
+                }
+            }
+            else {
+                animframe = 22.0
+            }
+            playframe()
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Lady_Squash, e == EventHit || e == EventFling || e == EventHitInvincible || e == EventSpinHit || e == EventSlideHit)
+    }
+}
+
+state Lady_Throw_Wait { // 2
+    statusc 0
+    code() {
+        statusb = 0
+        setanim(LADY_THROW, 22.0)
+        do {
+            LadyPhaseTime = time(CycleLength, CycleOffset) - 23
+            changestateif(Lady_Throw, LadyPhaseTime < 0)
+            changestateif(Lady_Peek, LadyPhaseTime >= ThrowWaitDuration)
+            if ((abs(x - player -> x) <= TriggerRangeX && abs(z - player -> z) <= TriggerRangeZ) && !(player -> stateflag & 0x20) && !player -> invincible) {
+                CanThrowBomb = 1
+            }
+            else {
+                CanThrowBomb = 0
+            }
+            playframe()
+        } while (1)
+    }
+}
+
+state Lady_Peek { // 3
+    statusc 0
+    code() {
+        statusb = FLAG_COLLIDABLE
+        setanim(LADY_PEEK)
+        do {
+            animframe = time(CycleLength, CycleOffset) - (ThrowWaitDuration + 23)
+            changestateif(Lady_Throw_Wait, animframe < 0)
+            changestateif(Lady_Peek_Wait, animframe >= 60)
+            animframe <<= 8
+            if (animframe >= 0 && animframe <= 6.0) {
+                LadyFadeAmount = animframe * 16.0 / 7.0
+                moda = 16.0 - LadyFadeAmount
+            }
+            else if (animframe >= 52.0 && animframe <= 55.0) {
+                moda = (animframe - 52.0) * 4.0
+            }
+            else if (animframe >= 56.0 && animframe <= 59.0) {
+                moda = 16.0
+            }
+            else {
+                moda = 0
+            }
+            if ((abs(x - player -> x) <= TriggerRangeX && abs(z - player -> z) <= TriggerRangeZ) && !(player -> stateflag & 0x20) && !player -> invincible) {
+                CanThrowBomb = 1
+            }
+            else {
+                CanThrowBomb = 0
+            }
+            playframe()
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Lady_Squash, e == EventHit || e == EventFling || e == EventHitInvincible || e == EventSpinHit || e == EventSlideHit)
+    }
+}
+
+state Lady_Peek_Wait { // 4
+    statusc 0
+    code() {
+        statusb = 0
+        setanim(LADY_PEEK, 59.0)
+        do {
+            LadyPhaseTime = time(CycleLength, CycleOffset) - (ThrowWaitDuration + 83)
+            changestateif(Lady_Throw, LadyPhaseTime < 0)
+            if ((abs(x - player -> x) <= TriggerRangeX && abs(z - player -> z) <= TriggerRangeZ) && !(player -> stateflag & 0x20) && !player -> invincible) {
+                CanThrowBomb = 1
+            }
+            else {
+                CanThrowBomb = 0
+            }
+            playframe()
+        } while (1)
+    }
+}
+
+state Lady_Squash { // 5
+    statusc 0x32
+    code() {
+        entitysetstate(1)
+        setanim(LADY_PEEK, 59.0)
+        moda = 16.0
+        playframe()
+        soundpitch(0x3A0)
+        sounddecay(0xFA)
+        soundsetup(6, self, 8)
+        soundplay([bnk0A], 1V)
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        playframe()
+        changestate(Lady_Die)
+    }
+}
+
+sub SetParticleColor() {
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x05, 0xBD, 0xBE)
+    }
+    else if (r == 1) {
+        SetColor1(0x0D, 0x4C, 0x4C)
+    }
+    else if (r == 2) {
+        SetColor1(0xE7, 0x85, 0x81)
+    }
+}
+
+state Lady_Die { // 6
+    statusc 0x32
+    code() {
+        setanim(LADY_PEEK, 59.0)
+        moda = 16.0
+        sleep()
+    }
+}
+
+state Bomb_Init { // 7
+    statusc 0
+    code(pitch, yaw, speed, gravity, ground, axis, reach) {
+        BombFallAcceleration = gravity
+        BombLandingY = ground
+        BombFlameAxis = axis
+        BombFlameRange = reach
+        zindex = creator -> zindex
+        rotx = creator -> rotx
+        roty = creator -> roty
+        rotz = creator -> rotz
+        playframes(BOMB_THROW, 0.0, 11.0)
+        rotx = pitch
+        roty = yaw
+        vectransf(vtrans, vvel, speed, 0, 0)
+        velx -= x
+        vely -= y
+        velz -= z
+        getvert(vtrans, self, 0)
+        getvert(vvec, self, 1.0)
+        vecx -= x
+        vecy = y - vecy
+        vecz -= z
+        var dz = vecz, dx = vecx, yw
+        yw = atan(dx, dz)
+        roty = yw % 360deg
+        yw = -yw
+        var hz = (((dz >> 8) * cos(yw)) >> 4) - (((dx >> 8) * sin(yw)) >> 4)
+        rotx = atan(vecy, hz) % 360deg
+        rotz = 0
+        rotz = roty
+        changestate(Bomb_Throw)
+    }
+}
+
+state Bomb_Throw { // 8
+    statusc 0
+    code() {
+        soundpitch(3.263)
+        soundsetup(6, self, 8)
+        soundplay([jmp0A], 1V)
+        sleepanim(0, BOMB)
+    }
+    trans {
+        x = spd(x, velx)
+        y = spd(y, vely)
+        z = spd(z, velz)
+        if (y <= BombLandingY) {
+            y = BombLandingY
+            changestate(Bomb_Explode)
+        }
+        vely = spd(vely, BombFallAcceleration)
+        rotx = spd(rotx, 30deg)
+    }
+}
+
+state Bomb_Explode { // 9
+    statusc 0
+    code() {
+        soundpitch(4.0)
+        soundsetup(6, self, 8)
+        soundplay([FL1mA], 1V)
+        SetScale(2S)
+        sleepnull()
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            if (!BombFlameAxis) {
+                spawn(FatLC, S_FLAME, 1, x - 0.8m, z, 0, BombFlameAxis)
+                spawn(FatLC, S_FLAME, 1, x + 0.8m, z, 1, BombFlameAxis)
+            }
+            else {
+                spawn(FatLC, S_FLAME, 1, x, z - 0.8m, 0, BombFlameAxis)
+                spawn(FatLC, S_FLAME, 1, x, z + 0.8m, 1, BombFlameAxis)
+            }
+        }
+        changestateifn(Kill, child)
+        if (frametime - statetime < 57) {
+            vecy = player -> y - y
+            if (vecy <= 4m && vecy >= -0.92m) {
+                if (BombFlameAxis) {
+                    sendeventif(EventBurn, player, abs(player -> x - x) <= BombFlameRange && abs(player -> z - z) <= 2m, 100.0)
+                }
+                else {
+                    sendeventif(EventBurn, player, abs(player -> x - x) <= 2m && abs(player -> z - z) <= BombFlameRange, 100.0)
+                }
+            }
+        }
+    }
+}
+
+state Window { // 10
+    statusc 0
+    code() {
+        zindex = creator -> zindex
+        roty = creator -> roty
+        sleepanim(0, WINDOW)
+    }
+}
+
+state Flame_Init { // 11
+    statusc 0
+    code(px, pz, side, axis) {
+        x = px
+        z = pz
+        zindex = 24
+        if (!axis) {
+            scalex = 1.25S
+        }
+        else {
+            scalez = 1.25S
+        }
+        changestate(Flames)
+    }
+}
+
+state Flames { // 12
+    statusc 0
+    code() {
+        setanim(FLAMES, rand(27) << 8)
+        playframes(FLAMES, animframe, 26.0)
+        sleepframes(FLAMES, 0.0, 26.0)
+    }
+    trans {
+        once {
+            FlameFadeLevel = 0
+        }
+        if (frametime - statetime >= 2.25s) {
+            FlameFadeLevel = seek(FlameFadeLevel, 0, 2.56)
+        }
+        else {
+            FlameFadeLevel = seek(FlameFadeLevel, 16.0, 2.56)
+        }
+        moda = 16.0 - FlameFadeLevel
+        changestateif(Kill, frametime - statetime >= 2.5s)
+        roty = CAMROTY
+    }
+}
+
+state Kill { // 13
+    statusc 0
+    code() { }
+}
+
+sub KillVoice() {
+    voice = -1
+    soundfadet(1s, voice)
+    soundfadev(0V, voice, 3)
+    voice = -1
+    soundsetup(0, voice, 5)
+}

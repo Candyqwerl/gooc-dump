@@ -1,0 +1,551 @@
+#gool RatOC 28 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 2 -r pal "C2\C2_RatOC.gooc" "C2\Out\C2_RatOC.nsentry"
+
+#anim RAT_1  [Ra1aV] 17 1
+#anim RAT_2  [Ra2aV] 5 1
+#anim RAT_3  [Ra3aV] 13 1
+
+#iflev mf
+#anim POSSUM_1  [Pb1mV] 13 1
+#anim POSSUM_2  [Pb2mV] 17 1
+#anim POSSUM_3  [Pb3mV] 7 1
+#anim POSSUM_4  [Pb4mV] 6 1
+#anim POSSUM_5  [Pb5mV] 5 1
+#anim LIZARD_1  [Lp1mV] 1 1
+#anim LIZARD_2  [Lp2mV] 1 1
+#anim LIZARD_3  [Lp3mV] 19 1
+#eliflev cD  
+#anim POSSUM_1  [Pb1cV] 13 1
+#anim POSSUM_2  [Pb2cV] 17 1
+#anim POSSUM_3  [Pb3cV] 7 1
+#anim POSSUM_4  [Pb4cV] 6 1
+#anim POSSUM_5  [Pb5cV] 5 1
+#anim LIZARD_1  [Lp1cV] 1 1
+#anim LIZARD_2  [Lp2cV] 1 1
+#anim LIZARD_3  [Lp3cV] 19 1
+#else  
+#anim POSSUM_1  [Pb1mV] 13 1
+#anim POSSUM_2  [Pb2mV] 17 1
+#anim POSSUM_3  [Pb3mV] 7 1
+#anim POSSUM_4  [Pb4mV] 6 1
+#anim POSSUM_5  [Pb5mV] 5 1
+#anim LIZARD_1  [Lp1mV] 1 1
+#anim LIZARD_2  [Lp2mV] 1 1
+#anim LIZARD_3  [Lp3mV] 19 1
+#endif
+
+#spawn S_RAT                Rat_Init
+#spawn S_RAT_TUNNEL         Rat_Init
+#spawn S_POSSUM             Rat_Init
+#spawn S_LIZARD             Rat_Init
+#spawn S_RAT_CIRCLE         Rat_Orbit
+#spawn S_RAT_CIRCLE_CHILD   Rat_Orbit
+#spawn S_RAT_TUNNEL_RING    Rat_Orbit
+
+event EventJumpedOn         => state Rat_Squash
+event EventHit              => state Rat_Fling
+event EventSpinHit          => state Rat_Fling
+event EventHitInvincible    => state Rat_Fling
+event EventFling            => state Rat_Fling
+event EventSlideHit         => state Rat_Fling
+event EventSlamHit          => state Rat_Squash
+
+var RatCycleLen, RatCycleOffs, RatOrbitRadius, RatPathSpeed, RatTrackOffset, RatTunnelPitch, RatPathStartX, TunnelCenterY,
+    RatPathStartZ, RatPathEndX, RatPathEndZ, EntityID, EntityCount, RatTunnelYaw, RatVar15, RatHasPath
+
+expr PlayerPathStartDot = (((player -> x - RatPathStartX) >> 8) * ((RatPathEndX - RatPathStartX) >> 8)) + (((player -> z - RatPathStartZ) >> 8) * ((RatPathEndZ - RatPathStartZ) >> 8))
+expr PlayerPathEndDot = (((player -> x - RatPathEndX) >> 8) * ((RatPathStartX - RatPathEndX) >> 8)) + (((player -> z - RatPathEndZ) >> 8) * ((RatPathStartZ - RatPathEndZ) >> 8))
+
+state Rat_Init {
+    statusc 0x12
+    code(limit, speed, startpoint, trackoffs, obj, count, arg) {
+        pathdist = limit
+        RatPathSpeed = speed
+        pathprog = startpoint
+        RatTrackOffset = trackoffs
+        EntityID = obj
+        EntityCount = count
+        RatVar15 = arg
+        if (entity) {
+            RatHasPath = true
+        }
+        else {
+            RatHasPath = false
+            obj = -2.0
+        }
+        health = 0
+        density = 0.5m
+        SetZindexField(25)
+        yzapproach = 120deg
+        if (spawn == S_POSSUM) {
+            SetScale(1.2S)
+            density = 0.1m
+        }
+        if (RatHasPath) {
+            statusb = FLAG_TRACK_PATH_SIGN
+            save (vecx, vecy, vecz) {
+                calcpath(pathlen - 1.0, vvec)
+                RatPathEndX = vecx
+                RatPathEndZ = vecz
+                calcpath(0, vvec)
+                RatPathStartX = vecx
+                RatPathStartZ = vecz
+            }
+        }
+        if (spawn == S_RAT || spawn == S_RAT_TUNNEL) {
+            spawn(9, 42, 1, 0, 4.0)
+            spawn(9, 42, 1, 1.0, 4.0)
+        }
+        if (spawn == S_RAT_TUNNEL) {
+            if (RatHasPath) {
+                calcpath(pathlen >> 1, vvec)
+                statusb = FLAG_ROT_Y | FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | FLAG_SOLID_ALL | 0x20000000
+            }
+            else {
+                statusb = FLAG_ROT_Y | FLAG_COLLIDABLE | FLAG_SOLID_ALL | 0x20000000
+            }
+            RatTunnelYaw = troty
+            trotx = 4000deg
+            RatTrackOffset = trackoffs + 180deg
+            if (EntityID || !RatHasPath) {
+                changestate(Rat_Tunnel_Wait)
+            }
+            else {
+                changestate(Rat_Active)
+            }
+        }
+        else {
+            trotx = 180deg
+            if (RatHasPath) {
+                statusb = FLAG_ROT_Y | FLAG_TRACK_PATH_ROT | FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | 0x800 | 0x2000 | FLAG_SOLID_ALL | 0x20000000
+            }
+            else {
+                statusb = FLAG_ROT_Y | FLAG_COLLIDABLE | 0x2000 | FLAG_SOLID_ALL | 0x20000000
+            }
+            roty = troty
+            if (EntityID || !RatHasPath) {
+                changestate(Rat_Wait)
+            }
+            else {
+                changestate(Rat_Path_Active)
+            }
+        }
+    }
+}
+
+state Rat_Wait {
+    stateflag 0x5
+    statusc 0x0
+    code() {
+        if (spawn == S_POSSUM) {
+            epc = 0
+            do {
+                if (var r = rand(3); r == 0) {
+                    SoundPitchDefault(0.18)
+                    soundplay([PGrcA], 0.3V)
+                    playframes(POSSUM_2, 0.0, 16.0)
+                }
+                else if (r == 1) {
+                    playanim(0, POSSUM_3)
+                    playanim(1, POSSUM_3)
+                    playanim(2, POSSUM_3)
+                    playanim(3, POSSUM_3)
+                    playanim(3, POSSUM_3)
+                    playanim(4, POSSUM_3)
+                    playanim(5, POSSUM_3)
+                }
+                else if (r == 2) {
+                    playanim(0, POSSUM_4)
+                    playanim(1, POSSUM_4)
+                    playanim(2, POSSUM_4)
+                    playanim(3, POSSUM_4)
+                    playanim(3, POSSUM_4)
+                    playanim(4, POSSUM_4)
+                }
+            } while (1)
+        }
+        else if (spawn == S_LIZARD) {
+            setevent(LizardEvent)
+            sleepanim(0, LIZARD_1)
+        }
+        else {
+            setevent(RatEvent)
+            sleepframes(RAT_1, 0.0, 16.0)
+        }
+    }
+    trans {
+        if (STATUS_FIRSTFRAME && RatHasPath) {
+            save (RatPathSpeed) {
+                RatPathSpeed = 0
+                RatPathTrack()
+            }
+        }
+        if (RatHasPath) {
+            if (EntityID == -1.0) {
+                changestateif(Rat_Path_Active, PlayerPathStartDot >= -10m && PlayerPathEndDot >= -10m)
+            }
+            else if (EntityID >= 1.0 && !entitygetstate(EntityID, parent)) {
+                changestateif(Rat_Path_Active, EntityCount <= 1.0)
+                var obj_id = EntityID + 1.0
+                var obj_count = (EntityCount >> 8) - 1
+                var obj_alive = 0
+                while (obj_count) {
+                    if (entitygetstate(obj_id, parent)) {
+                        obj_alive += 1
+                    }
+                    obj_id += 1.0
+                    obj_count -= 1
+                }
+                changestateifn(Rat_Path_Active, obj_alive)
+            }
+        }
+        troty = atan2(player -> trans)
+        if (creator) {
+            x = creator -> x
+            y = creator -> y
+            z = creator -> z
+        }
+        sendeventif(EventHit, collider, player -> statusa \ FLAG_GROUNDLAND, 100.0)
+    }
+}
+
+state Rat_Tunnel_Wait {
+    stateflag 0x5
+    statusc 0x0
+    code => state Rat_Wait
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            calcpath(pathprog)
+            RatTunnelPitch = RatTrackOffset
+            RatTunnelTransform()
+        }
+        if (EntityID < 1.0) {
+            changestateif(Rat_Active, PlayerPathStartDot >= -8m && PlayerPathEndDot >= -8m)
+        }
+        else {
+            changestateifn(Rat_Active, entitygetstate(EntityID, parent))
+        }
+        troty = atan2(player -> trans)
+        sendeventif(EventHit, collider, player -> statusa \ FLAG_GROUNDLAND, 100.0)
+    }
+}
+
+state Rat_Active {
+    stateflag 0x5
+    statusc 0x0
+    code() {
+        if (spawn == S_POSSUM) {
+            health = 0
+            if (animseq == getanim(POSSUM_2) || animseq == getanim(POSSUM_3) || animseq == getanim(POSSUM_4)) {
+                playanim(0, POSSUM_5)
+                playanim(1, POSSUM_5)
+                playanim(2, POSSUM_5)
+                playanim(2, POSSUM_5)
+                playanim(3, POSSUM_5)
+            }
+            do (var loops = 0) {
+                unless (loops % 3) {
+                    SoundPitchDefault(0.18)
+                    soundplay([PGrcA], 0.3V)
+                }
+                playframes(POSSUM_1, 0.0, 12.0)
+                loops += 1
+            } while (1)
+        }
+        else if (spawn == S_LIZARD) {
+            setevent(LizardEvent)
+            if (animseq == getanim(LIZARD_1)) {
+                playanim(0, LIZARD_2)
+            }
+            do {
+                SoundPitchDefault(0.23)
+                soundplay([AEHcA], 0.3V)
+                playframes(LIZARD_3, 0.0, 18.0)
+            } while (1)
+        }
+        else {
+            setevent(RatEvent)
+            if (animseq == getanim(RAT_1)) {
+                playanim(0, RAT_2)
+                playanim(1, RAT_2)
+                playanim(2, RAT_2)
+                playanim(3, RAT_2)
+                playanim(3, RAT_2)
+            }
+            do {
+                SoundPitchDefault(0.23)
+                soundplay([RScaA], 0.3V)
+                playframes(RAT_3, 0.0, 12.0)
+            } while (1)
+        }
+    }
+    trans {
+        if (PlayerPathStartDot >= -5m && PlayerPathEndDot >= -5m && !(player -> stateflag & 0x20) && !player -> invincible) {
+            if (abs(degdist(atan2(player -> trans), troty)) > 135deg) {
+                pathprog = -pathprog
+            }
+            if (pathprog >= 0) {
+                pathprog = seek(pathprog, pathlen - 1.0, spd(RatPathSpeed))
+            }
+            else {
+                pathprog = seek(pathprog, 0, spd(RatPathSpeed))
+            }
+            calcpath(abs(pathprog))
+        }
+        else {
+            calcpath(loopseek(pathprog, pathlen + spd(RatPathSpeed) - 1.0, spd(RatPathSpeed)))
+        }
+        if (player -> statusa \ FLAG_GROUNDLAND) {
+            RatTrackOffset = atan(((((player -> x - vecx) >> 8) * cos(RatTunnelYaw)) >> 4) - ((((player -> z - vecz) >> 8) * sin(RatTunnelYaw)) >> 4), player -> y - y)
+        }
+        sendeventif(EventHit, collider, STATUS_PLAYER_D_COLLIDER && player -> statusa \ FLAG_GROUNDLAND, 100.0)
+        RatTunnelTrackPlayer()
+    }
+}
+
+state Rat_Path_Active {
+    stateflag 0x5
+    statusc 0x0
+    code => state Rat_Active
+    trans => sub RatPathTrack
+}
+
+sub RatTunnelTrackPlayer() {
+    RatTrackOffset = degseek(180deg, RatTrackOffset, 1050deg)
+    RatTunnelTransform()
+}
+
+sub RatTunnelTransform() {
+    save (trotx) {
+        var pathyaw = troty, playeryaw
+        trotz = pathyaw + 90deg
+        RatTunnelPitch = degseek(RatTunnelPitch, RatTrackOffset, 60deg)
+        trotx = RatTunnelPitch
+        troty = 0deg
+        vectransf2(vtrans, vtrans, 0, 0, pathdist)
+        rotz = trotz
+        rotx = 180deg + trotx
+        playeryaw = atan2(player -> trans)
+        if (pathprog < 0) {
+            pathyaw += 180deg
+        }
+        if (!(player -> stateflag & 0x20) && !player -> invincible) {
+            if (abs(degdist(playeryaw, pathyaw)) > 135deg) {
+                troty = playeryaw + 180deg
+            }
+            else {
+                troty = playeryaw
+            }
+        }
+        else {
+            troty = pathyaw
+        }
+    }
+}
+
+sub LizardEvent(e, a) {
+    if (interrupter == player) {
+        if (e == EventSpinHit || e == EventJumpedOn || e == EventSlamHit) {
+            rejev()
+            sendevent(Event24, interrupter, 100.0)
+        }
+        accevcstate(Rat_Fling, e == EventSlideHit || e == EventHitInvincible || e == EventFling)
+    }
+}
+
+sub RatEvent(e, a) {
+    if (interrupter == player) {
+        if (interrupter -> statusa & FLAG_GROUNDLAND && (e == EventSpinHit || e == EventSlideHit)) {
+            rejev()
+            sendevent(Event24, interrupter, 100.0)
+        }
+    }
+}
+
+sub RatPathTrack() {
+    if (STATUS_PATH_END) {
+        if (STATUS_REACHED_TROT) {
+            trotx = 180deg
+            statusb |= 0x20000000
+            statusa &= ~FLAG_PATH_END
+        }
+    }
+    else {
+        calcpath(loopseek(pathprog, pathlen + spd(RatPathSpeed) - 1.0, spd(RatPathSpeed)))
+        if (STATUS_PATH_END) {
+            trotx = 720deg
+            statusb &= ~0x20000000
+        }
+        var v1 = 0
+        var deg_to_player = 0deg
+        var pathrot = troty
+        save (troty, statusa, statusb, x, y, z, pathprog) {
+            statusb = FLAG_PATH_CALCS | FLAG_TRACK_PATH_SIGN
+            x = player -> x
+            y = player -> y
+            z = player -> z
+            calcpath(0)
+            v1 = troty
+            troty += 90deg
+            setvel(RatTrackOffset, vvel)
+        }
+        x += velx
+        z += velz
+        if (abs(RatTrackOffset - vecy) > 0.1m) {
+            deg_to_player = degdist(troty, atan2(player -> trans))
+            if (abs(deg_to_player) < 60deg) {
+                if (deg_to_player < -45deg) {
+                    deg_to_player = -45deg
+                }
+                else if (deg_to_player > 45deg) {
+                    deg_to_player = 45deg
+                }
+                troty += deg_to_player
+            }
+        }
+        RatTrackOffset = seek(RatTrackOffset, vecy, spd(1.86m))
+        if (RatTrackOffset < -pathdist) {
+            troty = pathrot
+            RatTrackOffset = -pathdist
+        }
+        else if (RatTrackOffset > pathdist) {
+            troty = pathrot
+            RatTrackOffset = pathdist
+        }
+    }
+    sendeventif(EventHit, collider, player -> statusa \ FLAG_GROUNDLAND, 100.0)
+}
+
+state Rat_Orbit {
+    code(yaw, cyclelen, cycleoffs, speed, radius, count) {
+        RatCycleLen = cyclelen * 1s / 1.2s
+        RatCycleOffs = cycleoffs * 1s / 1.2s
+        RatOrbitRadius = radius
+        RatPathSpeed = speed
+        if (spawn == S_RAT_CIRCLE_CHILD) {
+            zindex = creator -> zindex
+        }
+        else {
+            SetZindexField(24)
+        }
+        density = 0.5m
+        statusb = FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        SetTRot(0deg, yaw, 0deg)
+        SetVec(x, y, z)
+        if (spawn == S_RAT_CIRCLE || spawn == S_RAT_TUNNEL_RING) {
+            var offs = cyclelen / (count >> 8)
+            do (var rats = 0) {
+                spawn2(RatOC, S_RAT_CIRCLE_CHILD, 1, yaw, cyclelen, cycleoffs + offs * (rats >> 8), speed, radius, 0)
+            } while ({ rats += 1.0 }; rats < count)
+            statusb = 0
+            WaitChildNull()
+            KillEntity()
+            return
+        }
+        if (spawn == S_RAT_CIRCLE_CHILD) {
+            pathlen = creator -> pathlen
+            entity = creator -> entity
+            spawn = creator -> spawn
+        }
+        if (spawn == S_RAT_CIRCLE) {
+            changestate(Rat_Circle)
+        }
+        else if (spawn == S_RAT_TUNNEL_RING) {
+            calcpath(pathlen >> 1, vvec)
+            RatPathStartX = vecx
+            TunnelCenterY = vecy
+            RatPathStartZ = vecz
+            changestate(Rat_Tunnel_Ring)
+        }
+    }
+}
+
+state Rat_Circle {
+    statusc 0x0
+    code => state Rat_Active
+    trans {
+        if (pathlen > 1.0) {
+            calcpath(loopseek(pathprog, pathlen + spd(RatPathSpeed) - 1.0, spd(RatPathSpeed)), vvec)
+        }
+        troty = -((time(RatCycleLen, RatCycleOffs) << 12) / RatCycleLen)
+        vectransf2(vvec, vtrans, RatOrbitRadius, 0, 0)
+        roty = troty - 90deg
+        sendeventif(EventHit, collider, STATUS_PLAYER_D_COLLIDER && player -> statusa \ FLAG_GROUNDLAND, 100.0)
+    }
+}
+
+state Rat_Tunnel_Ring {
+    statusc 0x0
+    code => state Rat_Active
+    trans {
+        var cycletime = time(RatCycleLen, RatCycleOffs)
+        var angle = (cycletime << 12) / RatCycleLen
+        calcpath((((sin(angle) * ((pathlen >> 1) - 1)) >> 12) + (pathlen >> 1)), vvec)
+        trotz = troty + 90deg
+        trotx = 180deg + ((cos(angle) * 40deg) / -360deg)
+        vectransf2(vvec, vtrans, 0, 0, RatOrbitRadius)
+        rotx = 180deg + trotx
+        roty = atan2(self, RatPathStartX) + 90deg
+        rotz = trotz
+        sendeventif(EventHit, collider, player -> statusa \ FLAG_GROUNDLAND, 100.0)
+    }
+}
+
+state Rat_Fling {
+    stateflag 0x30
+    statusc 0x12
+    code(h) {
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir()
+        if (LEVEL == LEVEL_Ruination || LEVEL == LEVEL_RoadToRuin) {
+            var dir, delta
+            troty %= 360deg
+            dir = troty + 45deg >> 10
+            dir <<= 10
+            delta = degdist(dir, troty)
+            if (delta < 30deg) {
+                delta = 30deg
+            }
+            if (delta > -30deg) {
+                delta = -30deg
+            }
+            troty = (dir + delta) % 360deg
+        }
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    } 
+    trans {
+        EnemyFlingTrans(2m, EventFling)
+    }
+}
+
+state Rat_Squash {
+    stateflag 0x23
+    statusc 0x12
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        scaley = scaley * 12 >> 8
+        scalex = scalex * 1.05 >> 8
+        scalez = scalez * 1.05 >> 8
+        playframe()
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        playframe()
+    }
+}
+
+sub SetParticleColor() {
+    vfx = (vfx & 0xFFFF00FF) | 0x300
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x5, 0xBD, 0xBE)
+    }
+    else if (r == 1) {
+        SetColor1(0x0D, 0x4C, 0x4C)
+    }
+    else if (r == 2) {
+        SetColor1(0xE7, 0x85, 0x81)
+    }
+}

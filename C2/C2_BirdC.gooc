@@ -1,0 +1,308 @@
+#gool BirdC 6 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C2_ShadC.gooh"
+//gooc -c 2 -r pal "C2\C2_BirdC.gooc" "C2\Out\C2_BirdC.nsentry"
+
+#anim BIRD_HOVER         [Di1bV] 22 1
+#anim BIRD_DIVE_START    [Di2bV] 13 1
+#anim BIRD_DIVE          [Di3bV] 4 1
+#anim BIRD_FLY_UP        [Di4bV] 5 1
+#anim FEATHER            [Di5bV] 1 1
+  
+#spawn S_BIRD_SMALL      Bird_Init
+#spawn S_FEATHER         Feather
+#spawn S_BIRD            Bird_Init
+
+event EventJumpedOn      => state Bird_Squash
+event EventHit           => state Bird_Squash
+event EventHitInvincible => state Bird_Squash
+event EventFling         => state Bird_Squash
+event EventSlamHit       => state Bird_Squash
+
+var BirdTrackOffset, BirdHoverHeight, NeedsPathInit, BirdCanDive, BirdPathSpeed, BirdShowDist, BirdDiveTriggerDist
+
+inline sub BirdPathInit() {
+    save (vecx, vecy, vecz, trotx, troty, trotz) {
+        calcpath(0, vvec)
+        calcpath(pathlen - 1.0, vtrot)
+        if (distance(vecx, player, 0) > distance(trotx, player, 0)) {
+            misc = 0
+        }
+        else {
+            misc = -(pathlen - 1.0)
+        }
+    }
+    pathprog = misc
+    calcpath(pathprog)
+}
+
+inline sub SoundBirdFlap(delay) {
+    sounddelay(delay)
+    sounddecay(6.4s)
+    SoundPitchDefault(0.23)
+    soundplay([BdFJA], 0.4V)
+}
+
+state Bird_Init { // 0
+    code(limit, speed, showdist, attackdist, small) {
+        BirdPathSpeed = speed
+        pathdist = limit
+        BirdShowDist = showdist
+        BirdDiveTriggerDist = attackdist
+        if (small) {
+            SetScale(0.6S)
+        }
+        zindex = 40
+        density = 0.15m
+        spawn(ShadC, ShadC_S_SHADOW_GROUND, 1, y - 1m, 2S, 10)
+        creator = objectspawned
+        trotx = 180deg
+        yzapproach = 120deg
+        NeedsPathInit = true
+        changestate(Bird_Show)
+    }
+}
+
+state Bird_Hide { // 1
+    code() {
+        sleepnull()
+    }
+    trans {
+        once {
+            statusb = FLAG_TRACK_PATH_SIGN | FLAG_TRACK_PATH_ROT
+            NeedsPathInit = true
+        }
+        unless (STATUS_FIRSTFRAME) {
+            BirdPathInit()
+            var dist = distance(player, 0)
+            changestateif(Bird_Show, !(abs(degdist(troty, GAMEDIR + 180deg)) < 90deg) && dist >= BirdDiveTriggerDist && dist <= BirdShowDist)
+        }
+    }
+}
+
+state Bird_Show { // 2
+    event => state Bird_Dive
+    code() {
+        roty = troty
+        rotx = trotz
+        rotz = roty
+        do {
+            SoundBirdFlap(0.1s)
+            SoundBirdFlap(0.5s)
+            playframes(BIRD_HOVER, 0.0, 21.0)
+        } while (1)
+    }
+    trans {
+        once {
+            statusb = FLAG_ROT_Y | FLAG_TRACK_PATH_ROT | FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | FLAG_SOLID_TOP | FLAG_HAS_SHADOW | 0x800 | 0x2000 | 0x20000000
+        }
+        if (NeedsPathInit) {
+            BirdPathInit()
+            groundy = y
+            var dist = distance(player, 0)
+            changestateif(Bird_Hide, abs(degdist(troty, GAMEDIR + 180deg)) < 90deg || dist < BirdDiveTriggerDist || dist > BirdShowDist)
+            BirdTrackOffset = 0
+            BirdHoverHeight = 5m
+            NeedsPathInit = false
+            BirdCanDive = false
+        }
+        troty = atan2(player -> trans)
+        trotz = atan2_3d(self, player -> trans)
+        rotz = roty
+        BirdHoverHeight = seek(BirdHoverHeight, 1.25m, spd(8m))
+        y = groundy + BirdHoverHeight
+        if (distance(player, DIST_EXACT) < BirdDiveTriggerDist) {
+            BirdCanDive = true
+        }
+        changestateif(Bird_Dive, BirdCanDive)
+    }
+}
+
+state Bird_Dive { // 3
+    statusc 0
+    code() {
+        sounddecay(7.7s)
+        SoundPitchDefault()
+        soundplay([BrdJA], 1.28V)
+        playframes(BIRD_DIVE_START, 0.0, 4.0)
+        settrans(DivePathTrack)
+        playframes(5.0, 12.0)
+        do {
+            if (!(rand(10)) && pathprog < pathlen - 3.0) {
+                playanim(0, BIRD_DIVE)
+                playanim(1, BIRD_DIVE)
+                playanim(2, BIRD_DIVE)
+                playanim(2, BIRD_DIVE)
+            }
+            else {
+                playanim(12, BIRD_DIVE_START)
+            }
+        } while (1)
+    }
+    event(e, a) {
+        if ((e == EventSpinHit || e == EventSlideHit) && interrupter == player && player -> statusb \ FLAG_DPAD_CONTROL) {
+            save (velx, vely, velz, troty) {
+                troty = atan2(player -> trans)
+                interrupter -> speed = 15m
+                interrupter -> troty = atan2(player -> trans)
+                setvel(15m, vvel)
+                interrupter -> velx = velx
+                interrupter -> vely = vely
+                interrupter -> velz = velz
+                interrupter -> statusb &= ~FLAG_DPAD_CONTROL
+            }
+        }
+    }
+    trans {
+        BirdHoverHeight = seek(BirdHoverHeight, -0.75m, spd(16m))
+        y = groundy + BirdHoverHeight
+    }
+}
+
+sub DivePathTrack() {
+    calcpath(loopseek(pathprog, pathlen + spd(BirdPathSpeed) - 1.0, spd(BirdPathSpeed)))
+    sendevent(Event21, creator, y - 1m)
+    BirdHoverHeight = seek(BirdHoverHeight, -0.75m, 4m)
+    y += BirdHoverHeight
+    {
+        var v1 = 0
+        var deg_to_player = 0deg
+        var pathrot = troty
+        save (troty, statusa, statusb, x, y, z, pathprog) {
+            statusb = FLAG_PATH_CALCS | FLAG_TRACK_PATH_SIGN
+            x = player -> x
+            y = player -> y
+            z = player -> z
+            calcpath(0)
+            v1 = troty
+            troty += 90deg
+            setvel(BirdTrackOffset, vvel)
+        }
+        x += velx
+        z += velz
+        if (abs(BirdTrackOffset - vecy) > 0.1m) {
+            deg_to_player = degdist(troty, atan2(player -> trans))
+            if (abs(deg_to_player) < 60deg) {
+                if (deg_to_player < -30deg) {
+                    deg_to_player = -30deg
+                }
+                else if (deg_to_player > 30deg) {
+                    deg_to_player = 30deg
+                }
+                troty += deg_to_player
+            }
+        }
+        BirdTrackOffset = seek(BirdTrackOffset, vecy, spd(2m))
+        if (BirdTrackOffset < -pathdist) {
+            troty = pathrot
+            BirdTrackOffset = -pathdist
+        }
+        else if (BirdTrackOffset > pathdist) {
+            troty = pathrot
+            BirdTrackOffset = pathdist
+        }
+    }
+    sendevent(EventHit, collider, 100.0)
+    changestateif(Bird_Fly_Up, !STATUS_FIRSTFRAME && STATUS_PATH_END)
+}
+
+state Bird_Fly_Up { // 4
+    event => state Bird_Dive
+    code() {
+        playanim(0, BIRD_FLY_UP)
+        playanim(1, BIRD_FLY_UP)
+        playanim(2, BIRD_FLY_UP)
+        playanim(3, BIRD_FLY_UP)
+        playanim(3, BIRD_FLY_UP)
+        playframes(BIRD_HOVER, 3.0, 21.0)
+        playframes(BIRD_HOVER, 0.0, 21.0)
+        playframes(BIRD_HOVER, 0.0, 21.0)
+        changestate(Bird_Hide)
+    }
+    trans {
+        once {
+            vely = 0m
+        }
+        y = spd(y, vely)
+        vely = spd(vely, 2.5m)
+        troty = atan2(player -> trans)
+        sendevent(EventHit, collider, 100.0)
+        if (animseq == getanim(BIRD_HOVER) && (animframe == 3.0 || animframe == 12.0)) {
+            sounddecay(0xA0)
+            SoundPitchDefault(0.23)
+            soundplay([BdFJA], 0.4V)
+        }
+    }
+}
+
+sub SetParticleColor() {
+    if (var r = rand(4); r == 0) {
+        SetColor1(0xC8, 0x00, 0xC8)
+    }
+    else if (r == 1) {
+        SetColor1(0x96, 0x00, 0x64)
+    }
+    else if (r == 2) {
+        SetColor1(0x96, 0x1E, 0x96)
+    }
+    else if (r == 3) {
+        SetColor1(0xC4, 0x40, 0x00)
+    }
+}
+
+state Bird_Squash { // 5
+    stateflag 0x23
+    statusc 0x12
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        creator = child
+        spawn(BirdC, S_FEATHER, 10)
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        EnemyDieClearFlags()
+        playframe()
+        statusb = 0
+        SetScale(0S)
+        do {
+            playnull()
+        } until (child == creator)
+    }
+}
+
+state Feather { // 6
+    stateflag 0x80
+    statusc 0x22
+    code() {
+        SetScale(1.5S)
+        moda = 16.0
+        SetParticleColor()
+        x += randi(-0.5m, 0.5m)
+        z += randi(-0.5m, 0.5m)
+        y += 1m + rand(1m)
+        rotx = 0deg
+        roty = rand(360deg)
+        rotz = roty + 90deg
+        trotx = randi(-100deg, 100deg)
+        velx = randi(-0.7m, 0.7m)
+        vely = 0m
+        velz = randi(-0.7m, 0.7m)
+        statusb = FLAG_PHYSICS_ENGINE
+        playanim(0, FEATHER, 1.7s)
+        playanim(0, FEATHER, 1.7s)
+        while (scaley > 0S) {
+            playanim(0, FEATHER)
+        }
+    }
+    trans {
+        nofirst {
+            rotx = sin(loopseek(trotx, 190deg, spd(180deg)), 190deg - spd(180deg)) - 130deg
+            y = spd(y, -0.6m)
+            if (frametime - statetime >= 4s) {
+                scalex = seek(scalex, 0S, spd(1S))
+                scaley = seek(scaley, 0S, spd(1S))
+                scalez = seek(scalez, 0S, spd(1S))
+            }
+        }
+    }
+}

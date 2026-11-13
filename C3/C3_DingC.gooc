@@ -1,0 +1,2184 @@
+#gool DingC 88 3
+#interruptcount 90
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C3_FruiC.gooh"
+#include "..\\Includes\\C3_BosBC.gooh"
+#include "..\\Includes\\C3_ShadC.gooh"
+#include "..\\Includes\\C3_WEfOC.gooh"
+//gooc -c 3 -r pal "C3\C3_DingC.gooc" "C3\Out\C3_DingC.nsentry"
+
+#anim DINGO_STAND           [Di13V] [Di13G] 01 1 2
+#anim DINGO_SHOOT_UP_START  [DL13V] [Di13G] 38 1 2
+#anim DINGO_SHOOT_UP        [DL23V] [Di13G] 16 1 2
+#anim DINGO_SHOOT_UP_STOP   [DL33V] [Di13G] 28 1 2
+#anim DINGO_CHANGE_MODE     [DS13V] [Di13G] 48 1 2
+#anim DINGO_STEP_1          [DS23V] [Di13G] 14 1 2
+#anim DINGO_RELOAD_1        [DS33V] [Di13G] 24 1 2
+#anim DINGO_AIM_1           [Die3V] [Di13G] 14 1 2
+#anim DINGO_AIM_2           [Dif3V] [Di13G] 10 1 2
+#anim DINGO_AIM_3           [Dig3V] [Di13G] 08 1 2
+#anim DINGO_STEP_2          [Dih3V] [Di13G] 13 1 2
+#anim DINGO_AIM_4           [Dii3V] [Di13G] 14 1 2
+#anim DINGO_AIM_5           [Dij3V] [Di13G] 10 1 2
+#anim DINGO_AIM_6           [Dik3V] [Di13G] 08 1 2
+
+#anim DINGO_SHOOT_READY     [Dil3V] [Di13G] 01 1 2
+#anim DINGO_SHOOT_STOP      [Dim3V] [Di13G] 08 1 2
+#anim DINGO_RELOAD_2        [Din3V] [Di13G] 23 1 2
+#anim DINGO_PHASE_TRANS     [Dio3V] [Di13G] 85 1 2
+
+#anim DINGO_WIN_1           [Dip3V] [Di13G] 10 1 2
+#anim DINGO_WIN_2           [Diq3V] [Di13G] 38 1 2
+#anim DINGO_INTRO_1         [Dir3V] [Di13G] 98 1 2
+#anim DINGO_INTRO_2         [Dis3V] [Di13G] 98 1 2
+
+#anim DINGO_FLAME_SHOOT_1   [Dit3V] [Dir3G] 02 1 2
+#anim DINGO_FLAME_SHOOT_2   [Diu3V] [Dir3G] 04 1 2
+#anim DINGO_FLAME_SHOOT_3   [Div3V] [Diu3G] 18 1 2
+
+#anim DINGO_ATTACKED_1      [DH13V] [DH13G] 61 1 2
+#anim DINGO_ATTACKED_2      [DH23V] [DH13G] 62 1 2
+#anim DINGO_EXPLODE_1       [DH33V] [DH33G] 12 1 2
+#anim DINGO_EXPLODE_2       [DH43V] [DH33G] 30 1 2
+#anim DINGO_EXPLODE_3       [DH53V] [DH33G] 14 1 2
+#anim DINGO_DEFEATED_1      [DH63V] [DH33G] 76 1 2
+#anim DINGO_DEFEATED_2      [DH73V] [DH33G] 12 1 2
+#anim DINGO_RECOVER_1       [DH83V] [DH83G] 36 1 2
+#anim DINGO_RECOVER_2       [DH93V] [DH93G] 04 1 2
+#anim DINGO_RECOVER_3       [DHa3V] [DHa3G] 42 1 2
+
+#anim EXPLOSION_1           [Nu13V] [Nu13G] 43 1 2
+#anim FIREBALL              [Fb13V] [Fb13G] 17 1 2
+#anim FIREBALL_SHADOW       [Fb23V] [Fb23G] 08 1 2
+#anim FLAMETHROWER_WALL_HIT [FW13V] [FW13G] 38 1 2
+#anim FIREBALL_GROUND_HIT   [FG13V] [FG13G] 36 1 2
+#anim EXPLOSION_2           [FN13V] [FN13G] 36 1 2
+
+#anim FLAME_RED             [FS13V] [FS13G] 38 0 2
+#anim FLAME_GREEN           [FS23V] [FS23G] 38 0 2
+
+#anim WALL_INNER_1          [WI13V] [WI13G] 01 1 2
+#anim WALL_INNER_2          [WI23V] [WI23G] 01 1 2
+#anim WALL_INNER_3          [WI33V] [WI33G] 01 1 2
+#anim WALL_INNER_BREAK_1    [WI43V] [WI43G] 31 1 2
+#anim WALL_INNER_BREAK_2    [WI53V] [WI53G] 31 1 2
+#anim WALL_MIDDLE_1         [WM13V] [WM13G] 01 1 2
+#anim WALL_MIDDLE_2         [WM23V] [WM23G] 01 1 2
+#anim WALL_MIDDLE_3         [WM33V] [WM33G] 01 1 2
+#anim WALL_MIDDLE_BREAK_1   [WM43V] [WM43G] 31 1 2
+#anim WALL_MIDDLE_BREAK_2   [WM53V] [WM53G] 31 1 2
+#anim WALL_OUTER_1          [WO13V] [WO13G] 01 1 2
+#anim WALL_OUTER_2          [WO23V] [WO23G] 01 1 2
+#anim WALL_OUTER_3          [WO33V] [WO33G] 01 1 2
+#anim WALL_OUTER_BREAK_1    [WO43V] [WO43G] 31 1 2
+#anim WALL_OUTER_BREAK_2    [WO53V] [WO53G] 31 1 2
+#anim WALL_SHADOW_1         [WS13V] [WS13G] 01 1 2
+#anim WALL_SHADOW_2         [WS23V] [WS23G] 01 1 2
+#anim WALL_SHADOW_3         [WS33V] [WS33G] 01 1 2
+
+#anim PENTA_INTRO_1         [PI13V] [PI13G] 25 1 2
+#anim PENTA_INTRO_2         [PI23V] [PI13G] 29 1 2
+#anim PENTA_INTRO_3         [PI33V] [PI13G] 16 1 2
+#anim PENTA_INTRO_4         [PI43V] [PI13G] 24 1 2
+#anim PENTA_INTRO_5         [PI53V] [PI13G] 04 1 2
+#anim PENTA_INTRO_6         [PI63V] [PI13G] 10 1 2
+#anim PENTA_WIN_1           [PI73V] [PI13G] 11 1 2
+#anim PENTA_WIN_2           [PI83V] [PI13G] 25 1 2
+#anim PENTA_COWER_1         [PC13V] [PC13G] 05 1 2
+#anim PENTA_COWER_2         [PC23V] [PC13G] 14 1 2
+
+#sprite FOOTPRINT [Din1T]
+#tex 0x303020 0 3 0 12 896 80 16 16
+
+#sprite LIGHT [Cr10T]
+#tex 0x808080 0 3 2 9 800 32 32 32
+
+#sprite FLAMES [Din1T]
+#tex 0x808080 0 3 11 0 704 16 32 16
+#tex 0x808080 0 3 12 0 736 112 32 16
+#tex 0x808080 0 3 13 0 736 96 32 16
+#tex 0x808080 0 3 14 0 736 80 32 16
+#tex 0x808080 0 3 15 0 736 64 32 16
+#tex 0x808080 0 3 00 9 736 48 32 16
+#tex 0x808080 0 3 01 9 736 32 32 16
+#tex 0x808080 0 3 02 9 736 16 32 16
+#tex 0x808080 0 3 03 9 768 112 32 16
+#tex 0x808080 0 3 04 9 768 96 32 16
+#tex 0x808080 0 3 05 9 768 80 32 16
+#tex 0x808080 0 3 06 9 768 64 32 16
+#tex 0x808080 0 3 07 9 768 48 32 16
+#tex 0x808080 0 3 08 9 768 32 32 16
+#tex 0x808080 0 3 09 9 768 16 32 16
+#tex 0x808080 0 3 10 9 800 112 32 16
+#tex 0x808080 0 3 11 9 800 96 32 16
+#tex 0x808080 0 3 12 9 800 80 32 16
+#tex 0x808080 0 3 13 9 800 64 32 16
+#tex 0x808080 0 3 14 9 800 48 32 16
+#tex 0x808080 0 3 15 9 800 32 32 16
+#tex 0x808080 0 3 0 10 800 16 32 16
+#tex 0x808080 0 3 1 10 832 112 32 16
+#tex 0x808080 0 3 2 10 832 96 32 16
+#tex 0x808080 0 3 3 10 832 80 32 16
+#tex 0x808080 0 3 4 10 832 64 32 16
+#tex 0x808080 0 3 5 10 832 48 32 16
+#tex 0x808080 0 3 6 10 832 32 32 16
+#tex 0x808080 0 3 7 10 832 16 32 16
+#tex 0x808080 0 3 8 10 864 112 32 16
+#tex 0x808080 0 3 9 10 864 96 32 16
+#tex 0x808080 0 3 9 10 864 96 32 16
+
+#spawn S_DINGO                  Dingo_Init
+#spawn S_FLAME_PROJECTILE       FlameProjectile_Init
+#spawn S_FIREBALL               Fireball_Init
+#spawn S_FIREBALL_LIGHT         FireballLight_Init
+#spawn S_FLAMETHROWER           Flamethrower_Init
+#spawn S_FLAMETHROWER_IMPACT    Flamethrower_Impact
+#spawn S_ICE_CONTROLLER         IceController_Init
+#spawn S_ICE_WALL               IceWall_Init
+#spawn S_ICE_BREAK              IceWall_Break
+#spawn S_GREEN_FLAME            GreenFlame_Init
+#spawn S_TANK_EXPLOSION         Tank_Explosion
+#spawn S_FLAMES                 Flamethrower_Flames_Init
+#spawn S_ICE_SHADOW             IceShadow_Init
+#spawn S_FOOTPRINT              Footprint
+#spawn S_WILLY_BREATH           Willy_Breath_Vapor
+#spawn S_PENTA_INTRO            Penta_IntroInit
+#spawn S_PENTA_RETURN           Penta_Return
+
+var AimAngle, FlameLength, WallBurnLength, WallEventAccepted, FlameHitPlayer, PlayerDistance, VolleyShotIndex, IceController, WallsCleared, AimOffset, 
+    SavedFlags, AimLeadFrames, VolleyBaseAngle, VolleyTurn, FightDeathCount, WallSectorB, WallSegmentsLeft, IceLightX, IceLightZ, WallShadowOBJ
+
+expr ExplosionExitTimer  = SavedFlags
+expr InnerWallAngle      = IceController
+expr MiddleWallAngle     = WallsCleared
+expr OuterWallAngle      = AimOffset
+expr InnerWallMask       = SavedFlags
+expr MiddleWallMask      = AimLeadFrames
+expr OuterWallMask       = VolleyBaseAngle
+expr WallAngleOffset     = VolleyShotIndex
+expr WallFirstLanding    = VolleyTurn
+expr WallSectorA         = FightDeathCount
+expr WallLayer           = field_63
+expr FlameStopping       = VolleyShotIndex
+expr FlameFadeAmount     = IceController
+expr FlamePreviousX      = VolleyShotIndex
+expr FlamePreviousY      = IceController
+expr FlamePreviousZ      = WallsCleared
+expr FlameOlderX         = AimOffset
+expr FlameOlderY         = VolleyTurn
+expr FlameOlderZ         = FightDeathCount
+expr DingoSpeechOBJ      = field_62
+expr ShotDeathThreshold  = var0
+expr PentaCenterDistance = var0
+
+/* Angle offset / death count limit pairs (each volley ends with 0x1869F) */
+/* OG pool offs: 0x11C[0], 0x160[17], 0x1E4[50] */
+array DingoVolleyShots = {
+    0x000, 16,
+    0x200, 16,
+    0x400, 16,
+    0x600, 16,
+    0x800, 16,
+    0xA00, 13,
+    0xC00, 10,
+    0xE00, 7,
+    0x1869F,
+    
+    0x000, 16,
+    -0x200, 16,
+    -0x400, 16,
+    -0x600, 16,
+    -0x800, 16,
+    -0xA00, 16,
+    -0xC00, 16,
+    -0xE00, 16,
+    -0x100, 16,
+    -0x300, 16,
+    -0x500, 13,
+    -0x700, 13,
+    -0x900, 10,
+    -0xB00, 10,
+    -0xD00, 7,
+    -0xF00, 7,
+    0x1869F,
+    
+    0x000, 16,
+    0x71, 16,
+    0x200, 16,
+    0x271, 16,
+    0x400, 16,
+    0x471, 16,
+    0x600, 16,
+    0x671, 16,
+    0x800, 16,
+    0x871, 16,
+    0xA00, 13,
+    0xA71, 13,
+    0xC00, 10,
+    0xC71, 10,
+    0xE00, 7,
+    0xE71, 7,
+    0x1869F
+}
+
+state Dingo_Init { // 0
+    stateflag 0x4081
+    statusc 0
+    code() {
+        zindex = 24
+        FlameLength = 0
+        WallBurnLength = 0
+        FlameHitPlayer = 0
+        spawn(DingC, S_ICE_CONTROLLER, 1)
+        IceController = objectspawned
+        health = 3
+        spawn(BosBC, BosBC_S_HEALTH_TICK, 1, health << 8, 3)
+        GLOBAL_150 |= 0x20000
+        playnull()
+        FightDeathCount = SECTIONDEATHCOUNT >> 8
+        if (GLOBAL_27 & 0x8) {
+            FightDeathCount = 0
+        }
+        if (!!GLOBAL_105) {
+            FightDeathCount = 0
+        }
+        if (FightDeathCount > 15) {
+            FightDeathCount = 15
+        }
+        spawn(DingC, S_FLAMES, 1, 0)
+        spawn(DingC, S_FLAMES, 1, 1)
+        spawn(DingC, S_FLAMES, 1, 2)
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        if (!RESPAWNCOUNT) {
+            changestate(Dingo_Intro)
+        }
+        else {
+            roty = CAMROTY
+            changestate(Dingo_Restart)
+        }
+    }
+}
+
+state Dingo_Intro { // 1
+    stateflag 0x4081
+    statusc 0
+    code() {
+        roty = 90deg
+        DingoSpeechOBJ = 0
+        onstateexit(DingoIntroExit)
+        if (SFXVOL) {
+            if (var lang = GLOBAL_151; lang == LANG_FR) {
+                spawn2(9, 44, 1, [F003O], [F013O], [F023O], 3.0, 1000s, 8.0)
+                DingoSpeechOBJ = objectspawned
+            }
+            else if (lang == LANG_DE) {
+                spawn2(9, 44, 1, [G003O], [G013O], [G023O], 3.0, 1000s, 8.0)
+                DingoSpeechOBJ = objectspawned
+            }
+            else if (lang == LANG_IT) {
+                spawn2(9, 44, 1, [I003O], [I013O], [I023O], 3.0, 1000s, 8.0)
+                DingoSpeechOBJ = objectspawned
+            }
+            else if (lang == LANG_ES) {
+                spawn2(9, 44, 1, [S003O], [S013O], [S023O], 3.0, 1000s, 8.0)
+                DingoSpeechOBJ = objectspawned
+            }
+            else {
+                spawn2(9, 44, 1, [E003O], [E013O], [E023O], 3.0, 1000s, 8.0)
+                DingoSpeechOBJ = objectspawned
+            }
+        }
+        do { playanim(0, DINGO_INTRO_1) } until (frametime - statetime >= 4s)
+        interrupter = DingoSpeechOBJ
+        sendevent(EventTriggered, interrupter)
+        DingoSpeechOBJ = 0
+        do { playanim(0, DINGO_INTRO_1) } until (frametime - statetime >= 4.5s)
+        playframes(DINGO_INTRO_1, 0.0, 97.0)
+        setanim(DINGO_INTRO_2, -1.0)
+        do {
+            animframe += 1.0
+            if (animframe == 48.0) {
+                soundpitch(3.625)
+                soundplay([fs80A], 1V)
+            }
+            playframe()
+        } while (animframe + 1.0 <= 97.0)
+        changestate(Dingo_Trigger_Walls)
+    }
+    event(e, a) {
+        accevcstate(Dingo_Restart, e == Event67)
+    }
+    trans {
+        nofirst {
+            if (animseq == getanim(DINGO_INTRO_2) && animframe >= 34.0 && animframe <= 48.0) {
+                roty = seek(roty, 180deg, 6.45deg)
+            }
+        }
+    }
+}
+
+sub DingoIntroExit() {} // S-137
+
+inline sub SoundDingoFootstep() {
+    soundpitch(3.625)
+    soundplay([fs80A], 1V)
+}
+
+state Dingo_Trigger_Walls { // 2
+    stateflag 0x4081
+    statusc 0
+    event => state Dingo_VolleyStart
+    code() {
+        changestateif(Dingo_Victory, player -> stateflag & 0x20)
+        setanim(DINGO_PHASE_TRANS)
+        setanim(DINGO_PHASE_TRANS, -1.0)
+        do {
+            animframe += 1.0
+            if (animframe == 24.0) {
+                SoundDingoFootstep()
+            }
+            else if (animframe == 38.0) {
+                spawn(DingC, S_GREEN_FLAME, 1)
+            }
+            else if (animframe == 40.0) {
+                interrupter = IceController
+                sendevent(Event83, interrupter)
+            }
+            playframe()
+        } while (animframe + 1.0 <= 84.0)
+        SoundDingoFootstep()
+        if (var phase = health; phase == 3) {
+            VolleyShotIndex = 3
+        }
+        else if (phase == 2) {
+            VolleyShotIndex = 5
+        }
+        else {
+            VolleyShotIndex = 7
+        }
+        changestate(Dingo_VolleyStart)
+    }
+}
+
+state Dingo_Restart { // 3
+    stateflag 0x4081
+    statusc 0
+    event => state Dingo_VolleyStart
+    code() {
+        changestateif(Dingo_Victory, player -> stateflag & 0x20)
+        interrupter = IceController
+        sendevent(Event84, interrupter)
+        playframes(DINGO_CHANGE_MODE, 0.0, 47.0)
+        playframes(DINGO_RELOAD_1, 0.0, 23.0)
+        if (var phase = health; phase == 3) {
+            VolleyShotIndex = 3
+        }
+        else if (phase == 2) {
+            VolleyShotIndex = 5
+        }
+        else {
+            VolleyShotIndex = 7
+        }
+        changestate(Dingo_VolleyStart)
+    }
+}
+
+state Dingo_VolleyStart { // 4
+    stateflag 0x4081
+    statusc 0
+    code() {
+        playframes(DINGO_SHOOT_UP_START, 0.0, 37.0)
+        VolleyShotIndex = 0
+        VolleyBaseAngle = roty
+        changestate(Dingo_VolleyFire)
+    }
+    event(e, a) {
+        accevif (e == Event85) {
+            WallsCleared = 1
+        }
+        accevcstate(Dingo_Attacked, e == EventSpinHit || e == EventJumpedOn || e == EventSlamHit || e == EventSlideHit || e == EventHitInvincible)
+    }
+    trans {
+        once {
+            WallsCleared = false
+            var table
+            if (var phase = health; phase == 3) {
+                table = DingoVolleyShots[0]
+                VolleyTurn = 75deg
+                AimOffset = -90deg
+            }
+            else if (phase == 2) {
+                table = DingoVolleyShots[17]
+                VolleyTurn = 75deg
+                AimOffset = 90deg
+            }
+            else {
+                table = DingoVolleyShots[50]
+                VolleyTurn = 75deg
+                AimOffset = -90deg
+            }
+            AimAngle = table[0]
+        }
+        VolleyBaseAngle = atan2(player -> trans) + AimOffset
+        roty = degseek(roty, VolleyBaseAngle + AimAngle, 240deg)
+        changestateif(Dingo_Victory, player -> stateflag & 0x20)
+    }
+}
+
+state Dingo_VolleyFire { // 5
+    stateflag 0x4081
+    statusc 0
+    event => state Dingo_VolleyStart
+    code() {
+        playframes(DINGO_SHOOT_UP, 0.0, 15.0)
+        sleep()
+    }
+    trans {
+        once {
+            var table, index
+            if (var phase = health; phase == 3) {
+                table = DingoVolleyShots[0]
+            }
+            else if (phase == 2) {
+                table = DingoVolleyShots[17]
+            }
+            else {
+                table = DingoVolleyShots[50]
+            }
+            do {
+                index = (VolleyShotIndex << 1) << 8
+                VolleyShotIndex += 1
+                AimAngle = table[ index ]
+                changestateif(Dingo_VolleyStop, AimAngle == 0x1869F)
+                ShotDeathThreshold = table[index + 1.0]
+                if (FightDeathCount < ShotDeathThreshold) {
+                    break
+                }
+            } while (1)
+            AimAngle += VolleyBaseAngle
+        }
+        changestateif(Dingo_Victory, player -> stateflag & 0x20)
+        roty = degseek(roty, AimAngle, VolleyTurn)
+        if (roty == AimAngle) {
+            {
+                var dx, dz, radius
+                radius = distance(player, DIST_NO_Y | DIST_EXACT) >> 8
+                dx = (radius * sin(roty)) >> 4
+                dz = (radius * cos(roty)) >> 4
+                spawn(DingC, S_FIREBALL, 1, dx, player -> y, dz, 0)
+            }
+            changestate(Dingo_VolleyFire)
+        }
+    }
+}
+
+state Dingo_VolleyStop { // 6
+    stateflag 0x4081
+    statusc 0
+    event => state Dingo_VolleyStart
+    code() {
+        playframes(DINGO_SHOOT_UP_STOP, 0.0, 27.0)
+        changestate(Dingo_SweepStart)
+    }
+    trans {
+        changestateif(Dingo_Victory, player -> stateflag & 0x20)
+    }
+}
+
+state Dingo_SweepStart { // 7
+    stateflag 0x4081
+    statusc 0
+    event => state Dingo_VolleyStart
+    code() {
+        playframes(DINGO_CHANGE_MODE, 0.0, 47.0)
+        changestate(Dingo_TrackPlayer)
+    }
+    trans { 
+        once {
+            if (var phase = health; phase == 3) {
+                AimLeadFrames = 25
+            }
+            else if (phase == 2) {
+                AimLeadFrames = 20
+            }
+            else {
+                AimLeadFrames = 17
+            }
+        }
+        changestateif(Dingo_Victory, player -> stateflag & 0x20)
+    }
+}
+
+state Dingo_TrackPlayer { // 8
+    stateflag 0x4081
+    statusc 0
+    event => state Dingo_VolleyStart
+    code() {
+        do {
+            playframes(DINGO_STEP_1, 0.0, 13.0)
+            SoundDingoFootstep()
+            changestateif(Dingo_AimFirst, abs(degdist(roty, AimAngle)) <= 2)
+            playframes(DINGO_STEP_2, 0.0, 12.0)
+            SoundDingoFootstep()
+            changestateif(Dingo_AimSecond, abs(degdist(roty, AimAngle)) <= 2)
+        } while (1)
+    }
+    trans {
+        once {
+            AimOffset = 0
+            field_63 = atan2(player -> trans)
+        }
+        changestateif(Dingo_Victory, player -> stateflag & 0x20)
+        var v1, v2
+        var angle, lead
+        var v3, v4, v5, v6
+        angle = atan2(player -> trans)
+        lead = degdist(field_63, angle) * AimLeadFrames
+        field_63 = angle
+        AimOffset = seek(AimOffset, lead, 20)
+        AimAngle = angle + AimOffset
+        roty = degseek(roty, AimAngle, 100deg)
+    }
+}
+
+state Dingo_AimFirst { // 9
+    stateflag 0x4081
+    statusc 0
+    event => state Dingo_VolleyStart
+    code() {
+        if (var phase = health; phase == 3) {
+            playframes(DINGO_AIM_1, 0.0, 13.0)
+        }
+        else if (phase == 2) {
+            playframes(DINGO_AIM_2, 0.0, 9.0)
+        }
+        else {
+            playanim(0, DINGO_AIM_3)
+            playanim(1, DINGO_AIM_3)
+            playanim(2, DINGO_AIM_3)
+            playanim(3, DINGO_AIM_3)
+            playanim(4, DINGO_AIM_3)
+            playanim(4, DINGO_AIM_3)
+            playanim(5, DINGO_AIM_3)
+            playanim(6, DINGO_AIM_3)
+        }
+        changestate(Dingo_FireFlamethrower)
+    }
+    trans {
+        changestateif(Dingo_Victory, player -> stateflag & 0x20)
+    }
+}
+
+state Dingo_AimSecond { // 10
+    stateflag 0x4081
+    statusc 0
+    event => state Dingo_VolleyStart
+    code() {
+        SoundDingoFootstep()
+        if (var phase = health; phase == 3) {
+            playframes(DINGO_AIM_4, 0.0, 13.0)
+        }
+        else if (phase == 2) {
+            playframes(DINGO_AIM_5, 0.0, 9.0)
+        }
+        else {
+            playanim(0, DINGO_AIM_6)
+            playanim(1, DINGO_AIM_6)
+            playanim(2, DINGO_AIM_6)
+            playanim(3, DINGO_AIM_6)
+            playanim(4, DINGO_AIM_6)
+            playanim(4, DINGO_AIM_6)
+            playanim(5, DINGO_AIM_6)
+            playanim(6, DINGO_AIM_6)
+        }
+        changestate(Dingo_FireFlamethrower)
+    }
+    trans {
+        changestateif(Dingo_Victory, player -> stateflag & 0x20)
+    }
+}
+
+state Dingo_FireFlamethrower { // 11
+    stateflag 0x4081
+    statusc 0
+    event => state Dingo_VolleyStart
+    code() {
+        playanim(0, DINGO_SHOOT_READY)
+        AimAngle = roty
+        spawn(DingC, S_FLAMETHROWER, 1, roty)
+        playanim(0, DINGO_FLAME_SHOOT_1)
+        playanim(1, DINGO_FLAME_SHOOT_1)
+        playframes(DINGO_FLAME_SHOOT_3, 0.0, 17.0)
+        playanim(0, DINGO_FLAME_SHOOT_2)
+        playanim(1, DINGO_FLAME_SHOOT_2)
+        playanim(2, DINGO_FLAME_SHOOT_2)
+        playanim(2, DINGO_FLAME_SHOOT_2)
+        soundpitch(3.625)
+        soundplay([fs80A], 1V)
+        playanim(0, DINGO_SHOOT_STOP)
+        playanim(1, DINGO_SHOOT_STOP)
+        playanim(2, DINGO_SHOOT_STOP)
+        playanim(3, DINGO_SHOOT_STOP)
+        playanim(4, DINGO_SHOOT_STOP)
+        playanim(4, DINGO_SHOOT_STOP)
+        playanim(5, DINGO_SHOOT_STOP)
+        playanim(6, DINGO_SHOOT_STOP)
+        if (player -> stateflag & 0x20) {
+            playframes(DINGO_RELOAD_2, 0.0, 22.0)
+            changestate(Dingo_Victory)
+        }
+        settrans(CheckDingoVictory)
+        CheckDingoVictory()
+        if (WallsCleared) {
+            playframes(DINGO_RELOAD_2, 0.0, 22.0)
+            changestate(Dingo_Trigger_Walls)
+        }
+        changestate(Dingo_TrackPlayer)
+    }
+    trans {
+        once {
+            FlameHitPlayer = 0
+        }
+        changestateif(Dingo_Victory, !FlameHitPlayer && player -> stateflag & 0x20)
+    }
+}
+
+sub CheckDingoVictory() { // S-554
+    changestateif(Dingo_Victory, player -> stateflag & 0x20)
+}
+
+state Dingo_Victory { // 12
+    stateflag 0x4081
+    statusc 0
+    code() {
+        cascadeevent(Event88, self)
+        FlameLength = 0
+        WallBurnLength = 0
+        playframes(DINGO_WIN_1, 0.0, 9.0)
+        do {
+            setanim(DINGO_WIN_2, -1.0)
+            do {
+                animframe += 1.0
+                if (animframe == 15.0 || animframe == 35.0) {
+                    SoundDingoFootstep()
+                }
+                playframe()
+            } while (animframe + 1.0 <= 37.0)
+        } while (1)
+    }
+    trans {
+        roty = spd(roty, 130deg)
+    }
+}
+
+state Dingo_Attacked { // 13
+    stateflag 0x4081
+    statusc 0
+    code() {
+        statusb |= FLAG_COLLIDABLE
+        SoundPitchDefault(0.295)
+        sounddecay(8.4s + 1)
+        soundsetup(7, self, 8)
+        soundplay([Bp10A], 1V)
+        if (GLOBAL_151 == 5.0) {
+            if (rand(2)) {
+                SoundPitchDefault(0.23)
+                sounddecay(8.2s)
+                soundsetup(8, self, 8)
+                soundplay([1130I], 1V)
+            }
+            else {
+                SoundPitchDefault(0.34)
+                sounddecay(8.2s)
+                soundsetup(8, self, 8)
+                soundplay([1131I], 1V)
+            }
+        }
+        GLOBAL_101 = 2
+        GLOBAL_100 = 0xFF
+        cascadeevent(Event88, self)
+        FlameLength = 0
+        WallBurnLength = 0
+        setanim(DINGO_ATTACKED_1)
+        setanim(DINGO_ATTACKED_1, -1.0)
+        do {
+            animframe += 1.0
+            if (animframe == 13.0) {
+                soundpitch(2.903)
+                soundplay([fs80A], 1.2V)
+                spawn(9, 21, 1, -1.0, 0, 0, 0, 4S, 0, 24, 2)
+            }
+            else if (animframe == 26.0) {
+                soundpitch(2.903)
+                soundplay([fs80A], 0.6V)
+                spawn(9, 21, 1, -1.0, 0, 0, 0, 48.0, 0, 24, 2)
+            }
+            else if (animframe == 43.0) {
+                soundpitch(0x6e4)
+                soundplay([Di43A], 1.28V)
+            }
+            playframe()
+        } while (animframe + 1.0 <= 60.0)
+        setanim(DINGO_ATTACKED_2, -1.0)
+        do {
+            animframe += 1.0
+            if (animframe == 8.0 || animframe == 29.0 || animframe == 46.0 || animframe == 57.0) {
+                soundpitch(6.892)
+                soundplay([Di43A], 1.28V)
+            }
+            playframe()
+        } while (animframe + 1.0 <= 61.0)
+        spawn(DingC, S_TANK_EXPLOSION, 1)
+        if (GLOBAL_151 == 5.0) {
+            if (rand(2)) {
+                SoundPitchDefault(0.23)
+                sounddecay(8.2s)
+                soundsetup(8, self, 8)
+                soundplay([1130I], 1V)
+            }
+            else {
+                SoundPitchDefault(0.34)
+                sounddecay(8.2s)
+                soundsetup(8, self, 8)
+                soundplay([1131I], 1V)
+            }
+        }
+        playframes(DINGO_EXPLODE_1, 0.0, 11.0)
+        health -= 1
+        changestateif(Dingo_Defeated, health <= 0)
+        interrupter = IceController
+        sendevent(Event83, interrupter)
+        setanim(DINGO_EXPLODE_2, -1.0)
+        do {
+            animframe += 1.0
+            if (animframe == 14.0) {
+                soundpitch(2.54)
+                soundsetup(7, self, 8)
+                soundplay([fs80A], 1V)
+            }
+            playframe()
+        } while (animframe + 1.0 <= 29.0)
+        setanim(DINGO_RECOVER_1, -1.0)
+        do {
+            animframe += 1.0
+            if (animframe == 32.0) {
+                soundpitch(4.715)
+                soundsetup(6, self, 8)
+                soundplay([HSh3A], 1V)
+            }
+            playframe()
+        } while (animframe + 1.0 <= 35.0)
+        playanim(0, DINGO_RECOVER_2)
+        playanim(1, DINGO_RECOVER_2)
+        playanim(2, DINGO_RECOVER_2)
+        playanim(2, DINGO_RECOVER_2)
+        setanim(DINGO_RECOVER_3, -1.0)
+        do {
+            animframe += 1.0
+            if (animframe == 36.0) {
+                soundpitch(2.903)
+                soundplay([fs80A], 1.2V)
+            }
+            playframe()
+        } while (animframe + 1.0 <= 41.0)
+        changestate(Dingo_VolleyStart)
+    }
+}
+
+state Dingo_Defeated { // 14
+    stateflag 0x4004081
+    statusc 0x80010
+    code() {
+        cascadeevent(Event89, self)
+        GAMEFLAGS |= -0x80000000
+        DingoSpeechOBJ = 0
+        if (SFXVOL) {
+            if (var lang = GLOBAL_151; lang == LANG_FR) {
+                spawn2(9, 44, 1, [F103O], [F113O], [F123O], [E133O], 4.0, 1000s, 8.0)
+                DingoSpeechOBJ = objectspawned
+            }
+            else if (lang == LANG_DE) {
+                spawn2(9, 44, 1, [G103O], [G113O], [G123O], [E133O], 4.0, 1000s, 8.0)
+                DingoSpeechOBJ = objectspawned
+            }
+            else if (lang == LANG_IT) {
+                spawn2(9, 44, 1, [I103O], [I113O], [I123O], [E133O], 4.0, 1000s, 8.0)
+                DingoSpeechOBJ = objectspawned
+            }
+            else if (lang == LANG_ES) {
+                spawn2(9, 44, 1, [S103O], [S113O], [S123O], [E133O], 4.0, 1000s, 8.0)
+                DingoSpeechOBJ = objectspawned
+            }
+            else {
+                spawn2(9, 44, 1, [E103O], [E113O], [E123O], [E133O], 4.0, 1000s, 8.0)
+                DingoSpeechOBJ = objectspawned
+            }
+        }
+        playframes(DINGO_EXPLODE_3, 0.0, 13.0)
+        soundpitch(2.54)
+        soundsetup(7, self, 8)
+        soundplay([fs80A], 1V)
+        setanim(DINGO_DEFEATED_1, -1.0)
+        do {
+            animframe += 1.0
+            if (animframe == 28.0) {
+                interrupter = DingoSpeechOBJ
+                sendevent(EventTriggered, interrupter)
+            }
+            playframe()
+        } while (animframe + 1.0 <= 67.0)
+        spawn(DingC, S_PENTA_RETURN, 1)
+        playframes(68.0, 75.0)
+        unless (player -> stateflag & 0x20) {
+            if (GLOBAL_160 & 0x2) {
+                field_61 = true
+            }
+            else {
+                field_61 = false
+                SavedFlags = GLOBAL_160
+                save (x, y, z) {
+                    {
+                        var angle
+                        angle = CAMROTY - 45deg
+                        x = (6.25 * sin(angle)) >> 4
+                        z = (6.25 * cos(angle)) >> 4
+                    }
+                    y = 300.0
+                    spawn2(FruiC, FruiC_S_FRUIT_HOP, 1, 701.0, 0)
+                }
+            }
+        }
+        changestate(Dingo_Dead)
+    }
+}
+
+state Dingo_Dead { // 15
+    stateflag 0x4081
+    statusc 0
+    code() {
+        playframes(DINGO_DEFEATED_2, 0.0, 11.0)
+        sleep()
+    }
+    event(e, a) {
+        accevcstate(Dingo_Dead, e == EventTriggered
+            || e == EventJumpedOn 
+            || e == EventSlamHit
+            || e == EventHit 
+            || e == EventFling 
+            || e == EventHitInvincible 
+            || e == EventSpinHit
+            || e == EventSlideHit)
+    }
+    trans {
+        unless (player -> stateflag & 0x20) {
+            if (SavedFlags != GLOBAL_160 || field_61) {
+                SavedFlags = GLOBAL_160
+                if (field_61) {
+                    var0 = 0
+                }
+                else {
+                    var0 = 701.0
+                }
+                spawn2(WEfOC, WEfOC_S_WARP_OUT, 1, 5m, 0, 9.5m, 16m, 2S, var0)
+                creator = objectspawned
+                field_61 = 0
+            }
+        }
+    }
+}
+
+state Tank_Explosion { // 16
+    statusc 0
+    code() {
+        SetTrans(0, 0, 0)
+        soundpitch(3.625)
+        sounddecay(10s)
+        soundsetup(8, self, 8)
+        soundplay([tnt0A], 1V)
+        ExplosionExitTimer = 0
+        zindex = creator -> zindex
+        SetScale(2.5S)
+        if (!SHAKEY) {
+            SHAKEY = 15.0
+        }
+        setanim(EXPLOSION_1)
+        setanim(EXPLOSION_1, -1.0)
+        do {
+
+            animframe += 1.0
+            if (animframe == 0) {
+                broadcastevent(Event87, 0, 0)
+            }
+            else if (animframe == 3.0) {
+                broadcastevent(Event87, 0, 1)
+            }
+            else if (animframe == 6.0) {
+                broadcastevent(Event87, 0, 2)
+            }
+            else if (animframe == 7.0) {
+                if (distance(player, DIST_NO_Y | DIST_EXACT) <= 6.1m) {
+                    vecx = player -> x
+                    vecz = player -> z
+                    sendevent(Event59, player, 0x27874A, 12m, miscfunc(vecx, self, 1, 2))
+                }
+                else if (creator -> health) {
+                    settrans(KeepPlayerOutsideExplosion)
+                }
+            }
+            else if (animframe >= 33.0 && animframe <= 42.0) {
+                moda = 16.0 * (animframe - 32.0) / 10.0
+            }
+            playframe()
+        } while (animframe + 1.0 <= 42.0)
+        sleepnull()
+    }
+    event(e, a) {
+        accevif (e == Event89) {
+            ExplosionExitTimer = 25
+        }
+    }
+}
+
+sub KeepPlayerOutsideExplosion() { // S-983
+    if (ExplosionExitTimer) {
+        ExplosionExitTimer -= 1
+        changestateif(Kill, ExplosionExitTimer <= 0)
+    }
+    if (distance(player, DIST_NO_Y | DIST_EXACT) <= 6.1m) {
+        var0 = atan2(player -> trans)
+        player -> x = (0x988 * sin(var0)) >> 4
+        player -> z = (0x988 * cos(var0)) >> 4
+    }
+}
+
+state IceController_Init { // 17
+    statusc 0
+    code() {
+        zindex = creator -> zindex
+        zindex += 10
+        SetTrans(0, 0, 0)
+        InnerWallAngle = 0
+        MiddleWallAngle = 0
+        OuterWallAngle = 0
+        IceLightX = -0xEB6
+        IceLightZ = 0x172
+        InnerWallMask = 0
+        MiddleWallMask = 0
+        OuterWallMask = 0
+        changestate(IceController_Wait)
+    }
+}
+
+inline sub ConstrainPlayerToArena() {
+    PlayerDistance = distance(player, DIST_NO_Y | DIST_EXACT)
+    if (PlayerDistance > 8.322m) {
+        {
+            var angle
+            angle = atan2(player -> trans)
+            player -> x = (13.0 * sin(angle)) >> 4
+            player -> z = (13.0 * cos(angle)) >> 4
+        }
+        PlayerDistance = 8.322m
+    }
+}
+
+state IceController_Wait { // 18
+    statusc 0
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(IceController_DropWalls, e == Event83)
+        accevcstate(IceController_CreateWalls, e == Event84)
+    }
+    trans {
+        ConstrainPlayerToArena()
+    }
+}
+
+state IceController_DropWalls { // 19
+    statusc 0
+    code() {
+        InnerWallMask = 0xFF
+        spawn(DingC, S_ICE_WALL, 1, 0, 0.0, 1, 1)
+        spawn(DingC, S_ICE_WALL, 1, 0, 4.0, 1, 0)
+        spawn(DingC, S_ICE_WALL, 1, 0, 8.0, 1, 0)
+        spawn(DingC, S_ICE_WALL, 1, 0, 12.0, 1, 0)
+        playnull(5)
+        MiddleWallMask = 0xFF
+        spawn(DingC, S_ICE_WALL, 1, 1, 0.0, 1, 1)
+        spawn(DingC, S_ICE_WALL, 1, 1, 4.0, 1, 0)
+        spawn(DingC, S_ICE_WALL, 1, 1, 8.0, 1, 0)
+        spawn(DingC, S_ICE_WALL, 1, 1, 12.0, 1, 0)
+        playnull(5)
+        OuterWallMask = 0xFF
+        spawn(DingC, S_ICE_WALL, 1, 2, 0.0, 1, 1)
+        spawn(DingC, S_ICE_WALL, 1, 2, 4.0, 1, 0)
+        spawn(DingC, S_ICE_WALL, 1, 2, 8.0, 1, 0)
+        spawn(DingC, S_ICE_WALL, 1, 2, 12.0, 1, 0)
+        changestate(IceController_Active)
+    }
+    trans {
+        ConstrainPlayerToArena()
+    }
+}
+
+state IceController_CreateWalls { // 20
+    statusc 0
+    code() {
+        InnerWallMask = 0xFF
+        spawn(DingC, S_ICE_WALL, 1, 0, 0.0, 0, 0)
+        spawn(DingC, S_ICE_WALL, 1, 0, 4.0, 0, 0)
+        spawn(DingC, S_ICE_WALL, 1, 0, 8.0, 0, 0)
+        spawn(DingC, S_ICE_WALL, 1, 0, 12.0, 0, 0)
+        MiddleWallMask = 0xFF
+        spawn(DingC, S_ICE_WALL, 1, 1, 0.0, 0, 0)
+        spawn(DingC, S_ICE_WALL, 1, 1, 4.0, 0, 0)
+        spawn(DingC, S_ICE_WALL, 1, 1, 8.0, 0, 0)
+        spawn(DingC, S_ICE_WALL, 1, 1, 12.0, 0, 0)
+        OuterWallMask = 0xFF
+        spawn(DingC, S_ICE_WALL, 1, 2, 0.0, 0, 0)
+        spawn(DingC, S_ICE_WALL, 1, 2, 4.0, 0, 0)
+        spawn(DingC, S_ICE_WALL, 1, 2, 8.0, 0, 0)
+        spawn(DingC, S_ICE_WALL, 1, 2, 12.0, 0, 0)
+        changestate(IceController_Active)
+    }
+}
+
+state IceController_Active { // 21
+    statusc 0
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        accevif (e == Event87) {
+            var layer
+            layer = a[0]
+            if (var temp = layer; temp == 0) {
+                InnerWallMask = 0
+            }
+            else if (temp == 1) {
+                MiddleWallMask = 0
+            }
+            else {
+                OuterWallMask = 0
+            }
+        }
+    }
+    trans {
+        once {
+            broadcastevent(Event89, 0)
+        }
+        WallBurnLength = creator -> WallBurnLength
+        ConstrainPlayerToArena()
+        if (!(frametime - statetime >= 2.5s) && PlayerDistance <= 6.1m) {
+            var0 = atan2(player -> trans)
+            player -> x = (0x988 * sin(var0)) >> 4 
+            player -> z = (0x988 * cos(var0)) >> 4
+        }
+        InnerWallAngle = spd(InnerWallAngle, 1.0) % 360deg
+        MiddleWallAngle = spd(MiddleWallAngle, -0x12A) % 360deg
+        OuterWallAngle = spd(OuterWallAngle, 0x155) % 360deg
+        {
+            var angle
+            angle = atan2(player -> trans)
+            if (PlayerDistance >= 2m && PlayerDistance <= 3.4m) {
+                var0 = ((angle - InnerWallAngle) % 360deg) >> 9
+                if (InnerWallMask & (1 << var0)) {
+                    cascadeevent(Event82, self, 0, var0)
+                }
+            }
+            if (PlayerDistance >= 3.6m && PlayerDistance <= 4.4m) {
+                var0 = ((angle - MiddleWallAngle) % 360deg) >> 9
+                if (MiddleWallMask & (1 << var0)) {
+                    cascadeevent(Event82, self, 1, var0)
+                }
+            }
+            if (PlayerDistance >= 4.6m && PlayerDistance <= 6m) {
+                var0 = ((angle - OuterWallAngle) % 360deg) >> 9
+                if (OuterWallMask & (1 << var0)) {
+                    cascadeevent(Event82, self, 2, var0)
+                }
+            }
+        }
+        {
+            var angle, s, c
+            angle = CAMROTY
+            s = sin(angle)
+            c = cos(angle)
+            IceLightZ = ((0x172 * c) - (-0xEB6 * s)) >> 12
+            IceLightX = ((0x172 * s) + (-0xEB6 * c)) >> 12
+        }
+        if (WallBurnLength) {
+            AimAngle = creator -> AimAngle
+            if (WallBurnLength >= 1m) {
+                var0 = ((AimAngle - InnerWallAngle) % 360deg) >> 9
+                if (InnerWallMask & (1 << var0)) {
+                    WallEventAccepted = 0
+                    cascadeevent(Event81, self, 0, var0)
+                    if (WallEventAccepted) {
+                        InnerWallMask ^= (1 << var0)
+                    }
+                }
+            }
+            if (WallBurnLength >= 2m) {
+                var0 = ((AimAngle - MiddleWallAngle) % 360deg) >> 9
+                if (MiddleWallMask & (1 << var0)) {
+                    WallEventAccepted = 0
+                    cascadeevent(Event81, self, 1, var0)
+                    if (WallEventAccepted) {
+                        MiddleWallMask ^= (1 << var0)
+                    }
+                }
+            }
+            if (WallBurnLength >= 3m) {
+                var0 = ((AimAngle - OuterWallAngle) % 360deg) >> 9
+                if (OuterWallMask & (1 << var0)) {
+                    WallEventAccepted = 0
+                    cascadeevent(Event81, self, 2, var0)
+                    if (WallEventAccepted) {
+                        OuterWallMask ^= (1 << var0)
+                    }
+                }
+            }
+        }
+        if (!InnerWallMask && !MiddleWallMask && !OuterWallMask) {
+            sendevent(Event85, creator)
+            changestate(IceController_Wait)
+        }
+    }
+}
+
+state IceWall_Init { // 22
+    statusc 0
+    code(layer, angle, fall, shadow) {
+        WallLayer = layer
+        WallAngleOffset = angle
+        WallSectorA = ((angle % 360deg) >> 10) << 1
+        WallSectorB = WallSectorA - 1
+        if (WallSectorB < 0) {
+            WallSectorB = 7
+        }
+        WallSegmentsLeft = 2
+        WallShadowOBJ = 0
+        vfx = (vfx & 0xFFFFFF00) | 0xA
+        vfx = (vfx & 0xFF00FFFF) | 0x30000
+        moda = 4.0
+        if (var temp = WallLayer; temp == 0) {
+            SetColor1(0x80, 0x00, 0xFF)
+        }
+        else if (temp == 1) {
+            SetColor1(0x63, 0xF0, 0x00)
+        }
+        else {
+            SetColor1(0x0A, 0x24, 0xE6)
+        }
+        zindex = creator -> zindex
+        if (fall) {
+            y = 6000.0
+            vely = 0
+            WallFirstLanding = 1
+            if (shadow) {
+                spawn(DingC, S_ICE_SHADOW, 1, WallLayer)
+                WallShadowOBJ = objectspawned
+            }
+            changestate(IceWall_Falling)
+        }
+        else {
+            y = 0
+            vely = 0
+            changestate(IceWall_Active)
+        }
+    }
+}
+
+inline sub UpdateIceWallTransform() {
+    IceLightX = creator -> IceLightX
+    IceLightZ = creator -> IceLightZ
+    SetColor2(IceLightX, 0x61F, IceLightZ)
+    if (var layer = WallLayer; layer == 0) {
+        InnerWallAngle = creator -> InnerWallAngle
+        roty = InnerWallAngle + WallAngleOffset
+    }
+    else if (layer == 1) {
+        MiddleWallAngle = creator -> MiddleWallAngle
+        roty = MiddleWallAngle + WallAngleOffset
+    }
+    else {
+        OuterWallAngle = creator -> OuterWallAngle
+        roty = OuterWallAngle + WallAngleOffset
+    }
+}
+
+sub UpdateFallingIceWall() { // S-1399
+    vely = spd(vely, -35m)
+    y = spd(y, vely)
+    if (y <= 0) {
+        if (WallFirstLanding) {
+            WallFirstLanding = 0
+            if (!SHAKEY) {
+                SHAKEY = 4.0
+            }
+            if (!WallAngleOffset) {
+                SoundPitchDefault(0.43)
+                soundsetup(7, self, 8)
+                soundplay([Di33A], 1V)
+            }
+        }
+        else if (!WallAngleOffset) {
+            SoundPitchDefault(0.34)
+            soundsetup(7, self, 8)
+            soundplay([Di23A], 1V)
+        }
+        y = 0
+        vely = -vely >> 2
+        if (abs(vely) < 100.0) {
+            interrupter = WallShadowOBJ
+            sendevent(Event1, interrupter)
+            WallShadowOBJ = 0
+            changestate(IceWall_Active)
+        }
+    }
+    UpdateIceWallTransform()
+}
+
+state IceWall_Falling { // 23
+    statusc 0
+    trans => sub UpdateFallingIceWall
+    code() {
+        if (var temp = WallLayer; temp == 0) {
+            InnerWallMask = creator -> InnerWallMask
+            if (InnerWallMask & (1 << WallSectorA)) {
+                if (InnerWallMask & (1 << WallSectorB)) {
+                    sleepanim(0, WALL_INNER_1)
+                }
+                else {
+                    sleepanim(0, WALL_INNER_3)
+                }
+            }
+            else {
+                sleepanim(0, WALL_INNER_2)
+            }
+        }
+        else if (temp == 1) {
+            MiddleWallMask = creator -> MiddleWallMask
+            if (MiddleWallMask & (1 << WallSectorA)) {
+                if (MiddleWallMask & (1 << WallSectorB)) {
+                    sleepanim(0, WALL_MIDDLE_1)
+                }
+                else {
+                    sleepanim(0, WALL_MIDDLE_3)
+                }
+            }
+            else {
+                sleepanim(0, WALL_MIDDLE_2)
+            }
+        }
+        else {
+            OuterWallMask = creator -> OuterWallMask
+            if (OuterWallMask & (1 << WallSectorA)) {
+                if (OuterWallMask & (1 << WallSectorB)) {
+                    sleepanim(0, WALL_OUTER_1)
+                }
+                else {
+                    sleepanim(0, WALL_OUTER_3)
+                }
+            }
+            else {
+                sleepanim(0, WALL_OUTER_2)
+            }
+        }
+    }
+    event(e, a) {
+        if (e == Event81) {
+            var layer, sector
+            layer = a[0]
+            sector = a[1.0]
+            if (layer == WallLayer && WallSegmentsLeft > 0 && (sector == WallSectorA || sector == WallSectorB)) {
+                interrupter -> WallEventAccepted = 1
+                WallSegmentsLeft -= 1
+                if (sector == WallSectorA) {
+                    spawn(DingC, S_ICE_BREAK, 1, WallLayer, roty, 1)
+                }
+                else {
+                    spawn(DingC, S_ICE_BREAK, 1, WallLayer, roty, 0)
+                }
+                if (WallSegmentsLeft) {
+                    accevcstate(IceWall_Active)
+                }
+                else {
+                    accevcstate(IceWall_Destroyed)
+                }
+            }
+            else {
+                rejevret()
+            }
+        }
+        if (e == Event87) {
+            var layer, mask
+            layer = a[0]
+            if (layer == WallLayer && WallSegmentsLeft > 0) {
+                interrupter -> WallEventAccepted = 1
+                WallSegmentsLeft = 0
+                if (var temp = WallLayer; temp == 0) {
+                    InnerWallMask = creator -> InnerWallMask
+                    mask = InnerWallMask
+                }
+                else if (temp == 1) {
+                    MiddleWallMask = creator -> MiddleWallMask
+                    mask = MiddleWallMask
+                }
+                else if (temp == 2) {
+                    OuterWallMask = creator -> OuterWallMask
+                    mask = OuterWallMask
+                }
+                if (mask & (1 << WallSectorA)) {
+                    spawn(DingC, S_ICE_BREAK, 1, WallLayer, roty, 1)
+                }
+                if (mask & (1 << WallSectorB)) {
+                    spawn(DingC, S_ICE_BREAK, 1, WallLayer, roty, 0)
+                }
+                accevcstate(IceWall_Destroyed)
+            }
+            else {
+                rejevret()
+            }
+        }
+        if (e == Event82) {
+            var layer, sector, radius, angle
+            layer = a[0]
+            sector = a[1.0]
+            if (layer == WallLayer && WallSegmentsLeft > 0 && (sector == WallSectorA || sector == WallSectorB) && y <= player -> y + 1m && player -> y - y <= 3.5m) {
+                zindex = creator -> zindex
+                PlayerDistance = creator -> PlayerDistance
+                angle = atan2(player -> trans)
+                if (var temp = WallLayer; temp == 0) {
+                    if (PlayerDistance > 2.7m) {
+                        radius = 3.4m
+                        zindex -= 6
+                    }
+                    else {
+                        radius = 2m
+                        zindex += 6
+                    }
+                }
+                else if (temp == 1) {
+                    if (PlayerDistance > 4m) {
+                        radius = 4.4m
+                        zindex -= 6
+                    }
+                    else {
+                        radius = 3.6m
+                        zindex += 6
+                    }
+                }
+                else if (PlayerDistance > 5.3m) {
+                    radius = 6m
+                    zindex -= 1
+                }
+                else {
+                    radius = 4.6m
+                    zindex += 6
+                }
+                interrupter -> WallEventAccepted = 1
+                player -> x = ((radius >> 8) * sin(angle)) >> 4
+                player -> z = ((radius >> 8) * cos(angle)) >> 4
+            }
+            else {
+                rejevret()
+            }
+        }
+    }
+}
+
+state IceWall_Active { // 24
+    statusc 0
+    code => state IceWall_Falling
+    event => state IceWall_Falling
+    trans {
+        UpdateIceWallTransform()
+    }
+}
+
+state IceWall_Destroyed { // 25
+    statusc 0
+    code() {
+        if (WallShadowOBJ) {
+            interrupter = WallShadowOBJ
+            sendevent(Event1, interrupter)
+        }
+        WaitChildNull()
+    }
+}
+
+state IceShadow_Init { // 26
+    statusc 0
+    code(layer) {
+        WallLayer = layer
+        zindex = creator -> zindex
+        y = 0
+        changestate(IceShadow_Active)
+    }
+}
+
+state IceShadow_Active { // 27
+    statusc 0
+    code() {
+        if (var temp = WallLayer; temp == 0) {
+            sleepanim(0, WALL_SHADOW_1)
+        }
+        else if (temp == 1) {
+            sleepanim(0, WALL_SHADOW_2)
+        }
+        else {
+            sleepanim(0, WALL_SHADOW_3)
+        }
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event1)
+    }
+    trans {
+        roty = creator -> roty
+        var0 = (23.44 - (creator -> y >> 8) << 12) / 23.44
+        var0 = sin(var0 >> 2)
+        moda = 16.0 - var0
+    }
+}
+
+state IceWall_Break { // 28
+    statusc 0
+    code(layer, angle, side) {
+        roty = angle
+        zindex = creator -> zindex
+        vfx = (vfx & 0xFFFFFF00) | 0xA
+        vfx = (vfx & 0xFF00FFFF) | 0x30000
+        moda = 4.0
+        IceLightX = creator -> IceLightX
+        IceLightZ = creator -> IceLightZ
+        SetColor2(IceLightX, 0x61F, IceLightZ)
+        SoundPitchDefault(0.295)
+        soundsetup(6, self, 8)
+        soundplay([Di13A], 0.85V)
+        if (var temp = layer; temp == 0) {
+            SetColor1(0x80, 0x00, 0xFF)
+        }
+        else if (temp == 1) {
+            SetColor1(0x63, 0xF0, 0x00)
+        }
+        else {
+            SetColor1(0x0A, 0x24, 0xE6)
+        }
+        if (var temp = layer; temp == 0) {
+            if (side) {
+                playframes(WALL_INNER_BREAK_2, 0.0, 30.0)
+            }
+            else {
+                playframes(WALL_INNER_BREAK_1, 0.0, 30.0)
+            }
+        }
+        else if (temp == 1) {
+            if (side) {
+                playframes(WALL_MIDDLE_BREAK_2, 0.0, 30.0)
+            }
+            else {
+                playframes(WALL_MIDDLE_BREAK_1, 0.0, 30.0)
+            }
+        }
+        else {
+            if (side) {
+                playframes(WALL_OUTER_BREAK_2, 0.0, 30.0)
+            }
+            else {
+                playframes(WALL_OUTER_BREAK_1, 0.0, 30.0)
+            }
+        }
+    }
+}
+
+state Flamethrower_Init { // 29
+    statusc 0x32
+    code(angle) {
+        roty = angle
+        soundpitch(5.442)
+        sounddecay(10s)
+        soundsetup(8, self, 8)
+        soundplay([Di63A], 1V)
+        vfx = (vfx & 0xFF00FFFF) | 0x20000
+        zindex = creator -> zindex
+        FlameStopping = 0
+        FlameFadeAmount = 16.0
+        changestate(Flamethrower_Active)
+    }
+}
+
+state Flamethrower_Active { // 30
+    statusc 0x32
+    code() {
+        setanim(FLAME_RED)
+        playframes(FLAME_RED, 0.0, 6.0)
+        spawn(DingC, S_FLAMETHROWER_IMPACT, 1)
+        playframes(FLAME_RED, 7.0, 37.0)
+        FlameLength = 0
+        WallBurnLength = 0
+        creator -> FlameLength = FlameLength
+        creator -> WallBurnLength = WallBurnLength
+    }
+    event(e, a) {
+        accevif (e == Event88) {
+            FlameStopping = 1
+        }
+    }
+    trans {
+        getvert(vtrans, creator, 0)
+        unless (STATUS_FIRSTFRAME) {
+            var0 = animframe
+            if (var0 > 6.0) {
+                var0 = 6.0
+            }
+            FlameLength = ((var0 >> 8) * 10m) / 6
+            if (animseq == getanim(FLAME_RED) && animframe <= 24.0) {
+                WallBurnLength = FlameLength
+            }
+            else {
+                WallBurnLength = 0
+            }
+            if (animframe >= 7.0 && animframe <= 23.0) {
+                {
+                    var c, s, dx, dz
+                    dx = player -> x - x >> 8
+                    dz = player -> z - z >> 8
+                    c = cos(-roty)
+                    s = sin(-roty)
+                    vecz = ((dz * c) - (dx * s)) >> 4
+                    vecx = ((dz * s) + (dx * c)) >> 4
+                }
+                vecy = (player -> y + 1m) - y
+                if (vecz >= 0m && abs(vecx) <= 0.5m && abs(vecy) <= 3.5m) {
+                    sendevent(EventBurn, player, 100.0)
+                    if (eventaccepted) {
+                        creator -> FlameHitPlayer = 1
+                    }
+                }
+            }
+            if (FlameStopping) {
+                FlameFadeAmount = seek(FlameFadeAmount, 0, 3.2)
+                moda = 16.0 - FlameFadeAmount
+                changestateifn(Flamethrower_Stop, FlameFadeAmount)
+            }
+            creator -> FlameLength = FlameLength
+            creator -> WallBurnLength = WallBurnLength
+        }
+    }
+}
+
+state Flamethrower_Stop { // 31
+    statusc 0x32
+    code() {
+        FlameLength = 0
+        WallBurnLength = 0
+        creator -> FlameLength = FlameLength
+        creator -> WallBurnLength = WallBurnLength
+        WaitChildNull()
+    }
+}
+
+state Flamethrower_Impact { // 32
+    statusc 0x32
+    code() {
+        roty = creator -> roty
+        zindex = creator -> zindex
+        x += (15.625 * sin(roty)) >> 4
+        z += (15.625 * cos(roty)) >> 4
+        playframes(FLAMETHROWER_WALL_HIT, 0.0, 37.0)
+    }
+}
+
+state GreenFlame_Init { // 33
+    statusc 0x32
+    code() {
+        soundpitch(5.442)
+        sounddecay(10s)
+        soundsetup(8, self, 8)
+        soundplay([Di63A], 1V)
+        vfx = (vfx & 0xFF00FFFF) | 0x20000
+        vfx = (vfx & 0xFFFFFF00) | 0x5
+        zindex = creator -> zindex
+        setanim(FLAME_GREEN, 0)
+        changestate(GreenFlame_Active)
+    }
+}
+
+state GreenFlame_Active { // 34
+    statusc 0x32
+    code() {
+        playframes(FLAME_GREEN, 0.0, 37.0)
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event88)
+    }
+    trans {
+        getvert(vtrans, creator, 0)
+        getvert(vvec, creator, 1.0)
+        var dz = vecz - z
+        var dx = vecx - x
+        var angle
+        angle = atan(dx, dz)
+        roty = angle % 360deg
+        angle = -angle
+        var reach = (((dz >> 8) * cos(angle)) >> 4) - (((dx >> 8) * sin(angle)) >> 4)
+        rotx = atan(y - vecy, reach) % 360deg
+        rotz = 0
+    }
+}
+
+state Fireball_Init { // 35
+    statusc 0x32
+    code(px, py, pz, ground) {
+        soundpitch(4.715)
+        sounddecay(8s)
+        soundsetup(6, self, 8)
+        soundplay([Di53A], 1V)
+        groundy = ground
+        zindex = creator -> zindex
+        zindex += 9
+        getvert(vtrans, creator, 0)
+        vely = -((((y - groundy) * 25) / 25) - 45m)
+        velx = (px - x) / 25
+        velz = (pz - z) / 25
+        roty = atan(px - x, pz - z)
+        rotz = roty
+        spawn(DingC, S_FIREBALL_LIGHT, 1, px, py, pz)
+        statusb = FLAG_COLLIDABLE
+        changestate(Fireball_Flying)
+    }
+}
+
+state Fireball_Flying { // 36
+    statusc 0x32
+    code() {
+        sleepframes(FIREBALL, 0.0, 16.0)
+    }
+    trans {
+        sendevent(EventBurn, collider, 100.0)
+        vecx = x + velx
+        vecy = y + (vely / 25)
+        vecz = z + velz
+        rotx = atan2_3d(self, vecx)
+        SetTrans(vecx, vecy, vecz)
+        changestateif(Fireball_Impact, y <= groundy)
+        vely = spd(vely, -90m)
+    }
+}
+
+state Fireball_Impact { // 37
+    statusc 0x32
+    code() {
+        cascadeevent(Event1, self)
+        rotx = 0
+        SetScale(0xC00)
+        playframes(FIREBALL_GROUND_HIT, 0.0, 35.0)
+    }
+    trans {
+        once {
+            setanim(FIREBALL_GROUND_HIT, 0)
+            field_63 = 0
+            zindex += 6
+            SoundPitchDefault(0.295)
+            soundsetup(6, self, 8)
+            soundplay([Di83A], 1V)
+        }
+        if (animframe == 9.0) {
+            statusb = 0
+        }
+        else if (animframe >= 28.0 && animframe <= 35.0) {
+            field_63 = seek(field_63, 16.0, 1.922)
+            moda = field_63
+        }
+        sendevent(EventBurn, collider, 100.0)
+    }
+}
+
+state FireballLight_Init { // 38
+    statusc 0x32
+    code(px, py, pz) {
+        SetTrans(px, py, pz)
+        zindex = creator -> zindex
+        vfx = (vfx & 0xFFFFFF00) | 0x3
+        rotx = 90deg
+        SetScale(36.0)
+        changestate(FireballLight_Active)
+    }
+}
+
+state FireballLight_Active { // 39
+    statusc 0x32
+    code() {
+        sleepanim(0, LIGHT)
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event1)
+    }
+    trans {
+        once {
+            field_63 = 16.0
+        }
+        field_63 = seek(field_63, 8.0, 0.32)
+        moda = field_63
+    }
+}
+
+state FlameProjectile_Init { // 40
+    statusc 0
+    code(angle, reach, frame, type) {
+        field_63 = type
+        roty = angle
+        rotz = angle
+        rotx = 0
+        vectransf(vtrans, vvel, reach, 0, 0)
+        velx -= x
+        vely -= y
+        velz -= z
+        animframe = frame
+        zindex = 24
+        changestate(FlameProjectile_Flying)
+    }
+}
+
+state FlameProjectile_Flying { // 41
+    statusc 0
+    code() {
+        if (field_63) {
+            if (animseq != getanim(FIREBALL)) {
+                setanim(FIREBALL, -1.0)
+            }
+            while (animframe < 16.0) {
+                playframe(animframe + 1.0)
+            }
+            sleepframes(FIREBALL, 0.0, 16.0)
+        }
+        else {
+            if (animseq != getanim(FIREBALL_SHADOW)) {
+                setanim(FIREBALL_SHADOW, -1.0)
+            }
+            while (animframe < 7.0) {
+                playframe(animframe + 1.0)
+            }
+            do {
+                playanim(0, FIREBALL_SHADOW)
+                playanim(1, FIREBALL_SHADOW)
+                playanim(2, FIREBALL_SHADOW)
+                playanim(2, FIREBALL_SHADOW)
+                playanim(3, FIREBALL_SHADOW)
+                playanim(4, FIREBALL_SHADOW)
+                playanim(5, FIREBALL_SHADOW)
+                playanim(6, FIREBALL_SHADOW)
+            } while (1)
+        }
+    }
+    trans {
+        changestateif(FlameProjectile_Impact, frametime - statetime >= 37)
+        x = spd(x, velx)
+        y = spd(y, vely)
+        z = spd(z, velz)
+    }
+}
+
+state FlameProjectile_Impact { // 42
+    statusc 0
+    code() {
+        playframes(FLAMETHROWER_WALL_HIT, 0.0, 37.0)
+    }
+}
+
+state Flamethrower_Flames_Init { // 43
+    stateflag 0x4081
+    statusc 0
+    code(index) {
+        field_63 = index
+        zindex = creator -> zindex
+        SetRot(0deg, 0deg, -90deg)
+        SetScale(0.5S)
+        getvert(vtrans, creator, 0)
+        FlamePreviousX = x
+        FlamePreviousY = y
+        FlamePreviousZ = z
+        setanim(FLAMES)
+        if (var type = field_63; type == 0) {
+            animframe = 0
+            soundpitch(5.442)
+            sounddecay(10.18s)
+            soundcount(0xFFFF)
+            soundplay([Di73A], 0.2V)
+        }
+        else if (type == 1) {
+            animframe = 3.0
+        }
+        else {
+            animframe = 6.0
+            FlameOlderX = x
+            FlameOlderY = y
+            FlameOlderZ = z
+        }
+        changestate(Flamethrower_Flames)
+    }
+}
+
+state Flamethrower_Flames { // 44
+    stateflag 0x4081
+    statusc 0
+    code() {
+        if (animseq != getanim(FLAMES)) {
+            setanim(FLAMES, -1.0)
+        }
+        while (animframe < 31.0) {
+            playframe(animframe + 1.0)
+        }
+        sleepframes(FLAMES, 0.0, 31.0)
+    }
+    trans {
+        if (var type = field_63; type == 0) {
+            getvert(vtrans, creator, 0)
+            y += 0.2m
+        }
+        else if (type == 1) {
+            SetTrans(FlamePreviousX, FlamePreviousY, FlamePreviousZ)
+            getvert(vvec, creator, 0)
+            FlamePreviousX = vecx
+            FlamePreviousY = vecy
+            FlamePreviousZ = vecz
+            y += 0.25m
+            moda = 4.0
+        }
+        else {
+            SetTrans(FlameOlderX, FlameOlderY, FlameOlderZ)
+            FlameOlderX = FlamePreviousX
+            FlameOlderY = FlamePreviousY
+            FlameOlderZ = FlamePreviousZ
+            getvert(vvec, creator, 0)
+            FlamePreviousX = vecx
+            FlamePreviousY = vecy
+            FlamePreviousZ = vecz
+            moda = 8.0
+            y += 0.3m
+        }
+    }
+}
+
+state Footprint { // 45
+    stateflag 0x20001
+    code(offset, angle, size) {
+        troty = angle
+        vectransf2(vtrans, vtrans, offset, 0, 0)
+        scalex = size
+        scaley = abs(size)
+        vfx = (vfx & 0xFFFFFF00) | 0x3
+        scalez = 1S
+        rotx = 90deg
+        rotz = roty
+        zindex = 24
+        playanim(0, FOOTPRINT, 29)
+        settrans(FootprintFade)
+        sleepanim(0, FOOTPRINT, 52)
+    }
+}
+
+sub FootprintFade() { // S-2415
+    moda = seek(moda, 16.0, 0.64)
+    changestateif(Kill, moda == 16.0)
+}
+
+state Willy_Breath_Vapor { // 46
+    stateflag 0x10001
+    code(vertex) {
+        do {
+            start :
+            if (var mode = getfield(creator, offsetof(VolleyTurn)); mode == 0) { // creator (player) -> mem14
+                if (creator -> speed > 3m) {
+                    if (time(8)) {
+                        playnull()
+                        goto start;
+                    }
+                }
+                else if (time(50)) {
+                    playnull()
+                    goto start;
+                }
+            }
+            else if (mode == 2) {
+                if (time(3)) {
+                    playnull()
+                    goto start;
+                }
+            }
+            else if (mode == 3) {
+                playnull()
+                goto start;
+            }
+            unless (creator -> stateflag & 0x2000 || creator -> stateflag & 0x20) {
+                getvert(vtrans, creator, vertex)
+                y -= 28.0
+                troty = parent -> roty
+                setvel(1m)
+                x -= velx >> 3
+                z -= velz >> 3
+                if (abs(degdist(CAMROTY, creator -> roty)) < 90deg) {
+                    zindex = 70
+                }
+                else {
+                    zindex = -50
+                }
+                spawn(9, 21, 1, -1.0, velx, 1.5m, velz, 9.6, 0, zindex, 19)
+            }
+            playnull()
+        } while (1)
+    }
+}
+
+state Penta_IntroInit { // 47
+    stateflag 0x4081
+    statusc 0
+    code() {
+        if (!!RESPAWNCOUNT) {
+            KillEntity()
+            changestate(Kill)
+        }
+        zindex = 26
+        pathprog = 0
+        calcpath(pathprog)
+        {
+            var ahead
+            ahead = pathprog + 5.0
+            calcpath(ahead, vvec)
+        }
+        troty = atan(vecx - x, vecz - z)
+        roty = troty
+        statusb = 0x14000000
+        groundy = 0
+        field_60 = 0
+        spawn(ShadC, ShadC_S_BOSS_VIDO, 1, 0, 2.6S, 2)
+        changestate(Penta_Intro)
+    }
+    event(e, a) {
+        if (e == Event67) {
+            KillEntity()
+            GLOBAL_186 = 0
+            accevcstate(Kill)
+        }
+    }
+}
+
+inline sub SoundPentaFootstep(volume) {
+    soundpitch((25.6 + rand(3.2)) * 0.23 >> 8)
+    soundplay([fs80A], volume)
+}
+
+inline sub PlayFramesPenta(anim, start, end, soundframe, volume) {
+    setanim(anim, start)
+    do {
+        animframe += 1.0
+        if (animframe == soundframe) {
+            SoundPentaFootstep(volume)
+        }
+        playframe()
+    } while (animframe + 1.0 <= end)
+}
+
+state Penta_Intro { // 48
+    stateflag 0x4081
+    statusc 0
+    event => state Penta_IntroInit
+    code() {
+        do (var i = 0) {
+            SoundPentaFootstep(0.3V)
+            PlayFramesPenta(PENTA_INTRO_1, -1.0, 24.0, 12.0, 0.4V)
+        } while ({ i += 1.0 }; i < 3.0)
+        SoundPentaFootstep(0.3V)
+        setanim(PENTA_INTRO_2, -1.0)
+        do {
+            animframe += 1.0
+            if (animframe == 12.0) {
+                SoundPentaFootstep(0.3V)
+            }
+            else if (animframe == 25.0) {
+                SoundPentaFootstep(0.4V)
+            }
+            playframe()
+        } while (animframe + 1.0 <= 28.0)
+        playanim(0, PENTA_COWER_1)
+        playanim(1, PENTA_COWER_1)
+        playanim(2, PENTA_COWER_1)
+        playanim(3, PENTA_COWER_1)
+        playanim(3, PENTA_COWER_1)
+        PlayFramesPenta(PENTA_INTRO_3, -1.0, 15.0, 3.0, 0.3V)
+        SoundPentaFootstep(0.4V)
+        playframes(PENTA_INTRO_4, 0.0, 23.0)
+        playframes(PENTA_COWER_2, 0.0, 13.0)
+        sleep()
+    }
+    trans {
+        nofirst {
+            if (pathprog < 148.0) {
+                pathprog = spd(pathprog, 30.0)
+                calcpath(pathprog)
+                {
+                    var ahead
+                    ahead = pathprog + 5.0
+                    if (ahead < 148.0) {
+                        calcpath(ahead, vvec)
+                        troty = atan(vecx - x, vecz - z)
+                    }
+                }
+                statetime = frametime
+            }
+            else {
+                changestateif(Penta_Escape, frametime - statetime >= 3.5s)
+            }
+            roty = degseek(roty, troty, 360deg)
+        }
+    }
+}
+
+state Penta_Escape { // 49
+    stateflag 0x4081
+    statusc 0
+    event => state Penta_IntroInit
+    code() {
+        playanim(0, PENTA_INTRO_5)
+        playanim(1, PENTA_INTRO_5)
+        playanim(2, PENTA_INTRO_5)
+        playanim(2, PENTA_INTRO_5)
+        do {
+            SoundPentaFootstep(0.3V)
+            PlayFramesPenta(PENTA_INTRO_6, -1.0, 9.0, 5.0, 0.4V)
+        } while (1)
+    }
+    trans {
+        pathprog = spd(pathprog, 25.0)
+        if (pathprog >= pathlen) {
+            KillEntity()
+            GLOBAL_186 = 0
+            changestate(Kill)
+        }
+        calcpath(pathprog)
+        {
+            var ahead
+            ahead = pathprog + 5.0
+            if (ahead < pathlen) {
+                calcpath(ahead, vvec)
+                troty = atan(vecx - x, vecz - z)
+            }
+        }
+        roty = degseek(roty, troty, 360deg)
+    }
+}
+
+state Penta_Return { // 50
+    stateflag 0x4081
+    statusc 0
+    code() {
+        zindex = 24
+        roty = atan2(player -> trans) + 45deg
+        x = (15.625 * sin(roty)) >> 4 
+        z = (15.625 * cos(roty)) >> 4 
+        y = 0
+        roty += 180deg
+        velx = (9.375 * sin(roty)) >> 4 
+        velz = (9.375 * cos(roty)) >> 4 
+        vely = 0
+        changestate(Penta_ApproachDingo)
+    }
+}
+
+state Penta_ApproachDingo { // 51
+    stateflag 0x4081
+    statusc 0
+    code() {
+        do {
+            SoundPentaFootstep(0.3V)
+            PlayFramesPenta(PENTA_INTRO_6, -1.0, 9.0, 5.0, 0.4V)
+            changestateif(Penta_JumpOnDingo, distance(x, self, 10) <= 4m)
+        } while (1)
+    }
+    trans {
+        x = spd(x, velx)
+        z = spd(z, velz)
+    }
+}
+
+state Penta_JumpOnDingo { // 52
+    stateflag 0x4081
+    statusc 0
+    code() {
+        playframes(PENTA_WIN_1, 0.0, 10.0)
+        sleep()
+    }
+    trans {
+        once {
+            speed = distance(x, self, 11)
+            speed /= 11
+            speed += 1
+            groundy = 2.55m
+            vely = -((((y - groundy) * 25) / 11) - (19.8m + 1))
+        }
+        PentaCenterDistance = distance(x, self, 11)
+        if (PentaCenterDistance <= speed) {
+            x = 0
+            z = 0
+        }
+        else {
+            troty = miscfunc(x, self, 1, 2) + 180deg
+            velx = ((speed >> 8) * sin(troty)) >> 4
+            velz = ((speed >> 8) * cos(troty)) >> 4
+            x += velx
+            z += velz
+        }
+        y = spd(y, vely)
+        if (vely < 0 && y < groundy) {
+            y = groundy
+            changestate(Penta_BounceOnDingo)
+        }
+        vely = spd(vely, -90m)
+        if (distance(player, DIST_NO_Y | DIST_EXACT) <= 1m) {
+            var0 = atan2(player -> trans)
+            player -> x = (1.565 * sin(var0)) >> 4
+            player -> z = (1.565 * cos(var0)) >> 4
+        }
+    }
+}
+
+state Penta_BounceOnDingo { // 53
+    stateflag 0x4081
+    statusc 0
+    code() {
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_SIDES
+        setanim(PENTA_WIN_2)
+        do {
+            sendevent(EventTriggered, creator)
+            setanim(PENTA_WIN_2, -1.0)
+            do {
+                animframe += 1.0
+                if (animframe == 2.0) {
+                    SoundPentaFootstep(0.5V)
+                    spawn(9, 21, 1, -1.0, 0, 0, 0, 1.2S, 0, 40, 2)
+                }
+                playframe()
+            } while (animframe + 1.0 <= 24.0)
+        } while (1)
+    }
+    trans {
+        if (animseq == getanim(PENTA_WIN_2) && (animframe >= 14.0 && animframe <= 24.0)) {
+            roty = (roty + 4.75deg) % 360deg
+        }
+        if (distance(player, DIST_NO_Y | DIST_EXACT) <= 1m) {
+            var0 = atan2(player -> trans)
+            player -> x = (1.565 * sin(var0)) >> 4
+            player -> z = (1.565 * cos(var0)) >> 4
+        }
+    }
+}
+
+state Kill { // 54
+    statusc 0
+    code() {}
+}

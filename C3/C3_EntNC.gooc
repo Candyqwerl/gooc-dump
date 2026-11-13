@@ -1,0 +1,879 @@
+#gool EntNC 66 2
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C3_DispC.gooh"
+#include "..\\Includes\\C3_FruiC.gooh"
+
+//gooc -c 3 -r pal "C3\C3_EntNC.gooc" "C3\Out\C3_EntNC.nsentry"
+
+#anim ENTER_NAME_BACKGROUND [NE10V] [NE10G] 1 1 2
+
+#include "..\\Includes\\Fonts\\C3_FONT_SMALL.gooc"
+#include "..\\Includes\\Fonts\\C3_FONT_BIG.gooc"
+
+#text TEXT   FONT_SMALL[Cr20T]
+"00                                      "                  // 0.0
+"01                                      "                  // 1.0
+"02                                      "                  // 2.0
+"03                                      "                  // 3.0
+"A"                                                         // 4.0
+"B"                                                         // 5.0
+"C"                                                         // 6.0
+"D"                                                         // 7.0
+"E"                                                         // 8.0
+"F"                                                         // 9.0
+"G"                                                         // 10.0
+"H"                                                         // 11.0
+"I"                                                         // 12.0
+"J"                                                         // 13.0
+"K"                                                         // 14.0
+"L"                                                         // 15.0
+"M"                                                         // 16.0
+"N"                                                         // 17.0
+"O"                                                         // 18.0
+"P"                                                         // 19.0
+"Q"                                                         // 20.0
+"R"                                                         // 21.0
+"S"                                                         // 22.0
+"T"                                                         // 23.0
+"U"                                                         // 24.0
+"V"                                                         // 25.0
+"W"                                                         // 26.0
+"X"                                                         // 27.0
+"Y"                                                         // 28.0
+"Z"                                                         // 29.0
+"_"                                                         // 30.0
+"ENTRER UN NOM"                                             // 31.0 (French: Enter a name)
+"NAME EINGEBEN"                                             // 32.0 (German: Enter a name)
+"INSERISCI NOME"                                            // 33.0 (Italian: Enter name)
+"ESCRIBIR NOMBRE"                                           // 34.0 (Spanish: Enter name)
+"ENTER NAME"                                                // 35.0
+"TERMINE"                                                   // 36.0 (French: Done)
+"FERTIG"                                                    // 37.0 (German: Done)
+"FATTO"                                                     // 38.0 (Italian: Done)
+"LISTO"                                                     // 39.0 (Spanish: Done)
+"DONE"                                                      // 40.0
+"___"                                                       // 41.0
+"________"                                                  // 42.0
+"A B C D E F G~nH I J K L M N~nO P Q R S T U~nV W X Y Z _"  // 43.0
+"<"                                                         // 44.0
+"%s"                                                        // 45.0
+"KEINE NEUE ZEIT"                                           // 46.0 (German: No new time)
+"NINGUN TIEMPO NUEVO"                                       // 47.0 (Spanish: No new time)
+"NESSUN NUOVO TEMPO"                                        // 48.0 (Italian: No new time)
+"PAS DE NOUVEAU TEMPS"                                      // 49.0 (French: No new time)
+"NO NEW TIME"                                               // 50.0
+"BESTZEIT!"                                                 // 51.0 (German: Best time!)
+"!MEJOR TIEMPO!"                                            // 52.0 (Spanish: Best time!)
+"TEMPO MIGLIORE!"                                           // 53.0 (Italian: Best time!)
+"MEILLEUR TEMPS!"                                           // 54.0 (French: Best time!)
+"BEST TIME!"                                                // 55.0
+"ZWEITBESTE ZEIT"                                           // 56.0 (German: Second best time)
+"2O MEJOR TIEMPO"                                           // 57.0 (Spanish: Second best time)
+"2O TEMPO MIGLIORE"                                         // 58.0 (Italian: Second best time)
+"2E MEILLEUR TEMPS"                                         // 59.0 (French: Second best time)
+"2ND BEST TIME!"                                            // 60.0
+"DRITTBESTE ZEIT"                                           // 61.0 (German: Third best time)
+"3ER MEJOR TIEMPO"                                          // 62.0 (Spanish: Third best time)
+"3O TEMPO MIGLIORE"                                         // 63.0 (Italian: Third best time)
+"3E MEILLEUR TEMPS"                                         // 64.0 (French: Third best time)
+"3RD BEST TIME!"                                            // 65.0
+"WARP ROOM"                                                 // 66.0
+"NEU ANFANG"                                                // 67.0 (German: Restart)
+"RENICIAR"                                                  // 68.0 (Spanish: Restart)
+"REINIZIARE"                                                // 69.0 (Italian: Restart)
+"RECOMMENCER"                                               // 70.0 (French: Restart)
+"RESTART"                                                   // 71.0
+"TRIAL"                                                     // 72.0
+
+#spawn S_MENU_TEXT          Menu_Text
+#spawn S_ENTER_NAME         Enter_Name
+#spawn S_NAME               Trial_Name
+#spawn S_KEYBOARD_CURSOR    Keyboard_Cursor
+#spawn S_TRIAL_RESULTS      Trial_Result_Menu
+#spawn S_TRIAL_EXIT_MENU    Trial_Exit_Menu
+
+event Event19 => state Kill
+
+array KeyboardMap = {
+    0x8000003, 0x103FFFF, 0x1000300, 0x3000603, -16252927, 0x203FF, 0x3010103, 0x2030000,
+    -63488, 0x3000303, 0x1030102, 0x30300, 0x3FFFF08, 0x3030004, 0x20301, 0x8000403,
+    0x503FFFF, 0x1040300, 0x3000303, -16252923, 0x603FF, 0x3010503, 0x6030004, -63488,
+    0x3000003, 0x5030106, 0x1000300, 0x3000003, 0x30101, 0x1060302, 0x3010103, 0x2030001,
+    0x2010301, 0x3010003, 0x2030102, 0x1030300, 0x3020203, 0x3030101, 0x30301, 0x3010403,
+    0x2030203, 0x1040301, 0x3000403, 0x4030105, 0x1030302, 0x3010503, 0x6030005, 0x2050301,
+    0x3010403, 0x6030106, 0x1000300, 0x3020603, 0x30105, 0x1000302, 0x3020103, 0x6030300,
+    0x2010302, 0x3010103, 0x1030202, 0x2000303, 0x3020203, 0x3030102, 0x3020302, 0x3020103,
+    0x3030203, 0x2040301, 0x3030303, 0x4030202, 0x1040302, 0x3020503, 0x3030304, 0x2050302,
+    0x3010503, 0x5030206, 0x2040303, 0x3020603, 0x30106, 0x3060202, 0x3020503, 0x30300,
+    0x3010302, 0x2FFFF07, 0x1030306, 0x2010303, 0x7030203, 0x3FFFF, 0x3020303, 0x3020203,
+    -16317693, 0x30103FF, 0x3030303, 0x4030203, -63741, 0x3030203, 0x4030304, 0x3050302,
+    0x3FFFF07, 0x5030303, 0x2050303, 0x7030602, 0x403FFFF, -65021, 0x3020603, -16317696,
+    0x30503FF, 0x3FF0007, -16317696, -63233, 0x7FFFF07, 0x103FF01, -63741, 0x7FFFF08,
+    0x207FFFF, 0x30203FF, 0x8FFFF07, -16252929, -16578561, 0x7030303, -16187393, -63489,
+    0x3FF0407, -16317692, -63233, 0x7FFFF07, 0x503FF05, -63741, 0x7FFFF08, 0x607FFFF,
+    0x30602FF, 0x8FFFF07, -16252929, -16774913, 0x8FFFF07, 0x3FFFF, -63488, 0x7FF0108,
+    -16187393, 0x103FF, 0x8FFFF08, -16253182, -63233, 0x8000203, 0x308FFFF, -63489,
+    0x3FFFF08, -16252925, -16512769, 0x8FFFF07, 0x403FFFF, -63488, 0x7FF0508, -16187393,
+    0x503FF, 0x8FFFF08, -16253178, -63233, 0x8000603, 0xFFFF
+}
+
+var DisplayVar1, DisplayVar2, DisplayVar3, DisplayVar4, DisplayVar5, DisplayVar6,
+    DisplayVar7, DisplayVar8, DisplayVar9, DisplayVar10, DisplayVar11,
+    SelectedItem, BlinkItem, DisplayItem, TextMode,
+    NameWord0, NameWord1, NameWord2, NameWord3, NameWord4, NameMaxLength,
+    KeyboardColumn, KeyboardRow, KeyboardState, KeyboardObject, BackspaceObject,
+    TextFrame1, DisplayVar28, DisplayVar29
+
+expr SavedGameFlags    = KeyboardColumn
+expr SavedMusicVolume  = DisplayItem
+expr RelicAwarded      = KeyboardRow
+expr RestartTextFrame  = KeyboardRow
+expr NavigationTable   = field_61
+expr PreviousRow       = field_61
+expr PreviousColumn    = var0
+expr PreviousItem      = vecx
+expr PrevKeyboardState = vecy
+expr MenuButtonCount   = field_61
+expr MenuButtonIndex   = stalltime
+
+expr ITEM_STATIC = 0x1F5
+
+inline sub SetTextLanguage1(fr, de, it, es, en) {
+    if (var lang = GLOBAL_151; lang == LANG_FR) {
+        TextFrame1 = fr
+    }
+    else if (lang == LANG_DE) {
+        TextFrame1 = de
+    }
+    else if (lang == LANG_IT) {
+        TextFrame1 = it
+    }
+    else if (lang == LANG_ES) {
+        TextFrame1 = es
+    }
+    else {
+        TextFrame1 = en
+    }
+}
+
+inline sub SetTextLanguage2(de, es, it, fr, en) {
+    if (var lang = GLOBAL_151; lang == LANG_DE) {
+        var0 = de
+    }
+    else if (lang == LANG_ES) {
+        var0 = es
+    }
+    else if (lang == LANG_IT) {
+        var0 = it
+    }
+    else if (lang == LANG_FR) {
+        var0 = fr
+    }
+    else {
+        var0 = en
+    }
+}
+
+inline sub SetTextLanguage3(fr, de, it, es, en) {
+    if (var lang = GLOBAL_151; lang == LANG_FR) {
+        RestartTextFrame = fr
+    }
+    else if (lang == LANG_DE) {
+        RestartTextFrame = de
+    }
+    else if (lang == LANG_IT) {
+        RestartTextFrame = it
+    }
+    else if (lang == LANG_ES) {
+        RestartTextFrame = es
+    }
+    else {
+        RestartTextFrame = en
+    }
+}
+
+inline sub SoundButtonNavigate() {
+    soundpitch(0x7F)
+    sounddecay(0xF0)
+    soundsetup(0, self, 8)
+    soundplay([Mb10A], 1V)
+}
+
+inline sub SoundButtonConfirm() {
+    soundpitch(4.0)
+    sounddecay(0xF0)
+    soundsetup(0, self, 8)
+    soundplay([tal0A], 0.8V)
+}
+
+state Enter_Name { // 0
+    stateflag 0x40001
+    code(len, arg) {
+        NameMaxLength = len
+        NameWord0 = 0
+        KeyboardState = 0
+        KeyboardObject = 0
+        BackspaceObject = 0
+        SelectedItem = 3
+        BlinkItem = 0
+        KeyboardColumn = 0
+        KeyboardRow = 0
+        SetTextLanguage1(31.0, 32.0, 33.0, 34.0, 35.0)
+        spawn2(EntNC, S_MENU_TEXT, 1, 1, 0, 85.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+        RefreshKeyboard()
+        SetTextLanguage1(36.0, 37.0, 38.0, 39.0, 40.0)
+        spawn2(EntNC, S_MENU_TEXT, 1, 7, 0, -57.0, TextFrame1, 2, 0xA3, 0x103, 0, 0)
+        if (NameMaxLength == 3) {
+            spawn2(EntNC, S_MENU_TEXT, 1, ITEM_STATIC, 74.0, -22.0, 41.0, 0, 0xA3, 0x103, 0, 0)
+        }
+        else {
+            spawn2(EntNC, S_MENU_TEXT, 1, ITEM_STATIC, 112.0, -22.0, 42.0, 0, 0xA3, 0x103, 0, 0)
+        }
+        spawn2(EntNC, S_KEYBOARD_CURSOR, 1)
+        var name, v2, v3
+        spawn2(EntNC, S_NAME, 1, ITEM_STATIC, 50.0, -16.0)
+        name = objectspawned
+        playnull(6)
+        do {
+            if (buttonpress(PAD_START | PAD_X)) {
+                SoundButtonConfirm()
+                if (SelectedItem == 7) {
+                    SubmitTrialName()
+                    cascadeevent(Event1, self)
+                    changestate(Trial_NameDone)
+                }
+                else if (SelectedItem == 2) {
+                    interrupter = name
+                    sendevent(Event1, interrupter)
+                    DeleteNameByte()
+                    spawn2(EntNC, S_NAME, 1, ITEM_STATIC, 50.0, -16.0)
+                    name = objectspawned
+                }
+                else if (SelectedItem == 3) {
+                    interrupter = name
+                    sendevent(Event1, interrupter)
+                    var0 = ((KeyboardRow * 7) + KeyboardColumn) + 0x41
+                    {
+                        var letter = var0
+                        GetNameLength()
+                        vecx = var0
+                        if (vecx == NameMaxLength) {
+                            vecx = NameMaxLength - 1
+                        }
+                        var0 = letter
+                        WriteNameByte()
+                        var0 = 0
+                        vecx += 1
+                        WriteNameByte()
+                        GetNameLength()
+                        if (var0 == NameMaxLength) {
+                            SelectedItem = 7
+                        }
+                    }
+                    spawn2(EntNC, S_NAME, 1, ITEM_STATIC, 50.0, -16.0)
+                    name = objectspawned
+                }
+            }
+            if (dirpress(PAD_N)) {
+                var0 = 0
+                NavigateKeyboard()
+                if (var0) { SoundButtonNavigate() }
+            }
+            else if (dirpress(PAD_S)) {
+                var0 = 2.0
+                NavigateKeyboard()
+                if (var0) { SoundButtonNavigate() }
+            }
+            else if (dirpress(PAD_W)) {
+                var0 = 3.0
+                NavigateKeyboard()
+                if (var0) { SoundButtonNavigate() }
+            }
+            else if (dirpress(PAD_E)) {
+                var0 = 1.0
+                NavigateKeyboard()
+                if (var0) { SoundButtonNavigate() }
+            }
+            playnull()
+        } while (1)
+    }
+}
+
+sub DeleteNameByte() { // S-180
+    save (var0, vecx) {
+        GetNameLength()
+        vecx = var0
+        if (vecx) {
+            var0 = 0
+            vecx -= 1
+            WriteNameByte()
+        }
+    }
+}
+
+sub RefreshKeyboard() { // S-191
+    if (KeyboardObject) {
+        interrupter = KeyboardObject
+        sendevent(Event1, interrupter)
+        KeyboardObject = 0
+    }
+    if (BackspaceObject) {
+        interrupter = BackspaceObject
+        sendevent(Event1, interrupter)
+        BackspaceObject = 0
+    }
+    spawn2(EntNC, S_MENU_TEXT, 1, ITEM_STATIC, -99.0, 32.0, 43.0, 2, 0xA3, 0x103, 0, 0)
+    KeyboardObject = objectspawned
+    spawn2(EntNC, S_MENU_TEXT, 1, 2, -3.0, -19.0, 44.0, 2, 0xA3, 0x103, 0, 0)
+    BackspaceObject = objectspawned
+}
+
+sub NavigateKeyboard() { // S-216
+    var direction = var0
+    var previous = SelectedItem
+    var row = KeyboardRow
+    var column = KeyboardColumn
+    NavigationTable = KeyboardMap
+    ApplyNavigation()
+    if (SelectedItem != previous || KeyboardRow != row || KeyboardColumn != column) {
+        var0 = 1
+    }
+    else {
+        var0 = 0
+    }
+}
+
+sub ApplyNavigation() { // S-234
+    var table = NavigationTable
+    var direction = var0
+    var offset, item, column, row, colmatch, rowmatch
+    do {
+        item = (table[offset >> 2] << ((3 - ((offset >> 8) & 3)) << 3)) >> 24
+        if (!item) {
+            var0 = 1
+            break
+        }
+        column = (table[(offset + 1.0) >> 2] << ((3 - (((offset + 1.0) >> 8) & 3)) << 3)) >> 24
+        row = (table[(offset + 2.0) >> 2] << ((3 - (((offset + 2.0) >> 8) & 3)) << 3)) >> 24
+        if (column == -1) {
+            colmatch = KeyboardColumn
+        }
+        else {
+            colmatch = column
+        }
+        if (row == -1) {
+            rowmatch = KeyboardRow
+        }
+        else {
+            rowmatch = row
+        }
+        if (SelectedItem == item && KeyboardColumn == colmatch && KeyboardRow == rowmatch) {
+            offset += (direction * 3) + 3.0
+            SelectedItem = (table[offset >> 2] << ((3 - ((offset >> 8) & 3)) << 3)) >> 24
+            var0 = (table[(offset + 1.0) >> 2] << ((3 - (((offset + 1.0) >> 8) & 3)) << 3)) >> 24
+            if (var0 >= 0) {
+                KeyboardColumn = var0
+            }
+            var0 = (table[(offset + 2.0) >> 2] << ((3 - (((offset + 2.0) >> 8) & 3)) << 3)) >> 24
+            if (var0 >= 0) {
+                KeyboardRow = var0
+            }
+            var0 = 0
+            break
+        }
+        offset += 15.0
+    } while (1)
+}
+
+sub ReadNameByte() { // S-337
+    var word
+    if (var0 < 4) {
+        word = NameWord0
+    }
+    else if (var0 < 8) {
+        word = NameWord1
+    }
+    else if (var0 < 12) {
+        word = NameWord2
+    }
+    else if (var0 < 16) {
+        word = NameWord3
+    }
+    else if (var0 < 20) {
+        word = NameWord4
+    }
+    var0 = word << (-8 * (var0 & 3)) & 0xFF
+}
+
+sub WriteNameByte() { // S-364
+    var mask = 0xFF
+    var value = var0
+    var shift
+    shift = (vecx & 3) << 3
+    value <<= shift
+    mask = ~(mask << shift)
+    if (vecx < 4) {
+        NameWord0 = (NameWord0 & mask | value)
+    }
+    else if (vecx < 8) {
+        NameWord1 = (NameWord1 & mask | value)
+    }
+    else if (vecx < 12) {
+        NameWord2 = (NameWord2 & mask | value)
+    }
+    else if (vecx < 16) {
+        NameWord3 = (NameWord3 & mask | value)
+    }
+    else if (vecx < 20) {
+        NameWord4 = (NameWord4 & mask | value)
+    }
+}
+
+sub GetNameLength() { // S-404
+    var len
+    do {
+        var0 = len
+        ReadNameByte()
+        if (!var0) {
+            break
+        }
+        len += 1
+    } while (1)
+    var0 = len
+}
+
+sub CountNameChars() { // S-415
+    var count, index
+    do {
+        var0 = index
+        ReadNameByte()
+        if (!var0) {
+            break
+        }
+        index += 1
+        if (var0 != 0xBC && var0 != 0xBD) {
+            count += 1
+        }
+    } while (1)
+    var0 = count
+}
+
+sub SubmitTrialName() { // S-434
+    sendevent(Event76, creator, &NameWord0)
+    playnull()
+}
+
+state Trial_NameDone { // 1
+    code() {}
+}
+
+inline sub SetKeyboardFrame(frame, f0, f1, f2, f3, f4, f5, f6) {
+    if (var column = KeyboardColumn; column == 0) {
+        frame = f0
+    }
+    else if (column == 1) {
+        frame = f1
+    }
+    else if (column == 2) {
+        frame = f2
+    }
+    else if (column == 3) {
+        frame = f3
+    }
+    else if (column == 4) {
+        frame = f4
+    }
+    else if (column == 5) {
+        frame = f5
+    }
+    else if (column == 6) {
+        frame = f6
+    }
+}
+
+state Keyboard_Cursor { // 2
+    statusc 0
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event1)
+    }
+    trans {
+        once {
+            SelectedItem = 0
+            BlinkItem = 0
+        }
+        PreviousColumn = KeyboardColumn
+        PreviousRow = KeyboardRow
+        PreviousItem = SelectedItem
+        PrevKeyboardState = KeyboardState
+        KeyboardColumn = creator -> KeyboardColumn
+        KeyboardRow = creator -> KeyboardRow
+        SelectedItem = creator -> SelectedItem
+        KeyboardState = creator -> KeyboardState
+        if (KeyboardColumn != PreviousColumn || KeyboardRow != PreviousRow || SelectedItem != PreviousItem || KeyboardState != PrevKeyboardState) {
+            cascadeevent(Event1, self)
+            var px, py, frame, v4
+            if (SelectedItem == 3) {
+                px = (KeyboardColumn << 13) - 196.0
+                if (var row = KeyboardRow; row == 0) {
+                    py = 33.0
+                    SetKeyboardFrame(frame, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0)
+                }
+                else if (row == 1) {
+                    py = 16.0
+                    SetKeyboardFrame(frame, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0)
+                }
+                else if (row == 2) {
+                    py = 0.0
+                    SetKeyboardFrame(frame, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0)
+                }
+                else if (row == 3) {
+                    py = -17.0
+                    if (var column = KeyboardColumn; column == 0) {
+                        frame = 25.0
+                    }
+                    else if (column == 1) {
+                        frame = 26.0
+                    }
+                    else if (column == 2) {
+                        frame = 27.0
+                    }
+                    else if (column == 3) {
+                        frame = 28.0
+                    }
+                    else if (column == 4) {
+                        frame = 29.0
+                    }
+                    else if (column == 5) {
+                        frame = 30.0
+                    }
+                }
+                if (frame) {
+                    spawn2(EntNC, S_MENU_TEXT, 1, 3, px, py, frame, 3, 0xA3, 0x103, 0, 0)
+                }
+            }
+        }
+    }
+}
+
+state Trial_Name { // 3
+    statusc 0
+    code(px, py) {
+        NameWord0 = creator -> NameWord0
+        NameWord1 = creator -> NameWord1
+        NameWord2 = creator -> NameWord2
+        NameWord3 = creator -> NameWord3
+        NameWord4 = creator -> NameWord4
+        spawn2(EntNC, S_MENU_TEXT, 1, ITEM_STATIC, px, py, 45.0, 0, 0xA3, 0x103, 1, &NameWord0)
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event1)
+    }
+}
+
+state Menu_Text { // 4
+    statusc 0
+    code(item, px, py, frame, mode, scax, scay, align, value) {
+        DisplayItem = item
+        py = (py << 8) / 216
+        SetTrans(px, py, 0)
+        TextMode = mode
+        SetScale(scax, scay, 0)
+        TextDefaultColor()
+        if (TextMode == 3) {
+            zindex = 160
+            TextMode = 2
+        }
+        else {
+            zindex = 150
+        }
+        SetVFX2D()
+        setanim(TEXT)
+        if (!align) {
+            statusb |= FLAG_STRING_CENTER
+        }
+        else if (align < 0) {
+            statusb |= 0x200000
+        }
+        if (scax > 0xA3) {
+            invincible = FONT_BIG
+        }
+        TextTrans()
+        settrans(TextTrans)
+        var arg
+        do {
+            arg = value
+            playframe(frame)
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event1)
+    }
+}
+
+sub TextTrans() { // S-700
+    SelectedItem = creator -> SelectedItem
+    BlinkItem = creator -> BlinkItem
+    if (BlinkItem == DisplayItem && ((frametime - statetime) % 12 > 6)) {
+        statusb |= FLAG_INVISIBLE
+    }
+    else {
+        statusb &= ~FLAG_INVISIBLE
+    }
+    if (TextMode == 2) {
+        if (SelectedItem == DisplayItem) {
+            if (frametime & 3) {
+                SetTextColor(0x1FF, 0x190, 0x000, 0x1FF, 0x000, 0x000)
+            }
+            else {
+                SetTextColor(0x1FF, 0x1FF, 0x1FF, 0x1FF, 0x1FF, 0x1FF)
+            }
+        }
+        else {
+            SetTextColor(0xA0, 0x8B, 0x60, 0xA0, 0x60, 0x6)
+        }
+    }
+    else if (TextMode == 1) {
+        if (SelectedItem == DisplayItem) {
+            if (frametime & 3) {
+                SetTextColor(0x1FF, 0x190, 0x000, 0x1FF, 0x000, 0x000)
+            }
+            else {
+                SetTextColor(0x1FF, 0x1FF, 0x1FF, 0x1FF, 0x1FF, 0x1FF)
+            }
+        }
+        else if ((frametime & 31) == 15) {
+            SetTextColor(0x1FF, 0x1FF, 0x1FF, 0x1FF, 0x1FF, 0x1FF)
+        }
+        else {
+            SetTextColor(0x1FF, 0x190, 0x00, 0x1FF, 0x00, 0x00)
+        }
+    }
+}
+
+state Trial_Result_Menu { // 5
+    statusc 0
+    code(achieved_time, spawner) {
+        movetolist(0.0, self)
+        SetScale(0xA3, 0x103, 0x1000)
+        save (GAMEFLAGS, GLOBAL_74) {
+            SavedGameFlags = GAMEFLAGS
+            SavedMusicVolume = MUSVOL
+            var record_time, name0, name1, v4
+            var best = -1
+            var reward_x = player -> x
+            var reward_y = player -> y
+            var reward_z = player -> z
+            var s_creator = creator
+            GLOBAL_74 = 0
+            interrupter = spawner
+            if (interrupter) {
+                reward_x = interrupter -> x
+                reward_y = interrupter -> y
+                reward_z = interrupter -> z
+            }
+            do (var rank = 0) {
+                getrank(LEVEL + rank, record_time, name0, name1)
+                if (!record_time || achieved_time < record_time) {
+                    best = rank
+                    goto WaitResultsReady;
+                }
+            } while ({ rank += 1 }; rank < 3)
+            
+            do {
+                WaitResultsReady:
+                playnull() 
+            } until (creator -> stateflag & 0x100000)
+            
+            {
+                var v9 = (GLOBAL_175 & ~(GLOBAL_179 | GLOBAL_181)) | GLOBAL_179
+                var v10 = (GLOBAL_176 & ~(GLOBAL_180 | GLOBAL_182)) | GLOBAL_180
+                var v11 = (GLOBAL_177 & ~(GLOBAL_179 | GLOBAL_181)) | GLOBAL_181
+                var v12 = (GLOBAL_178 & ~(GLOBAL_180 | GLOBAL_182)) | GLOBAL_182
+                var prev_tier, earned_tier
+
+                CheckItemPool(LEVEL >> 8, v9, v10)
+                if (misc) { prev_tier += 1 }
+
+                CheckItemPool(LEVEL >> 8, v11, v12)
+                if (misc) { prev_tier += 2 }
+
+                if      (achieved_time <= GLOBAL_123) { earned_tier = 3 }
+                else if (achieved_time <= GLOBAL_122) { earned_tier = 2 }
+                else if (achieved_time <= GLOBAL_121) { earned_tier = 1 }
+
+                RelicAwarded = false
+                if (earned_tier > prev_tier) {
+                    save (x, y, z) {
+                        x = reward_x
+                        y = reward_y
+                        z = reward_z
+                        spawn2(FruiC, FruiC_S_FRUIT_HOP, 1, 400.0 + ((earned_tier - 1) * 100.0) + LEVEL, 0)
+                        creator = objectspawned
+                        while (creator -> statusc & 0x2) {
+                            playnull()
+                        }
+                        sendevent(Event2, creator, 0)
+                        creator = s_creator
+                        RelicAwarded = true
+                    }
+                }
+            }
+            zindex = 1000
+            if (var rank = best; rank == -1) { // No new time
+                SetTextLanguage2(46.0, 47.0, 48.0, 49.0, 50.0)
+                field_61 = 40.0
+            }
+            else if (rank == 0) { // Best time
+                SetTextLanguage2(51.0, 52.0, 53.0, 54.0, 55.0)
+                spawn2(DispC, DispC_S_TIMETRIAL_RECORD, 1, LEVEL, 0, 0, -40.0)
+                spawn2(DispC, DispC_S_TIMETRIAL_RECORD, 1, LEVEL, 1, 0, -59.0)
+                field_61 = 40.0
+            }
+            else if (rank == 1) { // 2nd best time
+                SetTextLanguage2(56.0, 57.0, 58.0, 59.0, 60.0)
+                spawn2(DispC, DispC_S_TIMETRIAL_RECORD, 1, LEVEL, 0, 0, 21.0)
+                spawn2(DispC, DispC_S_TIMETRIAL_RECORD, 1, LEVEL, 1, 0, -40.0)
+                field_61 = 59.0
+            }
+            else if (rank == 2) { // 3rd best time
+                SetTextLanguage2(61.0, 62.0, 63.0, 64.0, 65.0)
+                spawn2(DispC, DispC_S_TIMETRIAL_RECORD, 1, LEVEL, 0, 0, 40.0)
+                spawn2(DispC, DispC_S_TIMETRIAL_RECORD, 1, LEVEL, 1, 0, 21.0)
+                field_61 = 78.0
+            }
+            spawn2(DispC, DispC_S_MENU_TEXT, 1, getanim(TEXT), var0, 0, field_61, 2, 7.0, 37.0)
+            playnull(42)
+            playnull(42)
+            if (RelicAwarded) {
+                playnull(42)
+            }
+            sendevent(Event12, creator, self)
+            cascadeevent(Event12, self, self)
+            statusb = FLAG_NO_CAMERA_CLIP | 0x100000
+            vfx = (vfx & 0xFFFFFF00) | 0x6
+            vfx = (vfx & 0xFFFF00FF) | 0x600
+            SetTrans(0, 0, 0)
+            SetScale(0xA37, 0x103A, 0x1000)
+            zindex = -1000
+            GAMEFLAGS &= ~0x200038D1
+            GAMEFLAGS |= 0x100000
+            if (best != -1) {
+                playanim(0, ENTER_NAME_BACKGROUND)
+                unkget(field_61)
+                MUSVOL = (MUSVOL * 5) >> 3
+                spawn2(EntNC, S_ENTER_NAME, 1, 3, GLOBAL_23)
+                var0 = 0
+                do {
+                    stalltime += 1
+                    playframe()
+                } until (var0)
+                if (var0 != -1) {
+                    v4 = 2
+                    while (v4 > best) {
+                        getrank(LEVEL + (v4 - 1), record_time, name0, name1)
+                        setrank(LEVEL + v4, name1, name0, record_time)
+                        v4 -= 1
+                    }
+                    record_time = achieved_time
+                    name0 = var0[0]
+                    name1 = var0[1.0]
+                    setrank(LEVEL + best, name1, name0, record_time)
+                }
+                while (child) {
+                    stalltime += 1
+                    playframe()
+                }
+                unkset(field_61)
+            }
+            GAMEFLAGS = SavedGameFlags
+            if (CRYSTALPOOL1 || CRYSTALPOOL2 || GEMPOOL1 || GEMPOOL2 || GLOBAL_179 || GLOBAL_180 || GLOBAL_181 || GLOBAL_182 || RelicAwarded) {
+                playnull(21)
+                playnull(21)
+            }
+            else {
+                MUSVOL = SavedMusicVolume
+                spawn2(EntNC, S_TRIAL_EXIT_MENU, 1)
+                WaitChildNull()
+            }
+            MUSVOL = SavedMusicVolume
+            sendevent(Event21, player, 0)
+        }
+    }
+    event(e, a) {
+        accevif (e == Event19) {
+            miscfunc(null, self, 0, 9)
+            accevcstate(Kill)
+        }
+        accevif (e == Event76) {
+            var0 = a[0]
+        }
+    }
+}
+
+state Trial_Exit_Menu { // 6
+    code() {
+        SetVFX2D()
+        SetTrans(0, -0x38E3, 0)
+        statusb = FLAG_STRING_CENTER | FLAG_NO_CAMERA_CLIP
+        zindex = 2000
+        var0 = 0
+        spawn2(DispC, DispC_S_MENU_BUTTON, 1, 0, getanim(TEXT), 66.0, 0, 0, 0)
+        SetTextLanguage3(67.0, 68.0, 69.0, 70.0, 71.0)
+        spawn2(DispC, DispC_S_MENU_BUTTON, 1, 1.0, getanim(TEXT), RestartTextFrame, 0, -18.0, 0)
+        do {
+            playnull()
+        } until (var0)
+        tpc = 0
+        if (MenuButtonIndex == 1.0) {
+            FadeToBlack()
+            WaitFadeNull()
+            sendevent(Event80, player, 0)
+        }
+        else {
+            playnull(4)
+        }
+    }
+    event(e, a) {
+        if (e == Event19) {
+            miscfunc(null, self, 0, 9)
+        }
+    }
+    trans {
+        once {
+            TextDefaultScale()
+            SetRot(0deg)
+            MenuButtonIndex = 0
+            MenuButtonCount = 2.0
+        }
+        unless (STATUS_FIRSTFRAME) {
+            unless (stateflag & 0x100000) {
+                if (dirpress(PAD_UP) && MenuButtonIndex > 0) {
+                    SoundButtonNavigate()
+                    MenuButtonIndex -= 1.0
+                }
+                if (dirpress(PAD_DOWN) && MenuButtonIndex < MenuButtonCount - 1.0) {
+                    SoundButtonNavigate()
+                    MenuButtonIndex += 1.0
+                }
+                if (buttonpress(PAD_X | PAD_START)) {
+                    SoundButtonConfirm()
+                    if (MenuButtonIndex == 0 || MenuButtonIndex == 1.0) {
+                        var0 = 1.0
+                    }
+                }
+            }
+        }
+    }
+}
+
+state Kill { // 7
+    statusc 0
+    code() {}
+}
+
+

@@ -1,0 +1,1013 @@
+#gool MeoOC 11 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C3_ShadC.gooh"
+//gooc -c 3 -r pal -l t "C3\C3_MeoOC.gooc" "C3\Out\C3_MeoOC.nsentry"
+
+#anim FROG_HOP_1       [FrobV] [FrobG] 34 1 2
+#anim FROG_HOP_2       [Fd1bV] [FrobG] 22 1 2
+#anim FROG_KISS_1      [Fd2bV] [FrobG] 06 1 2
+#anim FROG_KISS_2      [Fd3bV] [FrobG] 02 1 2
+#anim FROG_KISS_3      [Fd4bV] [FrobG] 03 1 2
+#anim FROG_KISS_4      [Fd5bV] [FrobG] 02 1 2
+#anim FROG_KISS_5      [Fd6bV] [FrobG] 04 1 2
+#anim FROG_KISS_6      [Fd7bV] [Fr2bG] 25 1 2
+
+#anim GOAT_WALK        [Goa0V] [Goa0G] 18 1 2
+#anim GOAT_KICK        [Go20V] [Goa0G] 22 1 2
+#anim GOAT_RAM         [Go30V] [Goa0G] 25 1 2
+
+#anim KNIGHT_SPIN      [Kn20V] [Kn10G] 17 1 2
+#anim KNIGHT_SPIN_STOP [Kn30V] [Kn10G] 17 1 2
+#anim KNIGHT_BODY      [Kn40V] [Kn10G] 12 1 2
+#anim KNIGHT_HEAD      [Kn50V] [Kn20G] 08 1 2
+#anim KNIGHT_5         [1034I] [Kn10G] 30 1 2
+#anim KNIGHT_LIFT      [Kn1PV] [Kn10G] 12 1 2
+
+#iflev t
+#anim MED_LOG          [LogtV] [LogtG] 01 1 2
+#anim MED_FENCE        [FentV] [FentG] 01 1 2
+#else
+#anim MED_LOG          [LogbV] [LogbG] 01 1 2
+#anim MED_FENCE        [FenbV] [FenbG] 01 1 2
+#endif
+
+#anim BOLT             [LitbV] [LitbG] 33 1 2
+
+#anim CRASH_SLICED_1   [Cs2bV] [CgtbG] 01 1 2
+#anim CRASH_SLICED_2   [Cs5bV] [CgtbG] 15 1 2
+
+#spawn S_FROG          Frog_Hop
+#spawn S_GOAT          Goat_Init
+#spawn S_KNIGHT        Knight_Init
+#spawn S_SMOKE         Chimney_Smoke
+#spawn S_KNIGHT_HEAD   Knight_Head
+#spawn S_CRASH_BODY    Crash_Body
+#spawn S_LOG           Medieval_Log
+#spawn S_FENCE         Medieval_Fence
+#spawn S_BOLT          Bolt_Init
+#spawn S_RAIN          Rain_Sound
+
+var FrogHopPending, FrogHalfCycle, FrogStartPoint, FrogTargetPoint, FrogTargetX, FrogTargetY, FrogTargetZ, FrogStartX,
+    FrogStartY, FrogStartZ, FrogTrackOffset, FrogCollateral, FrogCroakTimer
+
+expr KnightBaseYaw          = stalltime
+expr KnightHitAccepted      = field_62
+expr KnightZindexLow        = groundvel
+expr KnightZindexMid        = FrogHopPending
+expr KnightZindexHigh       = FrogStartPoint
+expr KnightZThresholdLow    = FrogHalfCycle
+expr KnightZThresholdHigh   = FrogTargetPoint
+
+expr FrogTrackLimit         = field_62
+expr FrogCycleOffset        = stalltime
+expr FrogReturning          = groundvel
+expr FrogCycleTime          = FrogHalfCycle
+
+expr GoatHalfCycle          = stalltime
+expr GoatCycleLength        = field_62
+expr GoatCycleOffset        = groundvel
+expr GoatReturning          = FrogHopPending
+expr GoatTrackLimit         = FrogStartPoint
+expr GoatTrackOffset        = FrogTargetPoint
+expr GoatInitialYaw         = FrogTargetX
+expr GoatBleatTimer         = FrogTargetY
+expr GoatZindexLow          = FrogTargetZ
+expr GoatZindexMid          = FrogStartX
+expr GoatZindexHigh         = FrogStartZ
+expr GoatZThresholdLow      = FrogStartY
+expr GoatZThresholdHigh     = FrogTrackOffset
+
+expr LogZindexLow           = stalltime
+expr LogZindexMid           = field_62
+expr LogZindexHigh          = FrogHopPending
+expr LogZThresholdLow       = groundvel
+expr LogZThresholdHigh      = FrogHalfCycle
+expr LogZindexOffset        = FrogStartPoint
+
+expr FenceZindexLow         = stalltime
+expr FenceZindexHigh        = field_62
+expr FenceZThreshold        = groundvel
+expr FenceZindexOffset      = FrogStartPoint
+
+expr BoltStrikeTime         = stalltime
+expr BoltFrame              = stalltime
+expr RainVoice              = stalltime
+
+state Chimney_Smoke { // 0 
+    statusc 0
+    code() {
+        do {
+            if (FRAMETIME < 32) {
+                spawn(9, 0, 1, -1.0, 16.0, 2)
+            }
+            playnull(5)
+        } while (1)
+    }
+}
+
+state Knight_Init { // 1
+    statusc 0
+    code(yaw, cycleoffs, low, mid, cut1, high, cut2) {
+        KnightBaseYaw = yaw
+        KnightZindexLow = low
+        KnightZindexMid = mid
+        KnightZThresholdLow = cut1
+        KnightZindexHigh = high
+        KnightZThresholdHigh = cut2
+        roty = KnightBaseYaw
+        statusb = FLAG_COLLIDABLE | FLAG_NO_CAMERA_CLIP
+        SetScale(1.2S)
+        KnightHitAccepted = 0
+        var0 = time(1.85s, cycleoffs * 1s / 1.2s)
+        changestateif(Knight_Wind_Up, var0 < 0.5s, var0)
+        var0 -= 0.5s
+        changestateif(Knight_Spin, var0 < 0.7s, var0)
+        var0 -= 0.7s
+        changestate(Knight_Recover, var0)
+    }
+}
+
+state Knight_Wind_Up { // 2
+    statusc 0
+    code(frame) {
+        animframe = frame << 8
+        SoundPitchDefault()
+        sounddecay(3.2s)
+        soundplay([KStbA], 0.6V)
+        playframes(KNIGHT_LIFT, 0.0, 11.0)
+        changestate(Knight_Spin, 0)
+    }
+    event(e, a) {
+        accevcstate(Medieval_Enemy_Squash, e == EventJumpedOn || e == EventSlamHit || e == EventHit || e == EventFling || e == EventHitInvincible)
+        accevcstate(Medieval_Enemy_Fling, e == EventSpinHit || e == EventSlideHit)
+    }
+    trans {
+        nofirst {
+            sendevent(EventHit, collider, 100.0)
+            if (eventaccepted) {
+                KnightHitAccepted = 1
+            }
+        }
+        var0 = player -> z - z
+        if (var0 >= KnightZThresholdLow) {
+            if (var0 >= KnightZThresholdHigh) {
+                zindex = KnightZindexHigh
+            }
+            else {
+                zindex = KnightZindexMid
+            }
+        }
+        else {
+            zindex = KnightZindexLow
+        }
+    }
+}
+
+state Knight_Spin { // 3
+    statusc 0
+    code(frame) {
+        animframe = frame << 8
+        SoundPitchDefault()
+        sounddecay(3.2s)
+        soundplay([KFSbA], 0.6V)
+        settrans(KightSpinTrans)
+        KightSpinTrans()
+        setanim(KNIGHT_SPIN)
+        animframe -= 1.0
+        do {
+            animframe += 1.0
+            if (animframe == 3.0) {
+                SoundPitchDefault(0.34)
+                sounddecay(3.2s)
+                soundplay([KSSbA], 0.6V)
+            }
+            playframe()
+        } while (animframe + 1.0 <= 16.0)
+        SoundPitchDefault()
+        sounddecay(3.2s)
+        soundplay([KSGbA], 0.6V)
+        changestate(Knight_Recover, 0)
+    }
+    event(e, a) {
+        if (interrupter == player) {
+            accevcstate(Medieval_Enemy_Squash, (e == EventJumpedOn || e == EventSlamHit) && distance(player, DIST_EXACT | DIST_NO_Y) <= 1.7m)
+            accevcstate(Medieval_Enemy_Fling, (e == EventSpinHit || e == EventSlideHit) && distance(player, DIST_EXACT | DIST_NO_Y) <= 1.7m)
+        }
+        accevcstate(Medieval_Enemy_Squash, e == EventHitInvincible || e == EventHit || e == EventFling)
+    }
+}
+
+sub KightSpinTrans() {
+    if (collider) {
+        if (distance(player, DIST_EXACT | DIST_NO_Y) <= 1.7m) {
+            sendevent(EventHit, collider, 100.0)
+            if (eventaccepted) {
+                KnightHitAccepted = 1
+            }
+        }
+        else {
+            sendevent(Event24, collider, 100.0)
+            if (eventaccepted) {
+                KnightHitAccepted = 1
+            }
+        }
+    }
+    var0 = player -> z - z
+    if (var0 >= KnightZThresholdLow) {
+        if (var0 >= KnightZThresholdHigh) {
+            zindex = KnightZindexHigh
+        }
+        else {
+            zindex = KnightZindexMid
+        }
+    }
+    else {
+        zindex = KnightZindexLow
+    }
+    roty = ((((animframe >> 8) + 1) * -16.0) / 17) + KnightBaseYaw
+}
+
+state Knight_Recover { // 4
+    statusc 0
+    code(frame) {
+        animframe = frame << 8
+        playframes(KNIGHT_SPIN_STOP, animframe, 16.0)
+        changestateif(Knight_Freeze, KnightHitAccepted || player -> stateflag & 0x8000000)
+        changestate(Knight_Wind_Up, 0)
+    }
+    event(e, a) {
+        accevcstate(Medieval_Enemy_Squash, e == EventJumpedOn || e == EventSlamHit || e == EventHit || e == EventFling)
+        accevcstate(Medieval_Enemy_Fling, e == EventSpinHit || e == EventSlideHit || e == EventHitInvincible)
+    }
+    trans {
+        sendevent(EventHit, collider, 100.0)
+        if (eventaccepted) {
+            KnightHitAccepted = 1
+        }
+        var0 = player -> z - z
+        if (var0 >= KnightZThresholdLow) {
+            if (var0 >= KnightZThresholdHigh) {
+                zindex = KnightZindexHigh
+            }
+            else {
+                zindex = KnightZindexMid
+            }
+        }
+        else {
+            zindex = KnightZindexLow
+        }
+    }
+}
+
+state Knight_Freeze { // 5
+    statusc 0
+    code() {
+        statusb = 0
+        spawn(MeoOC, S_KNIGHT_HEAD, 1)
+        playframes(KNIGHT_BODY, 0.0, 11.0)
+        sleep()
+    }
+    trans {
+        var0 = player -> z - z
+        if (var0 >= KnightZThresholdLow) {
+            if (var0 >= KnightZThresholdHigh) {
+                zindex = KnightZindexHigh
+            }
+            else {
+                zindex = KnightZindexMid
+            }
+        }
+        else {
+            zindex = KnightZindexLow
+        }
+        if (frametime - statetime >= 0.1s) {
+            changestateif(Medieval_Enemy_Squash, KnightHitAccepted && !(player -> stateflag & 0x8000000), 0)
+        }
+    }
+}
+
+state Knight_Head { // 6
+    statusc 0
+    code() {
+        zindex = creator -> zindex
+        zindex += 5
+        playanim(0, KNIGHT_HEAD)
+        playanim(1, KNIGHT_HEAD)
+        playanim(2, KNIGHT_HEAD)
+        playanim(2, KNIGHT_HEAD)
+        playanim(3, KNIGHT_HEAD)
+        playanim(4, KNIGHT_HEAD)
+        playanim(5, KNIGHT_HEAD)
+        playanim(6, KNIGHT_HEAD)
+        sleep()
+    }
+    trans {
+        once {
+            KnightBaseYaw = creator -> KnightBaseYaw
+        }
+        getvert(vtrans, parent, 0)
+        vecy = degdist(roty, atan2(player -> trans)) >> 2
+        var0 = degdist(KnightBaseYaw, vecy + roty)
+        if (var0 > 80deg) {
+            var0 = 80deg
+        }
+        if (var0 < -80deg) {
+            var0 = -80deg
+        }
+        vecy = degdist(roty, var0 + KnightBaseYaw)
+        if (vecy >= 0deg) {
+            if (vecy > 4.75deg) {
+                vecy = 4.75deg
+            }
+        }
+        else if (vecy < -4.75deg) {
+            vecy = -4.75deg
+        }
+        roty = (roty + vecy) % 360deg
+        rotz = (degdist(roty, KnightBaseYaw) >> 2) + roty
+        rotx = degseek(rotx, atan2_3d(self, player -> trans) - 25deg, 90deg)
+    }
+}
+
+state Frog_Hop { // 7
+    statusc 0
+    code(cycleoffs, limit, splashmask, arg, collateral, low, mid, cut1, high, cut2) {
+        FrogTrackLimit = limit
+        FrogCollateral = collateral
+        FrogCycleOffset = (cycleoffs * 8.18s) >> 8
+        if (FrogCycleOffset >= 8.18s) {
+            FrogCycleOffset = 8.12s
+        }
+        statusb = FLAG_COLLIDABLE
+        animseq = getanim(FROG_HOP_1)
+        FrogCycleTime = time(8.18s, FrogCycleOffset)
+        FrogReturning = 0
+        if (FrogCycleTime >= 4.09s) {
+            FrogCycleTime -= 4.09s
+            FrogReturning = 1
+        }
+        InitFrogHop()
+        FrogCroakTimer = rand(25)
+        do {
+            var0 = CAMTRANSZ - z
+            if (var0 >= cut1) {
+                if (var0 >= cut2) {
+                    zindex = high
+                }
+                else {
+                    zindex = mid
+                }
+            }
+            else {
+                zindex = low
+            }
+            sendevent(EventHit, collider, 100.0)
+            changestateif(Frog_Kiss, eventaccepted)
+            if (FrogCollateral) {
+                broadcastevent(EventHit, 4, 100.0)
+            }
+            FrogCroakTimer -= 1
+            if (FrogCroakTimer < 1) {
+                FrogCroakTimer = rand(30) + 5
+                SoundPitchDefault(0.25)
+                sounddecay(3.2s)
+                soundplay([FCrbA], 0.6V)
+            }
+            FrogCycleTime = time(8.18s, FrogCycleOffset)
+            FrogReturning = 0
+            if (FrogCycleTime >= 4.09s) {
+                FrogCycleTime -= 4.09s
+                FrogReturning = 1
+            }
+            animframe = (FrogCycleTime % 34) << 8
+            if (animframe >= 9.0 && animframe <= 12.0) {
+                if (FrogHopPending) {
+                    FrogHopPending = 0
+                    PrepareFrogHop()
+                }
+            }
+            else if (animframe >= 13.0 && animframe <= 21.0) {
+                var0 = (((animframe >> 8) - 13) << 8) >> 3
+                x = (((FrogTargetX - FrogStartX) * var0) >> 8) + FrogStartX
+                y = (((FrogTargetY - FrogStartY) * var0) >> 8) + FrogStartY
+                z = (((FrogTargetZ - FrogStartZ) * var0) >> 8) + FrogStartZ
+                if (animframe == 13.0) {
+                    if ((1 << FrogStartPoint) & splashmask) {
+                        spawn(9, 14, 1, -1.0, y, 2.0, 1m)
+                        SoundPitchDefault(0.25)
+                        sounddecay(3.2s)
+                        soundplay([FEWbA], 0.6V)
+                    }
+                }
+                else if (animframe == 21.0) {
+                    if ((1 << FrogTargetPoint) & splashmask) {
+                        spawn(9, 14, 1, -1.0, y, 2.0, 1m)
+                        SoundPitchDefault(0.25)
+                        sounddecay(3.2s)
+                        soundplay([FLWbA], 0.6V)
+                    }
+                    else {
+                        SoundPitchDefault(0.25)
+                        sounddecay(3.2s)
+                        soundplay([FLGbA], 0.4V)
+                    }
+                }
+            }
+            else {
+                FrogHopPending = 1
+            }
+            roty = degseek(roty, troty, 360deg)
+            playframe()
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Medieval_Enemy_Squash, e == EventJumpedOn || e == EventSlamHit || e == EventHit)
+        accevcstate(Medieval_Enemy_Fling, e == EventSpinHit || e == EventSlideHit || e == EventHitInvincible)
+    }
+}
+
+sub InitFrogHop() {
+    FrogStartPoint = FrogCycleTime / 34
+    FrogTargetPoint = FrogStartPoint + 1
+    if (FrogReturning) {
+        FrogStartPoint = 3 - FrogStartPoint
+        FrogTargetPoint = 3 - FrogTargetPoint
+    }
+    pathprog = FrogStartPoint << 8
+    if (pathprog >= pathlen) {
+        pathprog = pathlen - 1
+    }
+    calcpath(pathprog)
+    FrogStartX = x
+    FrogStartY = y
+    FrogStartZ = z
+    pathprog = FrogTargetPoint << 8
+    if (pathprog >= pathlen) {
+        pathprog = pathlen - 1
+    }
+    calcpath(pathprog)
+    FrogTargetX = x
+    FrogTargetY = y
+    FrogTargetZ = z
+    animframe = (FrogCycleTime % 34) << 8
+    if (animframe >= 0.0 && animframe <= 20.0) {
+        x = FrogStartX
+        y = FrogStartY
+        z = FrogStartZ
+    }
+    troty = atan(FrogTargetX - FrogStartX, FrogTargetZ - FrogStartZ)
+    roty = troty
+    FrogTrackOffset = 0
+    FrogHopPending = 0
+}
+
+sub PrepareFrogHop() {
+    {
+        var trackoffs, zoffs, xwork, zwork, yc, ys, segyaw
+        pathprog = FrogTargetPoint << 8
+        if (pathprog >= pathlen) {
+            pathprog = pathlen - 1
+        }
+        calcpath(pathprog, vvec)
+        xwork = vecx
+        zwork = vecz
+        FrogStartPoint = FrogTargetPoint
+        if (FrogReturning) {
+            FrogTargetPoint -= 1
+            if (FrogTargetPoint < 0) {
+                FrogTargetPoint = 1
+            }
+        }
+        else {
+            FrogTargetPoint += 1
+            if (FrogTargetPoint > 3) {
+                FrogTargetPoint = 2
+            }
+        }
+        FrogStartX = FrogTargetX
+        FrogStartY = FrogTargetY
+        FrogStartZ = FrogTargetZ
+        pathprog = FrogTargetPoint << 8
+        if (pathprog >= pathlen) {
+            pathprog = pathlen - 1
+        }
+        calcpath(pathprog, vvec)
+        FrogTargetX = vecx
+        FrogTargetY = vecy
+        FrogTargetZ = vecz
+        segyaw = atan(FrogTargetX - xwork, FrogTargetZ - zwork)
+        xwork = (player -> x - FrogTargetX) >> 8
+        zwork = (player -> z - FrogTargetZ) >> 8
+        yc = cos(-segyaw)
+        ys = sin(-segyaw)
+        trackoffs = ((zwork * ys) + (xwork * yc)) >> 4
+        if (FrogTrackLimit < abs(trackoffs)) {
+            if (trackoffs >= 0) {
+                trackoffs = FrogTrackLimit
+            }
+            else {
+                trackoffs = -FrogTrackLimit
+            }
+        }
+        if (FrogStartPoint < FrogTargetPoint) {
+            trackoffs = -FrogTrackOffset
+        }
+        else {
+            FrogTrackOffset = trackoffs
+        }
+        xwork = trackoffs >> 8
+        zoffs = -(xwork * sin(segyaw)) >> 4
+        FrogTargetX += (xwork * cos(segyaw)) >> 4
+        FrogTargetZ += zoffs
+    }
+    troty = atan(FrogTargetX - FrogStartX, FrogTargetZ - FrogStartZ)
+}
+
+state Frog_Kiss { // 8
+    stateflag 0x21
+    statusc 0
+    code() {
+        statusb = FLAG_ROT_Y
+        trotx = degdist(roty, CAMROTY)
+        troty = roty + trotx
+        trotx = abs(trotx) << 1
+        player -> troty = troty
+        player -> trotx = abs(degdist(player -> roty, troty)) << 1
+        soundpitch(3.625)
+        sounddelay(1.2s)
+        soundplay([Fr1bA], 0.7V)
+        playframes(FROG_HOP_2, 0.0, 21.0)
+        playanim(0, FROG_KISS_1)
+        playanim(1, FROG_KISS_1)
+        playanim(2, FROG_KISS_1)
+        playanim(3, FROG_KISS_1)
+        playanim(3, FROG_KISS_1)
+        playanim(4, FROG_KISS_1)
+        playframe(animframe, 4)
+        playanim(0, FROG_KISS_2)
+        playanim(1, FROG_KISS_2)
+        do (var i = 0) {
+            playframesback(FROG_KISS_2, 0.0, 0.0)
+            playanim(0, FROG_KISS_2)
+            playanim(1, FROG_KISS_2)
+        } while ({ i += 1.0 }; i < 4.0)
+        playanim(0, FROG_KISS_3)
+        playanim(1, FROG_KISS_3)
+        playanim(1, FROG_KISS_3)
+        zindex = 50
+        playanim(0, FROG_KISS_4, 2)
+        playanim(1, FROG_KISS_4)
+        playanim(1, FROG_KISS_4, 2)
+        playanim(1, FROG_KISS_4)
+        playanim(1, FROG_KISS_4)
+        playanim(1, FROG_KISS_4, 2)
+        spawn(9, 40, 1, getins(SetExplosionColor), 0)
+        playanim(0, FROG_KISS_5)
+        playanim(1, FROG_KISS_5)
+        playanim(2, FROG_KISS_5)
+        playanim(2, FROG_KISS_5)
+        playframes(FROG_KISS_6, 0.0, 24.0)
+        sleep()
+    }
+    event(e, a) {
+        accevcstate(Medieval_Enemy_Squash, e == EventHit || e == EventHitInvincible)
+    }
+    trans {
+        x = seek(x, player -> x, spd(6m))
+        y = seek(y, player -> y, spd(6m))
+        z = seek(z, player -> z, spd(6m))
+    }
+}
+
+sub SetExplosionColor() {
+    if (var r = rand(4); r == 0) {
+        SetColor1(0x2A, 0x65, 0x62)
+    }
+    else if (r == 1) {
+        SetColor1(0x39, 0x95, 0x28)
+    }
+    else if (r == 2) {
+        SetColor1(0x52, 0xA3, 0x67)
+    }
+    else if (r == 3) {
+        SetColor1(0x47, 0x9C, 0x1A)
+    }
+    SetScale(3S)
+}
+
+state Goat_Init { // 9
+    statusc 0
+    code(cyclelen, cycleoffs, limit, low, mid, cut1, high, cut2) {
+        GoatHalfCycle = cyclelen * 1s / 1.2s
+        GoatCycleLength = (cyclelen * 1s / 1.2s) << 1
+        GoatCycleOffset = cycleoffs
+        GoatTrackLimit = limit
+        GoatZindexLow = low
+        GoatZindexMid = mid
+        GoatZThresholdLow = cut1
+        GoatZindexHigh = high
+        GoatZThresholdHigh = cut2
+        statusb = FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        SetScale(0.29S)
+        GoatTrackOffset = 0
+        var cycletime
+        cycletime = time(GoatCycleLength, GoatCycleOffset)
+        if (cycletime >= GoatHalfCycle) {
+            GoatReturning = 1
+            cycletime -= GoatHalfCycle
+            pathprog = (pathlen - 1) - (cycletime * pathlen) / GoatHalfCycle
+        }
+        else {
+            pathprog = (cycletime * pathlen) / GoatHalfCycle
+        }
+        calcpath(pathprog)
+        GoatInitialYaw = troty
+        roty = troty
+        changestate(Goat_Walk)
+    }
+}
+
+state Goat_Walk { // 10
+    statusc 0
+    code() {
+        do {
+            setanim(GOAT_WALK, -1.0)
+            do {
+                animframe += 1.0
+                if ((animseq == getanim(GOAT_WALK) && animframe == 6.0) || (animseq == getanim(GOAT_WALK) && animframe == 9.0) || (animseq == getanim(GOAT_WALK) && animframe == 15.0) || (animseq == getanim(GOAT_WALK) && animframe == 17.0)) {
+                    SoundPitchDefault(0.25)
+                    sounddecay(3.2s)
+                    soundplay([GFobA], 0.1V)
+                }
+                playframe()
+            } while (animframe + 1.0 <= 17.0)
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Medieval_Enemy_Squash, e == EventJumpedOn || e == EventSlamHit || e == EventHit || e == EventFling)
+        accevcstate(Medieval_Enemy_Fling, e == EventSpinHit || e == EventSlideHit || e == EventHitInvincible)
+    }
+    trans {
+        once {
+            statusb = FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | FLAG_SOLID_ALL
+            GoatBleatTimer = rand(25)
+        }
+        GoatBleatTimer -= 1
+        if (GoatBleatTimer <= 0) {
+            GoatBleatTimer = rand(60) + 37
+            SoundPitchDefault(0.25)
+            sounddecay(3.2s)
+            soundplay([GBlbA], 0.6V)
+        }
+        var cycletime
+        unless (STATUS_FIRSTFRAME) {
+            sendevent(EventHit, collider, 100.0)
+            changestateif(Goat_Select_Attack, eventaccepted)
+        }
+        cycletime = time(GoatCycleLength, GoatCycleOffset)
+        GoatReturning = 0
+        if (cycletime >= GoatHalfCycle) {
+            GoatReturning = 1
+            cycletime -= GoatHalfCycle
+            pathprog = (pathlen - 1) - (cycletime * pathlen) / GoatHalfCycle
+        }
+        else {
+            pathprog = (cycletime * pathlen) / GoatHalfCycle
+        }
+        calcpath(pathprog, vvec)
+        y = vecy
+        z = vecz
+        if (GoatReturning) {
+            troty = (troty + 180deg) % 360deg
+        }
+        if (GoatTrackLimit && GoatReturning) {
+            velx = player -> x - vecx
+            if (velx > GoatTrackLimit) {
+                velx = GoatTrackLimit
+            }
+            if (velx < -GoatTrackLimit) {
+                velx = -GoatTrackLimit
+            }
+            velx = ((vecx + velx) - x) >> 4
+            if (velx > 27.2) {
+                velx = 27.2
+            }
+            if (velx < -27.2) {
+                velx = -27.2
+            }
+            x += velx
+            GoatTrackOffset = x - vecx
+            if (player -> z >= z) {
+                troty += degdist(troty, atan2(player -> trans)) >> 1
+            }
+        }
+        else {
+            x = vecx + GoatTrackOffset
+        }
+        var0 = degdist(roty, troty) >> 2
+        if (var0 > 18.65deg) {
+            var0 = 18.65deg
+        }
+        if (var0 < -18.65deg) {
+            var0 = -18.65deg
+        }
+        roty = (roty + var0) % 360deg
+        var0 = CAMTRANSZ - z
+        if (var0 >= GoatZThresholdLow) {
+            if (var0 >= GoatZThresholdHigh) {
+                zindex = GoatZindexHigh
+            }
+            else { 
+                zindex = GoatZindexMid
+            }
+        }
+        else {
+            zindex = GoatZindexLow
+        }
+    }
+}
+
+state Goat_Select_Attack { // 1
+    statusc 0
+    code() {
+        if (abs(degdist(0deg, player -> roty)) > 90deg) {
+            changestate(Goat_Ram)
+        }
+        else {
+            changestate(Goat_Kick)
+        }
+    }
+}
+
+state Goat_Kick { // 12
+    statusc 0
+    code() {
+        SoundPitchDefault(0.25)
+        sounddecay(3.2s)
+        soundplay([GBlbA], 0.6V)
+        playframes(GOAT_KICK, 0.0, 21.0)
+        sleep()
+    }
+    event(e, a) {
+        accevcstate(Medieval_Enemy_Squash, e == EventJumpedOn || e == EventSlamHit || e == EventHit || e == EventFling)
+        accevcstate(Medieval_Enemy_Fling, e == EventSpinHit || e == EventSlideHit || e == EventHitInvincible)
+    }
+    trans {
+        once {
+            troty = (atan2(player -> trans) + 180deg) % 360deg
+        }
+        var0 = degdist(roty, troty) >> 1
+        if (var0 > 40deg) {
+            var0 = 40deg
+        }
+        if (var0 < -40deg) {
+            var0 = 40deg
+        }
+        roty += var0
+    }
+}
+
+state Goat_Ram { // 13
+    statusc 0
+    code() {
+        SoundPitchDefault(0.25)
+        sounddecay(3.2s)
+        soundplay([GBlbA], 0.6V)
+        playframes(GOAT_RAM, 0.0, 24.0)
+        sleep()
+    }
+    event(e, a) {
+        accevcstate(Medieval_Enemy_Squash, e == EventJumpedOn || e == EventSlamHit || e == EventHit || e == EventFling)
+        accevcstate(Medieval_Enemy_Fling, e == EventSpinHit || e == EventSlideHit || e == EventHitInvincible)
+    }
+    trans {
+        once {
+            troty = atan2(player -> trans)
+        }
+        var0 = degdist(roty, troty) >> 1
+        if (var0 > 40deg) {
+            var0 = 40deg
+        }
+        if (var0 < -40deg) {
+            var0 = 40deg
+        }
+        roty += var0
+    }
+}
+
+state Medieval_Enemy_Fling { // 14
+    stateflag 0x30
+    statusc 0x32
+    code(h) {
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir(0x80000)
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    } 
+    trans {
+        EnemyFlingTrans(2m, EventFling)
+    }
+}
+
+state Medieval_Enemy_Squash { // 15
+    stateflag 0x23
+    statusc 0x32
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        playframe()
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        playframe()
+    }
+}
+
+sub SetParticleColor() {
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    if (var r = rand(3); !r) {
+        SetColor1(0x05, 0xBD, 0xBE)
+    }
+    else if (r == 1) {
+        SetColor1(0x0D, 0x4C, 0x4C)
+    }
+    else if (r == 2) {
+        SetColor1(0xE7, 0x85, 0x81)
+    }
+}
+
+state Crash_Body { // 16
+    stateflag 0
+    statusc 0x3C02
+    code() {
+        zindex = parent -> zindex
+        playframes(CRASH_SLICED_2, 0.0, 14.0)
+        do {
+            if (!(parent -> stateflag & 0x20)) {
+                return 
+            }
+            playnull()
+        } while (!(parent -> stateflag & 0x100000))
+        statusb = 0x4000000
+        while (parent -> stateflag & 0x20) {
+            if (parent -> speed && !child) {
+                spawn(ShadC, ShadC_S_SHADOW, 1, 0, 1S, 0)
+            }
+            playanim(0, CRASH_SLICED_1)
+        }
+    }
+    trans {
+        roty = parent -> roty
+    }
+}
+
+state Medieval_Log { // 17
+    stateflag 0x4004081
+    statusc 0x80012
+    code(low, mid, cut1, high, cut2, offset) {
+        LogZindexLow = low
+        LogZindexMid = mid
+        LogZThresholdLow = cut1
+        LogZindexHigh = high
+        LogZThresholdHigh = cut2
+        LogZindexOffset = offset
+        settrans(UpdateLogZindex)
+        UpdateLogZindex()
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | 0x400000 | 0x40000000
+        sleepanim(0, MED_LOG)
+    }
+}
+
+sub UpdateLogZindex() {
+    vecz = player -> z - z
+    if (vecz >= LogZThresholdLow) {
+        if (vecz >= LogZThresholdHigh) {
+            zindex = LogZindexHigh
+        }
+        else { 
+            zindex = LogZindexMid
+        }
+    }
+    else {
+        zindex = LogZindexLow
+        if (player -> z < z - 1.25m) {
+            zindex += LogZindexOffset
+        }
+    }
+}
+
+state Medieval_Fence { // 18
+    stateflag 0x4004081
+    statusc 0x80012
+    code(low, high, cut, offset) {
+        FenceZindexLow = low
+        FenceZindexHigh = high
+        FenceZThreshold = cut
+        FenceZindexOffset = offset
+        settrans(UpdateFenceZindex)
+        UpdateFenceZindex()
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL | 0x400000 | 0x40000000
+        sleepanim(0, MED_FENCE)
+    }
+}
+
+sub UpdateFenceZindex() {
+    if (player -> z - z >= FenceZThreshold) {
+        zindex = FenceZindexHigh
+    }
+    else {
+        zindex = FenceZindexLow
+    }
+    if (player -> z < z - 1.25m) {
+        zindex += FenceZindexOffset
+    }
+}
+
+state Bolt_Init { // 19
+    statusc 0
+    code() {
+        rotx = 0deg
+        SetZindexField(-200)
+        BoltStrikeTime = frametime + rand(2s)
+        do {
+            playnull()
+        } until (frametime >= BoltStrikeTime)
+        changestate(Bolt_Strike)
+    }
+}
+
+state Bolt_Wait { // 20
+    statusc 0
+    code() {
+        BoltStrikeTime = frametime + rand(2s, 4s)
+        do {
+            playnull()
+        } until (frametime >= BoltStrikeTime)
+        changestate(Bolt_Strike)
+    }
+}
+
+state Bolt_Strike { // 21
+    statusc 0
+    code() {
+        statusb = 0x100000
+        if (rand(2)) {
+            scalex = -abs(scalex)
+        }
+        else {
+            scalex = abs(scalex)
+        }
+        sounddecay(8.4s)
+        soundsetup(0, self, 8)
+        SoundPitchDefault(29)
+        soundsetup(0, self, 5)
+        soundplay([Li1tA], rand(0.8V, 0.4V))
+        setanim(BOLT, -1.0)
+        do {
+            animframe += 1.0
+            BoltFrame = animframe >> 8
+            playframe()
+        } while (animframe + 1.0 <= 32.0)
+        changestate(Bolt_Wait)
+    }
+    trans {
+        roty = CAMROTY
+        rotz = roty
+    }
+}
+
+state Rain_Sound { // 22
+    stateflag 0x10001
+    code(start, volume) {
+        vfx = (vfx & 0xFFFFFF00) | 0x6
+        soundpitch(3.625)
+        sounddecay(10.2s)
+        soundplay([ranfA], 0V)
+        RainVoice = voice
+        if (!RainVoice) {
+            return
+        }
+        settrans(RainWaitForEnable)
+        sleepnull()
+    }
+}
+
+sub RainWaitForEnable(start, volume) __trans {
+    if (GLOBAL_119 & 0x10) {
+        soundsetup(2, RainVoice, 0, 6)
+        soundsetup(GLOBAL_88 * volume, RainVoice, 2, 0)
+        settrans(UpdateRainVolume)
+    }
+}
+
+sub UpdateRainVolume(start, volume) __trans {
+    if (GLOBAL_119 & 0x10) {
+        soundsetup(2, RainVoice, 0, 6)
+        soundsetup(GLOBAL_88 * volume, RainVoice, 2, 0)
+    }
+    else {
+        soundsetup(12, RainVoice, 0, 6)
+        soundsetup(0, RainVoice, 2, 0)
+        settrans(RainWaitForEnable)
+    }
+}

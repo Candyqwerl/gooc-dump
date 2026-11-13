@@ -1,0 +1,493 @@
+#gool NTrOC 90 5
+#interruptcount 86
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C3_ShadC.gooh"
+//gooc -c 3 -r pal "C3\C3_NTrOC.gooc" "C3\Out\C3_NTrOC.nsentry"
+
+#anim ORB_FIRED           [Nd14V] [Nd14G] 12 1 2
+#anim ORB_FLY             [Nd24V] [Nd14G] 27 1 2
+#anim ORB_SHRINK          [Nd34V] [Nd14G] 08 1 2
+#anim PLATFORM_1          [Pl14V] [Pl14G] 08 1 2
+#anim PLATFORM_2          [Pl24V] [Pl24G] 08 1 2
+#anim LAZER_Z             [Wf14V] [Wf14G] 10 0 2
+#anim LAZER_X             [Wf24V] [Wf24G] 10 0 2
+#anim FORK_BOLT           [Nb14V] [Nb14G] 20 0 2
+#anim FORK_SHOCKWAVE      [Nr14V] [Nr14G] 15 1 2
+#anim ORB_SHOCKWAVE       [Nr24V] [Nr24G] 15 1 2
+#anim PLATFORM_SHOCKWAVE  [Pw14V] [Pw14G] 01 0 2
+
+#spawn S_PLATFORM_CONTROLLER  PlatformController_Init
+#spawn S_PLATFORM             Platform
+#spawn S_ORB                  Orb_Spawn
+#spawn S_LAZER                Lazer_Spawn
+#spawn S_BOLT                 Fork_Bolt
+#spawn S_ATTACK_SHOCKWAVE     Attack_Shockwave
+#spawn S_SHOCKWAVE            Platform_Shockwave
+
+event Event1 => state Kill
+
+state Orb_Spawn {
+    stateflag 0x1
+    statusc 0x2
+    code(vertex, unused) {
+        speed = 14m - ((SECTIONDEATHCOUNT >> 8) * 1m)
+        if (speed < 6m) {
+            speed = 6m
+        }
+        soundpitch(4.715)
+        soundsetup(7, self, 8)
+        sounddecay(8s)
+        soundplay([Nd14A], 1V)
+    
+        soundpitch(4.715)
+        sounddecay(8.05s)
+        soundcount(0xFFFF)
+        soundplay([Nd24A], 1V)
+
+        SetScale(0.6S)
+        getvert(vtrans, creator, vertex)
+        spawn(ShadC, ShadC_S_SHADOW, 1, 0, 1S, 20)
+        statusb = FLAG_COLLIDABLE | FLAG_PHYSICS_ENGINE | FLAG_HAS_SHADOW
+        zindex = 32
+        playframes(ORB_FIRED, 0.0, 11.0)
+        settrans(OrbTrackPlayer)
+        while (z < 15m) {
+            playframes(ORB_FLY, 0.0, 26.0)
+        }
+        changestate(Orb_Shrink)
+    }
+}
+
+sub OrbTrackPlayer() {
+    unless (stateflag & 0x20) {
+        sendevent(Event24, collider, 100.0)
+        changestateif(Orb_Shrink, eventaccepted)
+    }
+    vecx = player -> x - x
+    vecy = (player -> y + 1m) - y
+    vecz = player -> z - z
+    misc5(vecx, speed)
+    velx = seek(velx, vecx, spd(15m))
+    vely = seek(vely, vecy, spd(1m))
+    velz = 9m
+    vecx = CAMTRANSX
+    vecy = CAMTRANSY
+    vecz = CAMTRANSZ
+    roty = atan2(self, vecx)
+    rotz = roty
+    rotx = atan2_3d(self, vecx)
+}
+
+state Orb_Shrink {
+    stateflag 0x21
+    statusc 0x2
+    trans => sub OrbTrackPlayer
+    code() {
+        sendevent(EventTriggered, parent)
+        playanim(0, ORB_SHRINK)
+        playanim(1, ORB_SHRINK)
+        playanim(2, ORB_SHRINK)
+        playanim(3, ORB_SHRINK)
+        playanim(4, ORB_SHRINK)
+        playanim(4, ORB_SHRINK)
+        playanim(5, ORB_SHRINK)
+        playanim(6, ORB_SHRINK)
+    }
+}
+
+state Lazer_Spawn {
+    stateflag 0x1
+    statusc 0x2
+    code(mode) {
+        SetScale(1S)
+        statusb = FLAG_COLLIDABLE | FLAG_PHYSICS_ENGINE
+        zindex = 32
+        SetRot(0deg)
+        settrans(LazerTrans)
+        if (mode == 0.0) {
+            SetTrans(0m, 0m, 0m)
+            SetVel(0m, 0m, 6m)
+            setanim(LAZER_Z)
+            var0 = 50
+        }
+        else if (mode == 1.0) {
+            SetTrans(0m, 0m, 0m)
+            SetVel(0m, 0m, -6m)
+            setanim(LAZER_Z)
+            roty += 180deg
+            var0 = 50
+        }
+        else if (mode == 2.0) {
+            SetTrans(-5m, 0m, 6m)
+            SetVel(6m, 0m, 0m)
+            setanim(LAZER_X)
+            var0 = 41
+        }
+        else if (mode == 3.0) {
+            SetTrans(5m, 0m, 6m)
+            SetVel(-6m, 0m, 0m)
+            setanim(LAZER_X)
+            scalex = -abs(scalex)
+            var0 = 41
+        }
+        y = (parent -> y / 50m) * 50m
+        sleepframes(0.0, 9.0)
+    }
+}
+
+sub LazerTrans() {
+    if (frametime - statetime >= var0) {
+        moda = seek(moda, 16.0, 3.2)
+        changestateif(Kill, moda == 16.0)
+    }
+    sendevent(Event24, collider, 100.0)
+}
+
+state Fork_Bolt {
+    stateflag 0x1
+    statusc 0x2
+    code(vertex, dir) {
+        soundpitch(4.065)
+        soundsetup(7, self, 8)
+        sounddecay(0xC8)
+        soundsetup(0, self, 5)
+        soundplay([Nb14A], 1V)
+        SetScale(1S)
+        statusb = 0x100000
+        health = 0
+        zindex = 32
+        SetRot(0deg)
+        getvert(vtrans, creator, vertex)
+        if (dir == 0 || dir == 1.0) {
+            vecz = 0
+            if (vertex == 4.0) {
+                vecx = 6m
+            }
+            else {
+                vecx = -6m
+            }
+        }
+        else if (dir == 2.0) {
+            vecx = -6m
+            if (vertex == 4.0) {
+                vecz = 0m
+            }
+            else {
+                vecz = 8m
+            }
+        }
+        else if (dir == 3.0) {
+            vecx = 6m
+            if (vertex == 4.0) {
+                vecz = 0m
+            }
+            else {
+                vecz = 8m
+            }
+        }
+        if (vecx > 0) {
+            scalex = -abs(scalex)
+        }
+        roty = atan2(self, vecx)
+        scalez = (distance(vecx, self, DIST_EXACT | DIST_NO_Y) << 4) / 0x1388
+        playframes(FORK_BOLT, 0.0, 19.0)
+        while (stalltime < 42) {
+            playframe()
+        }
+        do {
+            moda = seek(moda, 16.0, 3.2)
+            playframe()
+        } until (moda)
+    }
+    trans {
+        health += 1
+    }
+}
+
+state PlatformController_Init {
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        SetScale(1S)
+        SetTrans(-4m, 0m, -7m)
+        vecx = 0
+        vecy = 0
+        changestate(PlatformController_Wait)
+    }
+}
+
+state PlatformController_Wait {
+    stateflag 0x1
+    statusc 0x22
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(PlatformController_ChangeLayout, e == Event83)
+        accevcstate(PlatformController_Rebuild, e == Event84)
+        accevif (e == EventTriggered && interrupter != self) {
+            y = interrupter -> y
+            cascadeevent(EventTriggered, self)
+        }
+    }
+}
+
+state PlatformController_Rebuild {
+    stateflag 0x1
+    statusc 0x22
+    code(low, high, fade) {
+        cascadeevent(Event81, self)
+        playnull()
+        do (var i = 0) {
+            CheckItemPool(i, low, high)
+            if (misc) {
+                spawn(NTrOC, S_PLATFORM, 1, i, fade)
+            }
+        } while ({ i += 1 }; i < 40)
+        changestate(PlatformController_Wait)
+    }
+}
+
+state PlatformController_ChangeLayout {
+    stateflag 0x1
+    statusc 0x22
+    code(low, high) {
+        cascadeevent(Event85, self, ~low, ~high)
+        spawn(NTrOC, S_SHOCKWAVE)
+        var addlo, addhi, rowlo, rowhi
+        do (var i = 0) {
+            if (var row = i; row == 0) {
+                rowlo = 0x1F
+                rowhi = 0
+            }
+            else if (row == 1) {
+                rowlo = 0x3E0
+                rowhi = 0
+            }
+            else if (row == 2) {
+                rowlo = 0x7C00
+                rowhi = 0
+            }
+            else if (row == 3) {
+                rowlo = 0xF8000
+                rowhi = 0
+            }
+            else if (row == 4) {
+                rowlo = 0x1F00000
+                rowhi = 0
+            }
+            else if (row == 5) {
+                rowlo = 0x3E000000
+                rowhi = 0
+            }
+            else if (row == 6) {
+                rowlo = -0x40000000
+                rowhi = 0x7
+            }
+            else if (row == 7) {
+                rowlo = 0
+                rowhi = 0xF8
+            }
+            addlo = low & rowlo
+            addhi = high & rowhi
+            cascadeevent(Event83, self, ~low & rowlo, ~high & rowhi)
+            addlo &= ~vecx
+            addhi &= ~vecy
+            do (var j = 0) {
+                CheckItemPool(j, addlo, addhi)
+                if (misc) {
+                    spawn(NTrOC, S_PLATFORM, 1, j, 1)
+                }
+            } while ({ j += 1 }; j < 40)
+            playnull(2)
+        } while ({ i += 1 }; i < 8)
+        changestate(PlatformController_Wait)
+    }
+}
+
+state Platform {
+    stateflag 0x4004281
+    statusc 0x0
+    code(index, fade) {
+        health = index
+        if (index / 5 == 7) {
+            setanim(PLATFORM_2)
+        }
+        else {
+            setanim(PLATFORM_1)
+        }
+        animframe = 7.0
+        if (health < 32) {
+            vecx = 1 << health
+            vecy = 0
+        }
+        else {
+            vecy = 1 << (health - 32)
+            vecx = 0
+        }
+        x = parent -> x + (health % 5) * 2m
+        z = parent -> z + (health / 5) * 2m
+        parent -> vecx |= vecx
+        parent -> vecy |= vecy
+        if (fade) {
+            vfx = (vfx & 0xFF00FFFF) | 0x70000
+            var alpha = 16.0
+            statusb = FLAG_SOLID_TOP | FLAG_COLLIDABLE
+            do {
+                moda = alpha
+                playframe()
+                animframe -= 1.0
+                if (animframe < 0) {
+                    animframe = 0
+                }
+            } while ({ alpha -= 2.0 }; alpha >= 0)
+            moda = 0
+            vfx &= 0xFF00FFFF
+        }
+        statusb = FLAG_SOLID_TOP | FLAG_COLLIDABLE
+        animframe = 0
+        sleep()
+    }
+    event(e, a) {
+        accevcstate(Platform_Remove, e == Event1 || e == Event81)
+        if (e == Event82) {
+            var low = a[0]
+            var high = a[1.0]
+            CheckItemPool(health, low, high)
+            accevcstate(Platform_Remove, misc)
+        }
+        if (e == Event83) {
+            var low = a[0]
+            var high = a[1.0]
+            CheckItemPool(health, low, high)
+            accevcstate(Platform_FadeOut, misc)
+        }
+        if (e == Event85) {
+            var low = a[0]
+            var high = a[1.0]
+            CheckItemPool(health, low, high)
+            accevcstate(Platform_FlashRed, misc)
+        }
+        accevif (e == EventTriggered) {
+            y = interrupter -> y
+        }
+    }
+}
+
+state Platform_FlashRed {
+    stateflag 0x4004283
+    statusc 0x0
+    event => state Platform
+    code() {
+        zindex = 0
+        SetColor1(0xFF, 0x00, 0x00)
+        do {
+            if (time(5) < 2) {
+                moda = 16.0
+            } else {
+                moda = 0
+            }
+            playframe()
+        } while (1)
+    }
+}
+
+state Platform_FadeOut {
+    stateflag 0x4004283
+    statusc 0x2
+    event => state Platform
+    code() {
+        zindex = 0
+        SetColor1(0, 0, 0)
+        vfx = (vfx & 0xFF00FFFF) | 0x70000
+        animframe = 0
+        do (var i = 0) {
+            moda = i
+            playframe()
+            animframe += 1.0
+        } while ({ i += 2.0 }; i < 16.0)
+        animframe = 7.0
+        moda = 16.0
+        changestate(Platform_Remove)
+    }
+}
+
+state Platform_Remove {
+    stateflag 0x21
+    statusc 0x22
+    code() {
+        parent -> vecx &= ~vecx
+        parent -> vecy &= ~vecy
+    }
+}
+
+inline sub SetVertex(vertex) {
+    if (vertex != -1.0) {
+        getvert(vtrans, creator, vertex)
+    }
+}
+
+state Attack_Shockwave {
+    stateflag 0x3
+    statusc 0x2
+    code(vertex, mode) {
+        SetScale(1S)
+        zindex = 50
+        if (mode == 0) {
+            SetVertex(vertex)
+            playframes(FORK_SHOCKWAVE, 0.0, 14.0)
+        }
+        else if (mode == 1) {
+            SetVertex(vertex)
+            playframes(ORB_SHOCKWAVE, 0.0, 14.0)
+        }
+        else if (mode == 2) {
+            playnull(2)
+            sendevent(Event38, player, 100.0)
+            CopyPlayerTrans()
+            vecx = CAMTRANSX
+            vecy = CAMTRANSY
+            vecz = CAMTRANSZ
+            roty = atan2(self, vecx)
+            rotz = roty
+            rotx = -90deg
+            playframes(ORB_SHOCKWAVE, 0.0, 14.0)
+        }
+        else if (mode == 3) {
+            SetVertex(vertex)
+            CopyPlayerTrans()
+            vecx = CAMTRANSX
+            vecy = CAMTRANSY
+            vecz = CAMTRANSZ
+            roty = atan2(self, vecx)
+            rotz = roty
+            rotx = -90deg
+            playframes(ORB_SHOCKWAVE, 0.0, 14.0)
+        }
+    }
+    trans {
+        if (frametime - statetime >= 8) {
+            moda = seek(moda, 16.0, 4.0)
+        }
+    }
+}
+
+state Platform_Shockwave {
+    stateflag 0x3
+    statusc 0x2
+    code() {
+        playnull(2)
+        zindex = 40
+        x = 0
+        statusb = FLAG_PHYSICS_ENGINE
+        velz = 20m
+        playanim(0, PLATFORM_SHOCKWAVE, 17)
+    }
+}
+
+state Kill {
+    stateflag 0x20
+    statusc 0x0
+    code() {}
+}

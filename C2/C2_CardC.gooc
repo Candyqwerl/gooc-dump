@@ -1,0 +1,2823 @@
+#gool CardC 17 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C2_DispC.gooh"
+//gooc -c 2 -r pal "C2\C2_CardC.gooc" "C2\Out\C2_CardC.nsentry"
+
+#sprite SAVE_ICON[Car1T]
+#tex 0x808080 1 0 0 2 64 64 64 64
+#tex 0x808080 1 0 0 3 128 64 64 64
+#tex 0x808080 1 0 0 4 192 64 64 64
+#tex 0x808080 1 0 0 5 256 64 64 64
+
+#sprite SAVE_BACKGROUND[Cr10T]
+#tex 0xC0C0C0 0 1 15 7 136 12 4 4
+
+#sprite CORTEX_ICON[Car1T]
+#tex 0x808080 0 3 1 0 0 48 16 16
+#tex 0x808080 0 3 1 0 0 32 16 16
+
+#include "..\\Includes\\Fonts\\C2_FONT_SMALL.gooc"
+#include "..\\Includes\\Fonts\\C2_FONT_BIG.gooc"
+
+#text TEXT   FONT_SMALL[Cr20T]
+"00                                      "                  // 0.0
+"01                                      "                  // 1.0
+"02                                      "                  // 2.0
+"03                                      "                  // 3.0
+"A"                                                         // 4.0
+"B"                                                         // 5.0
+"C"                                                         // 6.0
+"D"                                                         // 7.0
+"E"                                                         // 8.0
+"F"                                                         // 9.0
+"G"                                                         // 10.0
+"H"                                                         // 11.0
+"I"                                                         // 12.0
+"J"                                                         // 13.0
+"K"                                                         // 14.0
+"L"                                                         // 15.0
+"M"                                                         // 16.0
+"N"                                                         // 17.0
+"O"                                                         // 18.0
+"P"                                                         // 19.0
+"Q"                                                         // 20.0
+"R"                                                         // 21.0
+"S"                                                         // 22.0
+"T"                                                         // 23.0
+"U"                                                         // 24.0
+"V"                                                         // 25.0
+"W"                                                         // 26.0
+"X"                                                         // 27.0
+"Y"                                                         // 28.0
+"Z"                                                         // 29.0
+"_"                                                         // 30.0
+"CARTE MEMOIRE"                                             // 31.0 (French: Memory Card)
+"TARJETA DE MEMORIA"                                        // 32.0 (Spanish: Memory Card)
+"MEMORY CARD"                                               // 33.0
+"UNE ERREUR S'EST PRODUITE"                                 // 34.0 (French: An error occurred)
+"LORS DU FORMATAGE."                                        // 35.0 (French: while formatting.)
+"FEHLER BEIM VERSUCH ZUM"                                   // 36.0 (German: Error while trying to)
+"FORMATIEREN."                                              // 37.0 (German: format.)
+"ERRORE DURANTE LA"                                         // 38.0 (Italian: Error during)
+"FORMATTAZIONE."                                            // 39.0 (Italian: formatting.)
+"SE HA PRODUCIDO UN ERROR"                                  // 40.0 (Spanish: An error occurred)
+"AL DAR FORMATO."                                           // 41.0 (Spanish: while formatting.)
+"AN ERROR OCCURRED WHILE"                                   // 42.0
+"TRYING TO FORMAT."                                         // 43.0
+"LORS DE LA LECTURE."                                       // 44.0 (French: while reading.)
+"FEHLER BEIM LESEN DER"                                     // 45.0 (German: Error while reading the)
+"MEMORY CARD."                                              // 46.0 (German: Memory Card.)
+"LETTURA."                                                  // 47.0 (Italian: Reading.)
+"SE HA PRODUCIDO UN ERROR AL"                               // 48.0 (Spanish: An error occurred while)
+"LEER TARJETA DE MEMORIA."                                  // 49.0 (Spanish: reading the Memory Card.)
+"READING."                                                  // 50.0
+"1 BLOC EST NECESSAIRE POUR"                                // 51.0 (French: 1 block is required to)
+"ENREGISTRER CETTE PARTIE."                                 // 52.0 (French: save this game.)
+"AUCUN BLOC DISPONIBLE."                                    // 53.0 (French: No blocks available.)
+"ZUM SPEICHERN DES SPIELS WIRD"                             // 54.0 (German: To save this game,)
+"1 BLOCK BENOETIGT. ES SIND"                                // 55.0 (German: 1 block is required. There are)
+"KEINE BLOCKS VERFUEGBAR."                                  // 56.0 (German: no blocks available.)
+"NESSUN BLOCCO DISPONIBILE."                                // 57.0 (Italian: No blocks available.)
+"PER SALVARE QUESTO GIOCO"                                  // 58.0 (Italian: To save this game)
+"OCCORRE 1 BLOCCO."                                         // 59.0 (Italian: 1 block is required.)
+"1 SE NECESITA UN BLOQUE PARA"                              // 60.0 (Spanish: 1 block is required to)
+"GUARDAR ESTE JUEGO."                                       // 61.0 (Spanish: save this game.)
+"NO HAY BLOQUES DISPONIBLES."                               // 62.0 (Spanish: No blocks available.)
+"1 BLOCK IS REQUIRED TO"                                    // 63.0
+"SAVE THIS GAME."                                           // 64.0
+"NO BLOCKS ARE AVAILABLE."                                  // 65.0
+"LORS DE L'ECRITURE."                                       // 66.0 (French: while writing.)
+"FEHLER BEIM SCHREIBEN IN DIE"                              // 67.0 (German: Error while writing to the)
+"SCRITTURA."                                                // 68.0 (Italian: Writing.)
+"ESCRIBIR TARJETA DE MEMORIA."                              // 69.0 (Spanish: Writing to the Memory Card.)
+"WRITING."                                                  // 70.0
+"UNE ERREUR S'EST PRODUITE."                                // 71.0 (French: An error occurred.)
+"EIN FEHLER IST AUFGETRETEN."                               // 72.0 (German: An error occurred.)
+"SI E' VERIFICATO UN ERRORE."                               // 73.0 (Italian: An error occurred.)
+"SE HA PRODUCIDO UN ERROR."                                 // 74.0 (Spanish: An error occurred.)
+"AN ERROR HAS OCCURRED."                                    // 75.0
+"QUITTER"                                                   // 76.0 (French: Exit)
+"BEENDEN"                                                   // 77.0 (German: Exit)
+"ESCI"                                                      // 78.0 (Italian: Exit)
+"SALIR"                                                     // 79.0 (Spanish: Exit)
+"EXIT"                                                      // 80.0
+"LES DONNEES SUR LA PARTIE"                                 // 81.0 (French: The saved game data)
+"ENREGISTREE SONT ERRONEES."                                // 82.0 (French: is corrupt.)
+"GESPEICHERTE SPIELDATEN"                                   // 83.0 (German: Saved game data)
+"SIND FEHLERHAFT."                                          // 84.0 (German: is corrupt.)
+"I DATI SALVATI SONO ERRATI."                               // 85.0 (Italian: The saved data is corrupt.)
+"LOS DATOS DEL JUEGO GUARDADO"                              // 86.0 (Spanish: The saved game data)
+"SON ERRONEOS."                                             // 87.0 (Spanish: is corrupt.)
+"SAVED GAME DATA IS BAD."                                   // 88.0
+"EFFACER"                                                   // 89.0 (French: Erase)
+"LOESCHEN"                                                  // 90.0 (German: Erase)
+"CANCELLA"                                                  // 91.0 (Italian: Erase)
+"BORRAR"                                                    // 92.0 (Spanish: Erase)
+"ERASE"                                                     // 93.0
+"LA CARTE MEMOIRE N'EST PAS"                                // 94.0 (French: The Memory Card is not)
+"INSEREE DANS LA FENTE."                                    // 95.0 (French: inserted in the slot.)
+"MEMORY CARD IST NICHT IN DEN"                              // 96.0 (German: The Memory Card is not in the)
+"STECKPLATZ EINGESETZT."                                    // 97.0 (German: slot.)
+"LA MEMORY CARD NON E'"                                     // 98.0 (Italian: The Memory Card is not)
+"INSERITA NELL'INGRESSO."                                   // 99.0 (Italian: inserted in the slot.)
+"NO SE HA INSERTADO LA TARJETA"                             // 100.0 (Spanish: The Memory Card is not inserted)
+"DE MEMORIA EN LA RANURA."                                  // 101.0 (Spanish: in the slot.)
+"MEMORY CARD IS NOT INSERTED"                               // 102.0
+"IN MEMORY CARD SLOT 1."                                    // 103.0
+"INSEREZ UNE CARTE MEMOIRE"                                 // 104.0 (French: Insert a Memory Card)
+"DANS LA FENTE 1."                                          // 105.0 (French: into slot 1.)
+"SETZEN SIE DIE MEMORY CARD"                                // 106.0 (German: Insert the Memory Card)
+"IN STECKPLATZ 1 EIN."                                      // 107.0 (German: into slot 1.)
+"INSERIRE LA MEMORY CARD"                                   // 108.0 (Italian: Insert the Memory Card)
+"NELL'INGRESSO 1."                                          // 109.0 (Italian: into slot 1.)
+"INSERTA TARJETA DE MEMORIA"                                // 110.0 (Spanish: Insert the Memory Card)
+"EN LA RANURA 1."                                           // 111.0 (Spanish: into slot 1.)
+"PLEASE INSERT MEMORY CARD"                                 // 112.0
+"INTO MEMORY CARD SLOT 1."                                  // 113.0
+"VERIFICATION DU FORMAT."                                   // 114.0 (French: Checking format.)
+"VEUILLEZ PATIENTER..."                                     // 115.0 (French: Please wait...)
+"FORMAT WIRD UEBERPRUEFT."                                  // 116.0 (German: Checking format.)
+"BITTE WARTEN..."                                           // 117.0 (German: Please wait...)
+"CONTROLLO FORMATTAZIONE."                                  // 118.0 (Italian: Checking formatting.)
+"ATTENDERE..."                                              // 119.0 (Italian: Please wait...)
+"COMPROBANDO FORMATO."                                      // 120.0 (Spanish: Checking format.)
+"ESPERA POR FAVOR..."                                       // 121.0 (Spanish: Please wait...)
+"CHECKING FORMAT."                                          // 122.0
+"PLEASE WAIT..."                                            // 123.0
+"LA CARTE MEMOIRE N'EST"                                    // 124.0 (French: The Memory Card is not)
+"PAS ENCORE FORMATEE."                                      // 125.0 (French: formatted yet.)
+"VOULEZ-VOUS LA FORMATER?"                                  // 126.0 (French: Do you want to format it?)
+"DIE MEMORY CARD IST NOCH"                                  // 127.0 (German: The Memory Card is not yet)
+"NICHT FORMATIERT."                                         // 128.0 (German: formatted.)
+"MOECHTEN SIE SIE FORMATIEREN?"                             // 129.0 (German: Do you want to format it?)
+"FORMATTATA."                                               // 130.0 (Italian: Formatted.)
+"DESIDERI FORMATTARLA?"                                     // 131.0 (Italian: Do you want to format it?)
+"LA TARJETA DE MEMORIA NO"                                  // 132.0 (Spanish: The Memory Card is not)
+"TIENE FORMATO."                                            // 133.0 (Spanish: formatted.)
+"?QUIERES DARLE FORMATO?"                                   // 134.0 (Spanish: Do you want to format it?)
+"THE MEMORY CARD IS NOT"                                    // 135.0
+"FORMATTED YET."                                            // 136.0
+"DO YOU WANT TO FORMAT IT?"                                 // 137.0
+"OUI"                                                       // 138.0 (French: Yes)
+"NON"                                                       // 139.0 (French: No)
+"JA"                                                        // 140.0 (German: Yes)
+"NEIN"                                                      // 141.0 (German: No)
+"SI"                                                        // 142.0 (Italian/Spanish: Yes)
+"NO"                                                        // 143.0 (Italian/Spanish: No)
+"YES"                                                       // 144.0
+"FORMATAGE DE LA CARTE MEMOIRE."                            // 145.0 (French: Formatting the Memory Card.)
+"MEMORY CARD WIRD FORMATIERT."                              // 146.0 (German: The Memory Card is being formatted.)
+"FORMATTAZIONE MEMORY CARD."                                // 147.0 (Italian: Formatting Memory Card.)
+"DANDO FORMATO A TARJETA DE"                                // 148.0 (Spanish: Formatting the Memory Card.)
+"MEMORIA.  ESPERA POR FAVOR..."                             // 149.0 (Spanish: Please wait...)
+"FORMATTING MEMORY CARD."                                   // 150.0
+"DEFORMATAGE DE LA CARTE"                                   // 151.0 (French: Unformatting the Memory Card)
+"MEMOIRE."                                                  // 152.0 (French: Memory Card.)
+"FORMATIERUNG WIRD RUECKGAENGIG"                            // 153.0 (German: Formatting is being undone)
+"GEMACHT."                                                  // 154.0 (German: undone.)
+"SFORMATTAZIONE MEMORY CARD."                               // 155.0 (Italian: Unformatting Memory Card.)
+"BORRANDO FORMATO DE TARJETA"                               // 156.0 (Spanish: Removing formatting from the)
+"DE MEMORIA."                                               // 157.0 (Spanish: Memory Card.)
+"UNFORMATTING MEMORY CARD."                                 // 158.0
+"LECTURE DU REPERTOIRE DE LA"                               // 159.0 (French: Reading the directory of the)
+"CARTE MEMOIRE."                                            // 160.0 (French: Memory Card.)
+"VERZEICHNIS AUF MEMORY CARD"                               // 161.0 (German: The directory on the Memory Card)
+"WIRD GELESEN."                                             // 162.0 (German: is being read.)
+"LETTURA DIRECTORY MEMORY"                                  // 163.0 (Italian: Reading the Memory Card)
+"CARD."                                                     // 164.0 (Italian: directory.)
+"LEYENDO DIRECTORIO DE"                                     // 165.0 (Spanish: Reading the directory of the)
+"TARJETA DE MEMORIA."                                       // 166.0 (Spanish: Memory Card.)
+"READING MEMORY CARD DIRECTORY."                            // 167.0
+"MISE A JOUR DE LA CARTE"                                   // 168.0 (French: Updating the Memory Card)
+"MEMORY CARD WIRD"                                          // 169.0 (German: Memory Card is)
+"AKTUALISIERT."                                             // 170.0 (German: being updated.)
+"AGGIORNAMENTO MEMORY CARD."                                // 171.0 (Italian: Updating Memory Card.)
+"ACTUALIZANDO TARJETA"                                      // 172.0 (Spanish: Updating the card)
+"UPDATING MEMORY CARD."                                     // 173.0
+"CHARGER/ENREGISTRER"                                       // 174.0 (French: Load/Save)
+"LADEN/SPEICHERN"                                           // 175.0 (German: Load/Save)
+"CARICA/SALVA"                                              // 176.0 (Italian: Load/Save)
+"CARGAR/GUARDAR"                                            // 177.0 (Spanish: Load/Save)
+"LOAD/SAVE"                                                 // 178.0
+"CHARGER UNE PARTIE"                                        // 179.0 (French: Load a Game)
+"SPIEL LADEN"                                               // 180.0 (German: Load Game)
+"CARICA PARTITA"                                            // 181.0 (Italian: Load Game)
+"CARGAR JUEGO"                                              // 182.0 (Spanish: Load Game)
+"LOAD GAME"                                                 // 183.0
+"ENREGISTRER UNE PARTIE"                                    // 184.0 (French: Save a Game)
+"SPIEL SPEICHERN"                                           // 185.0 (German: Save Game)
+"SALVA PARTITA"                                             // 186.0 (Italian: Save Game)
+"GUARDAR JUEGO"                                             // 187.0 (Spanish: Save Game)
+"SAVE GAME"                                                 // 188.0
+"SUPPRIMER UNE PARTIE"                                      // 189.0 (French: Delete a Game)
+"SPIEL LOESCHEN"                                            // 190.0 (German: Delete Game)
+"ELIMINA PARTITA"                                           // 191.0 (Italian: Delete Game)
+"BORRAR JUEGO"                                              // 192.0 (Spanish: Delete Game)
+"DELETE GAME"                                               // 193.0
+"DEFORMATER LA CARTE"                                       // 194.0 (French: Unformat Card)
+"FORMATIERUNG RUECKGAENGIG"                                 // 195.0 (German: Undo Formatting)
+"SFORMATTA CARD"                                            // 196.0 (Italian: Unformat Card)
+"ELIMINAR FORMATO DE TARJETA"                               // 197.0 (Spanish: Unformat Card)
+"UNFORMAT CARD"                                             // 198.0
+"ANNULER"                                                   // 199.0 (French: Cancel)
+"ABBRECHEN"                                                 // 200.0 (German: Cancel)
+"ANNULLA"                                                   // 201.0 (Italian: Cancel)
+"CANCELAR"                                                  // 202.0 (Spanish: Cancel)
+"CANCEL"                                                    // 203.0
+"REMPLACER?"                                                // 204.0 (French: Overwrite?)
+"UEBERSCHREIBEN?"                                           // 205.0 (German: Overwrite?)
+"SOVRASCRIVI?"                                              // 206.0 (Italian: Overwrite?)
+"?SOBRESCRIBIR?"                                            // 207.0 (Spanish: Overwrite?)
+"OVERWRITE?"                                                // 208.0
+"TERMINE"                                                   // 209.0 (French: Done)
+"FERTIG"                                                    // 210.0 (German: Done)
+"FATTO"                                                     // 211.0 (Italian: Done)
+"HECHO"                                                     // 212.0 (Spanish: Done)
+"DONE"                                                      // 213.0
+"SUPPRIMER?"                                                // 214.0 (French: Delete?)
+"LOESCHEN?"                                                 // 215.0 (German: Delete?)
+"ELIMINA?"                                                  // 216.0 (Italian: Delete?)
+"?BORRAR?"                                                  // 217.0 (Spanish: Delete?)
+"DELETE?"                                                   // 218.0
+"ENTRER UN NOM"                                             // 219.0 (French: Enter a Name)
+"NAME EINGEBEN"                                             // 220.0 (German: Enter Name)
+"INSERISCI NOME"                                            // 221.0 (Italian: Enter Name)
+"ESCRIBIR NOMBRE"                                           // 222.0 (Spanish: Enter Name)
+"ENTER NAME"                                                // 223.0
+"LISTO"                                                     // 224.0 (Spanish: Ready)
+"________"                                                  // 225.0
+"A B C D E F G~nH I J K L M N~nO P Q R S T U~nV W X Y Z _"  // 226.0
+"<"                                                         // 227.0
+"%s"                                                        // 228.0
+"CRASH B."                                                  // 229.0
+"%d$"                                                       // 230.0
+"%d"                                                        // 231.0
+
+#spawn S_MENU_TEXT      Card_Text
+#spawn S_CARD_MENU      Card_Init
+#spawn S_CARD_ICON      Card_Icon
+#spawn S_CARD_NAME      Card_Name
+#spawn S_CARD_BG        Card_Background
+#spawn S_CARD_INFO      Card_Info
+#spawn S_CARD_CURSOR    Card_Cursor
+
+array LevelSaveIconMap = {
+        0x1E00, 0x1,
+        0xE00,  0x2,
+        0x1900, 0x3,
+        0x1F00, 0x4,
+        0x1800, 0x5,
+        0x1100, 0x6,
+        0x2000, 0x7,
+        0x1D00, 0x8,
+        0x1B00, 0x9,
+        0x2300, 0xA,
+        0x2100, 0xB,
+        0xA00,  0xC,
+        0x2200, 0xD,
+        0x1600, 0xE,
+        0x1700, 0xF,
+        0xD00,  0x10,
+        0x1500, 0x11,
+        0x1300, 0x12,
+        0xF00,  0x13,
+        0x2400, 0x14,
+        0x1000, 0x15,
+        0x1200, 0x16, 
+        0xC00,  0x17,
+        0x1A00, 0x18,
+        0x2600, 0x19,
+        0x2500, 0x1A,
+        0x2700, 0x1B, 
+        0x600,  0x1C,
+        0x800,  0x1D, 
+        0x300,  0x1E, 
+        0x900,  0x1F, 
+        0x700,  0x20,
+        0x1C00, 0x21, 
+        0x2B00, 0x7,
+        0x2C00, 0xD,
+        0x2D00, 0x11,
+        0x2E00, 0xF,
+        0x2F00, 0x10, 
+        0x63,   0x21,
+        0x0
+}
+
+array KeyboardMap = {
+    0x8000003, 0x103FFFF, 0x1000300, 0x3000603, -16252927, 0x203FF, 0x3010103, 0x2030000,
+    -63488, 0x3000303, 0x1030102, 0x30300, 0x3FFFF08, 0x3030004, 0x20301, 0x8000403,
+    0x503FFFF, 0x1040300, 0x3000303, -16252923, 0x603FF, 0x3010503, 0x6030004, -63488,
+    0x3000003, 0x5030106, 0x1000300, 0x3000003, 0x30101, 0x1060302, 0x3010103, 0x2030001,
+    0x2010301, 0x3010003, 0x2030102, 0x1030300, 0x3020203, 0x3030101, 0x30301, 0x3010403,
+    0x2030203, 0x1040301, 0x3000403, 0x4030105, 0x1030302, 0x3010503, 0x6030005, 0x2050301,
+    0x3010403, 0x6030106, 0x1000300, 0x3020603, 0x30105, 0x1000302, 0x3020103, 0x6030300,
+    0x2010302, 0x3010103, 0x1030202, 0x2000303, 0x3020203, 0x3030102, 0x3020302, 0x3020103,
+    0x3030203, 0x2040301, 0x3030303, 0x4030202, 0x1040302, 0x3020503, 0x3030304, 0x2050302,
+    0x3010503, 0x5030206, 0x2040303, 0x3020603, 0x30106, 0x3060202, 0x3020503, 0x30300,
+    0x3010302, 0x2FFFF07, 0x1030306, 0x2010303, 0x7030203, 0x3FFFF, 0x3020303, 0x3020203,
+    -16317693, 0x30103FF, 0x3030303, 0x4030203, -63741, 0x3030203, 0x4030304, 0x3050302,
+    0x3FFFF07, 0x5030303, 0x2050303, 0x7030602, 0x403FFFF, -65021, 0x3020603, -16317696,
+    0x30503FF, 0x3FF0007, -16317696, -63233, 0x7FFFF07, 0x103FF01, -63741, 0x7FFFF08,
+    0x207FFFF, 0x30203FF, 0x8FFFF07, -16252929, -16578561, 0x7030303, -16187393, -63489,
+    0x3FF0407, -16317692, -63233, 0x7FFFF07, 0x503FF05, -63741, 0x7FFFF08, 0x607FFFF,
+    0x30602FF, 0x8FFFF07, -16252929, -16774913, 0x8FFFF07, 0x3FFFF, -63488, 0x7FF0108,
+    -16187393, 0x103FF, 0x8FFFF08, -16253182, -63233, 0x8000203, 0x308FFFF, -63489,
+    0x3FFFF08, -16252925, -16512769, 0x8FFFF07, 0x403FFFF, -63488, 0x7FF0508, -16187393,
+    0x503FF, 0x8FFFF08, -16253178, -63233, 0x8000603, 0xFFFF
+}
+
+expr ITEM_NONE           = 0
+expr ITEM_BACKSPACE      = 2
+expr ITEM_KEYBOARD       = 3
+expr ITEM_DONE           = 7
+expr ITEM_CANCEL         = 8
+expr ITEM_LOAD           = 0x66
+expr ITEM_SAVE           = 0x67
+expr ITEM_DELETE         = 0x68
+expr ITEM_UNFORMAT       = 0x69
+expr ITEM_EXIT           = 0x6A
+expr ITEM_ERASE          = 0x12F
+expr ITEM_SLOT1          = 0x191
+expr ITEM_SLOT2          = 0x192
+expr ITEM_SLOT3          = 0x193
+expr ITEM_SLOT4          = 0x194
+expr ITEM_YES            = 0x1F6
+expr ITEM_NO             = 0x1F7
+expr ITEM_NAME_TITLE     = 1
+expr ITEM_MENU_TITLE     = 0x65
+expr ITEM_CARD_TITLE     = 0xC9
+expr ITEM_WAIT           = 0xCA
+expr ITEM_OVERWRITE_TEXT = 0x12E
+expr ITEM_DELETE_TEXT    = 0x130
+expr ITEM_STATIC         = 0x1F5
+
+expr REWARD_CRYSTAL = 200.0
+expr REWARD_GEM     = 300.0
+expr REWARD_LIFE    = 97.0
+
+expr GemCount         = vecx
+expr CrystalCount     = vecy
+expr NameOffset       = vecx
+expr MenuRowY         = vecy
+expr NavigationTable  = field_61
+expr PreviousColumn   = var0
+expr PreviousRow      = field_61
+expr PreviousItem     = vecx
+
+var PreferLoad, DirectLoad, SelectedItem, BlinkItem, HighlightSlot, DisplayItem, TextMode, ErrorType, SelectedSlot, SaveIcon1,
+    SaveIcon2, SaveIcon3, SaveIcon4, NameWord0, NameWord1, NameWord2, NameWord3, NameWord4, GameLoaded,
+    SummaryObject, KeyboardColumn, KeyboardRow, KeyboardVar3, KeyboardObject, BackspaceObject, TextFrame1, TextFrame2, TextFrame3
+
+inline sub SetCardTitle(fr, es, en) {
+    if (var lang = GLOBAL_151; lang == LANG_FR) {
+        TextFrame1 = fr
+    }
+    else if (lang == LANG_ES) {
+        TextFrame1 = es
+    }
+    else {
+        TextFrame1 = en
+    }
+}
+
+inline sub SetTextLanguage1(fr, de, it, es, en) {
+    if (var lang = GLOBAL_151; lang == LANG_FR) {
+        TextFrame1 = fr
+    }
+    else if (lang == LANG_DE) {
+        TextFrame1 = de
+    }
+    else if (lang == LANG_IT) {
+        TextFrame1 = it
+    }
+    else if (lang == LANG_ES) {
+        TextFrame1 = es
+    }
+    else {
+        TextFrame1 = en
+    }
+}
+
+inline sub SetTextLanguage2(fr1, fr2, de1, de2, it1, it2, es1, es2, en1, en2) {
+    if (var lang = GLOBAL_151; lang == LANG_FR) {
+        TextFrame1 = fr1
+        TextFrame2 = fr2
+    }
+    else if (lang == LANG_DE) {
+        TextFrame1 = de1
+        TextFrame2 = de2
+    }
+    else if (lang == LANG_IT) {
+        TextFrame1 = it1
+        TextFrame2 = it2
+    }
+    else if (lang == LANG_ES) {
+        TextFrame1 = es1
+        TextFrame2 = es2
+    }
+    else {
+        TextFrame1 = en1
+        TextFrame2 = en2
+    }
+}
+
+inline sub SetTextLanguage3(fr1, fr2, fr3, de1, de2, de3, it1, it2, it3, es1, es2, es3, en1, en2, en3) {
+    if (var lang = GLOBAL_151; lang == LANG_FR) {
+        TextFrame1 = fr1
+        TextFrame2 = fr2
+        TextFrame3 = fr3
+    }
+    else if (lang == LANG_DE) {
+        TextFrame1 = de1
+        TextFrame2 = de2
+        TextFrame3 = de3
+    }
+    else if (lang == LANG_IT) {
+        TextFrame1 = it1
+        TextFrame2 = it2
+        TextFrame3 = it3
+    }
+    else if (lang == LANG_ES) {
+        TextFrame1 = es1
+        TextFrame2 = es2
+        TextFrame3 = es3
+    }
+    else {
+        TextFrame1 = en1
+        TextFrame2 = en2
+        TextFrame3 = en3
+    }
+}
+
+inline sub SelectSaveSlot() {
+    if (SelectedItem == ITEM_SLOT1) {
+        SelectedSlot = 0
+    }
+    else if (SelectedItem == ITEM_SLOT2) {
+        SelectedSlot = 1.0
+    }
+    else if (SelectedItem == ITEM_SLOT3) {
+        SelectedSlot = 2.0
+    }
+    else if (SelectedItem == ITEM_SLOT4) {
+        SelectedSlot = 3.0
+    }
+}
+
+inline sub CheckCardStatus(error) {
+    if (GLOBAL_59 & 2) {
+        ErrorType = error
+        cascadeevent(Event1, self)
+        changestate(Card_Error)
+    }
+    if (GLOBAL_59 & 4) {
+        cascadeevent(Event1, self)
+        changestate(Card_Check)
+    }
+}
+
+inline sub OpenCardMenu() {
+    if (DirectLoad) {
+        changestate(Card_Load)
+    }
+    else {
+        if (PreferLoad) {
+            SelectedItem = ITEM_LOAD
+        }
+        else {
+            SelectedItem = ITEM_SAVE
+        }
+        changestate(Card_Main)
+    }
+}
+
+inline sub SoundButtonNavigate() {
+    save (vfx) {
+        SetVFX2D()
+        soundpitch(0x7F)
+        sounddecay(0xF0)
+        soundplay([Mb10A], 0.5V)
+    }
+}
+
+inline sub SoundButtonConfirm() {
+    save (vfx) {
+        SetVFX2D()
+        soundpitch(4.0)
+        sounddecay(0xF0)
+        soundplay([tal0A], 0.8V)
+    }
+}
+
+state Card_Init { // 0
+    code(mode) {
+        if (GLOBAL_89 != 99) {
+            CURRENTLEVEL = GLOBAL_89
+        }
+        DirectLoad = mode
+        PreferLoad = mode
+        GLOBAL_74 = 0
+        BlinkItem = ITEM_NONE
+        HighlightSlot = 0
+        KeyboardVar3 = 0
+        loadfile([ic12D])
+        loadfile([ic22D])
+        SaveIcon1 = 0
+        SaveIcon2 = 0
+        SaveIcon3 = 0
+        SaveIcon4 = 0
+        GameLoaded = 0
+        GLOBAL_80 = getanim(TEXT)
+        GLOBAL_81 = getanim(CORTEX_ICON)
+        loadfile([Car1T])
+        loadfile([Car1T])
+        SetRot(0deg)
+        playnull(21)
+        miscfunc(0, player, 10, 15)
+        GAMEFLAGS |= 0x200000
+        changestate(Card_Check)
+    }
+}
+
+sub GetSaveStats() {
+    var slot = var0
+    var levels, clear, bosses
+    if (slot < 0) {
+        var pool1 = SAVEDCRYSTALPOOL1
+        var pool2 = SAVEDCRYSTALPOOL2
+        misc = 0
+        CountPoolBits(GLOBAL_27)
+        CountPoolBits(GLOBAL_28)
+        levels = misc
+        misc = 0
+        CountPoolBits(pool1)
+        CountPoolBits(pool2)
+        CrystalCount = misc
+        pool1 = SAVEDGEMPOOL1
+        pool2 = SAVEDGEMPOOL2
+        misc = 0
+        CountPoolBits(pool1)
+        CountPoolBits(pool2)
+        GemCount = misc
+        pool2 &= ~0x3FFFFFF
+        misc = 0
+        CountPoolBits(pool2)
+        clear = GemCount - misc
+        misc = 0
+        CountPoolBits(GLOBAL_150 & 31)
+        bosses = misc
+        var0 = (CrystalCount << 1) + (GemCount + bosses)
+        if (GLOBAL_27 & 0x80) {
+            var0 += 3
+        }
+    }
+    else {
+        var pool1 = GLOBAL_94[(slot * 0xA9) + 0x1100]
+        var pool2 = GLOBAL_94[(slot * 0xA9) + 0x1200]
+        misc = 0
+        CountPoolBits(GLOBAL_94[(slot * 0xA9) + 0xF00])
+        CountPoolBits(GLOBAL_94[(slot * 0xA9) + 0x1000])
+        levels = misc
+        misc = 0
+        CountPoolBits(pool1)
+        CountPoolBits(pool2)
+        CrystalCount = misc
+        pool1 = GLOBAL_94[(slot * 0xA9) + 0x1300]
+        pool2 = GLOBAL_94[(slot * 0xA9) + 0x1400]
+        misc = 0
+        CountPoolBits(pool1)
+        CountPoolBits(pool2)
+        GemCount = misc
+        pool2 &= ~0x3FFFFFF
+        misc = 0
+        CountPoolBits(pool2)
+        clear = GemCount - misc
+        misc = 0
+        CountPoolBits((GLOBAL_94[(slot * 0xA9) + 0xE00]) & 31)
+        bosses = misc
+        var0 = (CrystalCount << 1) + (GemCount + bosses)
+        if ((GLOBAL_94[(slot * 0xA9) + 0xF00]) & 0x80) {
+            var0 += 3
+        }
+    }
+}
+
+sub ReadNameByte() {
+    var word
+    if (var0 < 4)       { word = NameWord0 }
+    else if (var0 < 8)  { word = NameWord1 }
+    else if (var0 < 12) { word = NameWord2 }
+    else if (var0 < 16) { word = NameWord3 }
+    else if (var0 < 20) { word = NameWord4 }
+    var0 = word << (-8 * (var0 & 3)) & 0xFF
+}
+
+sub WriteNameByte() {
+    var mask = 0xFF
+    var value = var0
+    var shift
+    shift = (NameOffset & 3) << 3
+    value <<= shift
+    mask = ~(mask << shift)
+    if (NameOffset < 4) {
+        NameWord0 = (NameWord0 & mask | value)
+    }
+    else if (NameOffset < 8) {
+        NameWord1 = (NameWord1 & mask | value)
+    }
+    else if (NameOffset < 12) {
+        NameWord2 = (NameWord2 & mask | value)
+    }
+    else if (NameOffset < 16) {
+        NameWord3 = (NameWord3 & mask | value)
+    }
+    else if (NameOffset < 20) {
+        NameWord4 = (NameWord4 & mask | value)
+    }
+}
+
+sub GetNameLength() {
+    var len
+    do {
+        var0 = len
+        ReadNameByte()
+        if (!var0) {
+            break
+        }
+        len += 1
+    } while (1)
+    var0 = len
+}
+
+sub CountNameChars() {
+    var count, index
+    do {
+        var0 = index
+        ReadNameByte()
+        if (!var0) {
+            break
+        }
+        index += 1
+        if (var0 != 0xBC && var0 != 0xBD) {
+            count += 1
+        }
+    } while (1)
+    var0 = count
+}
+
+sub StoreSaveName() {
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0x300, NameWord0)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0x400, NameWord1)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0x500, NameWord2)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0x600, NameWord3)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0x700, NameWord4)
+}
+
+sub GenerateSaveID() {
+    do {
+        var0 = rand(0xF423F)
+        if (var0 && (var0 != GLOBAL_159 && var0 != GLOBAL_94[10 << 8] && var0 != GLOBAL_94[179 << 8] && var0 != GLOBAL_94[348 << 8] && var0 != GLOBAL_94[517 << 8])) {
+            break
+        }
+    } while (1)
+}
+
+sub SpawnSaveStats() {
+    {
+        var current = var0
+        var0 = current
+        AllocateIcons()
+        spawn2(CardC, S_CARD_INFO, 1, current)
+        var0 = misc
+    }
+    var summaries = var0
+    interrupter = child -> sibling
+    while (interrupter) {
+        if (interrupter -> spawn == S_CARD_INFO) {
+            break
+        }
+        interrupter = interrupter -> sibling
+    }
+    if (interrupter) {
+        player = summaries
+        child = player -> sibling
+        player -> sibling = interrupter -> sibling
+        interrupter -> sibling = player
+    }
+}
+
+sub GetLevelIcon() {
+    var level, table, idx, candidate
+    level = var0
+    table = LevelSaveIconMap
+    do {
+        candidate = table[idx]
+        if (!candidate) {
+            var0 = 0
+            break
+        }
+        if (candidate == level) {
+            var0 = table[idx + 1.0]
+            break
+        }
+        idx += 2.0
+    } while (1)
+}
+
+sub AllocateIcons() {
+    var icon, vido
+    var current = var0
+    var slot
+    ReleaseIcons()
+    do {
+        if (current) {
+            var0 = CURRENTLEVEL
+            GetLevelIcon()
+            icon = var0
+        }
+        else {
+            icon = GLOBAL_94[(slot * 0xA9) + 0x200]
+        }
+        vido = [ic12D]
+        if (icon >= 17) {
+            icon -= 17
+            vido = [ic22D]
+        }
+        if (slot == 0.0) {
+            SaveIcon1 = ins74(vido, null)
+        }
+        else if (slot == 1.0) {
+            SaveIcon2 = ins74(vido, null)
+        }
+        else if (slot == 2.0) {
+            SaveIcon3 = ins74(vido, null)
+        }
+        else if (slot == 3.0) {
+            SaveIcon4 = ins74(vido, null)
+        }
+        slot += 1.0
+        if (current || slot >= 4.0) {
+            break
+        }
+    } while (1)
+}
+
+sub ReleaseIcons() {
+    if (SaveIcon4) {
+        ins75(SaveIcon4, null)
+        SaveIcon4 = 0
+    }
+    if (SaveIcon3) {
+        ins75(SaveIcon3, null)
+        SaveIcon3 = 0
+    }
+    if (SaveIcon2) {
+        ins75(SaveIcon2, null)
+        SaveIcon2 = 0
+    }
+    if (SaveIcon1) {
+        ins75(SaveIcon1, null)
+        SaveIcon1 = 0
+    }
+}
+
+sub StoreSaveData() {
+    save (var0) {
+        var0 = CURRENTLEVEL
+        GetLevelIcon()
+        setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0x200, var0)
+    }
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0x800, CURRENTLEVEL)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0xB00, LIFECOUNT >> 8)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0xC00, FRUITCOUNT >> 8)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0xD00, HEALTH >> 8)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0xE00, GLOBAL_150)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0xF00, GLOBAL_27)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0x1000, GLOBAL_28)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0x1100, SAVEDCRYSTALPOOL1)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0x1200, SAVEDCRYSTALPOOL2)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0x1300, SAVEDGEMPOOL1)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0x1400, SAVEDGEMPOOL2)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0x9900, GLOBAL_63)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0x9A00, GLOBAL_64)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0x9C00, PREVBOXCOUNT)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0x9D00, PREVLEVEL)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0x1500, MONOSOUND)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0x1600, SFXVOL)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0x1700, MUSVOL)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0x9F00, GLOBAL_151)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0xA000, GLOBAL_152)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0xA100, GLOBAL_153)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0xA200, GLOBAL_154)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0xA300, GLOBAL_155)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0xA400, GLOBAL_156)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0xA500, GLOBAL_157)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0xA600, GLOBAL_32)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0xA700, GLOBAL_91)
+    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0xA800, GLOBAL_92)
+    miscfunc(SelectedSlot >> 8, player, 13, 15)
+}
+
+sub RestoreSaveData() {
+    startgame()
+    CURRENTLEVEL = GLOBAL_94[(SelectedSlot * 0xA9) + 0x800]
+    LIFECOUNT = GLOBAL_94[(SelectedSlot * 0xA9) + 0xB00] << 8
+    FRUITCOUNT = GLOBAL_94[(SelectedSlot * 0xA9) + 0xC00] << 8
+    HEALTH = GLOBAL_94[(SelectedSlot * 0xA9) + 0xD00] << 8
+    GLOBAL_150 = GLOBAL_94[(SelectedSlot * 0xA9) + 0xE00]
+    GLOBAL_27 = GLOBAL_94[(SelectedSlot * 0xA9) + 0xF00]
+    GLOBAL_28 = GLOBAL_94[(SelectedSlot * 0xA9) + 0x1000]
+    SAVEDCRYSTALPOOL1 = GLOBAL_94[(SelectedSlot * 0xA9) + 0x1100]
+    SAVEDCRYSTALPOOL2 = GLOBAL_94[(SelectedSlot * 0xA9) + 0x1200]
+    CRYSTALPOOL1 = 0
+    CRYSTALPOOL2 = 0
+    SAVEDGEMPOOL1 = GLOBAL_94[(SelectedSlot * 0xA9) + 0x1300]
+    SAVEDGEMPOOL2 = GLOBAL_94[(SelectedSlot * 0xA9) + 0x1400]
+    GLOBAL_63 = GLOBAL_94[(SelectedSlot * 0xA9) + 0x9900]
+    GLOBAL_64 = GLOBAL_94[(SelectedSlot * 0xA9) + 0x9A00]
+    PREVBOXCOUNT = GLOBAL_94[(SelectedSlot * 0xA9) + 0x9C00]
+    PREVLEVEL = GLOBAL_94[(SelectedSlot * 0xA9) + 0x9D00]
+    GEMPOOL1 = 0
+    GEMPOOL2 = 0
+    MONOSOUND = GLOBAL_94[(SelectedSlot * 0xA9) + 0x1500]
+    SFXVOL = GLOBAL_94[(SelectedSlot * 0xA9) + 0x1600]
+    MUSVOL = GLOBAL_94[(SelectedSlot * 0xA9) + 0x1700]
+    GLOBAL_151 = GLOBAL_94[(SelectedSlot * 0xA9) + 0x9F00]
+    GLOBAL_152 = GLOBAL_94[(SelectedSlot * 0xA9) + 0xA000]
+    GLOBAL_153 = GLOBAL_94[(SelectedSlot * 0xA9) + 0xA100]
+    GLOBAL_154 = GLOBAL_94[(SelectedSlot * 0xA9) + 0xA200]
+    GLOBAL_155 = GLOBAL_94[(SelectedSlot * 0xA9) + 0xA300]
+    GLOBAL_156 = GLOBAL_94[(SelectedSlot * 0xA9) + 0xA400]
+    GLOBAL_157 = GLOBAL_94[(SelectedSlot * 0xA9) + 0xA500]
+    GLOBAL_32 = GLOBAL_94[(SelectedSlot * 0xA9) + 0xA600]
+    GLOBAL_91 = GLOBAL_94[(SelectedSlot * 0xA9) + 0xA700]
+    GLOBAL_92 = GLOBAL_94[(SelectedSlot * 0xA9) + 0xA800]
+    GLOBAL_159 = GLOBAL_94[(SelectedSlot * 0xA9) + 0xA00]
+    miscfunc(SelectedSlot >> 8, player, 14, 15)
+}
+
+state Card_Check { // 1
+    code() {
+        cascadeevent(Event1, self)
+        miscfunc(0, player, 10, 15)
+        playnull()
+        playnull()
+        playnull()
+        playnull()
+        ErrorType = 0
+        if (GLOBAL_59 & 2) {
+            ErrorType = 1
+            changestate(Card_Error)
+        }
+        changestateif(Card_Missing, GLOBAL_59 & 4)
+        changestateif(Card_CheckFormat, GLOBAL_59 & 8)
+        changestateif(Card_ReadDirectory, GLOBAL_59 & 1)
+        OpenCardMenu()
+    }
+}
+
+state Card_Error { // 2
+    code() {
+        SelectedItem = ITEM_EXIT
+        SetCardTitle(31.0, 32.0, 33.0)
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_CARD_TITLE, 0, 85.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+        if (ErrorType == 2) {
+            SetTextLanguage2(
+                34.0, 35.0,
+                36.0, 37.0,
+                38.0, 39.0,
+                40.0, 41.0,
+                42.0, 43.0
+            )
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, 14.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, -5.0, TextFrame2, 0, 0xA3, 0x103, 0, 0)
+        }
+        else if (ErrorType == 3) {
+            SetTextLanguage2(
+                34.0, 44.0,
+                45.0, 46.0,
+                38.0, 47.0,
+                48.0, 49.0,
+                42.0, 50.0
+            )
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, 14.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, -5.0, TextFrame2, 0, 0xA3, 0x103, 0, 0)
+        }
+        else if (ErrorType == 4) {
+            SetTextLanguage3(
+                51.0, 52.0, 53.0,
+                54.0, 55.0, 56.0,
+                57.0, 58.0, 59.0,
+                60.0, 61.0, 62.0,
+                63.0, 64.0, 65.0
+            )
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, 24.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, 5.0, TextFrame2, 0, 0xA3, 0x103, 0, 0)
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, -14.0, TextFrame3, 0, 0xA3, 0x103, 0, 0)
+        }
+        else if (ErrorType == 5) {
+            SetTextLanguage2(
+                34.0, 66.0,
+                67.0, 46.0,
+                38.0, 68.0,
+                48.0, 69.0,
+                42.0, 70.0
+            )
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, 14.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, -5.0, TextFrame2, 0, 0xA3, 0x103, 0, 0)
+        }
+        else {
+            SetTextLanguage1(
+                71.0,
+                72.0,
+                73.0,
+                74.0,
+                75.0)
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, 5.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+        }
+        SetTextLanguage1(
+            76.0,
+            77.0,
+            78.0,
+            79.0,
+            80.0)
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_EXIT, 0, -57.0, TextFrame1, 2, 0xA3, 0x103, 0, 0)
+        playnull(21)
+        do {
+            playnull()
+            if (buttonpress(PAD_START | PAD_X)) {
+                SoundButtonConfirm()
+                soundsetup(0, voice, 5)
+                break
+            }
+        } while (1)
+        cascadeevent(Event1, self)
+        changestate(Card_Exit)
+    }
+    event(e, a) {
+        accevif (e == Event1 && interrupter != self) {
+            cascadeevent(Event1, self)
+            changestate(Card_Exit)
+        }
+    }
+    trans {
+        nofirst {
+            if (GLOBAL_59 & 4) {
+                cascadeevent(Event1, self)
+                changestate(Card_Check)
+            }
+        }
+    }
+}
+
+state Card_Corrupt { // 3
+    code() {
+        SetCardTitle(31.0, 32.0, 33.0)
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_CARD_TITLE, 0, 85.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+        SetTextLanguage2(
+            81.0, 82.0,
+            83.0, 84.0,
+            85.0, 0.00,
+            86.0, 87.0,
+            88.0, 0.00
+        )
+        if (TextFrame2) {
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, 14.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, -5.0, TextFrame2, 0, 0xA3, 0x103, 0, 0)
+        }
+        else {
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, 5.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+        }
+        SetTextLanguage1(
+            89.0,
+            90.0,
+            91.0,
+            92.0,
+            93.0)
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_ERASE, 0, -57.0, TextFrame1, 2, 0xA3, 0x103, 0, 0)
+        SetTextLanguage1(
+            76.0,
+            77.0, 
+            78.0,
+            79.0, 
+            80.0)
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_EXIT, 0, -73.0, TextFrame1, 2, 0xA3, 0x103, 0, 0)
+        SelectedItem = ITEM_EXIT
+        playnull(5)
+        do {
+            if (buttonpress(PAD_START | PAD_X)) {
+                SoundButtonConfirm()
+                soundsetup(0, voice, 5)
+                cascadeevent(Event1, self)
+                if (SelectedItem == ITEM_ERASE) {
+                    SelectedItem = ITEM_SAVE
+                    changestate(Card_Main)
+                }
+                changestate(Card_Exit)
+            }
+            if (dirpress(PAD_N) || dirpress(PAD_S)) {
+                SoundButtonNavigate()
+                if (SelectedItem == ITEM_ERASE) {
+                    SelectedItem = ITEM_EXIT
+                }
+                else if (SelectedItem == ITEM_EXIT) {
+                    SelectedItem = ITEM_ERASE
+                }
+            }
+            playnull()
+        } while (1)
+    }
+    event(e, a) {
+        accevif ( e == Event1 && interrupter != self) {
+            cascadeevent(Event1, self)
+            changestate(Card_Exit)
+        }
+    }
+    trans {
+        nofirst {
+            CheckCardStatus(1)
+        }
+    }
+}
+
+state Card_Missing { // 4
+    code() {
+        var prompted
+        var started = frametime
+        var line1, line2
+        SelectedItem = ITEM_EXIT
+        SetCardTitle(31.0, 32.0, 33.0)
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_CARD_TITLE, 0, 85.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+        SetTextLanguage2(
+            94.00, 95.00,
+            96.00, 97.00,
+            98.00, 99.00,
+            100.0, 101.0,
+            102.0, 103.0
+        )
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, 14.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+        line1 = objectspawned
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, -5.0, TextFrame2, 0, 0xA3, 0x103, 0, 0)
+        line2 = objectspawned
+        playnull(5)
+        SetTextLanguage1(
+            76.0,
+            77.0,
+            78.0,
+            79.0,
+            80.0)
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_EXIT, 0, -57.0, TextFrame1, 2, 0xA3, 0x103, 0, 0)
+        playnull(16)
+        do {
+            playnull()
+            if (buttonpress(PAD_START | PAD_X)) {
+                SoundButtonConfirm()
+                soundsetup(0, voice, 5)
+                cascadeevent(Event1, self)
+                changestate(Card_Exit)
+            }
+            if (!prompted) {
+                if (frametime - started > 0x5F) {
+                    prompted = 1
+                    interrupter = line1
+                    sendevent(Event1, interrupter, self)
+                    interrupter = line2
+                    sendevent(Event1, interrupter, self)
+                    SetTextLanguage2(
+                        104.0, 105.0,
+                        106.0, 107.0,
+                        108.0, 109.0,
+                        110.0, 111.0,
+                        112.0, 113.0
+                    )
+                    spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, 14.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+                    spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, -5.0, TextFrame2, 0, 0xA3, 0x103, 0, 0)
+                }
+            }
+        } while (1)
+    }
+    event(e, a) {
+        accevif (e == Event1 && interrupter != self) {
+            cascadeevent(Event1, self)
+            changestate(Card_Exit)
+        }
+    }
+    trans {
+        nofirst {
+            if (GLOBAL_59 & 2) {
+                ErrorType = 1
+                cascadeevent(Event1, self)
+                changestate(Card_Error)
+            }
+            unless (GLOBAL_59 & 4) {
+                cascadeevent(Event1, self)
+                changestateif(Card_CheckFormat, GLOBAL_59 & 8)
+                changestateif(Card_ReadDirectory, GLOBAL_59 & 1)
+                OpenCardMenu()
+            }
+        }
+    }
+}
+
+state Card_CheckFormat { // 5
+    code() {
+        var started = frametime
+        BlinkItem = ITEM_WAIT
+        SetCardTitle(31.0, 32.0, 33.0)
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_CARD_TITLE, 0, 85.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+        SetTextLanguage2(
+            114.0, 115.0,
+            116.0, 117.0,
+            118.0, 119.0,
+            120.0, 121.0,
+            122.0, 123.0
+        )
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, 14.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_WAIT, 0, -5.0, TextFrame2, 0, 0xA3, 0x103, 0, 0)
+        playnull(42)
+        do {
+            playnull()
+            if (frametime - started > 15s) {
+                cascadeevent(Event1, self)
+                changestate(Card_ConfirmFormat)
+            }
+        } while (1)
+    }
+    event(e, a) {
+        accevif (e == Event1 && interrupter != self) {
+            cascadeevent(Event1, self)
+            changestate(Card_Exit)
+        }
+    }
+    trans {
+        nofirst {
+            CheckCardStatus(1)
+            unless (GLOBAL_59 & 8) {
+                cascadeevent(Event1, self)
+                changestateif(Card_ReadDirectory, GLOBAL_59 & 1)
+                OpenCardMenu()
+            }
+        }
+    }
+}
+
+state Card_ConfirmFormat { // 6
+    code() {
+        SelectedItem = ITEM_NO
+        SetCardTitle(31.0, 32.0, 33.0)
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_CARD_TITLE, 0, 85.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+        SetTextLanguage3(
+            124.0, 125.0, 126.0,
+            127.0, 128.0, 129.0,
+            98.00, 130.0, 131.0,
+            132.0, 133.0, 134.0,
+            135.0, 136.0, 137.0
+        )
+        if (TextFrame3) {
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, 24.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, 5.0, TextFrame2, 0, 0xA3, 0x103, 0, 0)
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, -14.0, TextFrame3, 1, 0xA3, 0x103, 0, 0)
+        }
+        else {
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, 14.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, -5.0, TextFrame2, 1, 0xA3, 0x103, 0, 0)
+        }
+        SetTextLanguage2(
+            138.0, 139.0,
+            140.0, 141.0,
+            142.0, 143.0,
+            142.0, 143.0,
+            144.0, 143.0
+        )
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_YES, 0, -57.0, TextFrame1, 2, 0xA3, 0x103, 0, 0)
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_NO, 0, -73.0, TextFrame2, 2, 0xA3, 0x103, 0, 0)
+        playnull()
+        playnull()
+        playnull()
+        do {
+            playnull()
+            if (dirpress(PAD_N) || dirpress(PAD_S)) {
+                SoundButtonNavigate()
+                if (SelectedItem == ITEM_NO) {
+                    SelectedItem = ITEM_YES
+                }
+                else if (SelectedItem == ITEM_YES) {
+                    SelectedItem = ITEM_NO
+                }
+            }
+            if (frametime - statetime >= 1s && buttonpress(PAD_START | PAD_X)) {
+                SoundButtonConfirm()
+                soundsetup(0, voice, 5)
+                break
+            }
+        } while (1)
+        cascadeevent(Event1, self)
+        if (SelectedItem == ITEM_YES) {
+            changestate(Card_Format)
+        }
+        else {
+            changestate(Card_Exit)
+        }
+    }
+    event(e, a) {
+        accevif (e == Event1 && interrupter != self) {
+            cascadeevent(Event1, self)
+            changestate(Card_Exit)
+        }
+    }
+    trans {
+        nofirst {
+            CheckCardStatus(1)
+            unless (GLOBAL_59 & 8) {
+                cascadeevent(Event1, self)
+                changestateif(Card_ReadDirectory, GLOBAL_59 & 1)
+                if (PreferLoad) {
+                    SelectedItem = ITEM_LOAD
+                }
+                else {
+                    SelectedItem = ITEM_SAVE
+                }
+                changestate(Card_Main)
+            }
+        }
+    }
+}
+
+state Card_Format { // 7
+    code() {
+        miscfunc(0, player, 15, 15)
+        miscfunc(1, player, 15, 15)
+        miscfunc(2, player, 15, 15)
+        miscfunc(3, player, 15, 15)
+        BlinkItem = ITEM_WAIT
+        SetCardTitle(31.0, 32.0, 33.0)
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_CARD_TITLE, 0, 85.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+        SetTextLanguage2(
+            145.0, 115.0,
+            146.0, 117.0,
+            147.0, 119.0,
+            148.0, 149.0,
+            150.0, 123.0
+        )
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, 14.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_WAIT, 0, -5.0, TextFrame2, 0, 0xA3, 0x103, 0, 0)
+        playnull(5)
+        miscfunc(0, player, 5, 15)
+        while (GLOBAL_59 & 1) {
+            playnull()
+        }
+        playnull()
+        playnull()
+        cascadeevent(Event1, self)
+        if (GLOBAL_59 & 2) {
+            ErrorType = 2
+            changestate(Card_Error)
+        }
+        else {
+            changestate(Card_Check)
+        }
+    }
+    event(e, a) {
+        accevif (e == Event1 && interrupter != self) {
+            cascadeevent(Event1, self)
+            changestate(Card_Exit)
+        }
+    }
+    trans {
+        nofirst {
+            CheckCardStatus(2)
+        }
+    }
+}
+
+state Card_Unformat { // 8
+    code() {
+        miscfunc(0, player, 15, 15)
+        miscfunc(1, player, 15, 15)
+        miscfunc(2, player, 15, 15)
+        miscfunc(3, player, 15, 15)
+        BlinkItem = ITEM_WAIT
+        SetCardTitle(31.0, 32.0, 33.0)
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_CARD_TITLE, 0, 85.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+        SetTextLanguage3(
+            151.0, 152.0, 115.0,
+            153.0, 154.0, 117.0,
+            155.0, 119.0, 000.0,
+            156.0, 157.0, 121.0,
+            158.0, 123.0, 000.0
+        )
+        if (TextFrame3) {
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, 24.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, 5.0, TextFrame2, 0, 0xA3, 0x103, 0, 0)
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_WAIT, 0, -14.0, TextFrame3, 0, 0xA3, 0x103, 0, 0)
+        }
+        else {
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, 14.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_WAIT, 0, -5.0, TextFrame2, 0, 0xA3, 0x103, 0, 0)
+        }
+        playnull(5)
+        miscfunc(0, player, 12, 15)
+        while (GLOBAL_59 & 1) {
+            playnull()
+        }
+        playnull()
+        playnull()
+        cascadeevent(Event1, self)
+        if (GLOBAL_59 & 2) {
+            ErrorType = 1
+            changestate(Card_Error)
+        }
+        else {
+            changestate(Card_Check)
+        }
+    }
+    event(e, a) {
+        accevif (e == Event1 && interrupter != self) {
+            cascadeevent(Event1, self)
+            changestate(Card_Exit)
+        }
+    }
+    trans {
+        nofirst {
+            CheckCardStatus(1)
+        }
+    }
+}
+
+state Card_ReadDirectory { // 9
+    code() {
+        var started = frametime
+        BlinkItem = ITEM_WAIT
+        SetCardTitle(31.0, 32.0, 33.0)
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_CARD_TITLE, 0, 85.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+        SetTextLanguage3(
+            159.0, 160.0, 115.0,
+            161.0, 162.0, 117.0,
+            163.0, 164.0, 119.0,
+            165.0, 166.0, 121.0,
+            167.0, 123.0, 000.0
+        )
+        if (TextFrame3) {
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, 24.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, 5.0, TextFrame2, 0, 0xA3, 0x103, 0, 0)
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_WAIT, 0, -14.0, TextFrame3, 0, 0xA3, 0x103, 0, 0)
+        }
+        else {
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, 14.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_WAIT, 0, -5.0, TextFrame2, 0, 0xA3, 0x103, 0, 0)
+        }
+        sleepnull()
+    }
+    event(e, a) {
+        accevif (e == Event1 && interrupter != self) {
+            cascadeevent(Event1, self)
+            changestate(Card_Exit)
+        }
+    }
+    trans {
+        nofirst {
+            CheckCardStatus(3)
+            unless (GLOBAL_59 & 1) {
+                if (GLOBAL_59 & 64) {
+                    cascadeevent(Event1, self)
+                    ErrorType = 4
+                    changestate(Card_Error)
+                }
+                if (GLOBAL_59 & 0x80) {
+                    cascadeevent(Event1, self)
+                    miscfunc(0, player, 2, 15)
+                    changestate(Card_Corrupt)
+                }
+                cascadeevent(Event1, self)
+                OpenCardMenu()
+            }
+        }
+    }
+}
+
+state Card_Write { // 10
+    code() {
+        var unused, message
+        BlinkItem = ITEM_WAIT
+        SetCardTitle(31.0, 32.0, 33.0)
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_CARD_TITLE, 0, 85.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+        SetTextLanguage3(
+            168.0, 152.0, 115.0,
+            169.0, 170.0, 117.0,
+            171.0, 119.0, 0.0,
+            172.0, 157.0, 121.0,
+            173.0, 123.0, 0.0
+        )
+        if (TextFrame3) {
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, 24.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, 5.0, TextFrame2, 0, 0xA3, 0x103, 0, 0)
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_WAIT, 0, -14.0, TextFrame3, 0, 0xA3, 0x103, 0, 0)
+            message = objectspawned
+        }
+        else {
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 0, 14.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_WAIT, 0, -5.0, TextFrame2, 0, 0xA3, 0x103, 0, 0)
+            message = objectspawned
+        }
+        playnull()
+        playnull()
+        miscfunc(-1.0, player, 3, 15)
+        playnull(5)
+        do {
+            playnull()
+            if (!(GLOBAL_59 & 1)) {
+                break
+            }
+        } while (1)
+        cascadeevent(Event1, self)
+        SelectedItem = ITEM_EXIT
+        changestate(Card_Main)
+    }
+    event(e, a) {
+        accevif (e == Event1 && interrupter != self) {
+            cascadeevent(Event1, self)
+            changestate(Card_Exit)
+        }
+    }
+    trans {
+        nofirst {
+            CheckCardStatus(5)
+        }
+    }
+}
+
+state Card_Main { // 11
+    code() {
+        {
+            var load = 1
+            var delete = 1
+            var unformat = 1
+            var buttons = 5
+            HighlightSlot = 0
+            var0 = 1
+            SpawnSaveStats()
+            if (GLOBAL_94[1 << 8] && GLOBAL_94[170 << 8] && GLOBAL_94[339 << 8] && GLOBAL_94[508 << 8]) {
+                load = 0
+                delete = 0
+                buttons -= 2
+                if (SelectedItem == ITEM_LOAD || SelectedItem == ITEM_DELETE) {
+                    SelectedItem = ITEM_SAVE
+                }
+            }
+            if (!DEBUG) {
+                unformat = 0
+                buttons -= 1
+            }
+            unless (SelectedItem == ITEM_LOAD || SelectedItem == ITEM_SAVE || SelectedItem == ITEM_DELETE || SelectedItem == ITEM_EXIT) {
+                SelectedItem = ITEM_SAVE
+            }
+            SetTextLanguage1(
+                174.0, 
+                175.0,
+                176.0,
+                177.0,
+                178.0)
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_MENU_TITLE, 0, 85.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+            MenuRowY = -7.0
+            if (load) {
+                SetTextLanguage1(
+                    179.0,
+                    180.0,
+                    181.0,
+                    182.0,
+                    183.0)
+                spawn2(CardC, S_MENU_TEXT, 1, ITEM_LOAD, 0, MenuRowY, TextFrame1, 2, 0xA3, 0x103, 0, 0)
+                MenuRowY -= 19.0
+            }
+            SetTextLanguage1(
+                184.0,
+                185.0, 
+                186.0,
+                187.0,
+                188.0)
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_SAVE, 0, MenuRowY, TextFrame1, 2, 0xA3, 0x103, 0, 0)
+            MenuRowY -= 19.0
+            if (delete) {
+                SetTextLanguage1(
+                189.0, 
+                190.0, 
+                191.0,
+                192.0,
+                193.0)
+                spawn2(CardC, S_MENU_TEXT, 1, ITEM_DELETE, 0, MenuRowY, TextFrame1, 2, 0xA3, 0x103, 0, 0)
+                MenuRowY -= 19.0
+            }
+            if (unformat) {
+                SetTextLanguage1(
+                    194.0, 
+                    195.0, 
+                    196.0,
+                    197.0,
+                    198.0)
+                spawn2(CardC, S_MENU_TEXT, 1, ITEM_UNFORMAT, 0, MenuRowY, TextFrame1, 2, 0xA3, 0x103, 0, 0)
+                MenuRowY -= 19.0
+            }
+            SetTextLanguage1(
+                76.0,
+                77.0,
+                78.0,
+                79.0,
+                80.0)
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_EXIT, 0, MenuRowY, TextFrame1, 2, 0xA3, 0x103, 0, 0)
+            MenuRowY -= 19.0
+            playnull(5)
+            do {
+                if (dirpress(PAD_N)) {
+                    SoundButtonNavigate()
+                    if (SelectedItem == ITEM_LOAD) {
+                        SelectedItem = ITEM_EXIT
+                    }
+                    else if (SelectedItem == ITEM_SAVE) {
+                        if (load) {
+                            SelectedItem = ITEM_LOAD
+                        }
+                        else {
+                            SelectedItem = ITEM_EXIT
+                        }
+                    }
+                    else if (SelectedItem == ITEM_DELETE) {
+                        SelectedItem = ITEM_SAVE
+                    }
+                    else if (SelectedItem == ITEM_UNFORMAT) {
+                        if (delete) {
+                            SelectedItem = ITEM_DELETE
+                        }
+                        else {
+                            SelectedItem = ITEM_SAVE
+                        }
+                    }
+                    else if (SelectedItem == ITEM_EXIT) {
+                        if (unformat) {
+                            SelectedItem = ITEM_UNFORMAT
+                        }
+                        else if (delete) {
+                            SelectedItem = ITEM_DELETE
+                        }
+                        else {
+                            SelectedItem = ITEM_SAVE
+                        }
+                    }
+                }
+                if (dirpress(PAD_S)) {
+                    SoundButtonNavigate()
+                    if (SelectedItem == ITEM_LOAD) {
+                        SelectedItem = ITEM_SAVE
+                    }
+                    else if (SelectedItem == ITEM_SAVE) {
+                        if (delete) {
+                            SelectedItem = ITEM_DELETE
+                        }
+                        else if (unformat) {
+                            SelectedItem = ITEM_UNFORMAT
+                        }
+                        else {
+                            SelectedItem = ITEM_EXIT
+                        }
+                    }
+                    else if (SelectedItem == ITEM_DELETE) {
+                        if (unformat) {
+                            SelectedItem = ITEM_UNFORMAT
+                        }
+                        else {
+                            SelectedItem = ITEM_EXIT
+                        }
+                    }
+                    else if (SelectedItem == ITEM_UNFORMAT) {
+                        SelectedItem = ITEM_EXIT
+                    }
+                    else if (SelectedItem == ITEM_EXIT) {
+                        if (load) {
+                            SelectedItem = ITEM_LOAD
+                        }
+                        else {
+                            SelectedItem = ITEM_SAVE
+                        }
+                    }
+                }
+                if (buttonpress(PAD_START | PAD_X)) {
+                    SoundButtonConfirm()
+                    soundsetup(0, voice, 5)
+                    break
+                }
+                playnull()
+            } while (1)
+        }
+        cascadeevent(Event1, self)
+        if (SelectedItem == ITEM_LOAD) {
+            changestate(Card_Load)
+        }
+        else if (SelectedItem == ITEM_SAVE) {
+            changestate(Card_Save)
+        }
+        else if (SelectedItem == ITEM_DELETE) {
+            changestate(Card_Delete)
+        }
+        else if (SelectedItem == ITEM_UNFORMAT) {
+            changestate(Card_Unformat)
+        }
+        else {
+            changestateif(Card_Exit, SelectedItem == ITEM_EXIT)
+        }
+    }
+    event(e, a) {
+        accevif (e == Event1 && interrupter != self) {
+            cascadeevent(Event1, self)
+            changestate(Card_Exit)
+        }
+    }
+    trans {
+        CheckCardStatus(1)
+    }
+}
+
+state Card_Save { // 12
+    code() {
+        if (var slot = GLOBAL_158; slot == 0) {
+            SelectedItem = ITEM_SLOT1
+        }
+        else if (slot == 1.0) {
+            SelectedItem = ITEM_SLOT2
+        }
+        else if (slot == 2.0) {
+            SelectedItem = ITEM_SLOT3
+        }
+        else if (slot == 3.0) {
+            SelectedItem = ITEM_SLOT4
+        }
+        SetTextLanguage1(
+            184.0, 
+            185.0,
+            186.0,
+            187.0, 
+            188.0)
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_SAVE, 0, 85.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+        HighlightSlot = 0
+        var0 = 0
+        SpawnSaveStats()
+        SummaryObject = var0
+        {
+            var left = 1
+            var message, yes, no
+            SetTextLanguage1(
+                199.0, 
+                200.0, 
+                201.0, 
+                202.0, 
+                203.0)
+            spawn2(CardC, S_MENU_TEXT, 1, ITEM_CANCEL, 0, -65.0, TextFrame1, 2, 0xA3, 0x103, 0, 0)
+            message = objectspawned
+
+            playnull(5)
+            do {
+                if (buttonpress(PAD_START | PAD_X)) {
+                    SoundButtonConfirm()
+                    if (SelectedItem == ITEM_CANCEL) {
+                        cascadeevent(Event1, self)
+                        SelectedItem = ITEM_EXIT
+                        changestate(Card_Main)
+                    }
+                    else if (SelectedItem == ITEM_NO) {
+                        HighlightSlot = 0
+                        interrupter = message
+                        sendevent(Event1, interrupter, self)
+                        interrupter = yes
+                        sendevent(Event1, interrupter, self)
+                        interrupter = no
+                        sendevent(Event1, interrupter, self)
+                        SelectedItem = ITEM_CANCEL
+                        SetTextLanguage1(
+                            199.0, 
+                            200.0, 
+                            201.0, 
+                            202.0, 
+                            203.0)
+                        spawn2(CardC, S_MENU_TEXT, 1, ITEM_CANCEL, 0, -65.0, TextFrame1, 2, 0xA3, 0x103, 0, 0)
+                        message = objectspawned
+                    }
+                    else {
+                        if (SelectedItem == ITEM_YES) { goto exit }
+                        SelectSaveSlot()
+                        HighlightSlot = 1
+                        if (GLOBAL_94[(SelectedSlot * 0xA9) + 1.0]) {
+                            cascadeevent(Event1, self)
+                            changestate(Card_EnterName)
+                        }
+                        if (GLOBAL_159 && GLOBAL_159 == GLOBAL_94[(SelectedSlot * 0xA9) + 0xA00]) {
+                            miscfunc(SelectedSlot >> 8, player, 18, 15)
+                            goto exit
+                        }
+                        interrupter = message
+                        sendevent(Event1, interrupter, self)
+                        if (var lang = GLOBAL_151; lang == LANG_FR) {
+                            spawn2(CardC, S_MENU_TEXT, 1, ITEM_OVERWRITE_TEXT, -112.0, -65.0, 204.0, 1, 0xA3, 0x103, 0, 0)
+                            message = objectspawned
+                        }
+                        else if (lang == LANG_DE) {
+                            spawn2(CardC, S_MENU_TEXT, 1, ITEM_OVERWRITE_TEXT, -128.0, -65.0, 205.0, 1, 0xA3, 0x103, 0, 0)
+                            message = objectspawned
+                        }
+                        else if (lang == LANG_IT) {
+                            spawn2(CardC, S_MENU_TEXT, 1, ITEM_OVERWRITE_TEXT, -112.0, -65.0, 206.0, 1, 0xA3, 0x103, 0, 0)
+                            message = objectspawned
+                        }
+                        else if (lang == LANG_ES) {
+                            spawn2(CardC, S_MENU_TEXT, 1, ITEM_OVERWRITE_TEXT, -128.0, -65.0, 207.0, 1, 0xA3, 0x103, 0, 0)
+                            message = objectspawned
+                        }
+                        else {
+                            spawn2(CardC, S_MENU_TEXT, 1, ITEM_OVERWRITE_TEXT, -112.0, -65.0, 208.0, 1, 0xA3, 0x103, 0, 0)
+                            message = objectspawned
+                        }
+                        SetTextLanguage2(
+                            138.0, 139.0,
+                            140.0, 141.0,
+                            142.0, 143.0,
+                            142.0, 143.0,
+                            144.0, 143.0
+                        )
+                        spawn2(CardC, S_MENU_TEXT, 1, ITEM_YES, 32.0, -65.0, TextFrame1, 2, 0xA3, 0x103, 0, 0)
+                        yes = objectspawned
+                        spawn2(CardC, S_MENU_TEXT, 1, ITEM_NO, 32.0, -81.0, TextFrame2, 2, 0xA3, 0x103, 0, 0)
+                        no = objectspawned
+                        SelectedItem = ITEM_NO
+                        playnull(5)
+                    }
+                }
+                if (dirpress(PAD_N)) {
+                    SoundButtonNavigate()
+                    if (SelectedItem == ITEM_SLOT1) {
+                        SelectedItem = ITEM_CANCEL
+                    }
+                    else if (SelectedItem == ITEM_SLOT2) {
+                        SelectedItem = ITEM_SLOT1
+                    }
+                    else if (SelectedItem == ITEM_SLOT3) {
+                        SelectedItem = ITEM_CANCEL
+                    }
+                    else if (SelectedItem == ITEM_SLOT4) {
+                        SelectedItem = ITEM_SLOT3
+                    }
+                    else if (SelectedItem == ITEM_CANCEL) {
+                        if (left) {
+                            SelectedItem = ITEM_SLOT2
+                        }
+                        else {
+                            SelectedItem = ITEM_SLOT4
+                        }
+                    }
+                    else if (SelectedItem == ITEM_YES) {
+                        SelectedItem = ITEM_NO
+                    }
+                    else if (SelectedItem == ITEM_NO) {
+                        SelectedItem = ITEM_YES
+                    }
+                }
+                if (dirpress(PAD_S)) {
+                    SoundButtonNavigate()
+                    if (SelectedItem == ITEM_SLOT1) {
+                        SelectedItem = ITEM_SLOT2
+                    }
+                    else if (SelectedItem == ITEM_SLOT2) {
+                        SelectedItem = ITEM_CANCEL
+                    }
+                    else if (SelectedItem == ITEM_SLOT3) {
+                        SelectedItem = ITEM_SLOT4
+                    }
+                    else if (SelectedItem == ITEM_SLOT4) {
+                        SelectedItem = ITEM_CANCEL
+                    }
+                    else if (SelectedItem == ITEM_CANCEL) {
+                        if (left) {
+                            SelectedItem = ITEM_SLOT1
+                        }
+                        else {
+                            SelectedItem = ITEM_SLOT3
+                        }
+                    }
+                    else if (SelectedItem == ITEM_YES) {
+                        SelectedItem = ITEM_NO
+                    }
+                    else if (SelectedItem == ITEM_NO) {
+                        SelectedItem = ITEM_YES
+                    }
+                }
+                if (dirpress(PAD_W) || dirpress(PAD_E)) {
+                    if (SelectedItem == ITEM_SLOT1) {
+                        SoundButtonNavigate()
+                        SelectedItem = ITEM_SLOT3
+                        left = 0
+                    }
+                    else if (SelectedItem == ITEM_SLOT2) {
+                        SoundButtonNavigate()
+                        SelectedItem = ITEM_SLOT4
+                        left = 0
+                    }
+                    else if (SelectedItem == ITEM_SLOT3) {
+                        SoundButtonNavigate()
+                        SelectedItem = ITEM_SLOT1
+                        left = 1
+                    }
+                    else if (SelectedItem == ITEM_SLOT4) {
+                        SoundButtonNavigate()
+                        left = 1
+                        SelectedItem = ITEM_SLOT2
+                    }
+                }
+                playnull()
+            } while (1)
+        }
+        exit:
+        GLOBAL_158 = SelectedSlot
+        miscfunc(SelectedSlot >> 8, player, 17, 15)
+        StoreSaveData()
+        GenerateSaveID()
+        GLOBAL_159 = var0
+        setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0xA00, GLOBAL_159)
+        interrupter = SummaryObject
+        sendevent(Event1, interrupter, self)
+        var0 = 0
+        SpawnSaveStats()
+        playnull(5)
+        cascadeevent(Event1, self)
+        changestate(Card_Write)
+    }
+    event(e, a) {
+        accevif (e == Event1 && interrupter != self) {
+            cascadeevent(Event1, self)
+            changestate(Card_Exit)
+        }
+    }
+    trans {
+        CheckCardStatus(1)
+    }
+}
+
+state Card_Delete { // 13
+    code() {
+        SelectedItem = ITEM_DONE
+        SetTextLanguage1(
+            189.0,
+            190.0,
+            191.0,
+            192.0,
+            193.0)
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_DELETE, 0, 85.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+        HighlightSlot = 0
+        var0 = 0
+        SpawnSaveStats()
+        SummaryObject = var0
+        var left = 1
+        var message, yes, no
+        SetTextLanguage1(
+            209.0,
+            210.0,
+            211.0, 
+            212.0, 
+            213.0)
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_DONE, 0, -65.0, TextFrame1, 2, 0xA3, 0x103, 0, 0)
+        message = objectspawned
+        playnull(5)
+        do {
+            if (buttonpress(PAD_START | PAD_X)) {
+                if (SelectedItem == ITEM_DONE) {
+                    SoundButtonConfirm()
+                    cascadeevent(Event1, self)
+                    if (PreferLoad) {
+                        SelectedItem = ITEM_LOAD
+                    }
+                    else {
+                        SelectedItem = ITEM_SAVE
+                    }
+                    changestate(Card_Main)
+                }
+                else {
+                    if (SelectedItem == ITEM_NO) {
+                        SoundButtonConfirm()
+                        HighlightSlot = 0
+                        interrupter = message
+                        sendevent(Event1, interrupter, self)
+                        interrupter = yes
+                        sendevent(Event1, interrupter, self)
+                        interrupter = no
+                        sendevent(Event1, interrupter, self)
+                        SelectedItem = ITEM_DONE
+                        SetTextLanguage1(
+                            209.0, 
+                            210.0,
+                            211.0,
+                            212.0,
+                            213.0)
+                        spawn2(CardC, S_MENU_TEXT, 1, ITEM_DONE, 0, -65.0, TextFrame1, 2, 0xA3, 0x103, 0, 0)
+                        message = objectspawned
+                    }
+                    else {
+                        if (SelectedItem == ITEM_YES) {
+                            SoundButtonConfirm()
+                            miscfunc(SelectedSlot >> 8, player, 15, 15)
+                            interrupter = SummaryObject
+                            sendevent(Event1, interrupter, self)
+                            var0 = 0
+                            SpawnSaveStats()
+                            playnull(5)
+                            cascadeevent(Event1, self)
+                            playnull()
+                            changestate(Card_Write)
+                        }
+                        else {
+                            SelectSaveSlot()
+                            unless (GLOBAL_94[(SelectedSlot * 0xA9) + 0x100]) {
+                                SoundButtonConfirm()
+                                HighlightSlot = 1
+                                interrupter = message
+                                sendevent(Event1, interrupter, self)
+                                SetTextLanguage1(
+                                    214.0,
+                                    215.0,
+                                    216.0,
+                                    217.0,
+                                    218.0)
+                                spawn2(CardC, S_MENU_TEXT, 1, ITEM_DELETE_TEXT, -120.0, -65.0, TextFrame1, 1, 0xA3, 0x103, 0, 0)
+                                message = objectspawned
+                                SetTextLanguage2(
+                                    138.0, 139.0,
+                                    140.0, 141.0,
+                                    142.0, 143.0,
+                                    142.0, 143.0,
+                                    144.0, 143.0
+                                )
+                                spawn2(CardC, S_MENU_TEXT, 1, ITEM_YES, 0, -65.0, TextFrame1, 2, 0xA3, 0x103, 0, 0)
+                                yes = objectspawned
+                                spawn2(CardC, S_MENU_TEXT, 1, ITEM_NO, 0, -81.0, TextFrame2, 2, 0xA3, 0x103, 0, 0)
+                                no = objectspawned
+                                SelectedItem = ITEM_NO
+                                playnull(5)
+                            }
+                        }
+                    }
+                }
+            }
+            if (dirpress(PAD_N)) {
+                SoundButtonNavigate()
+                if (SelectedItem == ITEM_SLOT1) {
+                    SelectedItem = ITEM_DONE
+                }
+                else if (SelectedItem == ITEM_SLOT2) {
+                    SelectedItem = ITEM_SLOT1
+                }
+                else if (SelectedItem == ITEM_SLOT3) {
+                    SelectedItem = ITEM_DONE
+                }
+                else if (SelectedItem == ITEM_SLOT4) {
+                    SelectedItem = ITEM_SLOT3
+                }
+                else if (SelectedItem == ITEM_DONE) {
+                    if (left) {
+                        SelectedItem = ITEM_SLOT2
+                    }
+                    else {
+                        SelectedItem = ITEM_SLOT4
+                    }
+                }
+                else if (SelectedItem == ITEM_YES) {
+                    SelectedItem = ITEM_NO
+                }
+                else if (SelectedItem == ITEM_NO) {
+                    SelectedItem = ITEM_YES
+                }
+            }
+            if (dirpress(PAD_S)) {
+                SoundButtonNavigate()
+                if (SelectedItem == ITEM_SLOT1) {
+                    SelectedItem = ITEM_SLOT2
+                }
+                else if (SelectedItem == ITEM_SLOT2) {
+                    SelectedItem = ITEM_DONE
+                }
+                else if (SelectedItem == ITEM_SLOT3) {
+                    SelectedItem = ITEM_SLOT4
+                }
+                else if (SelectedItem == ITEM_SLOT4) {
+                    SelectedItem = ITEM_DONE
+                }
+                else if (SelectedItem == ITEM_DONE) {
+                    if (left) {
+                        SelectedItem = ITEM_SLOT1
+                    }
+                    else {
+                        SelectedItem = ITEM_SLOT3
+                    }
+                }
+                else if (SelectedItem == ITEM_YES) {
+                    SelectedItem = ITEM_NO
+                }
+                else if (SelectedItem == ITEM_NO) {
+                    SelectedItem = ITEM_YES
+                }
+            }
+            if (dirpress(PAD_W) || dirpress(PAD_E)) {
+                if (SelectedItem == ITEM_SLOT1) {
+                    SoundButtonNavigate()
+                    SelectedItem = ITEM_SLOT3
+                    left = 0
+                }
+                else if (SelectedItem == ITEM_SLOT2) {
+                    SoundButtonNavigate()
+                    SelectedItem = ITEM_SLOT4
+                    left = 0
+                }
+                else if (SelectedItem == ITEM_SLOT3) {
+                    SoundButtonNavigate()
+                    SelectedItem = ITEM_SLOT1
+                    left = 1
+                }
+                else if (SelectedItem == ITEM_SLOT4) {
+                    SoundButtonNavigate()
+                    left = 1
+                    SelectedItem = ITEM_SLOT2
+                }
+            }
+            playnull()
+        } while (1)
+    }
+    event(e, a) {
+        accevif (e == Event1 && interrupter != self) {
+            cascadeevent(Event1, self)
+            changestate(Card_Exit)
+        }
+    }
+    trans {
+        CheckCardStatus(1)
+    }
+}
+
+state Card_Load { // 14
+    code() {
+        if (GLOBAL_94[(GLOBAL_158 * 0xA9) + 1.0]) {
+            SelectedItem = ITEM_CANCEL
+        }
+        else if (var slot = GLOBAL_158; slot == 0) {
+            SelectedItem = ITEM_SLOT1
+        }
+        else if (slot == 1.0) {
+            SelectedItem = ITEM_SLOT2
+        }
+        else if (slot == 2.0) {
+            SelectedItem = ITEM_SLOT3
+        }
+        else if (slot == 3.0) {
+            SelectedItem = ITEM_SLOT4
+        }
+        SetTextLanguage1(
+            179.0,
+            180.0,
+            181.0,
+            182.0, 
+            183.0)
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_LOAD, 0, 85.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+        HighlightSlot = 0
+        var0 = 0
+        SpawnSaveStats()
+        var left = 1
+        var cancel
+        SetTextLanguage1(
+            199.0,
+            200.0,
+            201.0,
+            202.0,
+            203.0)
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_CANCEL, 0, -65.0, TextFrame1, 2, 0xA3, 0x103, 0, 0)
+        cancel = objectspawned
+        playnull(5)
+        do {
+            if (buttonpress(PAD_START | PAD_X)) {
+                if (SelectedItem == ITEM_CANCEL) {
+                    SoundButtonConfirm()
+                    cascadeevent(Event1, self)
+                    SelectedItem = ITEM_EXIT
+                    changestate(Card_Main)
+                }
+                SelectSaveSlot()
+                unless (GLOBAL_94[(SelectedSlot * 0xA9) + 1.0]) {
+                    SoundButtonConfirm()
+                    soundsetup(0, voice, 5)
+                    GLOBAL_158 = SelectedSlot
+                    break
+                }
+            }
+            if (dirpress(PAD_N)) {
+                SoundButtonNavigate()
+                if (SelectedItem == ITEM_SLOT1) {
+                    SelectedItem = ITEM_CANCEL
+                }
+                else if (SelectedItem == ITEM_SLOT2) {
+                    SelectedItem = ITEM_SLOT1
+                }
+                else if (SelectedItem == ITEM_SLOT3) {
+                    SelectedItem = ITEM_CANCEL
+                }
+                else if (SelectedItem == ITEM_SLOT4) {
+                    SelectedItem = ITEM_SLOT3
+                }
+                else if (SelectedItem == ITEM_CANCEL) {
+                    if (left) {
+                        SelectedItem = ITEM_SLOT2
+                    }
+                    else {
+                        SelectedItem = ITEM_SLOT4
+                    }
+                }
+            }
+            if (dirpress(PAD_S)) {
+                SoundButtonNavigate()
+                if (SelectedItem == ITEM_SLOT1) {
+                    SelectedItem = ITEM_SLOT2
+                }
+                else if (SelectedItem == ITEM_SLOT2) {
+                    SelectedItem = ITEM_CANCEL
+                }
+                else if (SelectedItem == ITEM_SLOT3) {
+                    SelectedItem = ITEM_SLOT4
+                }
+                else if (SelectedItem == ITEM_SLOT4) {
+                    SelectedItem = ITEM_CANCEL
+                }
+                else if (SelectedItem == ITEM_CANCEL) {
+                    if (left) {
+                        SelectedItem = ITEM_SLOT1
+                    }
+                    else {
+                        SelectedItem = ITEM_SLOT3
+                    }
+                }
+            }
+            if (dirpress(PAD_W) || dirpress(PAD_E)) {
+                if (SelectedItem == ITEM_SLOT1) {
+                    SoundButtonNavigate()
+                    SelectedItem = ITEM_SLOT3
+                    left = 0
+                }
+                else if (SelectedItem == ITEM_SLOT2) {
+                    SoundButtonNavigate()
+                    SelectedItem = ITEM_SLOT4
+                    left = 0
+                }
+                else if (SelectedItem == ITEM_SLOT3) {
+                    SoundButtonNavigate()
+                    SelectedItem = ITEM_SLOT1
+                    left = 1
+                }
+                else if (SelectedItem == ITEM_SLOT4) {
+                    SoundButtonNavigate()
+                    left = 1
+                    SelectedItem = ITEM_SLOT2
+                }
+            }
+            playnull()
+        } while (1)
+        cascadeevent(Event1, self)
+        RestoreSaveData()
+        GameLoaded = 1
+        changestate(Card_Exit)
+    }
+    event(e, a) {
+        accevif (e == Event1 && interrupter != self) {
+            cascadeevent(Event1, self)
+            changestate(Card_Exit)
+        }
+    }
+    trans {
+        CheckCardStatus(1)
+    }
+}
+
+state Card_EnterName { // 15
+    code() {
+        NameWord0 = 0
+        KeyboardObject = 0
+        BackspaceObject = 0
+        SelectedItem = ITEM_KEYBOARD
+        KeyboardColumn = 0
+        KeyboardRow = 0
+        SetTextLanguage1(
+            219.0, 
+            220.0, 
+            221.0, 
+            222.0, 
+            223.0)
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_NAME_TITLE, 0, 85.0, TextFrame1, 0, 0xA3, 0x103, 0, 0)
+        RefreshKeyboard()
+        SetTextLanguage1(
+            209.0, 
+            210.0, 
+            211.0, 
+            224.0, 
+            213.0)
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_DONE, 0, -57.0, TextFrame1, 2, 0xA3, 0x103, 0, 0)
+        SetTextLanguage1(
+            199.0, 
+            200.0, 
+            201.0, 
+            202.0, 
+            203.0)
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_CANCEL, 0, -73.0, TextFrame1, 2, 0xA3, 0x103, 0, 0)
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, 112.0, -22.0, 225.0, 0, 0xA3, 0x103, 0, 0)
+        spawn2(CardC, S_CARD_CURSOR, 1)
+        var name
+        spawn2(CardC, S_CARD_NAME, 1, ITEM_STATIC, 50.0, -16.0)
+        name = objectspawned
+        playnull(6)
+        do {
+            if (buttonpress(PAD_START | PAD_X)) {
+                SoundButtonConfirm()
+                if (SelectedItem == ITEM_DONE) {
+                    GLOBAL_158 = SelectedSlot
+                    StoreSaveName()
+                    StoreSaveData()
+                    GenerateSaveID()
+                    GLOBAL_159 = var0
+                    setval(GLOBAL_94, (SelectedSlot * 0xA9) + 0xA00, GLOBAL_159)
+                    miscfunc(SelectedSlot >> 8, player, 16, 15)
+                    cascadeevent(Event1, self)
+                    changestate(Card_Write)
+                }
+                else if (SelectedItem == ITEM_CANCEL) {
+                    cascadeevent(Event1, self)
+                    SelectedItem = ITEM_EXIT
+                    changestate(Card_Main)
+                }
+                else if (SelectedItem == ITEM_BACKSPACE) {
+                    interrupter = name
+                    sendevent(Event1, interrupter, self)
+                    GetNameLength()
+                    NameOffset = var0
+                    if (NameOffset) {
+                        var0 = 0
+                        NameOffset -= 1
+                        WriteNameByte()
+                    }
+                    spawn2(CardC, S_CARD_NAME, 1, ITEM_STATIC, 50.0, -16.0)
+                    name = objectspawned
+                }
+                else if (SelectedItem == ITEM_KEYBOARD) {
+                    interrupter = name
+                    sendevent(Event1, interrupter, self)
+                    var0 = ((KeyboardRow * 7) + KeyboardColumn) + 0x41
+                    {
+                        var letter = var0
+                        GetNameLength()
+                        NameOffset = var0
+                        if (NameOffset == 8) {
+                            NameOffset = 7
+                        }
+                        var0 = letter
+                        WriteNameByte()
+                        var0 = 0
+                        NameOffset += 1
+                        WriteNameByte()
+                    }
+                    spawn2(CardC, S_CARD_NAME, 1, ITEM_STATIC, 50.0, -16.0)
+                    name = objectspawned
+                }
+            }
+            if (dirpress(PAD_N)) {
+                var0 = 0
+                NavigateKeyboard()
+                if (var0) {
+                    SoundButtonNavigate()
+                }
+            }
+            else if (dirpress(PAD_S)) {
+                var0 = 2.0
+                NavigateKeyboard()
+                if (var0) {
+                    SoundButtonNavigate()
+                }
+            }
+            else if (dirpress(PAD_W)) {
+                var0 = 3.0
+                NavigateKeyboard()
+                if (var0) {
+                    SoundButtonNavigate()
+                }
+            }
+            else if (dirpress(PAD_E)) {
+                var0 = 1.0
+                NavigateKeyboard()
+                if (var0) {
+                    SoundButtonNavigate()
+                }
+            }
+            playnull()
+        } while (1)
+    }
+    event(e, a) {
+        accevif (e == Event1 && interrupter != self) {
+            cascadeevent(Event1, self)
+            changestate(Card_Exit)
+        }
+    }
+    trans {
+        CheckCardStatus(1)
+    }
+}
+
+sub RefreshKeyboard() {
+    if (KeyboardObject) {
+        interrupter = KeyboardObject
+        sendevent(Event1, interrupter, self)
+        KeyboardObject = 0
+    }
+    if (BackspaceObject) {
+        interrupter = BackspaceObject
+        sendevent(Event1, interrupter, self)
+        BackspaceObject = 0
+    }
+    spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, -99.0, 32.0, 226.0, 2, 0xA3, 0x103, 0, 0)
+    KeyboardObject = objectspawned
+    spawn2(CardC, S_MENU_TEXT, 1, ITEM_BACKSPACE, -3.0, -19.0, 227.0, 2, 0xA3, 0x103, 0, 0)
+    BackspaceObject = objectspawned
+}
+
+sub NavigateKeyboard() {
+    var direction = var0
+    var previous = SelectedItem
+    var row = KeyboardRow
+    var column = KeyboardColumn
+    NavigationTable = KeyboardMap
+    ApplyNavigation()
+    if (SelectedItem != previous || KeyboardRow != row || KeyboardColumn != column) {
+        var0 = 1
+    }
+    else {
+        var0 = 0
+    }
+}
+
+sub ApplyNavigation() {
+    var table = NavigationTable
+    var direction = var0
+    var offset, item, column, row, colmatch, rowmatch
+    do {
+        item = (table[offset >> 2] << ((3 - ((offset >> 8) & 3)) << 3)) >> 24
+        if (!item) {
+            var0 = 1
+            break
+        }
+        column = (table[(offset + 1.0) >> 2] << ((3 - (((offset + 1.0) >> 8) & 3)) << 3)) >> 24
+        row = (table[(offset + 2.0) >> 2] << ((3 - (((offset + 2.0) >> 8) & 3)) << 3)) >> 24
+        if (column == -1) {
+            colmatch = KeyboardColumn
+        }
+        else {
+            colmatch = column
+        }
+        if (row == -1) {
+            rowmatch = KeyboardRow
+        }
+        else {
+            rowmatch = row
+        }
+        if (SelectedItem == item && KeyboardColumn == colmatch && KeyboardRow == rowmatch) {
+            offset += (direction * 3) + 3.0
+            SelectedItem = (table[offset >> 2] << ((3 - ((offset >> 8) & 3)) << 3)) >> 24
+            var0 = (table[(offset + 1.0) >> 2] << ((3 - (((offset + 1.0) >> 8) & 3)) << 3)) >> 24
+            if (var0 >= 0) {
+                KeyboardColumn = var0
+            }
+            var0 = (table[(offset + 2.0) >> 2] << ((3 - (((offset + 2.0) >> 8) & 3)) << 3)) >> 24
+            if (var0 >= 0) {
+                KeyboardRow = var0
+            }
+            var0 = 0
+            break
+        }
+        offset += 15.0
+    } while (1)
+}
+
+state Card_Cursor { // 16
+    statusc 0
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Display_Kill, e == Event1)
+    }
+    trans {
+        once {
+            SelectedItem = ITEM_NONE
+            BlinkItem = ITEM_NONE
+            HighlightSlot = 0
+            SelectedSlot = 0
+        }
+        PreviousColumn = KeyboardColumn
+        PreviousRow = KeyboardRow
+        PreviousItem = SelectedItem
+        KeyboardColumn = creator -> KeyboardColumn
+        KeyboardRow = creator -> KeyboardRow
+        SelectedItem = creator -> SelectedItem
+        KeyboardVar3 = creator -> KeyboardVar3
+        if (KeyboardColumn != PreviousColumn || KeyboardRow != PreviousRow || SelectedItem != PreviousItem) {
+            cascadeevent(Event1, self)
+            var px, py, frame, unused
+            if (SelectedItem == ITEM_KEYBOARD) {
+                px = (KeyboardColumn << 13) - 196.0
+                if (var row = KeyboardRow; row == 0) {
+                    py = 33.0
+                    if (var column = KeyboardColumn; column == 0) {
+                        frame = 4.0
+                    }
+                    else if (column == 1) {
+                        frame = 5.0
+                    }
+                    else if (column == 2) {
+                        frame = 6.0
+                    }
+                    else if (column == 3) {
+                        frame = 7.0
+                    }
+                    else if (column == 4) {
+                        frame = 8.0
+                    }
+                    else if (column == 5) {
+                        frame = 9.0
+                    }
+                    else if (column == 6) {
+                        frame = 10.0
+                    }
+                }
+                else if (row == 1) {
+                    py = 16.0
+                    if (var column = KeyboardColumn; column == 0) {
+                        frame = 11.0
+                    }
+                    else if (column == 1) {
+                        frame = 12.0
+                    }
+                    else if (column == 2) {
+                        frame = 13.0
+                    }
+                    else if (column == 3) {
+                        frame = 14.0
+                    }
+                    else if (column == 4) {
+                        frame = 15.0
+                    }
+                    else if (column == 5) {
+                        frame = 16.0
+                    }
+                    else if (column == 6) {
+                        frame = 17.0
+                    }
+                }
+                else if (row == 2) {
+                    py = 0
+                    if (var column = KeyboardColumn; column == 0) {
+                        frame = 18.0
+                    }
+                    else if (column == 1) {
+                        frame = 19.0
+                    }
+                    else if (column == 2) {
+                        frame = 20.0
+                    }
+                    else if (column == 3) {
+                        frame = 21.0
+                    }
+                    else if (column == 4) {
+                        frame = 22.0
+                    }
+                    else if (column == 5) {
+                        frame = 23.0
+                    }
+                    else if (column == 6) {
+                        frame = 24.0
+                    }
+                }
+                else if (row == 3) {
+                    py = -17.0
+                    if (var column = KeyboardColumn; column == 0) {
+                        frame = 25.0
+                    }
+                    else if (column == 1) {
+                        frame = 26.0
+                    }
+                    else if (column == 2) {
+                        frame = 27.0
+                    }
+                    else if (column == 3) {
+                        frame = 28.0
+                    }
+                    else if (column == 4) {
+                        frame = 29.0
+                    }
+                    else if (column == 5) {
+                        frame = 30.0
+                    }
+                }
+                if (frame) {
+                    spawn2(CardC, S_MENU_TEXT, 1, ITEM_KEYBOARD, px, py, frame, 3, 0xA3, 0x103, 0, 0)
+                }
+            }
+        }
+    }
+}
+
+state Card_Exit { // 17
+    code() {
+        ReleaseIcons()
+        GAMEFLAGS &= ~0x200000
+        deloadfile([Car1T])
+        deloadfile([Car1T])
+        GLOBAL_74 = 1.0
+        if (GameLoaded) {
+            GLOBAL_131 = 0
+            playnull(2)
+            GAMEFLAGS |= 0x800000
+            FadeToBlack()
+            WaitFadeNull()
+            loadlevel(LEVEL_WarpRoom)
+        }
+        sendevent(Event14, parent)
+        deloadfile([ic12D])
+        deloadfile([ic22D])
+    }
+}
+
+state Card_Text { // 18
+    statusc 0
+    code(item, px, py, frame, mode, scax, scay, align, value) {
+        DisplayItem = item
+        py = (py << 8) / 216
+        SetTrans(px, py, 0)
+        TextMode = mode
+        SetScale(scax, scay, 0)
+        TextDefaultColor()
+        if (TextMode == 3) {
+            zindex = 600
+            TextMode = 2
+        }
+        else {
+            zindex = 200
+        }
+        SetVFX2D()
+        setanim(TEXT)
+        if (!align) {
+            statusb |= FLAG_STRING_CENTER
+        }
+        else if (align < 0) {
+            statusb |= 0x200000
+        }
+        if (scax > 0xA3) {
+            invincible = FONT_BIG
+        }
+        TextTrans()
+        settrans(TextTrans)
+        var arg
+        do {
+            arg = value
+            playframe(frame)
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Display_Kill, e == Event1)
+    }
+}
+
+sub TextTrans() {
+    SelectedItem = creator -> SelectedItem
+    BlinkItem = creator -> BlinkItem
+    HighlightSlot = creator -> HighlightSlot
+    if (HighlightSlot) {
+        SelectedSlot = creator -> SelectedSlot
+        if (DisplayItem - ITEM_SLOT1 == SelectedSlot >> 8) {
+            SelectedItem = DisplayItem
+        }
+    }
+    if (BlinkItem == DisplayItem && ((frametime - statetime) % 12 > 6)) {
+        statusb |= FLAG_INVISIBLE
+    }
+    else {
+        statusb &= ~FLAG_INVISIBLE
+    }
+    if (TextMode == 2) {
+        if (SelectedItem == DisplayItem) {
+            if (frametime & 3) {
+                SetTextColor(0x1FF, 0x190, 0x000, 0x1FF, 0x000, 0x000)
+            }
+            else {
+                SetTextColor(0x1FF, 0x1FF, 0x1FF, 0x1FF, 0x1FF, 0x1FF)
+            }
+        }
+        else {
+            SetTextColor(0xA0, 0x8B, 0x60, 0xA0, 0x60, 0x6)
+        }
+    }
+    else if (TextMode == 1) {
+        if (SelectedItem == DisplayItem) {
+            if (frametime & 3) {
+                SetTextColor(0x1FF, 0x190, 0x000, 0x1FF, 0x000, 0x000)
+            }
+            else {
+                SetTextColor(0x1FF, 0x1FF, 0x1FF, 0x1FF, 0x1FF, 0x1FF)
+            }
+        }
+        else if ((frametime & 31) == 15) {
+            SetTextColor(0x1FF, 0x1FF, 0x1FF, 0x1FF, 0x1FF, 0x1FF)
+        }
+        else {
+            SetTextColor(0x1FF, 0x190, 0x00, 0x1FF, 0x00, 0x00)
+        }
+    }
+}
+
+state Card_Info { // 19
+    statusc 0
+    code(current) {
+        do (var px, py, item, slot, pass) {
+            slot = 0
+            do {
+                if (current) {
+                    item = ITEM_SLOT1
+                    px = 30
+                    py = 48
+                }
+                else {
+                    if (var choice = slot; choice == 0) {
+                        item = ITEM_SLOT1
+                        px = -81
+                        py = 48
+                    }
+                    else if (choice == 1.0) {
+                        item = ITEM_SLOT2
+                        px = -81
+                        py = -8
+                    }
+                    else if (choice == 2.0) {
+                        item = ITEM_SLOT3
+                        px = 143
+                        py = 48
+                    }
+                    else if (choice == 3.0) {
+                        item = ITEM_SLOT4
+                        px = 143
+                        py = -8
+                    }
+                }
+                if (pass) {
+                    if (current) {
+                        var0 = CURRENTLEVEL
+                        GetLevelIcon()
+                    }
+                    else {
+                        var0 = GLOBAL_94[(slot * 0xA9) + 0x200]
+                    }
+                    spawn2(CardC, S_CARD_ICON, 1, ITEM_STATIC, (px - 104) << 8, (py - 32) << 8, slot, var0)
+                    if (GLOBAL_94[(slot * 0xA9) + 0x100] && !current) {
+                        spawn2(CardC, S_MENU_TEXT, 1, item, px << 8, (py - 18) << 8, slot, 2, 0xA3, 0x103, 0, 0)
+                    }
+                    else {
+                        if (current) {
+                            var0 = GLOBAL_23
+                            if (var0) {
+                                misc = 228.0
+                            }
+                            else {
+                                misc = 229.0
+                            }
+                            spawn2(CardC, S_MENU_TEXT, 1, item, px << 8, py << 8, misc, 2, 0xA3, 0x103, 0, var0)
+                        }
+                        else {
+                            spawn2(CardC, S_MENU_TEXT, 1, item, px << 8, py << 8, slot, 2, 0xA3, 0x103, 0, 0)
+                        }
+                        if (current) {
+                            var0 = -1
+                        }
+                        else {
+                            var0 = slot
+                        }
+                        GetSaveStats()
+                        spawn2(CardC, S_MENU_TEXT, 1, item, (px - 1) << 8, (py - 16) << 8, 230.0, 2, 0xA3, 0x103, -1, var0)
+                        spawn2(CardC, S_MENU_TEXT, 1, item, (px - 17) << 8, (py - 32) << 8, 231.0, 2, 0xA3, 0x103, -1, CrystalCount)
+                        spawn2(CardC, S_MENU_TEXT, 1, item, (px + 48) << 8, (py - 32) << 8, 231.0, 2, 0xA3, 0x103, -1, GemCount)
+                        if (current) {
+                            var0 = LIFECOUNT >> 8
+                        }
+                        else {
+                            var0 = GLOBAL_94[(slot * 0xA9) + 0xB00]
+                        }
+                        spawn2(CardC, S_MENU_TEXT, 1, item, (px + 48) << 8, (py - 16) << 8, 231.0, 2, 0xA3, 0x103, -1, var0)
+                        spawn2(DispC, DispC_S_INVENTORY, 1, REWARD_CRYSTAL, (px - 8) << 8, (((py - 40) << 8) << 8) / 216, 8)
+                        spawn2(DispC, DispC_S_INVENTORY, 1, REWARD_GEM, (px + 62) << 8, (((py - 40) << 8) << 8) / 216, 8)
+                        spawn2(DispC, DispC_S_INVENTORY, 1, REWARD_LIFE, (px + 62) << 8, (((py - 23) << 8) << 8) / 216, 8)
+                    }
+                }
+                else {
+                    spawn2(CardC, S_CARD_BG, 1, ITEM_STATIC, (px - 31) << 8, (py - 25) << 8)
+                }
+                slot += 1.0
+                if (current || slot >= 4.0) {
+                    break
+                }
+            } while (1)
+            if (pass) {
+                break
+            }
+            pass = 1
+        } while (1)
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Display_Kill, e == Event1)
+    }
+    trans {
+        SelectedItem = creator -> SelectedItem
+        BlinkItem = creator -> BlinkItem
+        HighlightSlot = creator -> HighlightSlot
+        SelectedSlot = creator -> SelectedSlot
+        SaveIcon1 = creator -> SaveIcon1
+        SaveIcon2 = creator -> SaveIcon2
+        SaveIcon3 = creator -> SaveIcon3
+        SaveIcon4 = creator -> SaveIcon4
+    }
+}
+
+state Card_Icon { // 20
+    statusc 0
+    code(item, px, py, frame, icon) {
+        DisplayItem = item
+        py = (py << 8) / 216
+        SetTrans(px, py, 0)
+        SetScale(0x28D, 0x40E, 0x000)
+        SetVFX2D()
+        zindex = 400
+        if (frame == 0) {
+            SaveIcon1 = creator -> SaveIcon1
+        }
+        else if (frame == 1.0) {
+            SaveIcon1 = creator -> SaveIcon2
+        }
+        else if (frame == 2.0) {
+            SaveIcon1 = creator -> SaveIcon3
+        }
+        else if (frame == 3.0) {
+            SaveIcon1 = creator -> SaveIcon4
+        }
+        if (icon >= 17) {
+            icon -= 17
+        }
+        if (SaveIcon1) {
+            ins76(SaveIcon1, icon << 8)
+            ins77(frame, misc, SaveIcon1, SAVE_ICON)
+        }
+        setanim(SAVE_ICON)
+        sleepframe(frame)
+    }
+    event(e, a) {
+        accevcstate(Display_Kill, e == Event1)
+    }
+}
+
+state Card_Background { // 21
+    statusc 0
+    code(px, py) {
+        py = (py << 8) / 216
+        SetTrans(px, py, 0)
+        SetScale(0x8B3, 0x35C, 0x000)
+        SetVFX2D()
+        zindex = -100
+        setanim(SAVE_BACKGROUND)
+        sleepframe(0)
+    }
+    event(e, a) {
+        accevcstate(Display_Kill, e == Event1)
+    }
+}
+
+state Card_Name { // 22
+    statusc 0
+    code(px, py) {
+        NameWord0 = creator -> NameWord0
+        NameWord1 = creator -> NameWord1
+        NameWord2 = creator -> NameWord2
+        NameWord3 = creator -> NameWord3
+        NameWord4 = creator -> NameWord4
+        spawn2(CardC, S_MENU_TEXT, 1, ITEM_STATIC, px, py, 228.0, 0, 0xA3, 0x103, 1, &NameWord0)
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Display_Kill, e == Event1)
+    }
+}
+
+state Display_Kill { // 23
+    statusc 0
+    code() {}
+}

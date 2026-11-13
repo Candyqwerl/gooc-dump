@@ -1,0 +1,1137 @@
+#gool ButOC 73 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_ButOC.gooc" "C3\Out\C3_ButOC.nsentry"
+
+#anim BUTTON_L1_APPEAR              [D012V] [D012G] 16 0 2
+#anim BUTTON_L1_PRESS               [D022V] [D012G] 04 0 2
+#anim BUTTON_L1_DISAPPEAR           [D032V] [D012G] 09 0 2
+
+#anim BUTTON_L2_APPEAR              [D012V] [D022G] 16 0 2
+#anim BUTTON_L2_PRESS               [D022V] [D022G] 04 0 2
+#anim BUTTON_L2_DISAPPEAR           [D032V] [D022G] 09 0 2
+
+#anim BUTTON_L3_APPEAR              [D012V] [D032G] 16 0 2
+#anim BUTTON_L3_PRESS               [D022V] [D032G] 04 0 2
+#anim BUTTON_L3_DISAPPEAR           [D032V] [D032G] 09 0 2
+
+#anim BUTTON_L4_APPEAR              [D012V] [D042G] 16 0 2
+#anim BUTTON_L4_PRESS               [D022V] [D042G] 04 0 2
+#anim BUTTON_L4_DISAPPEAR           [D032V] [D042G] 09 0 2
+
+#anim BUTTON_L5_APPEAR              [D012V] [D052G] 16 0 2
+#anim BUTTON_L5_PRESS               [D022V] [D052G] 04 0 2
+#anim BUTTON_L5_DISAPPEAR           [D032V] [D052G] 09 0 2
+
+#anim BUTTON_TINY_APPEAR            [D712V] [D362G] 16 0 2
+#anim BUTTON_TINY_PRESS             [D722V] [D362G] 04 0 2
+#anim BUTTON_TINY_DISAPPEAR         [D732V] [D362G] 09 0 2
+
+#anim BUTTON_L1_PRESSED             [L012V] [L012G] 01 1 2
+#anim BUTTON_L2_PRESSED             [L012V] [L022G] 01 1 2
+#anim BUTTON_L3_PRESSED             [L012V] [L032G] 01 1 2
+#anim BUTTON_L4_PRESSED             [L012V] [L042G] 01 1 2
+#anim BUTTON_L5_PRESSED             [L012V] [L052G] 01 1 2
+#anim BUTTON_TINY_PRESSED           [L712V] [L362G] 01 1 2
+
+#anim BUTTON_L6_APPEAR              [D012V] [D062G] 16 0 2
+#anim BUTTON_L6_PRESS               [D022V] [D062G] 04 0 2
+#anim BUTTON_L6_DISAPPEAR           [D032V] [D062G] 09 0 2
+
+#anim BUTTON_L7_APPEAR              [D012V] [D072G] 16 0 2
+#anim BUTTON_L7_PRESS               [D022V] [D072G] 04 0 2
+#anim BUTTON_L7_DISAPPEAR           [D032V] [D072G] 09 0 2
+
+#anim BUTTON_L8_APPEAR              [D012V] [D082G] 16 0 2
+#anim BUTTON_L8_PRESS               [D022V] [D082G] 04 0 2
+#anim BUTTON_L8_DISAPPEAR           [D032V] [D082G] 09 0 2
+
+#anim BUTTON_L9_APPEAR              [D012V] [D092G] 16 0 2
+#anim BUTTON_L9_PRESS               [D022V] [D092G] 04 0 2
+#anim BUTTON_L9_DISAPPEAR           [D032V] [D092G] 09 0 2
+
+#anim BUTTON_L10_APPEAR             [D112V] [D102G] 16 0 2
+#anim BUTTON_L10_PRESS              [D122V] [D102G] 04 0 2
+#anim BUTTON_L10_DISAPPEAR          [D132V] [D102G] 09 0 2
+
+#anim BUTTON_DINGODILE_APPEAR       [D712V] [D322G] 16 0 2
+#anim BUTTON_DINGODILE_PRESS        [D722V] [D322G] 04 0 2
+#anim BUTTON_DINGODILE_DISAPPEAR    [D732V] [D322G] 09 0 2
+
+#anim BUTTON_L6_PRESSED             [L012V] [L062G] 01 1 2
+#anim BUTTON_L7_PRESSED             [L012V] [L072G] 01 1 2
+#anim BUTTON_L8_PRESSED             [L012V] [L082G] 01 1 2
+#anim BUTTON_L9_PRESSED             [L012V] [L092G] 01 1 2
+#anim BUTTON_L10_PRESSED            [L112V] [L102G] 01 1 2
+#anim BUTTON_DINGODILE_PRESSED      [L712V] [L322G] 01 1 2
+
+#anim BUTTON_L11_APPEAR             [D112V] [D112G] 16 0 2
+#anim BUTTON_L11_PRESS              [D122V] [D112G] 04 0 2
+#anim BUTTON_L11_DISAPPEAR          [D132V] [D112G] 09 0 2
+
+#anim BUTTON_L12_APPEAR             [D112V] [D122G] 16 0 2
+#anim BUTTON_L12_PRESS              [D122V] [D122G] 04 0 2
+#anim BUTTON_L12_DISAPPEAR          [D132V] [D122G] 09 0 2
+
+#anim BUTTON_L13_APPEAR             [D112V] [D132G] 16 0 2
+#anim BUTTON_L13_PRESS              [D122V] [D132G] 04 0 2
+#anim BUTTON_L13_DISAPPEAR          [D132V] [D132G] 09 0 2
+
+#anim BUTTON_L14_APPEAR             [D112V] [D142G] 16 0 2
+#anim BUTTON_L14_PRESS              [D122V] [D142G] 04 0 2
+#anim BUTTON_L14_DISAPPEAR          [D132V] [D142G] 09 0 2
+
+#anim BUTTON_L15_APPEAR             [D112V] [D152G] 16 0 2
+#anim BUTTON_L15_PRESS              [D122V] [D152G] 04 0 2
+#anim BUTTON_L15_DISAPPEAR          [D132V] [D152G] 09 0 2
+
+#anim BUTTON_NTROPY_APPEAR          [D712V] [D332G] 16 0 2
+#anim BUTTON_NTROPY_PRESS           [D722V] [D332G] 04 0 2
+#anim BUTTON_NTROPY_DISAPPEAR       [D732V] [D332G] 09 0 2
+
+#anim BUTTON_L11_PRESSED            [L112V] [L112G] 01 1 2
+#anim BUTTON_L12_PRESSED            [L112V] [L122G] 01 1 2
+#anim BUTTON_L13_PRESSED            [L112V] [L132G] 01 1 2
+#anim BUTTON_L14_PRESSED            [L112V] [L142G] 01 1 2
+#anim BUTTON_L15_PRESSED            [L112V] [L152G] 01 1 2
+#anim BUTTON_NTROPY_PRESSED         [L712V] [L332G] 01 1 2
+
+#anim BUTTON_L16_APPEAR             [D112V] [D162G] 16 0 2
+#anim BUTTON_L16_PRESS              [D122V] [D162G] 04 0 2
+#anim BUTTON_L16_DISAPPEAR          [D132V] [D162G] 09 0 2
+
+#anim BUTTON_L17_APPEAR             [D112V] [D172G] 16 0 2
+#anim BUTTON_L17_PRESS              [D122V] [D172G] 04 0 2
+#anim BUTTON_L17_DISAPPEAR          [D132V] [D172G] 09 0 2
+
+#anim BUTTON_L18_APPEAR             [D112V] [D182G] 16 0 2
+#anim BUTTON_L18_PRESS              [D122V] [D182G] 04 0 2
+#anim BUTTON_L18_DISAPPEAR          [D132V] [D182G] 09 0 2
+
+#anim BUTTON_L19_APPEAR             [D112V] [D192G] 16 0 2
+#anim BUTTON_L19_PRESS              [D122V] [D192G] 04 0 2
+#anim BUTTON_L19_DISAPPEAR          [D132V] [D192G] 09 0 2
+
+#anim BUTTON_L20_APPEAR             [D112V] [D202G] 16 0 2
+#anim BUTTON_L20_PRESS              [D122V] [D202G] 04 0 2
+#anim BUTTON_L20_DISAPPEAR          [D132V] [D202G] 09 0 2
+
+#anim BUTTON_NGIN_APPEAR            [D712V] [D342G] 16 0 2
+#anim BUTTON_NGIN_PRESS             [D722V] [D342G] 04 0 2
+#anim BUTTON_NGIN_DISAPPEAR         [D732V] [D342G] 09 0 2
+
+#anim BUTTON_L16_PRESSED            [L112V] [L162G] 01 1 2
+#anim BUTTON_L17_PRESSED            [L112V] [L172G] 01 1 2
+#anim BUTTON_L18_PRESSED            [L112V] [L182G] 01 1 2
+#anim BUTTON_L19_PRESSED            [L112V] [L192G] 01 1 2
+#anim BUTTON_L20_PRESSED            [L112V] [L202G] 01 1 2
+#anim BUTTON_NGIN_PRESSED           [L712V] [L342G] 01 1 2
+
+#anim BUTTON_L21_APPEAR             [D112V] [D212G] 16 0 2
+#anim BUTTON_L21_PRESS              [D122V] [D212G] 04 0 2
+#anim BUTTON_L21_DISAPPEAR          [D132V] [D212G] 09 0 2
+
+#anim BUTTON_L22_APPEAR             [D112V] [D222G] 16 0 2
+#anim BUTTON_L22_PRESS              [D122V] [D222G] 04 0 2
+#anim BUTTON_L22_DISAPPEAR          [D132V] [D222G] 09 0 2
+
+#anim BUTTON_L23_APPEAR             [D112V] [D232G] 16 0 2
+#anim BUTTON_L23_PRESS              [D122V] [D232G] 04 0 2
+#anim BUTTON_L23_DISAPPEAR          [D132V] [D232G] 09 0 2
+
+#anim BUTTON_L24_APPEAR             [D112V] [D242G] 16 0 2
+#anim BUTTON_L24_PRESS              [D122V] [D242G] 04 0 2
+#anim BUTTON_L24_DISAPPEAR          [D132V] [D242G] 09 0 2
+
+#anim BUTTON_L25_APPEAR             [D112V] [D252G] 16 0 2
+#anim BUTTON_L25_PRESS              [D122V] [D252G] 04 0 2
+#anim BUTTON_L25_DISAPPEAR          [D132V] [D252G] 09 0 2
+
+#anim BUTTON_CORTEX_APPEAR          [D712V] [D352G] 16 0 2
+#anim BUTTON_CORTEX_PRESS           [D722V] [D352G] 04 0 2
+#anim BUTTON_CORTEX_DISAPPEAR       [D732V] [D352G] 09 0 2
+
+#anim BUTTON_L21_PRESSED            [L112V] [L212G] 01 1 2
+#anim BUTTON_L22_PRESSED            [L112V] [L222G] 01 1 2
+#anim BUTTON_L23_PRESSED            [L112V] [L232G] 01 1 2
+#anim BUTTON_L24_PRESSED            [L112V] [L242G] 01 1 2
+#anim BUTTON_L25_PRESSED            [L112V] [L252G] 01 1 2
+#anim BUTTON_CORTEX_PRESSED         [L712V] [L352G] 01 1 2
+
+#anim BUTTON_S1_APPEAR              [D112V] [D262G] 16 0 2
+#anim BUTTON_S1_PRESS               [D122V] [D262G] 04 0 2
+#anim BUTTON_S1_DISAPPEAR           [D132V] [D262G] 09 0 2
+
+#anim BUTTON_S2_APPEAR              [D112V] [D272G] 16 0 2
+#anim BUTTON_S2_PRESS               [D122V] [D272G] 04 0 2
+#anim BUTTON_S2_DISAPPEAR           [D132V] [D272G] 09 0 2
+
+#anim BUTTON_S3_APPEAR              [D112V] [D282G] 16 0 2
+#anim BUTTON_S3_PRESS               [D122V] [D282G] 04 0 2
+#anim BUTTON_S3_DISAPPEAR           [D132V] [D282G] 09 0 2
+
+#anim BUTTON_S4_APPEAR              [D112V] [D292G] 16 0 2
+#anim BUTTON_S4_PRESS               [D122V] [D292G] 04 0 2
+#anim BUTTON_S4_DISAPPEAR           [D132V] [D292G] 09 0 2
+
+#anim BUTTON_S5_APPEAR              [D112V] [D302G] 16 0 2
+#anim BUTTON_S5_PRESS               [D122V] [D302G] 04 0 2
+#anim BUTTON_S5_DISAPPEAR           [D132V] [D302G] 09 0 2
+
+#anim BUTTON_S6_APPEAR              [D112V] [D312G] 16 0 2
+#anim BUTTON_S6_PRESS               [D122V] [D312G] 04 0 2
+#anim BUTTON_S6_DISAPPEAR           [D132V] [D312G] 09 0 2
+
+#anim BUTTON_S1_PRESSED             [L112V] [L262G] 01 1 2
+#anim BUTTON_S2_PRESSED             [L112V] [L272G] 01 1 2
+#anim BUTTON_S3_PRESSED             [L112V] [L282G] 01 1 2
+#anim BUTTON_S4_PRESSED             [L112V] [L292G] 01 1 2
+#anim BUTTON_S5_PRESSED             [L112V] [L302G] 01 1 2
+#anim BUTTON_S6_PRESSED             [L112V] [L312G] 01 1 2
+
+#spawn S_BUTTON_L1    Button_Init
+#spawn S_BUTTON_L2    Button_Init
+#spawn S_BUTTON_L3    Button_Init
+#spawn S_BUTTON_L4    Button_Init
+#spawn S_BUTTON_L5    Button_Init
+#spawn S_BUTTON_B1    Button_Init
+
+#spawn S_BUTTON_L6    Button_Init
+#spawn S_BUTTON_L7    Button_Init
+#spawn S_BUTTON_L8    Button_Init
+#spawn S_BUTTON_L9    Button_Init
+#spawn S_BUTTON_L10   Button_Init
+#spawn S_BUTTON_B2    Button_Init
+
+#spawn S_BUTTON_L11   Button_Init
+#spawn S_BUTTON_L12   Button_Init
+#spawn S_BUTTON_L13   Button_Init
+#spawn S_BUTTON_L14   Button_Init
+#spawn S_BUTTON_L15   Button_Init
+#spawn S_BUTTON_B3    Button_Init
+
+#spawn S_BUTTON_L16   Button_Init
+#spawn S_BUTTON_L17   Button_Init
+#spawn S_BUTTON_L18   Button_Init
+#spawn S_BUTTON_L19   Button_Init
+#spawn S_BUTTON_L20   Button_Init
+#spawn S_BUTTON_B4    Button_Init
+
+#spawn S_BUTTON_L21   Button_Init
+#spawn S_BUTTON_L22   Button_Init
+#spawn S_BUTTON_L23   Button_Init
+#spawn S_BUTTON_L24   Button_Init
+#spawn S_BUTTON_L25   Button_Init
+#spawn S_BUTTON_B5    Button_Init
+
+#spawn S_BUTTON_S1    Button_Init
+#spawn S_BUTTON_S2    Button_Init
+#spawn S_BUTTON_S3    Button_Init
+#spawn S_BUTTON_S4    Button_Init
+#spawn S_BUTTON_S5    Button_Init
+#spawn S_BUTTON_S6    Button_Init
+
+// XYZ triples
+array LevelButtonPositions = {
+        -0x51F00, 0x0, -0x300100,    // 1
+        -0x34E00, 0x0, -0x2D6D00,    // 2
+        0x0, 0x0, -0x2C1600,         // 3
+        0x37800, 0x0, -0x2D5D00,     // 4
+        0x59300, 0x0, -0x302A00,     // 5
+        0x270300, 0x0, -0x1C7000,    // 6
+        0x25B000, 0x0, -0x199300,    // 7
+        0x262E00, 0x0, -0x160B00,    // 8
+        0x290500, 0x0, -0x13AD00,    // 9
+        0x2C8000, 0x0, -0x134100,    // 10
+        0x2C2200, 0x0, 0x139100,     // 11
+        0x28FD00, 0x0, 0x13DA00,     // 12
+        0x262E00, 0x0, 0x160B00,     // 13
+        0x258D00, 0x0, 0x19AF00,     // 14
+        0x26ED00, 0x0, 0x1CE900,     // 15
+        0x51F00, 0x0, 0x300100,      // 16
+        0x34E00, 0x0, 0x2D6D00,      // 17
+        0x0, 0x0, 0x2C1600,          // 18
+        -0x37800, 0x0, 0x2D5D00,     // 19
+        -0x59300, 0x0, 0x302A00,     // 20
+        -0x270300, 0x0, 0x1C7000,    // 21
+        -0x25B000, 0x0, 0x199300,    // 22
+        -0x261000, 0x0, 0x160B00,    // 23
+        -0x290500, 0x0, 0x13AD00,    // 24
+        -0x2C8000, 0x0, 0x134100,    // 25
+        -0x51F00, 0x9C4000, -0x12100,// 26
+        -0x34E00, 0x9C4000, 0x17300, // 27
+        0x0, 0x9C4000, 0x2CA00,      // 28
+        0x37800, 0x9C4000, 0x18300,  // 29
+        0x59300, 0x9C4000, -0x14A00, // 30
+        0x0, 0x0, 0x0,               // 31
+        0x0, 0x0, 0x0,               // 32
+        0x0, 0x0, 0x0,               // 33
+        0x0, 0x0, 0x0,               // 34
+        0x0, 0x0, 0x0,               // 35
+        0x0, 0x0, 0x0                // 36
+}
+
+array BossButtonPositions = {
+        0x0, 0x0, 0x0,               // 1
+        0x0, 0x0, 0x0,               // 2
+        0x0, 0x0, 0x0,               // 3
+        0x0, 0x0, 0x0,               // 4
+        0x0, 0x0, 0x0,               // 5
+        0x0, 0x0, 0x0,               // 6
+        0x0, 0x0, 0x0,               // 7
+        0x0, 0x0, 0x0,               // 8
+        0x0, 0x0, 0x0,               // 9
+        0x0, 0x0, 0x0,               // 10
+        0x0, 0x0, 0x0,               // 11
+        0x0, 0x0, 0x0,               // 12
+        0x0, 0x0, 0x0,               // 13
+        0x0, 0x0, 0x0,               // 14
+        0x0, 0x0, 0x0,               // 15
+        0x0, 0x0, 0x0,               // 16
+        0x0, 0x0, 0x0,               // 17
+        0x0, 0x0, 0x0,               // 18
+        0x0, 0x0, 0x0,               // 19
+        0x0, 0x0, 0x0,               // 20
+        0x0, 0x0, 0x0,               // 21
+        0x0, 0x0, 0x0,               // 22
+        0x0, 0x0, 0x0,               // 23
+        0x0, 0x0, 0x0,               // 24
+        0x0, 0x0, 0x0,               // 25
+        0x0, 0x0, 0x0,               // 26
+        0x0, 0x0, 0x0,               // 27
+        0x0, 0x0, 0x0,               // 28
+        0x0, 0x0, 0x0,               // 29
+        0x0, 0x0, 0x0,               // 30
+        0x0, 0x0, -0x2C1600,         // 31
+        0x262E00, 0x0, -0x160B00,    // 32
+        0x262E00, 0x0, 0x160B00,     // 33
+        0x0, 0x0, 0x2C1600,          // 34
+        -0x262E00, 0x0, 0x160B00,    // 35
+        0x0, 0x0, 0x0                // 36
+}
+
+array AllButtonPositions = {
+     -0x69800, 0x0, -0x309B00,     // 1
+     -0x4B400, 0x0, -0x2DEA00,     // 2
+     -0x1C500, 0x0, -0x2C5C00,     // 3
+     0x1AC00, 0x0, -0x2C5600,      // 4
+     0x4A500, 0x0, -0x2DDF00,      // 5
+     0x26CC00, 0x0, -0x1E0300,     // 6
+     0x256900, 0x0, -0x1B0800,     // 7
+     0x258700, 0x0, -0x17B600,     // 8
+     0x273B00, 0x0, -0x14B900,     // 9
+     0x2A0C00, 0x0, -0x12EA00,     // 10
+     0x2D6400, 0x0, 0x129800,      // 11
+     0x2A1E00, 0x0, 0x12E200,      // 12
+     0x274D00, 0x0, 0x14A500,      // 13
+     0x258F00, 0x0, 0x179D00,      // 14
+     0x256800, 0x0, 0x1AF500,      // 15
+     0x69800, 0x0, 0x309B00,       // 16
+     0x4B400, 0x0, 0x2DEA00,       // 17
+     0x1C500, 0x0, 0x2C5C00,       // 18
+     -0x1AC00, 0x0, 0x2C5600,      // 19
+     -0x4A500, 0x0, 0x2DDF00,      // 20
+     -0x26CC00, 0x0, 0x1E0300,     // 21
+     -0x256900, 0x0, 0x1B0800,     // 22
+     -0x258700, 0x0, 0x17B600,     // 23
+     -0x273B00, 0x0, 0x14B900,     // 24
+     -0x2A0C00, 0x0, 0x12EA00,     // 25
+     -0x6AF00, 0x9C4000, -0x18800, // 26
+     -0x4CB00, 0x9C4000, 0x12900,  // 27
+     -0x1DC00, 0x9C4000, 0x2B800,  // 28
+     0x19500, 0x9C4000, 0x2BD00,   // 29
+     0x48E00, 0x9C4000, 0x13400,   // 30
+     0x6C600, 0x0, -0x309200,      // 31
+     0x2D7300, 0x0, -0x126C00,     // 32
+     0x26AE00, 0x0, 0x1E2600,      // 33
+     -0x6C600, 0x0, 0x309200,      // 34
+     -0x2D7300, 0x0, 0x126C00,     // 35
+     0x6AF00, 0x9C4000, -0x17F00   // 36
+}
+
+var ButtonNumber, TargetLevel, WarpEffectOBJ, ButtonVar4, AppearAnim, PressAnim, DisappearAnim, PressedAnim, ButtonVar9
+var WarpRoomNumber, RoomCenterX, RoomCenterY, RoomCenterZ
+
+expr SapphireTarget = GLOBAL_121
+expr GoldTarget = GLOBAL_122
+expr PlatinumTarget = GLOBAL_123
+
+state Button_Init { // 0
+    stateflag 0x4004281
+    statusc 0x0
+    code(level, obj, arg, yaw) {
+        TargetLevel = level
+        WarpEffectOBJ = obj
+        ButtonVar4 = arg
+        roty = yaw
+        playnull()
+        playnull()
+        if (spawn == S_BUTTON_L1) {
+            ButtonNumber = 1
+            AppearAnim = getanim(BUTTON_L1_APPEAR)
+            PressAnim = getanim(BUTTON_L1_PRESS)
+            DisappearAnim = getanim(BUTTON_L1_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_L1_PRESSED)
+        }
+        else if (spawn == S_BUTTON_L2) {
+            ButtonNumber = 2
+            AppearAnim = getanim(BUTTON_L2_APPEAR)
+            PressAnim = getanim(BUTTON_L2_PRESS)
+            DisappearAnim = getanim(BUTTON_L2_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_L2_PRESSED)
+        }
+        else if (spawn == S_BUTTON_L3) {
+            ButtonNumber = 3
+            AppearAnim = getanim(BUTTON_L3_APPEAR)
+            PressAnim = getanim(BUTTON_L3_PRESS)
+            DisappearAnim = getanim(BUTTON_L3_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_L3_PRESSED)
+        }
+        else if (spawn == S_BUTTON_L4) {
+            ButtonNumber = 4
+            AppearAnim = getanim(BUTTON_L4_APPEAR)
+            PressAnim = getanim(BUTTON_L4_PRESS)
+            DisappearAnim = getanim(BUTTON_L4_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_L4_PRESSED)
+        }
+        else if (spawn == S_BUTTON_L5) {
+            ButtonNumber = 5
+            AppearAnim = getanim(BUTTON_L5_APPEAR)
+            PressAnim = getanim(BUTTON_L5_PRESS)
+            DisappearAnim = getanim(BUTTON_L5_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_L5_PRESSED)
+        }
+        else if (spawn == S_BUTTON_B1) {
+            ButtonNumber = 31
+            AppearAnim = getanim(BUTTON_TINY_APPEAR)
+            PressAnim = getanim(BUTTON_TINY_PRESS)
+            DisappearAnim = getanim(BUTTON_TINY_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_TINY_PRESSED)
+        }
+        else if (spawn == S_BUTTON_L6) {
+            ButtonNumber = 6
+            AppearAnim = getanim(BUTTON_L6_APPEAR)
+            PressAnim = getanim(BUTTON_L6_PRESS)
+            DisappearAnim = getanim(BUTTON_L6_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_L6_PRESSED)
+        }
+        else if (spawn == S_BUTTON_L7) {
+            ButtonNumber = 7
+            AppearAnim = getanim(BUTTON_L7_APPEAR)
+            PressAnim = getanim(BUTTON_L7_PRESS)
+            DisappearAnim = getanim(BUTTON_L7_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_L7_PRESSED)
+        }
+        else if (spawn == S_BUTTON_L8) {
+            ButtonNumber = 8
+            AppearAnim = getanim(BUTTON_L8_APPEAR)
+            PressAnim = getanim(BUTTON_L8_PRESS)
+            DisappearAnim = getanim(BUTTON_L8_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_L8_PRESSED)
+        }
+        else if (spawn == S_BUTTON_L9) {
+            ButtonNumber = 9
+            AppearAnim = getanim(BUTTON_L9_APPEAR)
+            PressAnim = getanim(BUTTON_L9_PRESS)
+            DisappearAnim = getanim(BUTTON_L9_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_L9_PRESSED)
+        }
+        else if (spawn == S_BUTTON_L10) {
+            ButtonNumber = 10
+            AppearAnim = getanim(BUTTON_L10_APPEAR)
+            PressAnim = getanim(BUTTON_L10_PRESS)
+            DisappearAnim = getanim(BUTTON_L10_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_L10_PRESSED)
+        }
+        else if (spawn == S_BUTTON_B2) {
+            ButtonNumber = 32
+            AppearAnim = getanim(BUTTON_DINGODILE_APPEAR)
+            PressAnim = getanim(BUTTON_DINGODILE_PRESS)
+            DisappearAnim = getanim(BUTTON_DINGODILE_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_DINGODILE_PRESSED)
+        }
+        else if (spawn == S_BUTTON_L11) {
+            ButtonNumber = 11
+            AppearAnim = getanim(BUTTON_L11_APPEAR)
+            PressAnim = getanim(BUTTON_L11_PRESS)
+            DisappearAnim = getanim(BUTTON_L11_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_L11_PRESSED)
+        }
+        else if (spawn == S_BUTTON_L12) {
+            ButtonNumber = 12
+            AppearAnim = getanim(BUTTON_L12_APPEAR)
+            PressAnim = getanim(BUTTON_L12_PRESS)
+            DisappearAnim = getanim(BUTTON_L12_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_L12_PRESSED)
+        }
+        else if (spawn == S_BUTTON_L13) {
+            ButtonNumber = 13
+            AppearAnim = getanim(BUTTON_L13_APPEAR)
+            PressAnim = getanim(BUTTON_L13_PRESS)
+            DisappearAnim = getanim(BUTTON_L13_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_L13_PRESSED)
+        }
+        else if (spawn == S_BUTTON_L14) {
+            ButtonNumber = 14
+            AppearAnim = getanim(BUTTON_L14_APPEAR)
+            PressAnim = getanim(BUTTON_L14_PRESS)
+            DisappearAnim = getanim(BUTTON_L14_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_L14_PRESSED)
+        }
+        else if (spawn == S_BUTTON_L15) {
+            ButtonNumber = 15
+            AppearAnim = getanim(BUTTON_L15_APPEAR)
+            PressAnim = getanim(BUTTON_L15_PRESS)
+            DisappearAnim = getanim(BUTTON_L15_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_L15_PRESSED)
+        }
+        else if (spawn == S_BUTTON_B3) {
+            ButtonNumber = 33
+            AppearAnim = getanim(BUTTON_NTROPY_APPEAR)
+            PressAnim = getanim(BUTTON_NTROPY_PRESS)
+            DisappearAnim = getanim(BUTTON_NTROPY_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_NTROPY_PRESSED)
+        }
+        else if (spawn == S_BUTTON_L16) {
+            ButtonNumber = 16
+            AppearAnim = getanim(BUTTON_L16_APPEAR)
+            PressAnim = getanim(BUTTON_L16_PRESS)
+            DisappearAnim = getanim(BUTTON_L16_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_L16_PRESSED)
+        }
+        else if (spawn == S_BUTTON_L17) {
+            ButtonNumber = 17
+            AppearAnim = getanim(BUTTON_L17_APPEAR)
+            PressAnim = getanim(BUTTON_L17_PRESS)
+            DisappearAnim = getanim(BUTTON_L17_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_L17_PRESSED)
+        }
+        else if (spawn == S_BUTTON_L18) {
+            ButtonNumber = 18
+            AppearAnim = getanim(BUTTON_L18_APPEAR)
+            PressAnim = getanim(BUTTON_L18_PRESS)
+            DisappearAnim = getanim(BUTTON_L18_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_L18_PRESSED)
+        }
+        else if (spawn == S_BUTTON_L19) {
+            ButtonNumber = 19
+            AppearAnim = getanim(BUTTON_L19_APPEAR)
+            PressAnim = getanim(BUTTON_L19_PRESS)
+            DisappearAnim = getanim(BUTTON_L19_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_L19_PRESSED)
+        }
+        else if (spawn == S_BUTTON_L20) {
+            ButtonNumber = 20
+            AppearAnim = getanim(BUTTON_L20_APPEAR)
+            PressAnim = getanim(BUTTON_L20_PRESS)
+            DisappearAnim = getanim(BUTTON_L20_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_L20_PRESSED)
+        }
+        else if (spawn == S_BUTTON_B4) {
+            ButtonNumber = 34
+            AppearAnim = getanim(BUTTON_NGIN_APPEAR)
+            PressAnim = getanim(BUTTON_NGIN_PRESS)
+            DisappearAnim = getanim(BUTTON_NGIN_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_NGIN_PRESSED)
+        }
+        else if (spawn == S_BUTTON_L21) {
+            ButtonNumber = 21
+            AppearAnim = getanim(BUTTON_L21_APPEAR)
+            PressAnim = getanim(BUTTON_L21_PRESS)
+            DisappearAnim = getanim(BUTTON_L21_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_L21_PRESSED)
+        }
+        else if (spawn == S_BUTTON_L22) {
+            ButtonNumber = 22
+            AppearAnim = getanim(BUTTON_L22_APPEAR)
+            PressAnim = getanim(BUTTON_L22_PRESS)
+            DisappearAnim = getanim(BUTTON_L22_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_L22_PRESSED)
+        }
+        else if (spawn == S_BUTTON_L23) {
+            ButtonNumber = 23
+            AppearAnim = getanim(BUTTON_L23_APPEAR)
+            PressAnim = getanim(BUTTON_L23_PRESS)
+            DisappearAnim = getanim(BUTTON_L23_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_L23_PRESSED)
+        }
+        else if (spawn == S_BUTTON_L24) {
+            ButtonNumber = 24
+            AppearAnim = getanim(BUTTON_L24_APPEAR)
+            PressAnim = getanim(BUTTON_L24_PRESS)
+            DisappearAnim = getanim(BUTTON_L24_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_L24_PRESSED)
+        }
+        else if (spawn == S_BUTTON_L25) {
+            ButtonNumber = 25
+            AppearAnim = getanim(BUTTON_L25_APPEAR)
+            PressAnim = getanim(BUTTON_L25_PRESS)
+            DisappearAnim = getanim(BUTTON_L25_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_L25_PRESSED)
+        }
+        else if (spawn == S_BUTTON_B5) {
+            ButtonNumber = 35
+            AppearAnim = getanim(BUTTON_CORTEX_APPEAR)
+            PressAnim = getanim(BUTTON_CORTEX_PRESS)
+            DisappearAnim = getanim(BUTTON_CORTEX_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_CORTEX_PRESSED)
+        }
+        else if (spawn == S_BUTTON_S1) {
+            ButtonNumber = 26
+            AppearAnim = getanim(BUTTON_S1_APPEAR)
+            PressAnim = getanim(BUTTON_S1_PRESS)
+            DisappearAnim = getanim(BUTTON_S1_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_S1_PRESSED)
+        }
+        else if (spawn == S_BUTTON_S2) {
+            ButtonNumber = 27
+            AppearAnim = getanim(BUTTON_S2_APPEAR)
+            PressAnim = getanim(BUTTON_S2_PRESS)
+            DisappearAnim = getanim(BUTTON_S2_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_S2_PRESSED)
+        }
+        else if (spawn == S_BUTTON_S3) {
+            ButtonNumber = 28
+            AppearAnim = getanim(BUTTON_S3_APPEAR)
+            PressAnim = getanim(BUTTON_S3_PRESS)
+            DisappearAnim = getanim(BUTTON_S3_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_S3_PRESSED)
+        }
+        else if (spawn == S_BUTTON_S4) {
+            ButtonNumber = 29
+            AppearAnim = getanim(BUTTON_S4_APPEAR)
+            PressAnim = getanim(BUTTON_S4_PRESS)
+            DisappearAnim = getanim(BUTTON_S4_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_S4_PRESSED)
+        }
+        else if (spawn == S_BUTTON_S5) {
+            ButtonNumber = 30
+            AppearAnim = getanim(BUTTON_S5_APPEAR)
+            PressAnim = getanim(BUTTON_S5_PRESS)
+            DisappearAnim = getanim(BUTTON_S5_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_S5_PRESSED)
+        }
+        else if (spawn == S_BUTTON_S6) {
+            ButtonNumber = 36
+            AppearAnim = getanim(BUTTON_S6_APPEAR)
+            PressAnim = getanim(BUTTON_S6_PRESS)
+            DisappearAnim = getanim(BUTTON_S6_DISAPPEAR)
+            PressedAnim = getanim(BUTTON_S6_PRESSED)
+        }
+        if (!GLOBAL_170) {
+            if (0x1000000 & GLOBAL_150) {
+                GLOBAL_170 = 1
+            }
+            else if (((GLOBAL_175 | (GLOBAL_177 | (GLOBAL_179 | GLOBAL_181))) \ -0x400) &&
+                (((GLOBAL_176 | (GLOBAL_178 | (GLOBAL_180 | GLOBAL_182))) \ 63) &&
+                    (((SAVEDGEMPOOL1 | GEMPOOL1) \ -2) &&
+                        ((SAVEDGEMPOOL2 | GEMPOOL2) \ 0x7C00003F)))) {
+                            GLOBAL_170 = 2
+                            GLOBAL_150 |= 0x1000000
+                        }
+            else {
+                GLOBAL_170 = 1
+            }
+        }
+        if (GLOBAL_170 == 2 && ButtonNumber != 35) {
+            KillEntity()
+            changestate(Kill)
+        }
+        if (ButtonNumber >= 31) {
+            WarpRoomNumber = ButtonNumber - 30
+        }
+        else {
+            WarpRoomNumber = ((ButtonNumber - 1) / 5) + 1
+        }
+        {
+            var required, crystals, table, defeated, visited, offset, low, high
+            required = WarpRoomNumber * 5
+            low = SAVEDCRYSTALPOOL1 | CRYSTALPOOL1
+            high = SAVEDCRYSTALPOOL2 | CRYSTALPOOL2
+            misc = 0
+            CountPoolBits(low)
+            CountPoolBits(high)
+            crystals = misc
+            if (crystals > required || (WarpRoomNumber == 6 && (1 & GLOBAL_150))) {
+                table = AllButtonPositions[0]
+            }
+            else {
+                table = LevelButtonPositions[0]
+                if (required == crystals) {
+                    if (var room = WarpRoomNumber; room == 1) {
+                        if (0x40 & GLOBAL_27) {
+                            defeated = 1
+                        }
+                        if (0x10000 & GLOBAL_150) {
+                            visited = 1
+                        }
+                    }
+                    else if (room == 2) {
+                        if (0x8 & GLOBAL_27) {
+                            defeated = 1
+                        }
+                        if (0x20000 & GLOBAL_150) {
+                            visited = 1
+                        }
+                    }
+                    else if (room == 3) {
+                        if (0x10 & GLOBAL_27) {
+                            defeated = 1
+                        }
+                        if (0x40000 & GLOBAL_150) {
+                            visited = 1
+                        }
+                    }
+                    else if (room == 4) {
+                        if (0x20 & GLOBAL_27) {
+                            defeated = 1
+                        }
+                        if (0x80000 & GLOBAL_150) {
+                            visited = 1
+                        }
+                    }
+                    else if (room == 5) {
+                        if (0x80 & GLOBAL_27) {
+                            defeated = 1
+                        }
+                        if (0x100000 & GLOBAL_150) {
+                            visited = 1
+                        }
+                    }
+                    if (defeated || visited) {
+                        table = AllButtonPositions[0]
+                    }
+                    else {
+                        table = BossButtonPositions[0]
+                    }
+                }
+            }
+            if (GLOBAL_170 == 2) {
+                table = BossButtonPositions[0]
+            }
+            offset = ((ButtonNumber - 1) * 3) << 8
+            x = table[offset]
+            y = table[offset + 1.0]
+            z = table[offset + 2.0]
+            unless ((x | y) | z) {
+                KillEntity()
+                changestate(Kill)
+            }
+            table = AllButtonPositions[0]
+            offset = ((((WarpRoomNumber - 1) * 5) + 2) * 3) << 8
+            RoomCenterX = table[offset]
+            RoomCenterY = table[offset + 1.0]
+            RoomCenterZ = table[offset + 2.0]
+        }
+        zindex = 26
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_TOP | 0x400000
+        SetVec(RoomCenterX, RoomCenterY, RoomCenterZ)
+        var0 = distance(vecx, player, DIST_NO_Y)
+        if (var0 >= 10.5m) {
+            changestate(Button_Hidden)
+        }
+        else {
+            changestate(Button_Appear)
+        }
+    }
+}
+
+sub CalculateCompletionPercent() { // S-518
+    var completed, clear, sapphire, gold, platinum
+    var bits0 = SAVEDCRYSTALPOOL1
+    var bits1 = SAVEDCRYSTALPOOL2
+    misc = 0
+    CountPoolBits(GLOBAL_27)
+    CountPoolBits(GLOBAL_28)
+    completed = misc
+    misc = 0
+    CountPoolBits(bits0)
+    CountPoolBits(bits1)
+    vecy = misc
+    bits0 = SAVEDGEMPOOL1
+    bits1 = SAVEDGEMPOOL2
+    misc = 0
+    CountPoolBits(bits0)
+    CountPoolBits(bits1)
+    vecx = misc
+    bits1 &= 0x7C000000
+    misc = 0
+    CountPoolBits(bits1)
+    clear = vecx - misc
+    misc = 0
+    CountPoolBits(GLOBAL_150 & 0xFFFF)
+    vecz = misc
+    sapphire = 0
+    gold = 0
+    platinum = 0
+    bits0 = GLOBAL_175
+    bits1 = GLOBAL_177
+    CountRelics(bits1, bits0, platinum, gold, sapphire)
+    bits0 = GLOBAL_176
+    bits1 = GLOBAL_178
+    CountRelics(bits1, bits0, platinum, gold, sapphire)
+    var0 = vecy + (vecx + (vecz + (platinum + (gold + sapphire))))
+    if (GLOBAL_27 & 0x40) {
+        var0 += 1
+    }
+    if (GLOBAL_27 & 0x8) {
+        var0 += 1
+    }
+    if (GLOBAL_27 & 0x10) {
+        var0 += 1
+    }
+    if (GLOBAL_27 & 0x20) {
+        var0 += 1
+    }
+    if (GLOBAL_27 & 0x80) {
+        var0 += 1
+    }
+    bits0 = GLOBAL_175 | GLOBAL_177
+    bits1 = GLOBAL_176 | GLOBAL_178
+    if (!(bits0 \ -0x400 && bits1 \ 63 && SAVEDGEMPOOL1 \ -2 && SAVEDGEMPOOL2 \ 0x7C00003F)) {
+        if (var0 > 99) {
+            var0 = 99
+        }
+    }
+}
+
+state Button_Appear { // 1
+    stateflag 0x4004281
+    statusc 0x0
+    code() {
+        if (ButtonNumber >= 31) {
+            var0 = 0
+        }
+        else {
+            var0 = (ButtonNumber - 1) % 5
+        }
+        if (var0 == 0) {
+            playnull(8)
+        }
+        else if (var0 == 1) {
+            playnull(4)
+        }
+        else if (var0 == 2) {
+            playnull(0)
+        }
+        else if (var0 == 3) {
+            playnull(2)
+        }
+        else if (var0 == 4) {
+            playnull(6)
+        }
+        else if (var0 == 5) {
+            playnull(10)
+        }
+        animseq = AppearAnim
+        playframes(0.0, 15.0)
+        changestate(Button_Idle)
+    }
+}
+
+state Button_Disappear { // 2
+    stateflag 0x4004281
+    statusc 0x0
+    code() {
+        if (ButtonNumber >= 31) {
+            var0 = 0
+        }
+        else {
+            var0 = (ButtonNumber - 1) % 5
+        }
+        if (var0 == 0) {
+            playframe(animframe, 4)
+        }
+        else if (var0 == 1) {
+            playframe(animframe, 2)
+        }
+        else if (var0 == 2) {
+            playframe(animframe, 0)
+        }
+        else if (var0 == 3) {
+            playframe(animframe, 0)
+        }
+        else if (var0 == 4) {
+            playframe(animframe, 2)
+        }
+        else if (var0 == 5) {
+            playframe(animframe, 4)
+        }
+        animseq = DisappearAnim
+        playframes(0.0, 8.0)
+        changestate(Button_Hidden)
+    }
+}
+
+state Button_Hidden { // 3
+    stateflag 0x4004281
+    statusc 0x0
+    code() {
+        sleepnull()
+    }
+    trans {
+        SetVec(RoomCenterX, RoomCenterY, RoomCenterZ)
+        var0 = distance(vecx, player, DIST_NO_Y)
+        changestateif(Button_Appear, var0 <= 10m)
+    }
+}
+
+state Button_Idle { // 4
+    stateflag 0x4004281
+    statusc 0x0
+    code() {
+        animseq = PressAnim
+        sleepframe(0)
+    }
+    trans {
+        var0 = distance(player, DIST_NO_Y)
+        if (var0 <= 0.9m) {
+            changestateif(Button_Press, y - 0.5m < player -> y && player -> y < y + 0.5m)
+        }
+        SetVec(RoomCenterX, RoomCenterY, RoomCenterZ)
+        var0 = distance(vecx, player, DIST_NO_Y)
+        changestateif(Button_Disappear, var0 >= 10.5m)
+    }
+}
+
+sub SetRelicTargets(level) { // S-1061
+    SapphireTarget = 0
+    GoldTarget = 0
+    PlatinumTarget = 0
+    if (level == LEVEL_ToadVillage) {
+        SapphireTarget = 0x60E
+        GoldTarget = 0x585
+        PlatinumTarget = 0x434
+    }
+    if (level == LEVEL_UnderPressure) {
+        SapphireTarget = 0xA5A
+        GoldTarget = 0x79C
+        PlatinumTarget = 0x6E2
+    }
+    if (level == LEVEL_OrientExpress) {
+        SapphireTarget = 0x401
+        GoldTarget = 0x2B7
+        PlatinumTarget = 0x1C4
+    }
+    if (level == LEVEL_BoneYard) {
+        SapphireTarget = 0xA0F
+        GoldTarget = 0x997
+        PlatinumTarget = 0x7B7
+    }
+    if (level == LEVEL_MakinWaves) {
+        SapphireTarget = 0x6A4
+        GoldTarget = 0x5AF
+        PlatinumTarget = 0x533
+    }
+    if (level == LEVEL_GeeWiz) {
+        SapphireTarget = 0x92E
+        GoldTarget = 0x7FB
+        PlatinumTarget = 0x640
+    }
+    if (level == LEVEL_HangEmHigh) {
+        SapphireTarget = 0x81B
+        GoldTarget = 0x50B
+        PlatinumTarget = 0x42E
+    }
+    if (level == LEVEL_HogRide) {
+        SapphireTarget = 0x465
+        GoldTarget = 0x40C
+        PlatinumTarget = 0x36C
+    }
+    if (level == LEVEL_TombTime) {
+        SapphireTarget = 0x9DD
+        GoldTarget = 0x6BD
+        PlatinumTarget = 0x52B
+    }
+    if (level == LEVEL_MidnightRun) {
+        SapphireTarget = 0x52D
+        GoldTarget = 0x3BB
+        PlatinumTarget = 0x1C7
+    }
+    if (level == LEVEL_DinoMight) {
+        SapphireTarget = 0x915
+        GoldTarget = 0x847
+        PlatinumTarget = 0x60E
+    }
+    if (level == LEVEL_DeepTrouble) {
+        SapphireTarget = 0xA73
+        GoldTarget = 0x851
+        PlatinumTarget = 0x7A7
+    }
+    if (level == LEVEL_HighTime) {
+        SapphireTarget = 0xCE4
+        GoldTarget = 0x643
+        PlatinumTarget = 0x590
+    }
+    if (level == LEVEL_RoadCrash) {
+        SapphireTarget = 0x84D
+        GoldTarget = 0x7E2
+        PlatinumTarget = 0x787
+    }
+    if (level == LEVEL_DoubleHeader) {
+        SapphireTarget = 0x87F
+        GoldTarget = 0x7ED
+        PlatinumTarget = 0x5CD
+    }
+    if (level == LEVEL_Sphynxinator) {
+        SapphireTarget = 0x9F6
+        GoldTarget = 0x812
+        PlatinumTarget = 0x589
+    }
+    if (level == LEVEL_ByeByeBlimps) {
+        SapphireTarget = 0x6BD
+        GoldTarget = 0x5B4
+        PlatinumTarget = 0x507
+    }
+    if (level == LEVEL_TellNoTales) {
+        SapphireTarget = 0x9F6
+        GoldTarget = 0x85D
+        PlatinumTarget = 0x65F
+    }
+    if (level == LEVEL_FutureFrenzy) {
+        SapphireTarget = 0xBD1
+        GoldTarget = 0x92E
+        PlatinumTarget = 0x7C7
+    }
+    if (level == LEVEL_TombWader) {
+        SapphireTarget = 0x1004
+        GoldTarget = 0xA42
+        PlatinumTarget = 0x834
+    }
+    if (level == LEVEL_GoneTomorrow) {
+        SapphireTarget = 0xC03
+        GoldTarget = 0x82A
+        PlatinumTarget = 0x5DF
+    }
+    if (level == LEVEL_OrangeAsphalt) {
+        SapphireTarget = 0x960
+        GoldTarget = 0x8EA
+        PlatinumTarget = 0x7FD
+    }
+    if (level == LEVEL_FlamingPassion) {
+        SapphireTarget = 0x9F6
+        GoldTarget = 0x70A
+        PlatinumTarget = 0x5B4
+    }
+    if (level == LEVEL_MadBombers) {
+        SapphireTarget = 0xC80
+        GoldTarget = 0xB40
+        PlatinumTarget = 0x996
+    }
+    if (level == LEVEL_BugLite) {
+        SapphireTarget = 0xA73
+        GoldTarget = 0x911
+        PlatinumTarget = 0x71F
+    }
+    if (level == LEVEL_SkiCrazed) {
+        SapphireTarget = 0x76C
+        GoldTarget = 0x4EE
+        PlatinumTarget = 0x341
+    }
+    if (level == LEVEL_Area51) {
+        SapphireTarget = 0xB09
+        GoldTarget = 0xAB9
+        PlatinumTarget = 0xA34
+    }
+    if (level == LEVEL_RingsOfPower) {
+        SapphireTarget = 0x802
+        GoldTarget = 0x632
+        PlatinumTarget = 0x540
+    }
+    if (level == LEVEL_HotCoco) {
+        SapphireTarget = 0x5DC
+        GoldTarget = 0x2F0
+        PlatinumTarget = 0x1F3
+    }
+    if (level == LEVEL_EggipusRex) {
+        SapphireTarget = 0x55F
+        GoldTarget = 0x4E2
+        PlatinumTarget = 0x460
+    }
+}
+
+sub GetLevelNumber(level) { // S-1215
+    misc = 0
+    if (level == LEVEL_WarpRoom)       misc = 0;
+    if (level == LEVEL_ToadVillage)    misc = 1;
+    if (level == LEVEL_UnderPressure)  misc = 2;
+    if (level == LEVEL_OrientExpress)  misc = 3;
+    if (level == LEVEL_BoneYard)       misc = 4;
+    if (level == LEVEL_MakinWaves)     misc = 5;
+    if (level == LEVEL_GeeWiz)         misc = 6;
+    if (level == LEVEL_HangEmHigh)     misc = 7;
+    if (level == LEVEL_HogRide)        misc = 8;
+    if (level == LEVEL_TombTime)       misc = 9;
+    if (level == LEVEL_MidnightRun)    misc = 10;
+    if (level == LEVEL_DinoMight)      misc = 11;
+    if (level == LEVEL_DeepTrouble)    misc = 12;
+    if (level == LEVEL_HighTime)       misc = 13;
+    if (level == LEVEL_RoadCrash)      misc = 14;
+    if (level == LEVEL_DoubleHeader)   misc = 15;
+    if (level == LEVEL_Sphynxinator)   misc = 16;
+    if (level == LEVEL_ByeByeBlimps)   misc = 17;
+    if (level == LEVEL_TellNoTales)    misc = 18;
+    if (level == LEVEL_FutureFrenzy)   misc = 19;
+    if (level == LEVEL_TombWader)      misc = 20;
+    if (level == LEVEL_GoneTomorrow)   misc = 21;
+    if (level == LEVEL_OrangeAsphalt)  misc = 22;
+    if (level == LEVEL_FlamingPassion) misc = 23;
+    if (level == LEVEL_MadBombers)     misc = 24;
+    if (level == LEVEL_BugLite)        misc = 25;
+    if (level == LEVEL_SkiCrazed)      misc = 26;
+    if (level == LEVEL_Area51)         misc = 28;
+    if (level == LEVEL_RingsOfPower)   misc = 30;
+    if (level == LEVEL_HotCoco)        misc = 31;
+    if (level == LEVEL_EggipusRex)     misc = 32;
+    if (level == LEVEL_BossTiny)       misc = -1;
+    if (level == LEVEL_BossDingodile)  misc = -2;
+    if (level == LEVEL_BossNTropy)     misc = -3;
+    if (level == LEVEL_BossNGin2)      misc = -4;
+    if (level == LEVEL_BossCortex2)    misc = -5;
+}
+
+state Button_Press { // 5
+    stateflag 0x4004281
+    statusc 0x0
+    code() {
+        if (WarpEffectOBJ) {
+            interrupter = objectget(WarpEffectOBJ)
+            sendevent(Event78, interrupter, TargetLevel, 0)
+        }
+        SetRelicTargets(TargetLevel)
+        GetLevelNumber(TargetLevel)
+        if (misc > 0 && misc <= 25 && !(GLOBAL_119 & 0x200)) {
+            GLOBAL_160 |= (1 << ((misc - 1) / 5)) - 1
+        }
+        playframes(1.0, 3.0)
+        changestate(Button_Pressed)
+    }
+}
+
+state Button_Pressed { // 6
+    stateflag 0x4004281
+    statusc 0x0
+    code() {
+        animseq = PressedAnim
+        sleepframe(0)
+    }
+    trans {
+        changestateif(Button_Release, distance(player, DIST_NO_Y) > 0.9m || player -> y < y - 0.5m || player -> y > y + 0.5m)
+    }
+}
+
+state Button_Release { // 7
+    stateflag 0x4004281
+    statusc 0x0
+    code() {
+        animseq = PressAnim
+        playframesback(3.0, 0.0)
+        changestate(Button_Idle)
+    }
+}
+
+state Kill { // 8
+    stateflag 0x1
+    statusc 0x0
+    code() {}
+}

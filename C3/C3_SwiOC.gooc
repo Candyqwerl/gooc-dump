@@ -1,0 +1,216 @@
+#gool SwiOC 20 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_SwiOC.gooc" "C3\Out\C3_SwiOC.nsentry"
+
+#anim SUBMARINE         [Su1eV] [Su1eG] 1 1 2
+#anim SUBMARINE_EXPLODE [Su2eV] [Su2eG] 13 1 2
+
+#sprite BUBBLES [At1eT]
+#tex 0x808080 0 3 1 0 64 32 32 32
+#tex 0x808080 0 3 2 0 96 32 32 32
+
+#sprite MISSILE [At3eT]
+#tex 0x808080 0 3 13 6 0 16 64 16
+
+#anim SCUBA_GEAR [CE1eV] [CE1eG] 29 1 2
+
+#spawn S_MISSILE     Missile
+#spawn S_SUB         Submarine
+#spawn S_BLOCKER     Submarine_Blocker
+#spawn S_EXPLOSION   Submarine_Explode
+#spawn S_SCUBA       Scuba_Gear
+
+state Missile { // 0
+    stateflag 0x1
+    statusc 0x0
+    code(speed, yaw) {
+        soundpitch(4.35)
+        sounddecay(10s)
+        soundplay([Su2eA], 1V)
+        statusb = FLAG_PHYSICS_ENGINE
+        zindex = 150
+        troty = yaw
+        setvel(speed)
+        SetScale(1.2S, 0.6S, 1.2S)
+        SetRot(0deg)
+        field_63 = y
+        if (velx > 0) {
+            scalex = abs(scalex)
+        }
+        else {
+            scalex = -abs(scalex)
+        }
+        x += velx >> 6
+        y += vely >> 6
+        z += velz >> 6
+        MissileTrans()
+        changestate(Missile_Launched)
+    }
+}
+
+sub MissileTrans() { // S-34
+    vecx = velx / 25.0
+    vecy = vely / 25.0
+    vecz = velz / 25.0
+    checkzonecollision(5, null, 5)
+    groundy = eventaccepted
+}
+
+state Missile_Launched { // 1
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        playanim(0, MISSILE, 42)
+        changestate(Missile_Explode)
+    }
+    trans {
+        broadcastevent(EventHit, 4, 0)
+        changestateif(Missile_Explode, eventaccepted)
+        if (groundy && (velx ^ (x - vecx)) >= 0) {
+            if ((groundy & 15) == 3 && y - field_63 < 0.6m) {
+                y += 0.5m
+                MissileTrans()
+            }
+            else if (!(groundy & 1)) {
+                interrupter = groundy
+                sendevent(EventHit, interrupter, 0)
+            }
+            changestate(Missile_Explode)
+        }
+        if (!time(2) && FRAMETIME < 32) {
+            spawn(9, 8, 1, -1.0, 0, x - (velx >> 2), y + 4m, z, 0.15S, 0.25S, 3m)
+        }
+    }
+}
+
+state Missile_Explode { // 2
+    stateflag 0x3
+    statusc 0x2
+    code() {
+        soundpitch(5.085)
+        soundplay([Su1eA], 1V)
+        soundsetup(0, voice, 5)
+        spawn(9, 4, 1, getins(SetParticleColor), 0)
+        playanim(0, MISSILE, 2)
+    }
+}
+
+sub SetParticleColor() { // S-92
+    if (var r = rand(4); r == 0) {
+        SetColor1(0x2A, 0x65, 0x62)
+    }
+    else if (r == 1) {
+        SetColor1(0x39, 0x95, 0x28)
+    }
+    else if (r == 2) {
+        SetColor1(0x52, 0xA3, 0x67)
+    }
+    else if (r == 3) {
+        SetColor1(0x47, 0x9C, 0x1A)
+    }
+    SetScale(1S)
+}
+
+state Submarine { // 3
+    stateflag 0x1
+    statusc 0x0
+    code(yaw) {
+        groundy = y
+        settrans(SubmarineTransIdle)
+        roty = yaw
+        statusb = FLAG_COLLIDABLE
+        zindex = fieldval(ENTITY_FIELD_ZINDEX)
+        sleepanim(0, SUBMARINE)
+    }
+}
+
+sub SubmarineTransIdle() { // S-129
+    unless (player -> stateflag & 0x100000) {
+        sendevent(Event58, collider)
+        changestateif(Submarine_Attach, eventaccepted)
+    }
+    y = groundy + (cos(frametime << 6) << 2)
+}
+
+state Submarine_Attach { // 4
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        statusb = 0
+        getvert(vvec, self, 0)
+        player -> velx = 0
+        player -> vely = 0
+        player -> velz = 0
+        do {
+            playanim(0, SUBMARINE)
+            player -> x = seek(player -> x, vecx, spd(8m))
+            player -> y = seek(player -> y, vecy, spd(8m))
+            player -> z = seek(player -> z, vecz, spd(8m))
+            player -> troty = roty
+            player -> trotz = 0
+            player -> rotx = degseek(player -> rotx, 0deg, 180deg)
+            player -> trotx = 720deg
+        } until (player -> x == vecx && player -> y == vecy && player -> z == vecz) 
+        sendevent(Event58, player)
+        player -> x = x
+        player -> y = y
+        player -> z = z
+        playframe()
+        KillEntity()
+    }
+}
+
+state Submarine_Blocker { // 5
+    stateflag 0x1
+    statusc 0x0
+    code(scx, scy, scz, dir) {
+        if (entitygetstate(2)) {
+            dir = 0
+        }
+        if (var temp = (dir & 0xFF); temp == 1) {
+            settrans(BlockerTransX)
+        }
+        else if (temp == 2) {
+            settrans(BlockerTransY)
+        }
+        SetScale(scx, scy, scz)
+        statusb = FLAG_COLLIDABLE
+        sleepnull()
+    }
+    trans {
+        sendeventif(Event58, collider, player -> stateflag & 0x100000)
+    }
+}
+
+sub BlockerTransX() { // S-199
+    if (player -> stateflag & 0x100000 && player -> x < x) {
+        player -> x = x
+    }
+}
+
+sub BlockerTransY() { // S-205
+    if (player -> stateflag & 0x100000 && player -> y > y) {
+        player -> y = y
+    }
+}
+
+state Submarine_Explode { // 6
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        SoundPitchDefault(0.23)
+        sounddecay(7.7s)
+        soundplay([tnt0A], 1V)
+        playframes(SUBMARINE_EXPLODE, 0.0, 12.0)
+    }
+}
+
+state Scuba_Gear { // 7
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        zindex = parent -> zindex
+        playframes(SCUBA_GEAR, 0.0, 28.0)
+    }
+}

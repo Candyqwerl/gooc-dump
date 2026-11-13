@@ -1,0 +1,441 @@
+#gool VorOC 70 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_VorOC.gooc" "C3\Out\C3_VorOC.nsentry"
+
+#anim VORTEX  [Vo1eV] [Vo1eG] 24 0 2
+#anim BLADE   [Vo2eV] [Vo2eG] 1 0 2
+#anim MOTOR   [Vo3eV] [Vo3eG] 1 0 2
+
+#spawn S_BLADE       Blade_Init
+#spawn S_VORTEX      Vortex_Init
+#spawn S_MOTOR       Motor
+#spawn S_BLADE_OLD   Blade_Init
+
+var BladeIdleDur, BladeActiveDur, CycleOffset, CycleLength, VortexActive,
+    BladeTargetSpinVel, BladeSpinVel, VortexScaleY, VortexScaleXZ, VortexFadeAmount,
+    VortexTargetScaleY, VortexTargetScaleXZ, VortexAlpha, VortexTargetAlpha,
+    VortexFrame, VortexHasForce, VortexForceScale, VortexDeathArg
+    
+state Blade_Init {
+    statusc 0
+    code(idle, active, phase, idlealt, phasealt, offset, localphase) {
+        stalltime = 0
+        z = player -> z
+        y -= 4.95m
+        BladeIdleDur = idle * 1s / 1.2s
+        BladeActiveDur = active * 1s / 1.2s
+        CycleOffset = phase
+        if (idlealt >= 0) {
+            BladeIdleDur = idlealt * 1s / 1.2s
+        }
+        if (phasealt >= 0) {
+            CycleOffset = phasealt
+        }
+        CycleLength = BladeIdleDur + (5 + (BladeActiveDur + 5))
+        CycleOffset = (CycleOffset * CycleLength) >> 8
+        if (CycleOffset < 0) {
+            CycleOffset = 0
+        }
+        if (CycleOffset >= CycleLength) {
+            CycleOffset = CycleLength - 1
+        }
+        if (localphase) {
+            v0 = time(CycleLength)
+            CycleOffset -= v0
+            if (CycleOffset < 0) {
+                CycleOffset += CycleLength
+            }
+        }
+        zindex = 26
+        statusb = 0
+        BladeTargetSpinVel = 180deg
+        BladeSpinVel = 180deg
+        scalex = 19.52
+        scalez = scalex
+        VortexActive = false
+        spawn(VorOC, S_MOTOR, 1)
+        v0 = 21.485
+        vecy = ((offset >> 8) * v0) >> 12 << 8
+        spawn(VorOC, S_VORTEX, 1, 1, vecy, v0, 18.655, 2.4, 0, y)
+        v0 = 20.0
+        vecy = ((offset >> 8) * v0) >> 12 << 8
+        spawn(VorOC, S_VORTEX, 1, 0, vecy, v0, 13.68, 4.0, 1, y)
+        v0 = 20.8
+        vecy = ((offset >> 8) * v0) >> 12 << 8
+        spawn(VorOC, S_VORTEX, 1, 0, vecy, v0, 9.95, 12.8, 2, y)
+        v0 = time(CycleLength, CycleOffset)
+        changestateif(Blade_Spin_Idle, v0 < BladeIdleDur)
+        v0 -= BladeIdleDur
+        changestateif(Blade_Spin_Accel, v0 < 5)
+        v0 -= 5
+        changestateif(Blade_Spin_Active, v0 < BladeActiveDur)
+        v0 -= BladeActiveDur
+        changestate(Blade_Spin_Decel)
+
+    }
+}
+
+state Blade_Spin_Idle {
+    statusc 0
+    code() {
+        if (stalltime) {
+            soundfadet(1s, stalltime)
+            soundfadev(0V, stalltime, 3)
+        }
+        sleepanim(0, BLADE)
+    }
+    event(e, a) {
+        accevcstate(Blade_Spin_Triggered, e == EventTriggered)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            BladeTargetSpinVel = 180deg
+            VortexActive = false
+        }
+        v0 = time(CycleLength, CycleOffset)
+        changestateif(Blade_Spin_Accel, v0 >= BladeIdleDur)
+        BladeSpinVel = seek(BladeSpinVel, BladeTargetSpinVel, 50.4deg)
+        roty += BladeSpinVel / 25
+    }
+}
+
+state Blade_Spin_Accel {
+    statusc 0
+    code() {
+        soundpitch(4.715)
+        sounddecay(8s)
+        soundcount(0xFFFF)
+        soundfadet(1s, self)
+        soundfadev(1V, self, 2)
+        soundplay([Vo1eA], 0V)
+        stalltime = voice
+        sleepanim(0, BLADE)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            BladeTargetSpinVel = 1440deg
+            VortexActive = false
+        }
+        v0 = time(CycleLength, CycleOffset) - BladeIdleDur
+        changestateif(Blade_Spin_Active, v0 >= 5)
+        BladeSpinVel = seek(BladeSpinVel, BladeTargetSpinVel, 100.75deg)
+        roty += BladeSpinVel / 25
+    }
+}
+
+state Blade_Spin_Active {
+    statusc 0
+    code() {
+        sleepanim(0, BLADE)
+    }
+    event(e, a) {
+        accevcstate(Blade_Spin_Triggered, e == EventTriggered)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            BladeTargetSpinVel = 1440deg
+            VortexActive = 1
+        }
+        v0 = time(CycleLength, CycleOffset) - (BladeIdleDur + 5)
+        changestateif(Blade_Spin_Decel, v0 >= BladeActiveDur)
+        BladeSpinVel = seek(BladeSpinVel, BladeTargetSpinVel, 50.4deg)
+        roty += BladeSpinVel / 25
+    }
+}
+
+state Blade_Spin_Decel {
+    statusc 0
+    code() {
+        sleepanim(0, BLADE)
+    }
+    event(e, a) {
+        accevcstate(Blade_Spin_Triggered, e == EventTriggered)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            BladeTargetSpinVel = 180deg
+            VortexActive = false
+        }
+        v0 = time(CycleLength, CycleOffset) - (BladeIdleDur + (5 + BladeActiveDur))
+        changestateif(Blade_Spin_Idle, v0 < 0)
+        BladeSpinVel = seek(BladeSpinVel, BladeTargetSpinVel, 50.4deg)
+        roty += BladeSpinVel / 25
+    }
+}
+
+state Blade_Spin_Triggered {
+    statusc 0
+    code() {
+        sleepanim(0, BLADE)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            BladeTargetSpinVel = 1440deg
+            VortexActive = false
+            cascadeevent(EventTriggered, self)
+        }
+        BladeSpinVel = seek(BladeSpinVel, BladeTargetSpinVel, 100.75deg)
+        roty += BladeSpinVel / 25
+    }
+}
+
+state Vortex_Init {
+    statusc 0
+    code(force, yoff, scay, scax, fade, frame, deatharg) {
+        y += yoff
+        VortexHasForce = force
+        VortexScaleY = scay
+        VortexScaleXZ = scax
+        VortexFadeAmount = fade
+        VortexDeathArg = deatharg
+        VortexTargetScaleY = 0
+        VortexTargetScaleXZ = 0
+        SetScale(0S)
+        statusb = 0
+        VortexAlpha = 0
+        VortexTargetAlpha = 0
+        setanim(VORTEX, frame << 8)
+        zindex = 100
+        y += 1.15m
+        VortexForceScale = 0
+        VortexActive = creator -> VortexActive
+        if (VortexActive) {
+            changestate(Vortex_Active)
+        }
+        else {
+            changestate(Vortex_Hidden)
+        }
+    }
+}
+
+state Vortex_Active {
+    statusc 0
+    code() {
+        playframes4(VORTEX, -1.0, 23.0)
+        sleepframes(VORTEX, 0.0, 23.0)
+    }
+    event(e, a) {
+        accevcstate(Vortex_Forced_Active, e == EventTriggered)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            scalez = VortexScaleXZ
+            scalex = VortexScaleXZ
+            scaley = VortexScaleY
+            VortexAlpha = VortexFadeAmount
+            moda = 16.0 - VortexFadeAmount
+        }
+        VortexActive = creator -> VortexActive
+        changestateifn(Vortex_FadeOut, VortexActive)
+        if (VortexHasForce) {
+            VortexForceScale = seek(VortexForceScale, 1.0, 51)
+            var0 = 0
+            if (!(player -> stateflag & 0x20) || !player -> invincible) {
+                if (VortexForceScale && player -> y >= parent -> y - 1m && player -> y <= parent -> y + 10m) {
+                    var dx, abs_dx, force_x, force
+                    dx = x - player -> x
+                    abs_dx = abs(dx)
+                    if (abs_dx <= 6m) {
+                        force_x = ((((6m - abs_dx) >> 8) * 0.125m) / 9.375)
+                        if (abs_dx <= 0.5m) {
+                            var0 = 1
+                        }
+                        force = (force_x * VortexForceScale) >> 8
+                        player -> vely -= force
+                        force_x = force
+                        if (dx < 0) {
+                            force_x = -force
+                        }
+                        player -> velx += force_x
+                    }
+                    if (var0 && (!(player -> stateflag & 0x20) || !player -> invincible)) {
+                        sendevent(Event24, player, VortexDeathArg)
+                        sendeventif(EventTriggered, creator, eventaccepted && (player -> stateflag & 0x20))
+                    }
+                }
+            }
+        }
+    }
+}
+
+state Vortex_FadeOut {
+    statusc 0
+    code() {
+        playframes4(VORTEX, -1.0, 23.0)
+        sleepframes(VORTEX, 0.0, 23.0)
+    }
+    event(e, a) {
+        accevcstate(Vortex_Forced_Active, e == EventTriggered)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            VortexTargetScaleXZ = 0
+            VortexTargetScaleY = 0
+            VortexTargetAlpha = 0
+        }
+        scalex = seek(scalex, VortexTargetScaleXZ, VortexScaleXZ / 8)
+        scalez = scalex
+        scaley = seek(scaley, VortexTargetScaleY, VortexScaleY / 16)
+        VortexAlpha = seek(VortexAlpha, VortexTargetAlpha, VortexFadeAmount / 6)
+        moda = 16.0 - VortexAlpha
+        changestateif(Vortex_Hidden, scalex == VortexTargetScaleXZ || VortexAlpha == VortexTargetAlpha)
+        if (VortexHasForce) {
+            VortexForceScale = seek(VortexForceScale, 0, 51)
+            var0 = 0
+            if (!(player -> stateflag & 0x20) || !player -> invincible) {
+                if (VortexForceScale && player -> y >= parent -> y - 1m && player -> y <= parent -> y + 10m) {
+                    var dx, abs_dx, force_x, force
+                    dx = x - player -> x
+                    abs_dx = abs(dx)
+                    if (abs_dx <= 6m) {
+                        force_x = ((((6m - abs_dx) >> 8) * 0.125m) / 9.375)
+                        if (abs_dx <= 0.5m) {
+                            var0 = 1
+                        }
+                        force = (force_x * VortexForceScale) >> 8
+                        player -> vely -= force
+                        force_x = force
+                        if (dx < 0) {
+                            force_x = -force
+                        }
+                        player -> velx += force_x
+                    }
+                }
+            }
+        }
+    }
+}
+
+state Vortex_Hidden {
+    statusc 0
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Vortex_Forced_Active, e == EventTriggered)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            SetScale(0S)
+            VortexAlpha = 0
+            moda = 16.0
+            VortexFrame = animframe
+        }
+        VortexActive = creator -> VortexActive
+        if (VortexActive) {
+            animseq = getanim(VORTEX)
+            animframe = VortexFrame
+            changestate(Vortex_FadeIn)
+        }
+        if (VortexHasForce) {
+            VortexForceScale = seek(VortexForceScale, 0, 51)
+            var0 = 0
+            if (!(player -> stateflag & 0x20) || !player -> invincible) {
+                if (VortexForceScale && player -> y >= parent -> y - 1m && player -> y <= parent -> y + 10m) {
+                    var dx, abs_dx, force_x, force
+                    dx = x - player -> x
+                    abs_dx = abs(dx)
+                    if (abs_dx <= 6m) {
+                        force_x = ((((6m - abs_dx) >> 8) * 0.125m) / 9.375)
+                        if (abs_dx <= 0.5m) {
+                            var0 = 1
+                        }
+                        force = (force_x * VortexForceScale) >> 8
+                        player -> vely -= force
+                        force_x = force
+                        if (dx < 0) {
+                            force_x = -force
+                        }
+                        player -> velx += force_x
+                    }
+                }
+            }
+        }
+    }
+}
+
+state Vortex_FadeIn {
+    statusc 0
+    code() {
+        playframes4(VORTEX, -1.0, 23.0)
+        sleepframes(VORTEX, 0.0, 23.0)
+    }
+    event(e, a) {
+        accevcstate(Vortex_Forced_Active, e == EventTriggered)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            VortexTargetScaleXZ = VortexScaleXZ
+            VortexTargetScaleY = VortexScaleY
+            VortexTargetAlpha = VortexFadeAmount
+            scalez = VortexScaleXZ >> 1
+            scalex = VortexScaleXZ >> 1
+            scaley = VortexScaleY >> 1
+        }
+        scalex = seek(scalex, VortexTargetScaleXZ, VortexScaleXZ / 8)
+        scalez = scalex
+        scaley = seek(scaley, VortexTargetScaleY, VortexScaleY / 8)
+        VortexAlpha = seek(VortexAlpha, VortexTargetAlpha, VortexFadeAmount / 10)
+        moda = 16.0 - VortexAlpha
+        changestateif(Vortex_Active, scalex == VortexTargetScaleXZ || VortexAlpha == VortexTargetAlpha)
+        if (VortexHasForce) {
+            VortexForceScale = seek(VortexForceScale, 1.0, 51)
+            var0 = 0
+            if (!(player -> stateflag & 0x20) || !player -> invincible) {
+                if (VortexForceScale && player -> y >= parent -> y - 1m && player -> y <= parent -> y + 10m) {
+                    var dx, abs_dx, force_x, force
+                    dx = x - player -> x
+                    abs_dx = abs(dx)
+                    if (abs_dx <= 6m) {
+                        force_x = ((((6m - abs_dx) >> 8) * 0.125m) / 9.375)
+                        if (abs_dx <= 0.5m) {
+                            var0 = 1
+                        }
+                        force = (force_x * VortexForceScale) >> 8
+                        player -> vely -= force
+                        force_x = force
+                        if (dx < 0) {
+                            force_x = -force
+                        }
+                        player -> velx += force_x
+                    }
+                    if (var0 && (!(player -> stateflag & 0x20) || !player -> invincible)) {
+                        sendevent(Event24, player, VortexDeathArg)
+                        sendeventif(EventTriggered, creator, eventaccepted && (player -> stateflag & 0x20))
+                    }
+                }
+            }
+        }
+    }
+}
+
+state Vortex_Forced_Active {
+    statusc 0
+    code() {
+        playframes4(VORTEX, -1.0, 23.0)
+        sleepframes(VORTEX, 0.0, 23.0)
+    }
+    trans {
+        if (STATUS_FIRSTFRAME) {
+            VortexTargetScaleXZ = VortexScaleXZ
+            VortexTargetScaleY = VortexScaleY
+            VortexTargetAlpha = VortexFadeAmount
+        }
+        scalex = seek(scalex, VortexTargetScaleXZ, VortexScaleXZ / 8)
+        scalez = scalex
+        scaley = seek(scaley, VortexTargetScaleY, VortexScaleY / 8)
+        VortexAlpha = seek(VortexAlpha, VortexTargetAlpha, VortexFadeAmount / 10)
+        moda = 16.0 - VortexAlpha
+    }
+}
+
+state Motor {
+    statusc 0
+    code() {
+        zindex = creator -> zindex
+        zindex -= 6
+        statusb = 0
+        sleepanim(0, MOTOR)
+    }
+}

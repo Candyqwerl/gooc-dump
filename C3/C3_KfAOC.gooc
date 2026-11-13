@@ -1,0 +1,201 @@
+#gool KfAOC 60 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_KfAOC.gooc" "C3\Out\C3_KfAOC.nsentry"
+
+#anim KNIFE_ASS_THROW  [Sw1mV] [Sw1mG] 66 1 2
+#anim KNIFE_ASS_SHADOW [Sw2mV] [Sw2mG] 66 1 2
+#anim KNIFE            [SS1mV] [SS1mG] 01 0 2
+
+#spawn S_KNIFE_ASS  Knife_Ass_Init
+#spawn S_KNIFE      Knife_Init
+#spawn S_SHADOW     Shadow_Init
+
+var ThrowCooldown, ActivationRange, KnifeTravelLimitX, KnifeTravelLimitZ, TravelLimitX, TravelLimitZ
+
+state Knife_Ass_Init { // 0
+    statusc 0
+    code(yaw, cooldown, range, xlim, zlim) {
+        roty = yaw
+        ThrowCooldown = cooldown * 1s / 1.2s
+        ActivationRange = range
+        KnifeTravelLimitX = xlim
+        KnifeTravelLimitZ = zlim
+        SetZindexField(24)
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_SIDES
+        spawn(KfAOC, S_SHADOW, 1, -6, 0)
+        changestate(Knife_Ass_Wait)
+    }
+}
+
+state Knife_Ass_Wait { // 1
+    statusc 0
+    code() {
+        sleepanim(0, KNIFE_ASS_THROW)
+    }
+    event(e, a) {
+        accevcstate(Knife_Ass_Squash, e == EventJumpedOn || e == EventSlamHit || e == EventHit || e == EventFling || e == EventHitInvincible)
+        accevcstate(Knife_Ass_Fling, e == EventSpinHit || e == EventSlideHit)
+    }
+    trans {
+        changestateif(Knife_Ass_Throw, !(player -> stateflag & 0x20) && !player -> invincible && distance(player, DIST_NO_Y) <= ActivationRange)
+        sendevent(EventHit, collider, 100.0)
+    }
+}
+
+state Knife_Ass_Throw { // 2
+    statusc 0
+    code() {
+        soundpitch(4.716)
+        sounddelay(1s)
+        soundplay([GS1mA], 1V)
+        playframes(KNIFE_ASS_THROW, 0.0, 39.0)
+        soundpitch(5.442)
+        soundplay([KSSbA], 1V)
+        spawn(KfAOC, S_KNIFE, 1, 0.0, roty, -33.32deg, 48deg, 0.36m, KnifeTravelLimitX, KnifeTravelLimitZ)
+        playframes(40.0, 65.0)
+        statetime = frametime
+        do {
+            playanim(0, KNIFE_ASS_THROW)
+        } until (frametime - statetime >= ThrowCooldown)
+        if (!(player -> stateflag & 0x20) && !player -> invincible && distance(player, DIST_NO_Y) <= ActivationRange) {
+            changestate(Knife_Ass_Throw)
+        }
+        else {
+            changestate(Knife_Ass_Wait)
+        }
+    }
+    event(e, a) {
+        accevcstate(Knife_Ass_Squash, e == EventJumpedOn || e == EventSlamHit || e == EventHit || e == EventFling || e == EventHitInvincible)
+        accevcstate(Knife_Ass_Fling, e == EventSpinHit || e == EventSlideHit)
+    }
+    trans {
+        sendevent(EventHit, collider, 100.0)
+    }
+}
+
+state Knife_Init { // 3
+    statusc 0
+    code(vertex, yaw, pitch, spin, velocity, xlim, zlim) {
+        roty = yaw
+        rotz = yaw
+        trotx = spin
+        TravelLimitX = xlim
+        TravelLimitZ = zlim
+        getvert(vtrans, creator, vertex)
+        y -= 1m
+        rotx = 0deg
+        vectransf(vtrans, vvel, velocity, 0, 0)
+        velx -= x
+        vely -= y
+        velz -= z
+        rotx = pitch
+        zindex = creator -> zindex
+        statusb = FLAG_COLLIDABLE
+        changestate(Knife_Fly)
+    }
+}
+
+state Knife_Fly { // 4
+    statusc 0
+    code() {
+        sleepanim(0, KNIFE)
+    }
+    event(e, a) {
+        if (interrupter != player) {
+            accevcstate(Knife_Ass_Squash, e == EventHit || e == EventFling)
+        }
+        accevcstate(Knife_Ass_Squash, e == EventHitInvincible)
+        rejevret(e == Event1)
+    }
+    trans {
+        vecy = player -> y + 1m
+        sendeventif(Event24, player, vecy <= y + 0.5m && vecy >= y - 1.5m && abs(player -> x - x) <= 0.5m && abs(player -> z - z) <= 1.25m, 100.0)
+        x += velx
+        y += vely
+        z += velz
+        rotx += trotx
+        if (abs(x - creator -> x) > TravelLimitX || abs(z - creator -> z) > TravelLimitZ) {
+            soundpitch(3.263)
+            sounddecay(7.2s)
+            soundsetup(0, self, 5)
+            soundplay([Kt1mA], 1V)
+            changestate(Knife_Ass_Squash, 0)
+        }
+    }
+}
+
+state Knife_Ass_Fling { // 5
+    stateflag 0x30
+    statusc 0x32
+    code(h) {
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir(0x80000)
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    }
+    trans {
+        EnemyFlingTrans(2m, EventFling)
+    }
+}
+
+state Knife_Ass_Squash { // 6
+    stateflag 0x23
+    statusc 0x32
+    code(h) {
+        KillEntity()
+        if (spawn == S_KNIFE_ASS) {
+            sendevent(EventCombo, player, h)
+        }
+        EnemyDieClearFlags()
+        playframe()
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        playframe()
+    }
+}
+
+sub SetParticleColor() {
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x05, 0xBD, 0xBE)
+    }
+    else if (r == 1) {
+        SetColor1(0x0D, 0x4C, 0x4C)
+    }
+    else if (r == 2) {
+        SetColor1(0xE7, 0x85, 0x81)
+    }
+}
+
+state Kill { // 7
+    statusc 0
+    code() {}
+}
+
+state Shadow_Init { // 8
+    statusc 0
+    code(zmod, arg) {
+        var0 = zmod
+        rotx = 0deg
+        changestate(Shadow)
+    }
+}
+
+state Shadow { // 9
+    code() {
+        setanim(KNIFE_ASS_SHADOW)
+        sleepframe(parent -> animframe)
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event1)
+    }
+    trans {
+        zindex = creator -> zindex
+        roty = creator -> roty
+        rotz = creator -> rotz
+        x = creator -> x
+        y = creator -> y 
+        z = creator -> z
+        zindex += var0
+    }
+}

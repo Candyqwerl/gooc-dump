@@ -1,0 +1,859 @@
+#gool KimoC 54 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C2_BosBC.gooh"
+//gooc -c 2 -r pal "C2\C2_KimOC.gooc" "C2\Out\C2_KimOC.nsentry"
+
+#anim KOMODO_INTRO_1       [Kb18V] 48 0 
+#anim KOMODO_INTRO_2       [Kb28V] 27 0 
+#anim KOMODO_INTRO_3       [Kb38V] 38 0 
+#anim KOMODO_INTRO_4       [Kb48V] 38 0 
+#anim KOMODO_INTRO_5       [Kb58V] 38 0 
+#anim KOMODO_INTRO_6       [Kb68V] 29 0 
+#anim KOMODO_INTRO_7       [Kb78V] 28 0 
+#anim KOMODO_INTRO_8       [Kb88V] 8 0  
+
+#anim JOE_STAND            [Kj18V] 1 1  
+#anim JOE_SPIN             [Kj28V] 12 0 
+#anim JOE_DIZZY            [Kj38V] 93 1 
+#anim JOE_RECOVER          [Kj48V] 55 0 
+#anim JOE_SLIDE            [Kj58V] 9 0  
+#anim JOE_DAZED            [Kj68V] 111 1
+          
+#anim MOE_STAND            [Km18V] 1 1  
+#anim MOE_RAISE_SWORD      [Km28V] 16 1 
+#anim MOE_LAUGH            [Km38V] 67 1 
+#anim MOE_THROW_SWORD_1    [Km48V] 9 1  
+#anim MOE_THROW_SWORD_2    [Km58V] 102 1
+#anim SWORD_LAND_1         [Km68V] 36 0 
+#anim SWORD_LAND_2         [Km78V] 36 0 
+#anim SWORD_LAND_3         [Km88V] 36 0 
+#anim MOE_THROW_SWORD_3    [Km98V] 95 1 
+         
+#anim MOE_SPIN_JOE         [Kma8V] 68 1 
+#anim MOE_RECOVER          [Kmb8V] 68 1 
+#anim MOE_GET_SWORD        [Kmc8V] 48 1 
+#anim MOE_SHAKE_HEAD       [Kmd8V] 210 1
+#anim MOE_STAND_2          [Kme8V] 37 1 
+#anim MOE_DEATH            [Kmf8V] 96 1 
+
+#sprite LIGHT[Cr20T]
+#tex 0xFFFFFF 0 0 5 0 928 32 32 32
+
+#spawn S_KOMODO_JOE        Komodo_Joe
+#spawn S_KOMODO_INTRO      Komodo_Intro
+#spawn S_SWORD_SLEEP_1     Sword_Sleep
+#spawn S_SWORD_SLEEP_2     Sword_Sleep
+#spawn S_SWORD_1           Komodo_Sword
+#spawn S_SWORD_2           Komodo_Sword
+#spawn S_SWORD_PARTICLE    Sword_Particle_Spawn
+#spawn S_SWORD_3           Komodo_Sword
+
+var ArenaCenterX, ArenaCenterY, ArenaCenterZ, ArenaRadius, JoeMaxRicochetAngle, ArenaWallLeftX,
+    ArenaWallLeftY, ArenaWallLeftZ, ArenaWallRightX, ArenaWallRightY, ArenaWallRightZ, JoeRicochetMode,
+    JoeDizzy, MoeCanTargetPlayer, JoeRemainingRicochets, JoeInitialRicochetCount, JoeVelocity
+
+expr CENTER_MARKER = 100.0
+expr RADIUS_MARKER = 101.0
+expr KOMODO_JOE    = 200.0
+expr KOMODO_MOE    = 201.0
+
+inline sub SetKomodoVec() {
+    SetTRot(0deg, creator -> roty, 0deg)
+    SetVec(ArenaCenterX, ArenaCenterY, ArenaCenterZ)
+    vectransf2(vvec, vvec, 1.904m, 0, 0)
+}
+
+state Komodo_Joe { // 0
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        vecx = 0
+        do { playnull() } until (vecx)
+        playnull(0.1s)
+        interrupter = objectget(CENTER_MARKER)
+        creator = objectget(RADIUS_MARKER)
+        ArenaCenterX = interrupter -> x
+        ArenaCenterY = interrupter -> y
+        ArenaCenterZ = interrupter -> z
+        ArenaRadius = distance(creator -> x, interrupter, DIST_EXACT | DIST_NO_Y)
+        JoeMaxRicochetAngle = atan(2.75m, ArenaRadius)
+        JoeVelocity = 7m
+        health = 3
+        spawn(BosBC, BosBC_S_HEALTH, 1, 3.0, 3)
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        SetColor1(0xFF, 0xFF, 0xFF)
+        zindex = 128
+        creator = objectget(KOMODO_MOE)
+        SetTRot(0deg, creator -> roty, 0deg)
+        SetVec(ArenaCenterX, ArenaCenterY, ArenaCenterZ)
+        vectransf2(vvec, vtrans, 1.904m, 0, 0)
+        playanim(27, JOE_DIZZY, 0.2s)
+        changestate(Joe_Start_Spin)
+    }
+    event(e, a) {
+        accevif (e == EventTriggered) {
+            vecx = true
+        }
+    }
+}
+
+state Joe_Start_Spin { // 1
+    stateflag 0x1
+    statusc 0
+    code() {
+        soundpitch(6.892)
+        soundplay([KSS8A], 1V)
+        creator = objectget(KOMODO_MOE)
+        creator -> JoeRicochetMode = 0
+        if (health < 2) {
+            creator -> MoeCanTargetPlayer = true
+        }
+        troty = creator -> roty - 30deg
+        JoeInitialRicochetCount = 2 + (3 - health)
+        JoeRemainingRicochets = JoeInitialRicochetCount
+        setvel(JoeVelocity)
+        changestate(Joe_Spinning)
+    }
+}
+
+sub JoeSlide(v) {
+    EnemyFlingSetDir()
+    JoeRicochetMode = 0
+    JoeRicochetAngle(0xFFFFFF, JoeRicochetMode)
+    setvel(v)
+}
+
+sub JoeRicochetAngle(target, ricochet) {
+    if (target == 0xFFFFFF) {
+        target = atan2(self, ArenaCenterX)
+    }
+    save (x, y, z, troty, trotx, trotz) {
+        trotx = 0deg
+        troty = target + 90deg
+        trotz = 0deg
+        x = ArenaCenterX
+        y = ArenaCenterY
+        z = ArenaCenterZ
+        vectransf2(vtrans, vvec, 2.75m, 0, 0)
+        ArenaWallLeftX = vecx
+        ArenaWallLeftY = vecy
+        ArenaWallLeftZ = vecz
+        vectransf2(vtrans, vvec, -2.75m, 0, 0)
+        ArenaWallRightX = vecx
+        ArenaWallRightY = vecy
+        ArenaWallRightZ = vecz
+    }
+    if (abs(degdist(troty, target)) <= JoeMaxRicochetAngle) {
+        if (var mode = ricochet; mode == 0 || mode == 2) {
+            vecx = atan2(self, ArenaWallLeftX)
+            vecy = atan2(self, ArenaWallRightX)
+            if (degdist(troty, vecx) < degdist(troty, vecy)) {
+                troty = vecx
+            }
+            else {
+                troty = vecy
+            }
+        }
+        else if (mode == 1) {
+            trotx = 0
+            troty = target + atan2(player, ArenaCenterX) >> 1
+            trotz = 0
+            vecx = ArenaCenterX
+            vecy = ArenaCenterY
+            vecz = ArenaCenterZ
+            vectransf2(vvec, vvec, ArenaRadius, 0, 0)
+            troty = atan2(self, vecx)
+            JoeRicochetMode = 1
+        }
+    }
+}
+
+sub JoeRicochet(ricochet) {
+    if (distance(ArenaCenterX, self, DIST_EXACT | DIST_NO_Y) >= ArenaRadius) {
+        JoeRemainingRicochets -= 1
+        if (JoeRemainingRicochets == 0) {
+            creator = objectget(KOMODO_MOE)
+            creator -> MoeCanTargetPlayer = false
+        }
+        var angle = atan2(self, ArenaCenterX)
+        save (trotx, trotz) {
+            save (troty) {
+                trotx = 0deg
+                troty = angle + 180deg
+                trotz = 0deg
+                SetVec(ArenaCenterX, ArenaCenterY, ArenaCenterZ)
+                vectransf2(vvec, vtrans, ArenaRadius - 20.0, 0, 0)
+                angle = atan2(self, ArenaCenterX)
+            }
+            if (var mode = ricochet; mode == 0 || mode == 2) {
+                troty = 180deg + angle + degdist(troty, angle)
+                JoeRicochetMode = (JoeRicochetMode + 1) % 3
+            }
+            else if (mode == 1) {
+                troty = atan2(player -> trans)
+                JoeRicochetMode = 2
+            }
+            else if (mode == 3) {
+                troty = atan2(self, ArenaCenterX)
+            }
+            if (ricochet < 3) {
+                JoeRicochetAngle(angle, ricochet)
+            }
+        }
+        troty += randi(-5deg, 5deg)
+        setvel(JoeVelocity)
+    }
+}
+
+state Joe_Spinning { // 2
+    stateflag 0x1
+    statusc 0
+    code() {
+        JoeRicochetMode = 0
+        roty = 0deg
+        soundpitch(6.892)
+        soundplay([KSp8A], 0.75V)
+        playframes(JOE_SPIN, 0.0, 2.0)
+        do {
+            playframes(JOE_SPIN, 3.0, 11.0)
+            playframesback(JOE_SPIN, 10.0, 4.0)
+        } while (1)
+    }
+    event(e, a) {
+        rejevif (e == EventJumpedOn || e == EventSpinHit || e == EventSlideHit || e == EventSlamHit) {
+            soundfadet(0.18s, voice)
+            soundfadev(0V, voice, 3)
+            sendevent(Event24, interrupter, 100.0)
+        }
+    }
+    trans {
+        nofirst {
+            roty += spd(0, 1800deg)
+            x = spd(x, velx)
+            y = spd(y, vely)
+            z = spd(z, velz)
+            JoeRicochet(JoeRicochetMode)
+            if (JoeRemainingRicochets <= 0) { 
+                {
+                    var dist_to_center = distance(ArenaCenterX, self, DIST_EXACT | DIST_NO_Y)
+                    if (dist_to_center < 5.5m && dist_to_center > 3.5m) {
+                        creator = objectget(KOMODO_MOE)
+                        unless (creator -> animseq == getanim(MOE_THROW_SWORD_2)) {
+                            groundy = atan2(self, ArenaCenterX)
+                            if (abs(degdist((180deg + CAMROTY), groundy)) <= 120deg) {
+                                soundsetup(4, voice, 6)
+                                soundsetup(0, voice, 3, 0)
+                                changestate(Joe_Dizzy)
+                            }
+                        }
+                    }
+                }
+            }
+            sendevent(EventHit, collider, 100.0)
+        }
+    }
+}
+
+inline sub UpdateJoeVelocity(field, v) {
+    v = field >> 3
+    if (field > 0m) {
+        field -= v
+        if (!v || field < 0m) {
+            field = 0m
+        }
+    }
+    else {
+        field -= v
+        if (!v || field > 0m) {
+            field = 0m
+        }
+    }
+}
+
+state Joe_Dizzy { // 3
+    stateflag 0x1
+    statusc 0
+    code() {
+        creator = objectget(KOMODO_MOE)
+        creator -> MoeCanTargetPlayer = false
+        creator -> JoeRicochetMode = 1
+        field_63 = true
+        roty = CAMROTY
+        setanim(JOE_DIZZY, 28.0)
+        soundpitch(2.94)
+        sounddecay(3.2s)
+        soundplay([Sld0A], 0.5V)
+        until (var v; !velx && !vely && !velz) {
+            playframe()
+            animframe += 1.0
+            if (animframe == 92.0) {
+                animframe = 72.0
+            }
+            if (!!velx) { UpdateJoeVelocity(velx, v) }
+            if (!!vely) { UpdateJoeVelocity(vely, v) }
+            if (!!velz) { UpdateJoeVelocity(velz, v) }
+        }
+        vecx = frametime
+        do {
+            playframe()
+            animframe += 1.0
+            if (animframe == 92.0) {
+                if (frametime - vecx >= 2s) {
+                    break
+                }
+                animframe = 72.0
+            }
+        } while (1)
+        playframes(JOE_RECOVER, 0.0, 7.0)
+        do (var i = 0) {
+            playframes(JOE_RECOVER, 8.0, 13.0)
+            i += 1.0
+        } while (i < 3.0)
+        creator = objectget(KOMODO_MOE)
+        SetKomodoVec()
+        playframes(JOE_RECOVER, 14.0, 27.0)
+        troty = 180deg + creator -> roty
+        trotx = 270deg
+        statusb |= FLAG_ROT_Y
+        {
+            var s_x = x, s_y = y, s_z = z, t_x = vecx, t_y = vecy, t_z = vecz
+            troty = atan2(t_x)
+            do (var i = 1.0) {
+                x = s_x + ((t_x - s_x) * (i >> 8)) / 22
+                z = s_z + ((t_z - s_z) * (i >> 8)) / 22
+                animframe += 1.0
+                if (animframe == 39.0) {
+                    field_63 = 0
+                    moda = 0
+                    sendevent(Event14, creator, 0)
+                }
+                playframe()
+                i += 1.0
+            } while (i <= 22.0)
+        }
+        statusb &= ~FLAG_ROT_Y
+        playframes(JOE_DIZZY, 8.0, 26.0)
+        playanim(27, JOE_DIZZY, 0.35s)
+        changestate(Joe_Start_Spin)
+    }
+    event(e, a) {
+        if (field_63 && (e == EventSpinHit || e == EventSlideHit)) {
+            moda = 0
+            accevcstate(Joe_Slide)
+        }
+    }
+    trans {
+        nofirst {
+            if (field_63) {
+                if (!time(5)) {
+                    moda = 32.0
+                }
+                else {
+                    moda = 0
+                }
+            }
+            x = spd(x, velx)
+            y = spd(y, vely)
+            z = spd(z, velz)
+        }
+    }
+}
+
+state Joe_Slide { // 4
+    stateflag 0x1
+    statusc 0
+    code() {
+        JoeSlide(20m)
+        setvel(JoeVelocity << 1)
+        vecx = atan2(self, ArenaCenterX)
+        if (degdist(troty, vecx) <= 15deg) {
+            troty = vecx
+            setvel(JoeVelocity << 1)
+        }
+        JoeRicochetMode = 3
+        sleepframes(JOE_SLIDE, 0.0, 8.0)
+    }
+    trans {
+        nofirst {
+            x = spd(x, velx)
+            y = spd(y, vely)
+            z = spd(z, velz)
+            JoeRicochet(JoeRicochetMode)
+            changestateif(Joe_Attacked, distance(ArenaCenterX, self, DIST_EXACT | DIST_NO_Y) <= 2.2m)
+        }
+    }
+}
+
+state Joe_Attacked { // 5
+    stateflag 0x1
+    statusc 0
+    code() {
+        setvel(0)
+        soundpitch(3.262)
+        soundplay([KHF8A], 1V)
+        creator = objectget(KOMODO_MOE)
+        sendevent(EventTriggered, creator)
+        playframes(JOE_DAZED, 1.0, 61.0)
+        health -= 1
+        changestateif(Komodo_Defeated, health <= 0)
+        JoeDizzy = true
+        while (JoeDizzy) {
+            playframes(JOE_DAZED, 62.0, 93.0)
+        }
+        playframes(JOE_DAZED, 94.0, 110.0)
+        creator = objectget(KOMODO_MOE)
+        SetKomodoVec()
+        troty = 180deg + creator -> roty
+        trotx = 270deg
+        statusb |= FLAG_ROT_Y
+        setanim(JOE_RECOVER, 28.0)
+        {
+            var s_x = x, s_y = y, s_z = z, t_x = vecx, t_y = vecy, t_z = vecz
+            troty = atan2(t_x)
+            setanim(JOE_RECOVER)
+            do (var i = 1.0) {
+                x = s_x + ((t_x - s_x) * (i >> 8)) / 22
+                z = s_z + ((t_z - s_z) * (i >> 8)) / 22
+                animframe += 1.0
+                playframe()
+                i += 1.0
+            } while (i <= 22.0)
+        }
+        statusb &= ~FLAG_ROT_Y
+        playframes(JOE_DIZZY, 8.0, 26.0)
+        playanim(27, JOE_DIZZY)
+        changestate(Joe_Start_Spin)
+    }
+}
+
+inline sub SoundSwordThrow(pitch) {
+    soundpitch(3.262)
+    soundplay([KJg8A], 0.5V)
+}
+
+inline sub KomodoThrowSwords() {
+    setanim(KOMODO_INTRO_1, -1.0)
+    do {
+        animframe += 1.0
+        if (animframe == 5.0 || animframe == 28.0) {
+            SoundSwordThrow(3.262)
+        }
+        playframe()
+    } while (animframe + 1.0 <= 47.0)
+}
+
+state Komodo_Intro { // 6
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        playnull(2)
+        interrupter = objectget(CENTER_MARKER)
+        creator = objectget(RADIUS_MARKER)
+        ArenaCenterX = interrupter -> x
+        ArenaCenterY = interrupter -> y
+        ArenaCenterZ = interrupter -> z
+        ArenaRadius = distance(creator -> x, interrupter, DIST_EXACT | DIST_NO_Y)
+        JoeMaxRicochetAngle = atan(2.75m, ArenaRadius)
+        zindex = 128
+        statusb |= FLAG_NO_CAMERA_CLIP
+        if (!RESPAWNCOUNT) {
+            KomodoThrowSwords()
+            KomodoThrowSwords()
+            KomodoThrowSwords()
+            KomodoThrowSwords()
+            KomodoThrowSwords()
+
+            setanim(KOMODO_INTRO_2, -1.0)
+            do {
+                animframe += 1.0
+                if (animframe == 3.0) {
+                    SoundSwordThrow(3.262)
+                }
+                playframe()
+            } while (animframe + 1.0 <= 26.0)
+
+            setanim(KOMODO_INTRO_3, -1.0)
+        
+            do {
+                animframe += 1.0
+                if (animframe == 33.0) {
+                    soundpitch(3.625)
+                    soundplay([Lau8A], 1V)
+                }
+                playframe()
+            } while (animframe + 1.0 <= 37.0)
+
+            playframes(KOMODO_INTRO_4, 0.0, 37.0)
+
+            setanim(KOMODO_INTRO_5, -1.0)
+            do {
+                animframe += 1.0
+                if (animframe == 21.0 || animframe == 36.0) {
+                    SoundSwordThrow(3.265)
+                }
+                playframe()
+            } while (animframe + 1.0 <= 37.0)
+
+            setanim(KOMODO_INTRO_6, -1.0)
+            do {
+                animframe += 1.0
+                if (animframe == 13.0) {
+                    SoundSwordThrow(3.265)
+                }
+                if (animframe == 24.0) {
+                    soundpitch(3.625)
+                    soundplay([KKn8A], 0.5V)
+                    soundsetup(0, voice, 5)
+                }
+                playframe()
+            } while (animframe + 1.0 <= 28.0)
+
+            playframes(KOMODO_INTRO_7, 0.0, 27.0)
+            setanim(KOMODO_INTRO_8, -1.0)
+
+            do {
+                animframe += 1.0
+                if (animframe == 4.0) {
+                    interrupter = objectget(KOMODO_JOE)
+                    sendevent(EventTriggered, interrupter)
+                }
+                playframe()
+            } while (animframe + 1.0 <= 7.0)
+        }
+        else {
+            ins72(0, 0x8000)
+        }
+        changestate(Moe_Trigger_Joe)
+    }
+    event(e, a) {
+        accevcstate(Moe_Trigger_Joe, e == Event67)
+    }
+}
+
+state Moe_Trigger_Joe { // 7
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        interrupter = objectget(KOMODO_JOE)
+        sendevent(EventTriggered, interrupter)
+        statusb = FLAG_ROT_Y | FLAG_COLLIDABLE | FLAG_SOLID_SIDES
+        creator = objectget(KOMODO_JOE)
+        MoeCanTargetPlayer = false
+        playframes(MOE_SPIN_JOE, 36.0, 67.0)
+        changestate(Moe_Attack_Player)
+    }
+}
+
+state Moe_Attack_Player { // 8
+    stateflag 0x1
+    statusc 0
+    code() {
+        trotx = 270deg
+        JoeRicochetMode = 0
+        statusb |= FLAG_ROT_Y
+        creator -> JoeDizzy = false
+        setanim(MOE_RAISE_SWORD, 0)
+        do {
+            if (MoeCanTargetPlayer) {
+                if (v0 > 4.5m && ((animseq == getanim(MOE_RAISE_SWORD) && animframe == 0) || animseq == getanim(MOE_STAND_2))) {
+                    setanim(MOE_THROW_SWORD_2, -1.0)
+                    do {
+                        animframe += 1.0
+                        if (v0 <= 4.5m || !MoeCanTargetPlayer) {
+                            while (animframe > 0) {
+                                animframe -= 1.0
+                                playframe()
+                            }
+                            setanim(MOE_RAISE_SWORD, 0)
+                            goto exit
+                        }
+                        playframe()
+                    } while (animframe + 1.0 <= 16.0)
+                }
+                if (animseq == getanim(MOE_THROW_SWORD_2)) {
+                    setanim(MOE_THROW_SWORD_2, 16.0)
+                    do {
+                        animframe += 1.0
+                        if (v0 <= 4.5m && MoeCanTargetPlayer) {
+                            if (animframe >= 25.0 && animframe <= 27.0) {
+                                playframes(MOE_THROW_SWORD_2, 82.0, 86.0)
+                                setanim(MOE_LAUGH, 0)
+                                goto exit
+                            }
+                            else if (animframe == 39.0) {
+                                playframes(MOE_THROW_SWORD_2, 89.0, 93.0)
+                                setanim(MOE_LAUGH, 0)
+                                goto exit
+                            }
+                            else if (animframe == 59.0) {
+                                playframes(MOE_THROW_SWORD_2, 96.0, 100.0)
+                                setanim(MOE_LAUGH, 0)
+                                goto exit
+                            }
+                            else if (animframe == 73.0) {
+                                playframes(MOE_THROW_SWORD_2, 75.0, 79.0)
+                                setanim(MOE_LAUGH, 0)
+                                goto exit
+                            }
+                        }
+                        if (animframe == 22.0) {
+                            spawn(KimoC, S_SWORD_1, 1, roty, 0)
+                        }
+                        if (animframe >= 43.0 && animframe <= 46.0) {
+                            save (x, y, z) {
+                                getvert(vtrans, self, 1.0)
+                                spawn(KimoC, S_SWORD_PARTICLE, 1, 1.0)
+                            }
+                        }
+                        playframe()
+                    } while (animframe + 1.0 <= 72.0)
+                }
+                else {
+                    playframe()
+                }
+            }
+            else if (animseq == getanim(MOE_THROW_SWORD_2)) {
+                playanim(16, MOE_THROW_SWORD_2)
+                while (animframe > 0) {
+                    animframe -= 1.0
+                    playframe()
+                }
+                setanim(MOE_RAISE_SWORD, 0)
+            }
+            playframe()
+            exit :
+        } while (1)
+    }
+    event(e, a) {
+        rejevif (interrupter == player && (e == EventHitInvincible || e == EventSpinHit || e == EventSlideHit || e == EventJumpedOn || e == EventSlamHit)) {
+            sendevent(Event24, interrupter, 100.0)
+        }
+        accevcstate(Moe_Throw_Swords, e == EventTriggered)
+        accevcstate(Moe_Spin_Joe, e == Event14)
+    }
+    trans {
+        nofirst {
+            sendevent(Event24, collider, 100.0)
+            if (var mode = JoeRicochetMode; mode == 0) {
+                troty = atan2(player -> trans)
+            }
+            else if (mode == 1) {
+                troty = roty
+                if (animseq == getanim(MOE_SHAKE_HEAD)) {
+                    animframe += 1.0
+                    if (animframe >= 210.0) {
+                        animframe -= 1.0
+                    }
+                    if (animseq == getanim(MOE_SHAKE_HEAD) && (animframe >= 9.0)) {
+                        troty = atan2(creator -> trans)
+                    }
+                }
+                else {
+                    setanim(MOE_SHAKE_HEAD, 1.0)
+                }
+            }
+            v0 = distance(ArenaCenterX, player, 0)
+            sendeventif(Event24, player, v0 < 1.5m, 100.0)
+            if (animseq != getanim(MOE_THROW_SWORD_2)) {
+                if (animseq == getanim(MOE_LAUGH)) {
+                    if (animframe == 5.0) {
+                        if (v0 <= 4m) {
+                            sendevent(Event24, player, 100.0)
+                        }
+                        else {
+                            playframesback(MOE_THROW_SWORD_1, 8.0, 0.0)
+                            setanim(MOE_RAISE_SWORD, 0)
+                        }
+                        if (SHAKEY == 0) {
+                            SHAKEY = 3.0
+                        }
+                    }
+                    animframe += 1.0
+                    if (animframe >= 67.0) {
+                        setanim(MOE_RAISE_SWORD, 0)
+                    }
+                }
+                else if (v0 <= 3.5m && (animseq == getanim(MOE_RAISE_SWORD) && animframe >= 6.0) && JoeRicochetMode == 0) {
+                    setanim(MOE_LAUGH, 0)
+                }
+                else if (JoeRicochetMode == 0 && v0 <= 4.5m) {
+                    if (animseq == getanim(MOE_RAISE_SWORD)) {
+                        if (animframe <= 14.0) {
+                            animframe += 1.0
+                        }
+                    }
+                    else {
+                        setanim(MOE_RAISE_SWORD, 0)
+                    }
+                }
+                else if (animseq == getanim(MOE_RAISE_SWORD) && animframe == 0) {
+                    setanim(MOE_STAND_2, 0)
+                }
+                else if (animseq == getanim(MOE_STAND_2)) {
+                    animframe += 1.0
+                    if (animframe >= 37.0) {
+                        animframe = 0
+                    }
+                }
+                else if (animseq == getanim(MOE_RAISE_SWORD)) {
+                    animframe -= 1.0
+                    if (animframe < 0) {
+                        setanim(MOE_RAISE_SWORD, 0)
+                    }
+                }
+            }
+        }
+    }
+}
+
+state Moe_Throw_Swords { // 9
+    stateflag 0x1
+    statusc 0
+    code() {
+        statusb &= ~FLAG_ROT_Y
+        field_63 = 0
+        if (creator -> health <= 1) {
+            setanim(MOE_DEATH)
+            playframes(MOE_DEATH, 0, 95.0)
+            sleep()
+        }
+        else {
+            playframes(MOE_RECOVER, 0.0, 67.0)
+        }
+        creator -> JoeDizzy = true
+        setanim(MOE_THROW_SWORD_3, -1.0)
+        do {
+            animframe += 1.0
+            if (animframe == 63.0) {
+                field_63 = 1.0
+                spawn(KimoC, S_SWORD_2, 1, roty, 0)
+            }
+            playframe()
+        } while (animframe + 1.0 <= 70.0)
+
+        do (var throws = 0) {
+            if (throws >= 9.0) {
+                creator -> JoeDizzy = false
+            }
+            setanim(MOE_THROW_SWORD_3, 70.0)
+            do {
+                animframe += 1.0
+                if (animframe == 73.0) {
+                    spawn(KimoC, S_SWORD_3, 1, roty, 2.0)
+                }
+                if (animframe == 85.0) {
+                    spawn(KimoC, S_SWORD_2, 1, roty, 0)
+                }
+                if (animframe >= 82.0 && animframe <= 84.0) {
+                    save (x, y, z) {
+                        getvert(vtrans, self, 3.0)
+                        spawn(KimoC, S_SWORD_PARTICLE, 1, 1.0)
+                    }
+                }
+                playframe()
+            } while (animframe + 1.0 <= 94.0)
+            throws += 1.0
+        } while (throws < 10.0)
+
+        field_63 = 0
+        playframes(MOE_THROW_SWORD_3, 71.0, 78.0)
+        playframes(MOE_GET_SWORD, 1.0, 46.0)
+        statusb &= ~FLAG_ROT_Y
+        playframes(MOE_SPIN_JOE, 36.0, 67.0)
+        changestate(Moe_Attack_Player)
+    }
+    trans {
+        nofirst {
+            if (field_63) {
+                roty = spd(roty, 30deg)
+            }
+            sendeventif(Event24, player, distance(ArenaCenterX, player, 0) <= 2.75m, 100.0)
+        }
+    }
+}
+
+state Moe_Spin_Joe { // 10
+    stateflag 0x1
+    statusc 0
+    code() {
+        statusb &= ~FLAG_ROT_Y
+        playframes(MOE_SPIN_JOE, 0.0, 67.0)
+        changestate(Moe_Attack_Player)
+    }
+}
+
+state Komodo_Sword { // 11
+    code(yaw, vertex) {
+        soundpitch(3.02)
+        soundplay([KKn8A], 0.5V)
+        soundsetup(0, voice, 5)
+        statusb = FLAG_COLLIDABLE
+        roty = yaw
+        getvert(vtrans, parent, vertex)
+        if (spawn == S_SWORD_3) {
+            playframes(SWORD_LAND_3, 0.0, 35.0)
+        }
+        else if (spawn == S_SWORD_2) {
+            playframes(SWORD_LAND_2, 0.0, 35.0)
+        }
+        else if (spawn == S_SWORD_1) {
+            playframes(SWORD_LAND_1, 0.0, 35.0)
+        }
+        statusb |= FLAG_INVISIBLE
+        getvert(vtrans, self, 0)
+        spawn(KimoC, S_SWORD_PARTICLE, 1, 3.0)
+        WaitChildNull()
+    }
+    event(e, a) {
+        rejevif (e == EventJumpedOn || e == EventSpinHit || e == EventSlideHit || e == EventSlamHit) {
+            sendevent(Event24, interrupter, 100.0)
+        }
+    }
+    trans {
+        sendevent(Event24, collider, 100.0)
+    }
+}
+
+state Sword_Particle_Spawn { // 12
+    stateflag 0x1
+    statusc 0x2
+    code(count) {
+        statusb = FLAG_INVISIBLE
+        do (var i = 0) {
+            spawn(9, 5, 1, 1, getins(SetParticleColor), getfunc(self, self))
+            i += 1.0
+        } while (i < count)
+        WaitChildNull()
+    }
+}
+
+sub SetParticleColor() {
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x00, 0x46, 0xFF)
+    }
+    else if (r == 1) {
+        SetColor1(0xFF, 0xE1, 0xC8)
+    }
+    else if (r == 2) {
+        SetColor1(0x32, 0xC8, 0x64)
+    }
+}
+
+state Sword_Sleep { // 13
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        sleepnull()
+    }
+}
+
+state Komodo_Defeated { // 14
+    stateflag 0x21
+    statusc 0x2
+    code() {
+        KillEntity()
+        sendevent(EventWarp, player, 0)
+        sleep()
+    }
+}

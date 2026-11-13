@@ -1,0 +1,521 @@
+#gool GamOC 28 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C3_DispC.gooh"
+//gooc -c 3 -r pal "C3\C3_GamOC.gooc" "C3\Out\C3_GamOC.nsentry"
+
+#anim BACKGROUND_1    [Cb1XV] [Cb1XG] 67 1 2
+#anim BACKGROUND_2    [Cb2XV] [Cb1XG] 67 1 2
+#anim UKA_WAIT        [U40YV] [Uk1YG] 58 1 2
+#anim NEO_REVEALED    [U2aYV] [Uk1YG] 08 1 2
+
+#anim NEO_EN_NO       [U10XV] [Uk1YG] 46 1 2
+#anim UKA_EN_YES      [U20XV] [Uk1YG] 123 1 2
+#anim UKA_EN_GAMEOVER [U30XV] [Uk1YG] 68 1 2
+#anim UKA_EN_APPEAR   [U31XV] [Uk1YG] 18 1 2
+
+#anim NEO_FR_NO       [F10XV] [Uk1YG] 46 1 2
+#anim UKA_FR_YES      [F20XV] [Uk1YG] 123 1 2
+#anim UKA_FR_GAMEOVER [F30XV] [Uk1YG] 68 1 2
+#anim UKA_FR_APPEAR   [F31XV] [Uk1YG] 18 1 2
+
+#anim NEO_DE_NO       [G10XV] [Uk1YG] 46 1 2
+#anim UKA_DE_YES      [G20XV] [Uk1YG] 123 1 2
+#anim UKA_DE_GAMEOVER [G30XV] [Uk1YG] 68 1 2
+#anim UKA_DE_APPEAR   [G31XV] [Uk1YG] 18 1 2
+
+#anim NEO_ES_NO       [S10XV] [Uk1YG] 46 1 2
+#anim UKA_ES_YES      [S20XV] [Uk1YG] 123 1 2
+#anim UKA_ES_GAMEOVER [S30XV] [Uk1YG] 68 1 2
+#anim UKA_ES_APPEAR   [S31XV] [Uk1YG] 18 1 2
+
+#anim NEO_IT_NO       [I10XV] [Uk1YG] 46 1 2
+#anim UKA_IT_YES      [I20XV] [Uk1YG] 123 1 2
+#anim UKA_IT_GAMEOVER [I30XV] [Uk1YG] 68 1 2
+#anim UKA_IT_APPEAR   [I31XV] [Uk1YG] 18 1 2
+
+#include "..\\Includes\\Fonts\\C3_FONT_SMALL.gooc"
+
+#text TEXT           FONT_SMALL[Cr20T]
+">"                  // 0.0
+"CONTINUER?"         // 1.0
+"OUI"                // 2.0
+"NON"                // 3.0
+"WEITER?"            // 4.0
+"JA"                 // 5.0
+"NEIN"               // 6.0
+"CONTINUA?"          // 7.0
+"SI"                 // 8.0
+"NO"                 // 9.0
+"?CONTINUAR?"        // 10.0
+"CONTINUE?"          // 11.0
+"YES"                // 12.0
+
+#spawn S_SPEECH       Gameover_Speech
+#spawn S_LOAD         Gameover_LoadLevel
+#spawn S_BACKGROUND   GameOver_Background
+#spawn S_MENU         GameOver_Menu
+
+var GameVar1, SavedMusicVolume
+
+expr ButtonCount = field_61
+expr ButtonIndex = stalltime
+
+state GameOver_Background { // 0
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        SetRot(0deg)
+        SetScale(1S)
+        zindex = -200
+        y += 0.3m
+        statusb = FLAG_NO_CAMERA_CLIP
+        do {
+            playframes(BACKGROUND_1, 0.0, 66.0)
+            playframes(BACKGROUND_2, 0.0, 66.0)
+        } while (1)
+    }
+}
+
+state GameOver_Menu { // 1
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        movetolist(3.0, self)
+        SetTrans(-112.0, -71.0, -000.0)
+        zindex = 500
+        if (var lang = GLOBAL_151; lang == LANG_FR) {
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -2.0, getanim(TEXT), 00.0, 176.0, -00.0, 1)
+            player = objectspawned
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -1.0, getanim(TEXT), 01.0, 000.0, -00.0, player)
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -0.0, getanim(TEXT), 02.0, 192.0, -00.0, player)
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, +1.0, getanim(TEXT), 03.0, 192.0, -18.0, player)
+        }
+        else if (lang == LANG_DE) {
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -2.0, getanim(TEXT), 00.0, 160.0, -00.0, 1)
+            player = objectspawned
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -1.0, getanim(TEXT), 04.0, 000.0, -00.0, player)
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -0.0, getanim(TEXT), 05.0, 176.0, -00.0, player)
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, +1.0, getanim(TEXT), 06.0, 176.0, -18.0, player)
+        }
+        else if (lang == LANG_IT) {
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -2.0, getanim(TEXT), 00.0, 160.0, -00.0, 1)
+            player = objectspawned
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -1.0, getanim(TEXT), 07.0, 000.0, -00.0, player)
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -0.0, getanim(TEXT), 08.0, 176.0, -00.0, player)
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, +1.0, getanim(TEXT), 09.0, 176.0, -18.0, player)
+        }
+        else if (lang == LANG_ES) {
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -2.0, getanim(TEXT), 00.0, 192.0, -00.0, 1)
+            player = objectspawned
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -1.0, getanim(TEXT), 10.0, 000.0, -00.0, player)
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -0.0, getanim(TEXT), 08.0, 176.0, -00.0, player)
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, +1.0, getanim(TEXT), 09.0, 176.0, -18.0, player)
+        }
+        else {
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -2.0, getanim(TEXT), 00.0, 160.0, -00.0, 1)
+            player = objectspawned
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -1.0, getanim(TEXT), 11.0, 000.0, -00.0, player)
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, -0.0, getanim(TEXT), 12.0, 176.0, -00.0, player)
+            spawn2(DispC, DispC_S_MENU_BUTTON, 1, +1.0, getanim(TEXT), 09.0, 176.0, -18.0, player)
+        }
+        sleepnull()
+    }
+    event(e, a) {
+        accevif (e == Event12) {
+            var0 = true
+        }
+    }
+    trans {
+        once {
+            TextDefaultScale()
+            SetRot(0deg)
+            ButtonIndex = 0
+            ButtonCount = 2.0
+        }
+        unless (STATUS_FIRSTFRAME) {
+            unless (stateflag & 0x100000) {
+                if (dirpress(PAD_UP) && ButtonIndex > 0) {
+                    soundpitch(0x7F)
+                    sounddecay(0xF0)
+                    soundsetup(0, self, 8)
+                    soundplay([Mb10A], 1V)
+                    ButtonIndex -= 1.0
+                }
+                if (dirpress(PAD_DOWN) && ButtonIndex < ButtonCount - 1.0) {
+                    soundpitch(0x7F)
+                    sounddecay(0xF0)
+                    soundsetup(0, self, 8)
+                    soundplay([Mb10A], 1V)
+                    ButtonIndex += 1.0
+                }
+                if (buttonpress(PAD_START | PAD_X) && (ButtonIndex == 0.0 || frametime - statetime >= 2s)) {
+                    soundpitch(4.0)
+                    sounddecay(0xF0)
+                    soundsetup(0, self, 8)
+                    soundplay([tal0A], 0.8V)
+                    
+                    sendevent(Event3, creator, ButtonIndex)
+                    stateflag |= 0x100000
+                }
+            }
+        }
+    }
+}
+
+inline sub PlaySpeechSegmentIntro(intro, appear, clip, anim, audio) {
+    save (MUSVOL, GLOBAL_74) {
+        GLOBAL_74 = 0
+        MUSVOL = 0
+        field_61 = 0
+        loadfile([Uc1WT])
+        loadfile(intro)
+        loadfile([Uk1YG])
+        spawn2(9, 44, 1, audio, 1.0, 1000s, 8.0)
+        creator = objectspawned
+        loadfile(clip)
+        loadfile([Uk1YG])
+        playnull()
+        while (!(isloaded([Uk1YG]) && isloaded(clip) && isloaded([Uk1YG]) && isloaded(intro)) || !(creator -> stateflag & 0x100000)) {
+            playnull()
+        }
+        sendevent(EventTriggered, creator)
+        playframes(appear, 0.0, 17.0)
+        while (creator -> pathprog < 18) {
+            playframe()
+        }
+        field_62 = 0
+        DeloadAnim(intro, [Uk1YG])
+        setanim(anim)
+        do {
+            animframe = (creator -> pathprog - 18) << 8
+            if (animframe > 67.0) {
+                break
+            }
+            else if (animframe >= 0) {
+                playframe()
+            }
+            else {
+                playframe(0)
+            }
+        } while (1)
+        animframe = 67.0
+        DeloadAnim(clip, [Uk1YG])
+        cascadeevent(Event12, self, 0)
+        deloadfile([Uc1WT])
+    }
+}
+
+state Gameover_Speech { // 2
+    stateflag 0x2000001
+    statusc 0x2
+    code() {
+        if (CURRENTLEVEL != 99) {
+            CheckItemPool(CURRENTLEVEL >> 8, SAVEDCRYSTALPOOL1, SAVEDCRYSTALPOOL2)
+            if (!misc) {
+                var s3, s4, s5
+                getrank(CURRENTLEVEL + 3, s3, s4, s5)
+                s3 += GLOBAL_184
+                s4 += GLOBAL_185 >> 8
+                s5 += 1
+                setrank(CURRENTLEVEL + 3, s5, s4, s3)
+            }
+        }
+        SetTrans(0, 0, 0)
+        SavedMusicVolume = MUSVOL
+        SetRot(5deg, 0deg, 0deg)
+        y = CAMTRANSY + 0.3m
+        x = CAMTRANSX
+        z = CAMTRANSZ - 7.5m
+        spawn(GamOC, S_BACKGROUND)
+        GLOBAL_74 = 0
+        GAMEFLAGS &= ~0x800001
+        LoadAnim([U40YV], [Uk1YG])
+        LoadAnim([U2aYV], [Uk1YG])
+        playnull()
+        playnull()
+        playnull()
+        playnull()
+        spawn(GamOC, S_MENU)
+        GameVar1 = 0
+        SetScale(0.75S)
+        if (var lang = GLOBAL_151; lang == LANG_FR) {
+            PlaySpeechSegmentIntro([F31XV], UKA_FR_APPEAR, [F30XV], UKA_FR_GAMEOVER, [F10XO])
+        }
+        else if (lang == LANG_DE) {
+            PlaySpeechSegmentIntro([G31XV], UKA_DE_APPEAR, [G30XV], UKA_DE_GAMEOVER, [G10XO])
+        }
+        else if (lang == LANG_IT) {
+            PlaySpeechSegmentIntro([I31XV], UKA_IT_APPEAR, [I30XV], UKA_IT_GAMEOVER, [I10XO])
+        }
+        else if (lang == LANG_ES) {
+            PlaySpeechSegmentIntro([S31XV], UKA_ES_APPEAR, [S30XV], UKA_ES_GAMEOVER, [S10XO])
+        }
+        else {
+            PlaySpeechSegmentIntro([U31XV], UKA_EN_APPEAR, [U30XV], UKA_EN_GAMEOVER, [U10XO])
+        }
+        stateflag &= ~0x2000000
+        statetime = frametime
+        settrans(ForceLevelLoad)
+        sleepframes(UKA_WAIT, 0.0, 57.0)
+    }
+    event(e, a) {
+        if (e == Event3) {
+            if (stateflag & 0x2000000) {
+                if (a[0]) {
+                    spawn(GamOC, S_LOAD, 1, 4.0)
+                }
+                else {
+                    spawn(GamOC, S_LOAD, 1, 1.0)
+                }
+                epc = 0
+            }
+            else {
+                accevcstate(GameOver_Continue, a[0] == 0.0)
+                accevcstate(GameOver_Exit, a[0] == 1.0)
+            }
+        }
+    }
+}
+
+sub ForceLevelLoad() {
+    if (frametime - statetime >= 7200s) {
+        spawn(GamOC, S_LOAD, 1, 4.0)
+        epc = 0
+        tpc = 0
+    }
+}
+
+inline sub PlaySpeechSegmentNo(clip, anim, audio) {
+    loadfile(clip)
+    loadfile([Uk1YG])
+    loadfile(audio)
+    soundpitch(8.0)
+    soundplay(audio, 0V)
+    Null()
+    playanim(0, NEO_REVEALED)
+    playanim(1, NEO_REVEALED)
+    playanim(2, NEO_REVEALED)
+    playanim(2, NEO_REVEALED)
+    playanim(3, NEO_REVEALED)
+    playanim(4, NEO_REVEALED)
+    playanim(5, NEO_REVEALED)
+    playanim(6, NEO_REVEALED)
+    save (MUSVOL, GLOBAL_74) {
+        GLOBAL_74 = 0
+        MUSVOL = 0
+        field_61 = 0
+        loadfile([Uc1WT])
+        loadfile(clip)
+        loadfile([Uk1YG])
+        spawn2(9, 44, 1, audio, 1.0, 1000s, 8.0)
+        creator = objectspawned
+        playframe()
+        while (!(isloaded([Uk1YG]) && isloaded(clip)) || !(creator -> stateflag & 0x100000)) {
+            playframe()
+        }
+        sendevent(EventTriggered, creator)
+        playframe()
+        field_62 = 0
+        setanim(anim)
+        do {
+            animframe = creator -> pathprog << 8
+            if (animframe > 45.0) {
+                break
+            }
+            else if (animframe >= 0) {
+                playframe()
+            }
+            else {
+                playframe(0)
+            }
+        } while (1)
+        animframe = 45.0
+        deloadfile(clip)
+        deloadfile([Uk1YG])
+        cascadeevent(Event12, self, 0)
+        deloadfile([Uc1WT])
+    }
+    deloadfile(clip)
+    deloadfile([Uk1YG])
+    deloadfile(audio)
+}
+
+state GameOver_Exit { // 3
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        if (var lang = GLOBAL_151; lang == LANG_FR) {
+            PlaySpeechSegmentNo([F10XV], NEO_FR_NO, [F20XO])
+        }
+        else if (lang == LANG_DE) {
+            PlaySpeechSegmentNo([G10XV], NEO_DE_NO, [G20XO])
+        }
+        else if (lang == LANG_IT) {
+            PlaySpeechSegmentNo([I10XV], NEO_IT_NO, [I20XO])
+        }
+        else if (lang == LANG_ES) {
+            PlaySpeechSegmentNo([S10XV], NEO_ES_NO, [S20XO])
+        }
+        else {
+            PlaySpeechSegmentNo([U10XV], NEO_EN_NO, [U20XO])
+        }
+        spawn(GamOC, S_LOAD, 1, 4.0)
+        sleep()
+    }
+}
+
+sub Null() {}
+
+inline sub PlaySpeechSegmentYes(preload, silent, clip, anim, audio) {
+    loadfile(preload)
+    loadfile([Uk1YG])
+    loadfile(silent)
+    soundpitch(8.0)
+    soundplay(silent, 0V)
+    Null()
+    save (MUSVOL, GLOBAL_74) {
+        GLOBAL_74 = 0
+        MUSVOL = 0
+        field_61 = 0
+        loadfile([Uc1WT])
+        loadfile(clip)
+        loadfile([Uk1YG])
+        spawn2(9, 44, 1, audio, 1.0, 1000s, 8.0)
+        creator = objectspawned
+        playframe()
+        while (!(isloaded([Uk1YG]) && isloaded(clip)) || !(creator -> stateflag & 0x100000)) {
+            playframe()
+        }
+        sendevent(EventTriggered, creator)
+        playframe()
+        field_62 = 0
+        setanim(anim)
+        do {
+            animframe = creator -> pathprog << 8
+            if (animframe > 122.0) {
+                break
+            }
+            else if (animframe >= 0) {
+                playframe()
+            }
+            else {
+                playframe(0)
+            }
+        } while (1)
+        animframe = 122.0
+        deloadfile(clip)
+        deloadfile([Uk1YG])
+        cascadeevent(Event12, self, 0)
+        deloadfile([Uc1WT])
+    }
+    deloadfile(preload)
+    deloadfile([Uk1YG])
+    deloadfile(silent)
+}
+
+state GameOver_Continue { // 4
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        if (var lang = GLOBAL_151; lang == LANG_FR) {
+            PlaySpeechSegmentYes([F10XV], [F20XO], [F20XV], UKA_FR_YES, [F30XO])
+        }
+        else if (lang == LANG_DE) {
+            PlaySpeechSegmentYes([G10XV], [G20XO], [G20XV], UKA_DE_YES, [G30XO])
+        }
+        else if (lang == LANG_IT) {
+            PlaySpeechSegmentYes([I10XV], [I20XO], [I20XV], UKA_IT_YES, [I30XO])
+        }
+        else if (lang == LANG_ES) {
+            PlaySpeechSegmentYes([S10XV], [S20XO], [S20XV], UKA_ES_YES, [S30XO])
+        }
+        else {
+            PlaySpeechSegmentYes([U10XV], [U20XO], [U20XV], UKA_EN_YES, [U30XO])
+        }
+        spawn(GamOC, S_LOAD, 1, 1.0)
+        sleep()
+    }
+}
+
+state Gameover_LoadLevel { // 5
+    stateflag 0x1
+    statusc 0x2
+    code(mode) {
+        CRYSTALPOOL1 = 0
+        CRYSTALPOOL2 = 0
+        GEMPOOL1 = 0
+        GEMPOOL2 = 0
+        GLOBAL_179 = 0
+        GLOBAL_180 = 0
+        GLOBAL_181 = 0
+        GLOBAL_182 = 0
+        GLOBAL_90 = 0
+        if (mode >= 100.0) {
+            startgame(self)
+            GLOBAL_131 = 0
+            GLOBAL_10 = 0
+            var0 = mode - 100.0
+        }
+        if (!mode) {
+            GLOBAL_131 = 0
+            GLOBAL_17 = 6.0
+            GLOBAL_10 = 6.0
+            GAMEFLAGS &= ~0x2
+            startgame(self)
+            if (var demo = GLOBAL_114;
+                     demo == 0) { var0 = LEVEL_ToadVillage }
+            else if (demo == 1) { var0 = LEVEL_UnderPressure }
+            else if (demo == 2) { var0 = LEVEL_ByeByeBlimps }
+            else if (demo == 3) { var0 = LEVEL_MakinWaves }
+            else if (demo == 4) { var0 = LEVEL_BossTiny } 
+            else if (demo == 5) { var0 = LEVEL_TombWader }
+            else if (demo == 6) { var0 = LEVEL_MidnightRun }
+            GLOBAL_114 = (GLOBAL_114  + 1) % 7
+        }
+        else if (mode == 1.0) {
+            startgame(parent)
+            LIFECOUNT = STARTLIVES
+            CURRENTLEVEL = 99
+            var0 = LEVEL_WarpRoom
+        }
+        else if (mode == 2.0) {
+            startgame(self)
+            GLOBAL_131 = 0
+            GLOBAL_10 = 0
+            var0 = LEVEL_IntroEN
+            if (GLOBAL_109) {
+                GLOBAL_160 |= 0x1F
+            }
+        }
+        else if (mode == 3.0) {
+            startgame(self)
+            GLOBAL_131 = 0
+            GLOBAL_10 = 0
+            GLOBAL_90 |= 1
+            LIFECOUNT = STARTLIVES
+            var0 = LEVEL_WarpRoom
+        }
+        else if (mode == 4.0) {
+            GLOBAL_131 = 0
+            GLOBAL_17 = 6.0
+            GLOBAL_10 = 6.0
+            GAMEFLAGS &= ~0x2
+            startgame(self)
+            var0 = LEVEL_Title
+        }
+        FadeToBlack()
+        WaitFadeFrame()
+        if (parent -> spawn == S_SPEECH && mode == 1.0) {
+            MUSVOL = parent -> SavedMusicVolume
+        }
+        loadlevel(var0)
+        sleepnull()
+    }
+}
+
+state Kill { // 6
+    stateflag 0x1
+    statusc 0x0
+    code() {}
+}

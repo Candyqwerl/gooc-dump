@@ -1,0 +1,168 @@
+#gool WpSOC 86 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_WpSOC.gooc" "C3\Out\C3_WpSOC.nsentry"
+
+#anim CYBER_ASS     [Cyb2V] [Cyb2G] 01 1 2
+#anim ASS_PRESS     [APr2V] [APr2G] 01 1 2
+#anim MEDI_ASS      [AB12V] [AB12G] 106 1 2
+#anim EGYPT_ASS     [AB12V] [AB22G] 106 1 2
+#anim ARAB_ASS      [AB12V] [AB32G] 106 1 2
+#anim CHINA_ASS     [AB12V] [AB42G] 106 1 2
+
+#spawn S_CYBER_ASS    Cyber_Ass_Init
+#spawn S_PRESS        Ass_Press_Init
+#spawn S_WARPER       Warper
+
+var CyberStartX, CyberPressX, UnpressedZ, PressedZ, NextPressSound, AssAnim
+
+state Cyber_Ass_Init { // 0
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        x -= 2m
+        CyberStartX = x
+        CyberPressX = CyberStartX + 4m
+        zindex = 0
+        spawn(WpSOC, S_WARPER)
+        changestate(Cyber_Ass)
+    }
+}
+
+state Cyber_Ass { // 1
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        do {
+            var0 = time(106)
+            if (var0 < 53) {
+                x = CyberStartX + (((var0 * ((CyberPressX - CyberStartX) >> 8)) / 53) << 8)
+            }
+            else {
+                x = CyberPressX
+            }
+            playanim(0, CYBER_ASS)
+        } while (1)
+    }
+}
+
+state Ass_Press_Init { // 2
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        UnpressedZ = z
+        PressedZ = UnpressedZ - 2m
+        zindex = 0
+        soundpitch(5.442)
+        soundcount(0xFFFF)
+        soundsetup(8, self, 8)
+        soundplay([Wa42A], 0.2V)
+        NextPressSound = frametime + rand(25)
+        changestate(Ass_Press)
+    }
+}
+
+state Ass_Press { // 3
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        sleepanim(0, ASS_PRESS)
+    }
+    trans {
+        if (frametime >= NextPressSound) {
+            NextPressSound = frametime + rand(3s)
+            var0 = rand(100)
+            if (var0 <= 50) {
+                soundsetup(7, self, 8)
+                SoundPitchDefault(0.295)
+                soundplay([Wa12A], 0.3V + rand(0.2V))
+            }
+            else if (var0 <= 80) {
+                soundsetup(7, self, 8)
+                SoundPitchDefault(0.25)
+                soundplay([Wa32A], 0.3V + rand(0.2V))
+            }
+            else {
+                soundsetup(7, self, 8)
+                SoundPitchDefault(0.25)
+                soundplay([Wa22A], 0.3V + rand(0.2V))
+            }
+        }
+        var0 = time(107)
+        if (var0 == 50) {
+            soundpitch(5.442)
+            soundsetup(8, self, 8)
+            soundplay([Wa52A], 1V)
+        }
+        if (var0 == 70) {
+            soundpitch(5.442)
+            soundsetup(8, self, 8)
+            soundplay([Wa62A], 0.4V)
+        }
+        if (var0 < 53) {
+            z = UnpressedZ
+        }
+        else {
+            var0 -= 53
+            if (var0 < 13) {
+                z = UnpressedZ + (((var0 * ((PressedZ - UnpressedZ) >> 8)) / 13) << 8)
+            }
+            else {
+                var0 -= 13
+                if (var0 < 26) {
+                    z = PressedZ
+                }
+                else {
+                    var0 -= 26
+                    z = PressedZ + (((var0 * ((UnpressedZ - PressedZ) >> 8)) / 13) << 8)
+                }
+            }
+        }
+    }
+}
+
+state Warper { // 4
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        x += 16m
+        AssAnim = MEDI_ASS
+        zindex = creator -> zindex
+        do {
+            var0 = time(128)
+            if (var0 == 45) {
+                soundpitch(2.54)
+                soundsetup(7, self, 8)
+                soundplay([WAp2A], 0.3V)
+            }            
+            if (!var0) {
+                do (var previous = AssAnim, i = 4) {
+                    groundtime = rand(4)
+                    if (groundtime == 0) {
+                        AssAnim = MEDI_ASS
+                    }
+                    else if (groundtime == 1) {
+                        AssAnim = EGYPT_ASS
+                    }
+                    else if (groundtime == 2) {
+                        AssAnim = ARAB_ASS 
+                    }
+                    else if (groundtime == 3) {
+                        AssAnim = CHINA_ASS
+                    }
+                    if (AssAnim != previous || !i) {
+                        break
+                    } 
+                    i -= 1
+                } while (1)
+            }
+            if (var0 < 106) {
+                setanim(AssAnim)
+                playframe(var0 << 8)
+            }
+            else {
+                playnull()
+            }
+        } while (1)
+    }
+}

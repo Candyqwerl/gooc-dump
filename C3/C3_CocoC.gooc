@@ -1,0 +1,160 @@
+#gool CocoC 84 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C3_FruiC.gooh"
+//gooc -c 3 -r pal "C3\C3_CocoC.gooc" "C3\Out\C3_CocoC.nsentry"
+
+#anim SIS_STAND_1  [Si12V] [Si12G] 28 1 2
+#anim SIS_STAND_2  [Si72V] [Si12G] 36 1 2
+#anim SIS_STAND_3  [Si82V] [Si12G] 40 1 2
+#anim SIS_WALK             [Si22V] [Si12G] 20 1 2
+#anim SIS_WARP_IN          [Sia2V] [Si12G] 29 1 2
+#anim SIS_WARP_RETURN_FAIL [Sib2V] [Si12G] 71 1 2
+#anim SIS_WARP_RETURN_WIN  [Sic2V] [Si12G] 56 1 2
+#anim SIS_GIVE_REWARDS     [Sid2V] [Si12G] 39 1 2
+
+#spawn S_COCO      Coco_Stand
+#spawn S_WALK      Coco_Walk
+#spawn S_FIREWORK  Firework_Generator
+
+var WaitTime, FirstIdleCycle
+
+state Coco_Stand { // 0
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        if (id != 100.0) {
+            KillEntity()
+            return
+        }
+        roty = 90deg
+        SetScale(1.2S)
+        zindex = 32
+        playframes(SIS_STAND_1, 0.0, 27.0)
+        WaitTime = rand(3s)
+        WaitFrame(WaitTime)
+        FirstIdleCycle = true
+        do {
+            if (!rand(6) || FirstIdleCycle) {
+                playframes(SIS_STAND_2, 0.0, 35.0)
+            }
+            FirstIdleCycle = false
+            WaitTime = 2s + rand(3s)
+            WaitFrame(0, SIS_STAND_3, WaitTime)
+            playframes(SIS_STAND_3, 0.0, 39.0)
+            WaitTime = 2s + rand(3s)
+            WaitFrame(WaitTime)
+            playframesback(SIS_STAND_3, 39.0, 0.0)
+        } while (1)
+    }
+    trans {
+        CocoPushPlayerAway()
+        if (!(GLOBAL_178 \ 0xFF && GLOBAL_177 \ -0x400)) {
+            settrans(CocoPushPlayerAway)
+            return
+        }
+        if (distance(player, DIST_NO_Y) < 4m, !entitygetstate(3), !child, !(0x80000000 & SAVEDGEMPOOL2)) {
+            save (x, y, z) {
+                SetTrans(1754.0, 400.0, 361.0)
+                spawn2(FruiC, FruiC_S_FRUIT_HOP, 1, 363.0, id)
+                spawn(CocoC, S_FIREWORK)
+                spawn(9, 63, 1, -1.0, 0, 1m, 0.8S, 50, 362.0)
+            }
+        }
+    }
+}
+
+sub CocoPushPlayerAway() { // S-111
+    var dist = distance(player, DIST_NO_Y | DIST_EXACT)
+    save (troty, speed, vecx, vecz) {
+        if (dist < 1.6m) {
+            troty = atan2(player -> trans)
+            setvel(1.6m, vvec)
+            player -> x = x + vecx
+            player -> z = z + vecz
+        }
+    }
+}
+
+state Coco_Walk { // 1
+    stateflag 0x1
+    statusc 0x2
+    code(orb, ground) {
+        creator = orb
+        zindex = 32
+        groundy = ground
+        x = CAMTRANSX
+        z = CAMTRANSZ
+        y = groundy
+        roty = atan2(creator -> trans)
+        rotx = 0deg
+        rotz = 0deg
+        statusb = FLAG_PHYSICS_ENGINE | FLAG_SOLID_GROUND
+        troty = roty
+        setvel(6m)
+        setanim(SIS_WALK)
+        settrans(CheckDistanceToOrb)
+        do {
+            playframes(0.0, 8.0)
+            soundpitch(2.805)
+            sounddecay(3.2s)
+            soundplay([fs2aA], 0.3V)
+            playframes(8.0, 18.0)
+            soundpitch(2.94)
+            sounddecay(3.2s)
+            soundplay([fs2aA], 0.6V)
+            playframes(18.0, 19.0)
+        } while (1)
+    }
+}
+
+sub CheckDistanceToOrb() { // S-172
+    changestateif(Coco_Warp_In, distance(creator, DIST_NO_Y | DIST_EXACT) < 4m)
+}
+
+state Firework_Generator { // 2
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        do {
+            playnull()
+        } until (-0x80000000 & SAVEDGEMPOOL2)
+        do (var start = frametime) {
+            spawn(9, 63, 1, -1.0, 0, 1m, 0.8S, 50, 1)
+            playnull(6)
+            spawn(9, 63, 1, -1.0, 0, 1m, 0.8S, 50, 363.0 + 1)
+            playnull(6)
+        } while (frametime - start < 5s)
+        
+    }
+    trans {
+        x = randi(-5m, 5m)
+        y = rand(3m)
+        z = randi(-5m, 5m)
+    }
+}
+
+state Coco_Warp_In { // 3
+    stateflag 0x1
+    statusc 0x2
+    code() {
+        vely = 0
+        statusb &= ~(FLAG_ROT_Y | FLAG_PHYSICS_TEST | FLAG_GRAVITY | FLAG_PHYSICS_ENGINE | FLAG_DPAD_CONTROL | FLAG_ROT_Y2 | 0x2000 | 0x20000000)
+        statusb |= FLAG_ROT_Y | 0x2000
+        trotx = 720deg
+        yzapproach = 360deg
+        if (creator) {
+            troty = atan2(creator -> trans)
+            trotz = atan2_3d(self, creator -> trans) + 10deg
+        }
+        else {
+            troty = roty
+            trotz = 0deg
+        }
+        zindex = 100
+        rotz = troty
+        playframes(SIS_WARP_IN, 0.0, 28.0)
+        sendevent(EventTriggered, creator)
+        sleepnull()
+    }
+}

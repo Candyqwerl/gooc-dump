@@ -1,0 +1,655 @@
+#gool RivOC 47 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C2_ShadC.gooh"
+//gooc -c 2 -r pal "C2\C2_RivOC.gooc" "C2\Out\C2_RivOC.nsentry"
+
+#anim RAMP              [Ra1kV] 1 1
+#anim HIPPO             [Hp1pV] 113 1
+#anim MINE              [Mf1pV] 1 1
+#anim MINE_EXPLODE      [Mf2pV] 19 1
+#anim FISH              [Pa1pV] 122 1
+#anim BOARD_LAUNCH      [Bo1pV] 75 1
+#anim BOARD_MOUNT       [Bo2pV] 29 1
+#anim BOARD_SINK        [Bo3pV] 90 1
+
+#spawn S_RAMP           Ramp_Init
+#spawn S_HIPPO          Hippo_Init
+#spawn S_LAUNCH         Board_Launch
+#spawn S_DROPOFF        Board_DropOff
+#spawn S_MINE_FLOAT     Mine_Float
+#spawn S_FISH           Fish
+#spawn S_RAMP           Ramp_Init
+#spawn S_MINE_PATH      Mine_Path
+#spawn S_WHIRLPOOL      Whirlpool
+#spawn S_9              __s_9
+#spawn S_WATERFALL      Waterfall
+
+var FishMirrorX, FishCycleLength,
+    MineBaseX, MineBaseY, MineBaseZ, MinePathCycleLength, MinePathCycleOffset, MinePathSpeed, MineFloatVar,
+    BaseY, HippoSubmergeY, RiverY, BobOffset, BobVelocity, HippoCounter, HippoParticleDelay, RiverVoice
+
+inline sub SoundWaterSplash(vol) {
+    SoundPitchDefault(0.23)
+    soundplay([SplSA], vol)    
+}    
+
+inline sub SoundFishSnap(delay) {
+    sounddelay(delay)
+    soundpitch(((0xE66 + rand(0x333)) << 6) >> 8)
+    soundplay([FSnRA], 0.4V)
+}
+
+inline sub SoundHippoHuff() {
+    SoundPitchDefault(0.23)
+    soundplay([HSnRA], 0.5V)
+}
+
+inline sub SpawnSplashParticle(splash_y) {
+    spawn(9, 14, 1, -1.0, splash_y, 5.0, 1m)
+}
+
+inline sub SpawnSplashBubble(splash_y) {
+    spawn(9, 29, 1, splash_y, y, -1.0, 0, 0)
+}
+
+
+state Fish { // 0
+    statusc 0
+    code(cycleoffs, wait, splash_y) {
+        FishCycleLength = (wait * 61) + 61
+        calcpath(0)
+        FishMirrorX = x - 3m
+        statusb = FLAG_COLLIDABLE | FLAG_HAS_SHADOW | 0x80000000
+        vecy = 1
+        vecz = 0x7F7F7F
+        field_60 = 0
+        spawn(ShadC, ShadC_S_SHADOW, 1, 0, 1S, 20)
+        setanim(FISH)
+        do {
+            var0 = time(FishCycleLength << 1, (cycleoffs * 1s) / 1.2s)
+            if (var0 >= FishCycleLength) {
+                var0 -= FishCycleLength
+                scalex = -abs(scalex)
+            }
+            else {
+                scalex = abs(scalex)
+            }
+            if (var0 >= 61) {
+                var0 = ((var0 - 61) % 61) + 61
+            }
+            var0 <<= 8
+            if (animseq == getanim(FISH) && animframe == 0) {
+                statusb |= FLAG_HAS_SHADOW
+                SpawnSplashParticle(splash_y)
+                SoundWaterSplash(0.2V)
+                SoundFishSnap(0.25s)
+                SoundFishSnap(0.50s)
+                SoundFishSnap(0.75s)
+                SoundFishSnap(1s)
+            }
+            if (animseq == getanim(FISH) && animframe == 22.0) {
+                statusb &= ~FLAG_HAS_SHADOW
+                SpawnSplashParticle(splash_y)
+                SoundWaterSplash(0.3V)
+            }
+            if (animseq == getanim(FISH) && animframe >= 22.0 && animframe <= 24.0) {
+                SpawnSplashBubble(splash_y)
+            }
+            calcpath(var0)
+            if (scalex < 0S) {
+                x = (FishMirrorX << 1) - x
+            }
+            playframe(var0)
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Fish_Fling, e == EventSpinHit || e == EventFling || e == EventSlideHit || e == EventHitInvincible)
+    }
+    trans { 
+        vecx = GLOBAL_118
+        sendevent(EventHit, collider, 100.0)
+    }
+}
+
+state Mine_Float { // 1
+    statusc 0
+    code() { 
+        SetZindexField(5)
+        statusb = FLAG_COLLIDABLE | 0x80000000
+        vecy = 1
+        vecz = 0x7F7F7F
+        sleepanim(0, MINE)
+    }
+    trans { 
+        if (STATUS_FIRSTFRAME) {
+            roty = 45deg
+            MineBaseX = x
+            MineBaseY = y
+            MineBaseZ = z
+            MineFloatVar = 0
+        }
+        MineFloatTrans()
+        changestateif(Mine_Explode, collider)
+    }
+}
+
+sub MineFloatTrans() { 
+    vecx = GLOBAL_118
+    var angle = ((MineBaseX >> 8) + ((MineBaseZ >> 8) + GAMETICK)) << 6
+    if (((MineBaseX << 2) + MineBaseZ) & 0x2000) {
+        angle = -angle
+    }
+    var s = sin(angle)
+    var c = cos(angle)
+    x = MineBaseX + (s << 1)
+    z = MineBaseZ + (c << 1)
+    y = MineBaseY - (s << 2)
+}
+
+state Mine_Explode { // 2
+    stateflag 0x3
+    code() {
+        statusb = 0
+        KillEntity()
+        SoundPitchDefault(0.23)
+        sounddecay(9.2s)
+        soundplay([tnt0A], 1V)
+        soundsetup(0, voice, 5)
+        do (var particles = 0) {
+            spawn(9, 21, 1, 0, randi(-2m, 2m), 8m, randi(-2m, 2m), 2S, 2.4, 24, 1)
+        } while ({ particles += 1.0 }; particles < 5.0)
+        spawn(9, 4, 1, getins(SetParticleColor), 1)
+        sendevent(EventExplode, player, 100.0)
+        playframes(MINE_EXPLODE, 0.0, 18.0)
+    }
+}
+
+sub SetParticleColor() {
+    if (var r = rand(6); r == 0) {
+        SetColor1(0x20, 0x20, 0x20)
+    }
+    else if (r == 1) {
+        SetColor1(0x40, 0x40, 0x40)
+    }
+    else if (r == 2) {
+        SetColor1(0x80, 0x80, 0x80)
+    }
+    else if (r == 3) {
+        SetColor1(0xC8, 0x46, 0x32)
+    }
+    else if (r == 4) {
+        SetColor1(0xC8, 0x89, 0x46)
+    }
+    else if (r == 5) {
+        SetColor1(0xC8, 0x1E, 0x5A)
+    }
+}
+
+state Mine_Path { // 3
+    statusc 0
+    __transargs
+    code(cyclelen, cycleoffs) {
+        SetZindexField(5)
+        statusb = FLAG_TRACK_PATH_SIGN | FLAG_COLLIDABLE | FLAG_SOLID_ALL
+        sleepanim(0, MINE)
+    }
+    trans { 
+        if (STATUS_FIRSTFRAME) {
+            MinePathCycleLength = cyclelen
+            MinePathCycleOffset = (cycleoffs * (cyclelen + 1)) >> 16
+            MinePathSpeed = (pathlen << 1) / (cyclelen + 1)
+            MineBaseX = x
+            MineBaseY = y
+            MineBaseZ = z
+            roty = 45deg
+        }
+        MineFloatTrans()
+        {
+            var segtime = time((MinePathCycleLength * 1s) / 1.2s, MinePathCycleOffset)
+            pathprog = abs((segtime - (((MinePathCycleLength * 1s) / 1.2s) >> 1)) * MinePathSpeed)
+            calcpath(pathprog)
+            if (segtime >= (((MinePathCycleLength * 1s) / 1.2s) >> 1)) {
+                statusa |= 0x4
+            }
+        }
+        if (!time(2) && FRAMETIME < 32) {
+            spawn(9, 11, 1, troty, 0.2deg)
+        }
+        changestateif(Mine_Explode, collider)
+    }
+}
+
+state Hippo_Init { // 4
+    stateflag 0x801
+    statusc 0x200002
+    code(yaw) {
+        BaseY = y
+        HippoSubmergeY = BaseY - 3.75m
+        RiverY = BaseY
+        y = RiverY
+        BobOffset = 0
+        BobVelocity = 0
+        roty = yaw
+        statusb = -0x7FBCFFF0
+        vecy = 0
+        vecz = 0xFFFFFF
+        changestate(Hippo)
+    }
+}
+
+sub HippoUpdateBob() { 
+    var speed = 0
+    if (BobOffset < 0 || BobVelocity) {
+        if (BobVelocity > 0) {
+            speed = -BobOffset >> 3
+            if (speed < BobVelocity) {
+                BobVelocity = speed
+            }
+        }
+        BobOffset += BobVelocity
+        BobVelocity += 0.08m
+        if (BobOffset > 0) {
+            BobOffset = 0
+            BobVelocity = 0
+        }
+    }
+}
+
+sub HippoRiseToSurface() { 
+    var delta = BaseY - RiverY
+    if (delta > 0) {
+        delta >>= 4
+        if (!delta) {
+            delta = 1
+        }
+        RiverY += delta
+    }
+}
+
+sub HippoHuffParticles() {
+    save (x, y, z, vely) {
+        SetTrans(0, 0, 0)
+        do (var particles = 0) {
+            trotx = (rotx - randi(-20deg, 20deg)) + 10deg
+            troty = (roty - randi(-20deg, 20deg)) + 10deg
+            rotz = roty
+            vectransf2(vtrans, vvel, 2.75m, 0, 2m)
+            spawn(9, 21, 1, particles, velx, vely, velz, 0.8S, 0, 50, 2)
+        } while ({ particles += 1.0 }; particles < 2.0)
+    }
+}
+
+sub HippoUpdateBrightness() { 
+    var depth = vecx - y - 1m
+    if (depth < 0) {
+        depth = 0
+    }
+    if (depth > 2.4m) {
+        depth = 2.4m
+    }
+    moda = ((depth >> 8) * 11.2) / 3.75
+}
+
+state Hippo { // 5
+    stateflag 0x801
+    statusc 0x200002
+    code() { 
+        zindex = -20
+        setanim(HIPPO)
+        do {
+            HippoCounter = rand(100)
+            if (HippoCounter < 21) {
+                playframes(35.0, 40.0)
+            }
+            else if (HippoCounter < 41) {
+                playframes(41.0, 46.0)
+            }
+            else if (HippoCounter < 61) {
+                playframes(28.0, 34.0)
+            }
+            else if (HippoCounter < 76) {
+                playframes(14.0, 28.0)
+            }
+            else if (HippoCounter < 86) {
+                playframes(0.0, 13.0)
+            }
+            else {
+                do (var loops = 0) {
+                    playanim(0, HIPPO)
+                } while ({ loops += 1.0 }; loops < 10.0)
+            }
+            do (var loops = 0) {
+                playanim(0, HIPPO)
+            } while ({ loops += 1.0 }; loops < ((rand(16) + 6) << 8))
+        } while (1)
+    }
+    trans { 
+        vecx = GLOBAL_118
+        HippoRiseToSurface()
+        y = BobOffset + RiverY
+        HippoUpdateBrightness()
+        if (collider) {
+            GLOBAL_3 = frametime
+            changestate(Hippo_Submerge)
+        }
+    }
+}
+
+state Hippo_Submerge { // 6
+    stateflag 0x801
+    statusc 0x200002
+    code() { 
+        setanim(HIPPO)
+        SoundWaterSplash(0.5V)
+        playframes(46.0, 58.0)
+        HippoParticleDelay = rand(3)
+        SoundHippoHuff()
+        animframe = 58.0
+        do {
+            animframe += 1.0
+            if (!HippoParticleDelay) {
+                HippoParticleDelay = rand(3)
+                HippoHuffParticles()
+            }
+            else {
+                HippoParticleDelay -= 1
+            }
+            playframe()
+        } while (animframe + 1.0 <= 64.0)
+        changestate(Hippo_Resurface)
+    }
+    trans { 
+        if (STATUS_FIRSTFRAME) {
+            BobVelocity = -0.2m
+        }
+        vecx = GLOBAL_118
+        if (collider) {
+            GLOBAL_3 = frametime
+        }
+        HippoRiseToSurface()
+        HippoUpdateBob()
+        y = BobOffset + RiverY
+        HippoUpdateBrightness()
+    }
+}
+
+state Hippo_Resurface { // 7
+    stateflag 0x801
+    statusc 0x200002
+    code() { 
+        SoundWaterSplash(0.5V)
+        HippoParticleDelay = rand(3)
+        SoundHippoHuff()
+        animframe = 64.0
+        do {
+            animframe += 1.0
+            if (!HippoParticleDelay) {
+                HippoParticleDelay = rand(3)
+                HippoHuffParticles()
+            }
+            else {
+                HippoParticleDelay -= 1
+            }
+            playframe()
+        } while (animframe + 1.0 <= 74.0)
+        playframes(HIPPO, 75.0, 84.0)
+        playframes(85.0, 112.0)
+        sleep()
+    }
+    trans { 
+        if (STATUS_FIRSTFRAME) {
+            vely = 0
+            HippoCounter = 40
+        }
+        vecx = GLOBAL_118
+        vely -= 0.02m
+        var sinkspd = (HippoSubmergeY - RiverY) >> 3
+        if (sinkspd >= 0) {
+            sinkspd = -1
+        }
+        if (vely < sinkspd) {
+            vely = sinkspd
+        }
+        RiverY += vely
+        if (RiverY <= HippoSubmergeY) {
+            RiverY = HippoSubmergeY
+            HippoCounter -= 1
+            if (HippoCounter < 1) {
+                if (!(player -> stateflag & 0x20) && !player -> invincible) {
+                    changestate(Hippo)
+                }
+                else {
+                    HippoCounter += 1
+                }
+            }
+        }
+        HippoUpdateBob()
+        y = RiverY + BobOffset
+        HippoUpdateBrightness()
+        sendeventif(EventDrown, collider, y < vecx - 2m, vecx)
+    }
+}
+
+state Ramp_Init { // 8
+    code() {
+        zindex = fieldval(ENTITY_FIELD_ZINDEX)
+        troty = 180deg
+        rotz = troty
+        rotx = -20deg
+        y += 0.18m
+        BaseY = y
+        BobOffset = 0
+        BobVelocity = 0
+        RiverY = 0
+        statusb = FLAG_COLLIDABLE | FLAG_SOLID_TOP | FLAG_NO_CAMERA_CLIP
+        changestate(Ramp)
+    }
+}
+
+sub RampUpdateBob() { 
+    var oldbob = BobOffset
+    if (BobOffset == 0 || BobVelocity) {
+        BobVelocity -= BobOffset / 25
+        BobOffset += BobVelocity
+        if (oldbob >= 0) {
+            if (BobOffset < 1) {
+                BobVelocity -= BobVelocity >> 2
+            }
+        }
+        else if (BobOffset >= 0) {
+            BobVelocity -= BobVelocity >> 2
+        }
+    }
+}
+
+state Ramp { // 9
+    code() {
+        sleepanim(0, RAMP)
+    }
+    trans { 
+        if (collider) {
+            if (frametime - statetime >= 0.25s) {
+                BobVelocity -= 0.08m
+                statetime = frametime
+            }
+        }
+        RampUpdateBob()
+        RiverY = (sin((frametime << 5) & 0xFFF) * 0.075m) >> 12
+        y = BaseY + (RiverY + BobOffset)
+        sendeventif(EventBounce, collider, abs(degdist(troty, player -> roty)) < 45deg && player -> speed > 0, 0x1618DA)
+    }
+}
+
+state Board_Launch { // 10
+    statusc 0
+    code() { 
+        zindex = 0
+        roty = 180deg
+        statusb = FLAG_COLLIDABLE
+        sleepframes(BOARD_LAUNCH, 0.0, 74.0)
+    }
+    event(e, a) {
+        rejevcstate(Board_Launch_Triggered, e == EventJumpedOn)
+    }
+    trans {
+        y = GLOBAL_118
+        changestateif(Board_Launch_Triggered, collider)
+    }
+}
+
+state Board_Launch_Triggered { // 11
+    statusc 0
+    code() {
+        sendevent(EventTriggerJetboard, player, self)
+        KillEntity()
+        playframes(BOARD_MOUNT, 0.0, 28.0)
+    }
+}
+
+state Board_DropOff { // 12
+    code(s) {
+        unless (player -> stateflag & 0x20000000) {
+            return
+        }
+        do {
+            do {
+                playnull()
+            } until (distance(player, DIST_NO_Y) < 1m)
+            sendevent(Event66, player, self)
+        } until (eventaccepted || player -> stateflag & 0x20)
+        KillEntity()
+        x = player -> x
+        rotx = player -> rotx
+        y = player -> y
+        roty = player -> roty
+        z = player -> z
+        rotz = player -> rotz
+        groundy = GLOBAL_118
+        statusb = FLAG_GRAVITY | FLAG_PHYSICS_ENGINE | FLAG_SOLID_GROUND
+        SoundPitchDefault(0.23)
+        soundplay([SSiRA], 0.6V)
+        settrans(BoardSinkSpawnBubbles)
+        playframes(BOARD_SINK, s, 0, 68.0)
+        settrans(BoardSinkFadeBubbles)
+        playframes(BOARD_SINK, s, 70.0, 89.0)
+    }
+    trans {
+        if (player -> stateflag & 0x20000000 && !(player -> stateflag & 0x20) && player -> y > GLOBAL_118 + 0.1m && player -> z < z + 4.5m) {
+            player -> velz = 0
+            player -> z = z + 4.5m
+        }
+    }
+}
+
+sub BoardSinkSpawnBubbles() {
+    unless (time(4)) {
+        spawn(9, 29, 1, GLOBAL_118, GLOBAL_118 - 5m, -1.0, 0, 0)
+    }
+}
+
+sub BoardSinkFadeBubbles() {
+    unless (time(2)) {
+        spawn(9, 29, 1, GLOBAL_118, GLOBAL_118 - 5m, -1.0, 0, 0)
+    }
+    moda = seek(moda, 16.0, 0xF5)
+}
+
+state Whirlpool { // 13
+    __transargs
+    code(clockwise) {
+        soundpitch(3.265)
+        soundfadet(1s, self)
+        soundfadev(0.4V, self, 2)
+        sounddecay(10.22s)
+        soundplay([WflfA], 0V)
+        RiverVoice = voice
+        sleepnull()
+    }
+    event(e, a) {
+        accevif (e == EventDespawn) {
+            if (RiverVoice) {
+                voice = RiverVoice
+                soundsetup(0, voice, 5)
+                voice = RiverVoice
+                soundfadet(1s, voice)
+                soundfadev(0V, voice, 3)
+                RiverVoice = 0
+            }
+        }
+    }
+    trans { 
+        if (player -> y - y < 0.2m) {
+            var dist, strength, dir
+            dist = distance(player, DIST_EXACT | DIST_NO_Y)
+            if (dist <= 8m) {
+                strength = ((0x118 * ((8m - dist) >> 8)) / 0xC80) << 8
+                if (dist <= 1.4m) {
+                    strength += ((0x960 * ((1.4m - dist) >> 8)) / 0x230) << 8
+                }
+                sendeventif(Event4, player, dist <= 0.4m, 100.0)
+                var0 = atan(-(player -> x - x), -(player -> z - z)) & 0xFFF
+                vecz = (strength * cos(var0)) >> 12
+                vecx = (strength * sin(var0)) >> 12
+                player -> vecz += vecz
+                player -> vecx += vecx
+                dir = 90deg
+                troty = ((dir << 12) * 7) / (44 * dist)
+                if (!clockwise) {
+                    troty = -troty
+                }
+                trotx = 0
+                trotz = 0
+                vectransf2(vtrans, vvec, player -> z - z, player -> x - x, player -> y - y)
+                player -> vecx += (player -> x - vecx) * 25
+                player -> vecy += (player -> y - vecy) * 25
+                player -> vecz += (player -> z - vecz) * 25
+            }
+        }
+    }
+}
+
+state Waterfall { // 14
+    code() {
+        SetScale(0xD9B9, 0x582F, 0x204A)
+        statusb = FLAG_COLLIDABLE
+        soundpitch(3.265)
+        soundfadet(1s, self)
+        soundfadev(0.4V, self, 2)
+        sounddecay(10.22s)
+        soundplay([WflfA], 0V)
+        RiverVoice = voice
+        sleepnull()
+    }
+    event(e, a) {
+        accevif (e == EventDespawn) {
+            if (RiverVoice) {
+                voice = RiverVoice
+                soundsetup(0, voice, 5)
+                voice = RiverVoice
+                soundfadet(1s, voice)
+                soundfadev(0V, voice, 3)
+                RiverVoice = 0
+            }
+        }
+    }
+    trans { 
+        if (collider) {
+            collider -> vely += spd(-60m)
+        }
+    }
+}
+
+state Fish_Fling { // 15
+    stateflag 0x30
+    statusc 0x32
+    code(h) {
+        EnemyFlingCombo(h)
+        EnemyFlingSetDir()
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    } 
+    trans {
+        EnemyFlingTrans(2m, EventFling)
+    }
+}

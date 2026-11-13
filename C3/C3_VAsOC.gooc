@@ -1,0 +1,602 @@
+#gool VAsOC 65 3
+
+#include "..\\Includes\\goolstdlib.gooc"
+//gooc -c 3 -r pal "C3\C3_VAsOC.gooc" "C3\Out\C3_VAsOC.nsentry"
+
+#anim VASE_ASS_1  [VA1mV] [VA1mG] 99 1 2
+#anim VASE_ASS_2  [VA2mV] [VA2mG] 15 1 2
+#anim VASE_ASS_3  [VA3mV] [VA2mG] 08 1 2
+#anim VASE_ASS_4  [VA4mV] [VA2mG] 13 1 2
+#anim VASE_ASS_5  [VA5mV] [VA5mG] 20 1 2
+#anim VASE_ASS_6  [VA6mV] [VA5mG] 83 1 2
+#anim VASE_ASS_7  [AV1mV] [AV1mG] 40 1 2
+
+#spawn S_VASE_ASS         Vase_Ass_Init
+#spawn S_1                __s_1
+#spawn S_VASE             Vase
+
+event Event19 =>          sub KillVoice
+event Event26 =>          sub KillVoice
+
+var VaseLastX, VaseLastY, VaseLastZ, VaseBaseX, VaseBaseY, VaseBaseZ, PatrolRange, PatrolOffs, PatrolAxis,
+    VaseTargetX, VaseTargetZ, VaseVar12, VaseVar13, FallBaseY, VaseAssOnGround, Collateral, PlayerPushTimer,
+    AxisBias, VaseVar19, VaseVar20
+
+state Vase_Ass_Init { // 0
+    statusc 0
+    code(yaw, range, axis, damage) {
+        roty = yaw
+        PatrolRange = range
+        PatrolAxis = axis
+        Collateral = damage
+        VaseBaseX = x
+        VaseBaseY = y
+        VaseBaseZ = z
+        PatrolOffs = 0
+        VaseAssOnGround = 1
+        PlayerPushTimer = 0
+        AxisBias = 0
+        SetZindexField(24)
+        statusb = FLAG_COLLIDABLE
+        changestate(Vase_Ass_Walk)
+    }
+}
+
+state Vase_Ass_Walk { // 1
+    statusc 0
+    code() {
+        do {
+            soundpitch(4.0)
+            soundplay([VA2mA], 1V)
+            setanim(VASE_ASS_1, -1.0)
+            do {
+                animframe += 1.0
+                if (animframe == 15.0
+                    || animframe == 26.0
+                    || animframe == 37.0
+                    || animframe == 68.0
+                    || animframe == 79.0
+                    || animframe == 94.0) {
+                    soundpitch(3.263)
+                    sounddecay(3.2s)
+                    soundplay([fs20A], 0.7V)
+                }
+                if (animframe == 21.0
+                    || animframe == 30.0
+                    || animframe == 42.0
+                    || animframe == 59.0
+                    || animframe == 74.0
+                    || animframe == 87.0) {
+                    soundpitch(3.44)
+                    sounddecay(3.2s)
+                    soundplay([fs20A], 0.7V)
+                }
+                if (animframe == 49.0) {
+                    soundpitch(4.0)
+                    soundplay([VA2mA], 1V)
+                }
+                playframe()
+            } while (animframe + 1.0 <= 98.0)
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Vase_Ass_Squash, e == EventHit
+            || e == EventJumpedOn
+            || e == EventSlamHit
+            || e == EventFling
+            || e == EventHitInvincible)
+        accevcstate(Vase_Ass_Fling, e == EventSlideHit)
+        accevcstate(Vase_Ass_Attacked, e == EventSpinHit)
+    }
+    trans {
+        getvert(vvec, self, 0)
+        VaseLastX = vecx
+        VaseLastY = vecy
+        VaseLastZ = vecz
+        var target = 0
+        if (PatrolAxis == 0) {
+            if (VaseLastX >= player -> x) {
+                AxisBias += 1
+                if (AxisBias > 6) {
+                    AxisBias = 6
+                }
+            }
+            else {
+                AxisBias -= 1
+                if (AxisBias < -6) {
+                    AxisBias = -6
+                }
+            }
+            target = player -> z - VaseBaseZ
+        }
+        else {
+            if (VaseLastZ >= player -> z) {
+                AxisBias += 1
+                if (AxisBias > 6) {
+                    AxisBias = 6
+                }
+            }
+            else {
+                AxisBias -= 1
+                if (AxisBias < -6) {
+                    AxisBias = -6
+                }
+            }
+            target = player -> x - VaseBaseX
+        }
+        if (target > PatrolRange) {
+            target = PatrolRange
+        }
+        if (target < -PatrolRange) {
+            target = -PatrolRange
+        }
+        target -= PatrolOffs
+        if (target > 27.2) {
+            target = 27.2
+        }
+        if (target < -27.2) {
+            target = -27.2
+        }
+        PatrolOffs += target
+        if (PatrolAxis == 0) {
+            z = VaseBaseZ + PatrolOffs
+        }
+        else {
+            x = VaseBaseX + PatrolOffs
+        }
+        sendevent(EventHit, collider, 100.0)
+        changestateif(Vase_Ass_Kill_Player, eventaccepted)
+    }
+}
+
+state Vase_Ass_Attacked { // 2
+    stateflag 0x4004081
+    statusc 0
+    code() {
+        soundpitch(3.263)
+        soundplay([VA1mA], 1V)
+        playframes(VASE_ASS_2, 0.0, 14.0)
+        setanim(VASE_ASS_5, -1.0)
+        do {
+            animframe += 1.0
+            if (animframe == 11.0) {
+                setevent(VaseEvent)
+            }
+            playframe()
+        } while (animframe + 1.0 <= 19.0)
+        changestate(Vase_Ass_Walk_Blind)
+    }
+    event(e, a) {
+        accevcstate(Vase_Ass_Squash, e == EventHit
+            || e == EventJumpedOn
+            || e == EventSlamHit
+            || e == EventFling
+            || e == EventHitInvincible)
+    }
+    trans {
+        once {
+            KillEntity()
+            statusb = FLAG_COLLIDABLE | FLAG_SOLID_ALL
+            getvert(vtrans, self, 0)
+            if (PatrolAxis == 0) {
+                VaseTargetZ = z
+                if (AxisBias >= 0) {
+                    VaseTargetX = x + 3m
+                }
+                else {
+                    VaseTargetX = x - 3m
+                }
+            }
+            else {
+                VaseTargetX = x
+                if (AxisBias >= 0) {
+                    VaseTargetZ = z + 3m
+                }
+                else {
+                    VaseTargetZ = z - 3m
+                }
+            }
+        }
+        getvert(vvec, self, 0)
+        VaseLastX = vecx
+        VaseLastY = vecy
+        VaseLastZ = vecz
+        if (VaseAssOnGround && (frametime - statetime >= 0.2s)) {
+            var canfall = 1
+            save(x, y, z) {
+                x = VaseLastX
+                y = VaseLastY + 1m
+                z = VaseLastZ
+                projectzoneshadow(null)
+                if (eventaccepted) {
+                    if (VaseLastY - vecy <= 1m) {
+                        canfall = 0
+                    }
+                }
+            }
+            changestateif(Vase_Ass_Fall, canfall)
+        }
+        velx = VaseTargetX - x >> 2
+        if (velx > 0.4m) {
+            velx = 0.4m
+        }
+        if (velx < -0.4m) {
+            velx = -0.4m
+        }
+        x += velx
+        velz = VaseTargetZ - z >> 2
+        if (velz > 0.4m) {
+            velz = 0.4m
+        }
+        if (velz < -0.4m) {
+            velz = -0.4m
+        }
+        z += velz
+        if (Collateral) {
+            broadcastevent(EventHit, 4, 100.0)
+        }
+    }
+}
+
+sub VaseEvent(e, a) {
+    accevcstate(Vase_Ass_Squash, e == EventHit
+        || e == EventJumpedOn
+        || e == EventSlamHit
+        || e == EventFling
+        || e == EventHitInvincible)
+    accevcstate(Vase_Ass_Fling, e == EventSlideHit || e == EventSpinHit)
+}
+
+state Vase_Ass_Walk_Blind { // 3
+    statusc 0
+    code() {
+        setanim(VASE_ASS_6)
+        do {
+            setanim(VASE_ASS_6, -1.0)
+            do {
+                animframe += 1.0
+                if (animframe == 9.0
+                    || animframe == 19.0
+                    || animframe == 28.0
+                    || animframe == 46.0
+                    || animframe == 56.0
+                    || animframe == 63.0
+                    || animframe == 76.0) {
+                    soundpitch(3.263)
+                    sounddecay(3.2s)
+                    soundplay([fs20A], 0.7V)
+                }
+                if (animframe == 3.0
+                    || animframe == 15.0
+                    || animframe == 23.0
+                    || animframe == 32.0
+                    || animframe == 50.0
+                    || animframe == 58.0
+                    || animframe == 71.0
+                    || animframe == 79.0) {
+                    soundpitch(3.44)
+                    sounddecay(3.2s)
+                    soundplay([fs20A], 0.7V)
+                }
+                playframe()
+            } while (animframe + 1.0 <= 82.0)
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Vase_Ass_Squash, e == EventHit
+            || e == EventJumpedOn
+            || e == EventSlamHit
+            || e == EventFling
+            || e == EventHitInvincible)
+        accevcstate(Vase_Ass_Fling, e == EventSlideHit || e == EventSpinHit)
+    }
+    trans {
+        once {
+            statusb = FLAG_COLLIDABLE
+        }
+        getvert(vvec, self, 0)
+        VaseLastX = vecx
+        VaseLastY = vecy
+        VaseLastZ = vecz
+        if (PatrolAxis == 0) {
+            if (VaseLastX >= player -> x) {
+                AxisBias += 1
+                if (AxisBias > 6) {
+                    AxisBias = 6
+                }
+            }
+            else {
+                AxisBias -= 1
+                if (AxisBias < -6) {
+                    AxisBias = -6
+                }
+            }
+        }
+        else {
+            if (VaseLastZ >= player -> z) {
+                AxisBias += 1
+                if (AxisBias > 6) {
+                    AxisBias = 6
+                }
+            }
+            else {
+                AxisBias -= 1
+                if (AxisBias < -6) {
+                    AxisBias = -6
+                }
+            }
+        }
+        if (VaseAssOnGround) {
+            var canfall = 1
+            save(x, y, z) {
+                x = VaseLastX
+                y = VaseLastY + 1m
+                z = VaseLastZ
+                projectzoneshadow(null)
+                if (eventaccepted) {
+                    if (VaseLastY - vecy <= 1m) {
+                        canfall = 0
+                    }
+                }
+            }
+            changestateif(Vase_Ass_Fall, canfall)
+        }
+        var target = 0
+        if (PatrolAxis == 0) {
+            target = player -> z - VaseBaseZ
+        }
+        else {
+            target = player -> x - VaseBaseX
+        }
+        if (target > PatrolRange) {
+            target = PatrolRange
+        }
+        if (target < -PatrolRange) {
+            target = -PatrolRange
+        }
+        target -= PatrolOffs
+        if (target > 27.2) {
+            target = 27.2
+        }
+        if (target < -27.2) {
+            target = -27.2
+        }
+        PatrolOffs += target
+        if (PatrolAxis == 0) {
+            z = VaseBaseZ + PatrolOffs
+        }
+        else {
+            x = VaseBaseX + PatrolOffs
+        }
+        if (collider) {
+            PlayerPushTimer += 1
+            if (PlayerPushTimer >= 2) {
+                save(x, y, z) {
+                    getvert(vtrans, self, 0)
+                    vecy = atan2(player -> trans)
+                    sendevent(Event32, player, vecy, 14m)
+                }
+            }
+        }
+        else {
+            PlayerPushTimer = 0
+        }
+        if (Collateral) {
+            broadcastevent(EventHit, 4, 100.0)
+        }
+    }
+}
+
+state Vase_Ass_Fall { // 4
+    statusc 0
+    code() {
+        if (animseq == getanim(VASE_ASS_2)) {
+             playframes4(VASE_ASS_2, -1.0, 14.0)
+        }
+        else if (animseq == getanim(VASE_ASS_5)) {
+             playframes4(VASE_ASS_5, -1.0, 19.0)
+        }
+        else if (animseq == getanim(VASE_ASS_6)) {
+            playframes4(VASE_ASS_6, -1.0, 82.0)
+        }
+        playframes(VASE_ASS_6, 0.0, 82.0)
+        VaseAssOnGround = 0
+        sleepframes(VASE_ASS_6, 0.0, 82.0)
+    }
+    trans {
+        once {
+            statusb = FLAG_COLLIDABLE | FLAG_SOLID_SIDES
+            cascadeevent(Event1, self)
+            FallBaseY = VaseLastY
+            zindex >>= 1
+            vely = 0
+        }
+        changestateif(Kill, FallBaseY - y >= 20m)
+        getvert(vvec, self, 0)
+        x += (VaseLastX - vecx)
+        z += (VaseLastZ - vecz)
+        velx = 0
+        velz = 0
+        save(x, y, z) {
+            x = VaseLastX
+            y = vecy
+            z = VaseLastZ
+            if (PatrolAxis == 0) {
+                x += 2m
+                projectzoneshadow(null)
+                if (eventaccepted) {
+                    if (y - vecy <= 1m) {
+                        velx = -3m
+                    }
+                }
+                else {
+                    x -= 4m
+                    projectzoneshadow(null)
+                    if (eventaccepted) {
+                        if (y - vecy <= 1m) {
+                            velx = 3m
+                        }
+                    }
+                }
+            }
+            else {
+                z += 2m
+                projectzoneshadow(null)
+                if (eventaccepted) {
+                    if (y - vecy <= 1m) {
+                        velz = -3m
+                    }
+                }
+                else {
+                    x -= 4m
+                    projectzoneshadow(null)
+                    if (eventaccepted) {
+                        if (y - vecy <= 1m) {
+                            velz = -3m
+                        }
+                    }
+                    else {
+                        z -= 4m
+                        projectzoneshadow(null)
+                        if (eventaccepted) {
+                            if (y - vecy <= 1m) {
+                                velz = 3m
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        VaseLastX += spd(velx)
+        VaseLastZ += spd(velz)
+        vely -= 16.0
+        y += vely
+    }
+}
+
+state Vase_Ass_Kill_Player { // 5
+    statusc 0
+    code() {
+        soundpitch(3.263)
+        soundplay([VA1mA], 1V)
+        troty = atan2(player -> trans)
+        roty = troty
+        playanim(0, VASE_ASS_3)
+        playanim(1, VASE_ASS_3)
+        playanim(2, VASE_ASS_3)
+        playanim(2, VASE_ASS_3)
+        playanim(3, VASE_ASS_3)
+        playanim(4, VASE_ASS_3)
+        playanim(5, VASE_ASS_3)
+        playanim(6, VASE_ASS_3)
+        sounddelay(0.2s)
+        soundpitch(2.28)
+        soundplay([VA1mA], 1V)
+        sounddelay(0.65s)
+        soundpitch(2.8)
+        soundplay([VA2mA], 1V)
+        playframes(VASE_ASS_4, 0.0, 12.0)
+        sleep()
+    }
+    event(e, a) {
+        accevcstate(Vase_Ass_Squash, e == EventHitInvincible || e == EventHit || e == EventFling)
+        rejevret(e == EventSlideHit || e == EventSpinHit)
+    }
+    trans {
+        if (frametime - statetime >= 0.1s) {
+            changestateifn(Vase_Ass_Squash, player -> stateflag \ 0x8000000, 0)
+            tpc = 0
+        }
+    }
+}
+
+state Vase_Ass_Fling { // 6
+    stateflag 0x30
+    statusc 0x32
+    code(h) {
+        KillEntity()
+        health = h + 1.0
+        sendevent(EventCombo, player, h)
+        soundpitch(3.263)
+        soundplay([VA1mA], 1V)
+        SoundPitchDefault()
+        soundplay([fli0A], 0.17V + rand(0.05V))
+        if (PatrolAxis == 0) {
+            if (AxisBias >= 0) {
+                troty = 90deg
+            }
+            else {
+                troty = -90deg
+            }
+        }
+        else if (AxisBias >= 0) {
+            troty = 0deg
+        }
+        else {
+            troty = 180deg
+        }
+        EnemyFlingSetVel(3m)
+        EnemyFlingWaitScale()
+    }
+    trans {
+        EnemyFlingTrans(2m, EventFling)
+    }
+}
+
+state Vase_Ass_Squash { // 7
+    stateflag 0x23
+    statusc 0x32
+    code(h) {
+        KillEntity()
+        sendevent(EventCombo, player, h)
+        EnemyDieClearFlags()
+        soundpitch(3.263)
+        soundplay([VA1mA], 1V)
+        playframe()
+        save(x, y, z) {
+            getvert(vtrans, self, 0)
+            spawn(9, 4, 1, getins(SetParticleColor), 1)
+            playframe()
+        }
+        playframe()
+    }
+}
+
+sub SetParticleColor() {
+    vfx = (vfx & 0xFFFF00FF) | 0x400
+    if (var r = rand(3); r == 0) {
+        SetColor1(0x05, 0xBD, 0xBE)
+    }
+    else if (r == 1) {
+        SetColor1(0x0D, 0x4C, 0x4C)
+    }
+    else if (r == 2) {
+        SetColor1(0xE7, 0x85, 0x81)
+    }
+}
+
+state Kill { // 8
+    statusc 0
+    code() { }
+}
+
+state Vase { // 9
+    statusc 0
+    code() {
+        playframes(VASE_ASS_7, 0.0, 39.0)
+        sleep()
+    }
+    trans {
+        CopyCreatorTrans()
+        CopyCreatorRot()
+        zindex = creator -> zindex
+    }
+}
+
+sub KillVoice() {
+    voice = -1
+    soundfadet(1s, voice)
+    soundfadev(0V, voice, 3)
+    voice = -1
+    soundsetup(0, voice, 5)
+}

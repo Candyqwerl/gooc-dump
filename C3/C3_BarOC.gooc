@@ -1,0 +1,1205 @@
+#gool BarOC 32 5
+
+#include "..\\Includes\\goolstdlib.gooc"
+#include "..\\Includes\\C3_DispC.gooh"
+//gooc -c 3 -r pal -l j "C3\C3_BarOC.gooc" "C3\Out\C3_BarOC.nsentry"
+
+#sprite SPEED_PARTICLE_YELLOW [Cr10T]
+#tex 0x00E6FF 0 3 4 10 928 32 32 32
+#tex 0x00B8CC 0 3 4 10 928 32 32 32
+#tex 0x008A99 0 3 4 10 928 32 32 32
+#tex 0x005C66 0 3 4 10 928 32 32 32
+#tex 0x002E33 0 3 4 10 928 32 32 32
+#sprite SPEED_PARTICLE_PURPLE [Cr10T]
+#tex 0xEB00B4 0 3 4 10 928 32 32 32
+#tex 0xBC0090 0 3 4 10 928 32 32 32
+#tex 0x8D006C 0 3 4 10 928 32 32 32
+#tex 0x5E0048 0 3 4 10 928 32 32 32
+#tex 0x2F0024 0 3 4 10 928 32 32 32
+#sprite SPEED_PARTICLE_WHITE [Cr10T]
+#tex 0xFFFFFF 0 3 4 10 928 32 32 32
+
+#iflev vj
+#anim SKYBOX        [Sk1jV] [Sk1jG] 01 1 2
+#anim CLOUD_LOWQ    [Cl1jV] [Cl1jG] 180 1 2
+#anim CLOUD_HIGHQ   [Cl2jV] [Cl2jG] 180 1 2
+#else
+#anim SKYBOX        [Sk1nV] [Sk1nG] 01 1 2
+#anim CLOUD_LOWQ    [Cl1jV] [Cl1jG] 180 1 2
+#anim CLOUD_HIGHQ   [Cl2jV] [Cl2jG] 180 1 2
+#endif
+
+#anim WILLY_HEAD                   [CC1jV] [CC1jG] 50 1 2
+#anim WILLY_HEAD_STEER_LEFT        [CC2jV] [CC1jG] 25 1 2
+#anim WILLY_HEAD_STEER_LEFT_TRANS  [CC3jV] [CC1jG] 08 1 2
+#anim WILLY_HEAD_STEER_RIGHT_TRANS [CC4jV] [CC1jG] 07 1 2
+#anim WILLY_HEAD_STEER_RIGHT       [CC5jV] [CC1jG] 25 1 2
+#anim WILLY_HEAD_ROLL_RIGHT        [CC6jV] [CC1jG] 49 1 2
+#anim WILLY_HEAD_ROLL_LEFT         [CC7jV] [CC1jG] 49 1 2
+#anim WILLY_PARACHUTE_START        [CC8jV] [CC2jG] 12 1 2
+#anim WILLY_PARACHUTE              [CC9jV] [CC2jG] 14 1 2
+
+#anim SIS_HEAD                     [Cs1jV] [Cs1jG] 50 1 2
+#anim SIS_HEAD_STEER_LEFT          [Cs2jV] [Cs1jG] 25 1 2
+#anim SIS_HEAD_STEER_LEFT_TRANS    [Cs3jV] [Cs1jG] 08 1 2
+#anim SIS_HEAD_STEER_RIGHT_TRANS   [Cs4jV] [Cs1jG] 07 1 2
+#anim SIS_HEAD_STEER_RIGHT         [Cs5jV] [Cs1jG] 25 1 2
+#anim SIS_HEAD_ROLL_RIGHT          [Cs6jV] [Cs1jG] 49 1 2
+#anim SIS_HEAD_ROLL_LEFT           [Cs7jV] [Cs1jG] 49 1 2
+#anim SIS_PARACHUTE_START          [Cs8jV] [Cs2jG] 12 1 2
+#anim SIS_PARACHUTE                [Cs9jV] [Cs2jG] 14 1 2
+
+#iflev j
+#sprite BIPLANE_WHEEL [Ba3jT]
+#tex 0x808080 0 2 14 9 832 32 32 32
+#tex 0x808080 0 2 15 9 864 96 32 32
+#tex 0x808080 0 2 0 10 864 64 32 32
+#tex 0x808080 0 2 1 10 864 32 32 32
+#tex 0x808080 0 2 2 10 896 96 32 32
+#tex 0x808080 0 2 3 10 896 64 32 32
+#tex 0x808080 0 2 4 10 896 32 32 32
+#tex 0x808080 0 2 5 10 928 96 32 32
+#tex 0x808080 0 2 6 10 928 64 32 32
+#tex 0x808080 0 2 7 10 928 32 32 32
+#tex 0x808080 0 2 8 10 960 96 32 32
+#tex 0x808080 0 2 9 10 960 64 32 32
+#tex 0x808080 0 2 10 10 960 32 32 32
+#tex 0x808080 0 2 11 10 992 96 32 32
+#tex 0x808080 0 2 12 10 992 64 32 32
+#tex 0x808080 0 2 13 10 992 32 32 32
+
+#sprite SMOKE [Cr10T]
+#tex 0x3C3C3C 0 3 14 7 672 64 32 32
+#tex 0x3C3C3C 0 3 15 7 672 32 32 32
+#tex 0x3C3C3C 0 3 0 8 704 96 32 32
+#tex 0x3C3C3C 0 3 1 8 704 64 32 32
+#tex 0x3C3C3C 0 3 2 8 704 32 32 32
+#tex 0x3C3C3C 0 3 3 8 736 96 32 32
+#tex 0x3C3C3C 0 3 4 8 736 64 32 32
+#tex 0x3C3C3C 0 3 5 8 736 32 32 32
+#tex 0x3C3C3C 0 3 6 8 768 96 32 32
+#tex 0x3C3C3C 0 3 7 8 768 64 32 32
+#tex 0x3C3C3C 0 3 14 7 768 32 32 32
+#tex 0x3C3C3C 0 3 8 8 800 96 32 32
+#tex 0x3C3C3C 0 3 9 8 800 64 32 32
+#tex 0x3C3C3C 0 3 10 8 640 16 32 16
+#tex 0x3C3C3C 0 3 11 8 672 16 32 16
+#tex 0x3C3C3C 0 3 11 8 672 16 32 16
+
+#sprite HUD_ZEPPELIN_1 [Ba1jT]
+#tex 0x808080 1 1 0 1 0 96 64 32
+#tex 0x808080 1 1 0 1 0 64 64 32
+#tex 0x808080 1 1 0 1 0 32 64 32
+#tex 0x808080 1 1 0 1 64 96 64 32
+#tex 0x808080 1 1 0 1 64 64 64 32
+#tex 0x808080 1 1 0 1 64 32 64 32
+#tex 0x808080 1 1 0 1 128 96 64 32
+#tex 0x808080 1 1 0 1 128 64 64 32
+
+#sprite HUD_ZEPPELIN_2 [Ba5jT]
+#tex 0x808080 1 1 0 1 0 96 64 32
+#tex 0x808080 1 1 0 1 0 64 64 32
+#tex 0x808080 1 1 0 1 0 32 64 32
+#tex 0x808080 1 1 0 1 64 96 64 32
+#tex 0x808080 1 1 0 1 64 64 64 32
+#tex 0x808080 1 1 0 1 64 32 64 32
+#tex 0x808080 1 1 0 1 128 96 64 32
+#tex 0x808080 1 1 0 1 128 64 64 32
+#tex 0x808080 1 1 0 2 128 32 64 32
+#tex 0x808080 1 1 0 2 192 96 64 32
+#tex 0x808080 1 1 0 2 192 64 64 32
+#tex 0x808080 1 1 0 2 192 32 64 32
+#tex 0x808080 1 1 0 2 256 96 64 32
+#tex 0x808080 1 1 0 2 256 64 64 32
+#tex 0x808080 1 1 0 2 256 32 64 32
+#tex 0x808080 1 1 0 2 320 96 64 32
+#tex 0x808080 1 1 0 3 320 64 64 32
+#tex 0x808080 1 1 0 3 320 32 64 32
+#tex 0x808080 1 1 0 3 384 96 64 32
+#tex 0x808080 1 1 0 3 384 64 64 32
+#tex 0x808080 1 1 0 3 384 32 64 32
+#tex 0x808080 1 1 0 3 448 96 64 32
+#tex 0x808080 1 1 0 3 448 64 64 32
+#tex 0x808080 1 1 0 3 448 32 64 32
+
+#fraganim HUD_HEALTH_BAR [Cr10T] 1
+#frag 0x3C3CA0 0 3 13 8 264 12 4 4 0 -400 400 0
+#fraganim HUD_ZEPPELIN_BACKGROUND [Ba2jT] 2
+#frag 0x303030 0 1 9 0 832 64 64 64 { 127 64 64 64 127 127 64 127 } -400 -200 0 200
+#frag 0x303030 0 1 9 0 832 64 64 64 0 -200 400 200
+#sprite HUD_PLAYER_ICON [Ba4jT]
+#tex 0x808080 1 0 0 14 0 64 64 64
+
+#eliflev n
+#sprite BIPLANE_WHEEL [Ba3jT]
+#tex 0x808080 0 2 14 9 832 32 32 32
+#tex 0x808080 0 2 15 9 864 96 32 32
+#tex 0x808080 0 2 0 10 864 64 32 32
+#tex 0x808080 0 2 1 10 864 32 32 32
+#tex 0x808080 0 2 2 10 896 96 32 32
+#tex 0x808080 0 2 3 10 896 64 32 32
+#tex 0x808080 0 2 4 10 896 32 32 32
+#tex 0x808080 0 2 5 10 928 96 32 32
+#tex 0x808080 0 2 6 10 928 64 32 32
+#tex 0x808080 0 2 7 10 928 32 32 32
+#tex 0x808080 0 2 8 10 960 96 32 32
+#tex 0x808080 0 2 9 10 960 64 32 32
+#tex 0x808080 0 2 10 10 960 32 32 32
+#tex 0x808080 0 2 11 10 992 96 32 32
+#tex 0x808080 0 2 12 10 992 64 32 32
+#tex 0x808080 0 2 13 10 992 32 32 32
+
+#sprite SMOKE [Cr10T]
+#tex 0x3C3C3C 0 3 14 7 672 64 32 32
+#tex 0x3C3C3C 0 3 15 7 672 32 32 32
+#tex 0x3C3C3C 0 3 0 8 704 96 32 32
+#tex 0x3C3C3C 0 3 1 8 704 64 32 32
+#tex 0x3C3C3C 0 3 2 8 704 32 32 32
+#tex 0x3C3C3C 0 3 3 8 736 96 32 32
+#tex 0x3C3C3C 0 3 4 8 736 64 32 32
+#tex 0x3C3C3C 0 3 5 8 736 32 32 32
+#tex 0x3C3C3C 0 3 6 8 768 96 32 32
+#tex 0x3C3C3C 0 3 7 8 768 64 32 32
+#tex 0x3C3C3C 0 3 14 7 768 32 32 32
+#tex 0x3C3C3C 0 3 8 8 800 96 32 32
+#tex 0x3C3C3C 0 3 9 8 800 64 32 32
+#tex 0x3C3C3C 0 3 10 8 640 16 32 16
+#tex 0x3C3C3C 0 3 11 8 672 16 32 16
+#tex 0x3C3C3C 0 3 11 8 672 16 32 16
+
+#sprite HUD_ZEPPELIN_1 [Ba5nT]
+#tex 0x808080 0 1 1 0 0 96 64 32
+#tex 0x808080 0 1 2 0 0 64 64 32
+#tex 0x808080 0 1 3 0 0 32 64 32
+#tex 0x808080 0 1 4 0 64 96 64 32
+#tex 0x808080 0 1 5 0 64 64 64 32
+#tex 0x808080 0 1 6 0 64 32 64 32
+#tex 0x808080 0 1 7 0 128 96 64 32
+#tex 0x808080 0 1 8 0 128 64 64 32
+
+#sprite HUD_ZEPPELIN_2 [Ba5nT]
+#tex 0x808080 0 1 9 0 128 32 64 32
+#tex 0x808080 0 1 10 0 192 96 64 32
+#tex 0x808080 0 1 11 0 192 64 64 32
+#tex 0x808080 0 1 12 0 192 32 64 32
+#tex 0x808080 0 1 13 0 256 96 64 32
+#tex 0x808080 0 1 14 0 256 64 64 32
+#tex 0x808080 0 1 15 0 256 32 64 32
+#tex 0x808080 0 1 0 1 320 96 64 32
+#tex 0x808080 0 1 1 1 320 64 64 32
+#tex 0x808080 0 1 2 1 320 32 64 32
+#tex 0x808080 0 1 3 1 384 96 64 32
+#tex 0x808080 0 1 4 1 384 64 64 32
+#tex 0x808080 0 1 5 1 384 32 64 32
+#tex 0x808080 0 1 6 1 448 96 64 32
+#tex 0x808080 0 1 7 1 448 64 64 32
+#tex 0x808080 0 1 8 1 448 32 64 32
+#tex 0x808080 0 1 9 1 512 96 64 32
+#tex 0x808080 0 1 10 1 512 64 64 32
+#tex 0x808080 0 1 11 1 512 32 64 32
+#tex 0x808080 0 1 12 1 576 96 64 32
+#tex 0x808080 0 1 13 1 576 64 64 32
+#tex 0x808080 0 1 14 1 576 32 64 32
+#tex 0x808080 0 1 15 1 640 96 64 32
+#tex 0x808080 0 1 0 2 640 64 64 32
+
+#fraganim HUD_HEALTH_BAR [Cr10T] 1
+#frag 0x3C3CA0 0 3 13 8 264 12 4 4 0 -400 400 0
+#fraganim HUD_ZEPPELIN_BACKGROUND [Ba2jT] 2
+#frag 0x303030 0 1 9 0 832 64 64 64 { 127 64 64 64 127 127 64 127 } -400 -200 0 200
+#frag 0x303030 0 1 9 0 832 64 64 64 0 -200 400 200
+#sprite HUD_PLAYER_ICON [Ba2jT]
+#tex 0x808080 1 0 0 8 256 64 64 64
+
+#else
+#sprite BIPLANE_WHEEL [Ba3jT]
+#tex 0x808080 0 2 14 9 832 32 32 32
+#tex 0x808080 0 2 15 9 864 96 32 32
+#tex 0x808080 0 2 0 10 864 64 32 32
+#tex 0x808080 0 2 1 10 864 32 32 32
+#tex 0x808080 0 2 2 10 896 96 32 32
+#tex 0x808080 0 2 3 10 896 64 32 32
+#tex 0x808080 0 2 4 10 896 32 32 32
+#tex 0x808080 0 2 5 10 928 96 32 32
+#tex 0x808080 0 2 6 10 928 64 32 32
+#tex 0x808080 0 2 7 10 928 32 32 32
+#tex 0x808080 0 2 8 10 960 96 32 32
+#tex 0x808080 0 2 9 10 960 64 32 32
+#tex 0x808080 0 2 10 10 960 32 32 32
+#tex 0x808080 0 2 11 10 992 96 32 32
+#tex 0x808080 0 2 12 10 992 64 32 32
+#tex 0x808080 0 2 13 10 992 32 32 32
+
+#sprite SMOKE [Cr10T]
+#tex 0x3C3C3C 0 3 14 7 672 64 32 32
+#tex 0x3C3C3C 0 3 15 7 672 32 32 32
+#tex 0x3C3C3C 0 3 0 8 704 96 32 32
+#tex 0x3C3C3C 0 3 1 8 704 64 32 32
+#tex 0x3C3C3C 0 3 2 8 704 32 32 32
+#tex 0x3C3C3C 0 3 3 8 736 96 32 32
+#tex 0x3C3C3C 0 3 4 8 736 64 32 32
+#tex 0x3C3C3C 0 3 5 8 736 32 32 32
+#tex 0x3C3C3C 0 3 6 8 768 96 32 32
+#tex 0x3C3C3C 0 3 7 8 768 64 32 32
+#tex 0x3C3C3C 0 3 14 7 768 32 32 32
+#tex 0x3C3C3C 0 3 8 8 800 96 32 32
+#tex 0x3C3C3C 0 3 9 8 800 64 32 32
+#tex 0x3C3C3C 0 3 10 8 640 16 32 16
+#tex 0x3C3C3C 0 3 11 8 672 16 32 16
+#tex 0x3C3C3C 0 3 11 8 672 16 32 16
+
+#sprite HUD_ZEPPELIN_1 [Ba5vT]
+#tex 0x808080 1 1 0 1 256 96 32 32
+#tex 0x808080 1 1 0 1 256 64 32 32
+#tex 0x808080 1 1 0 1 256 32 32 32
+#tex 0x808080 1 1 0 1 288 96 32 32
+#tex 0x808080 1 1 0 1 288 64 32 32
+#tex 0x808080 1 1 0 1 288 32 32 32
+#tex 0x808080 1 1 0 1 320 96 32 32
+#tex 0x808080 1 1 0 1 320 64 32 32
+
+#sprite HUD_ZEPPELIN_2 [Ba5vT]
+#tex 0x808080 1 1 0 1 0 96 32 32
+#tex 0x808080 1 1 0 1 0 64 32 32
+#tex 0x808080 1 1 0 1 0 32 32 32
+#tex 0x808080 1 1 0 1 32 96 32 32
+#tex 0x808080 1 1 0 1 32 64 32 32
+#tex 0x808080 1 1 0 1 32 32 32 32
+#tex 0x808080 1 1 0 1 64 96 32 32
+#tex 0x808080 1 1 0 2 64 64 32 32
+#tex 0x808080 1 1 0 2 64 32 32 32
+#tex 0x808080 1 1 0 2 96 96 32 32
+#tex 0x808080 1 1 0 2 96 64 32 32
+#tex 0x808080 1 1 0 2 96 32 32 32
+#tex 0x808080 1 1 0 2 128 96 32 32
+#tex 0x808080 1 1 0 2 128 64 32 32
+#tex 0x808080 1 1 0 2 128 32 32 32
+#tex 0x808080 1 1 0 3 160 96 32 32
+#tex 0x808080 1 1 0 3 160 64 32 32
+#tex 0x808080 1 1 0 3 160 32 32 32
+#tex 0x808080 1 1 0 3 192 96 32 32
+#tex 0x808080 1 1 0 3 192 64 32 32
+#tex 0x808080 1 1 0 3 192 32 32 32
+#tex 0x808080 1 1 0 3 224 96 32 32
+#tex 0x808080 1 1 0 3 224 64 32 32
+#tex 0x808080 1 1 0 3 224 32 32 32
+
+#fraganim HUD_HEALTH_BAR [Cr10T] 1
+#frag 0x3C3CA0 0 3 13 8 264 12 4 4 0 -400 400 0
+#fraganim HUD_ZEPPELIN_BACKGROUND [Ba2jT] 2
+#frag 0x303030 0 1 9 0 832 64 64 64 { 127 64 64 64 127 127 64 127 } -400 -200 0 200
+#frag 0x303030 0 1 9 0 832 64 64 64 0 -200 400 200
+#sprite HUD_PLAYER_ICON [1050I]
+#tex 0x808080 1 0 0 8 256 64 1 1
+#endif
+
+#include "..\\Includes\\Fonts\\C3_FONT_SMALL.gooc"
+
+#text TEXT    FONT_SMALL[1054I]
+"%d/%d"
+"%3d$"
+
+#spawn S_CAMERA            Biplane_Camera_Init
+#spawn S_SKYBOX            SkyBox
+#spawn S_WHEEL             Biplane_Wheel
+#spawn S_CLOUD             Cloud
+#spawn S_BULLET            Bullet
+#spawn S_5                 __s_5
+#spawn S_5                 __s_6
+#spawn S_HEAD              Player_Head_Init
+#spawn S_HUD_ZEPP_INFO     HUD_Zeppelin_Info_Init
+#spawn S_HEALTH            Player_Health
+#spawn S_HUD_HEALTH_BAR    HUD_Health_Bar
+#spawn S_HUD_ZEPP          HUD_Zeppelin
+#spawn S_HUD_PLAYER_ICON   HUD_Player_Icon
+#spawn S_BOOST             Boost_Particle
+#spawn S_HUD_BACKGROUND    HUD_Zeppelin_Background
+#spawn S_PARACHUTE_CORDS   Parachute_Cords
+
+var BaronVar1, BaronVar2, BaronVar3, BaronVar4, BaronVar5, BaronVar6, BaronVar7
+var ObjectiveTarget3, ObjectiveTarget4, ObjectiveTarget5, ObjectiveTarget6, ObjectiveTarget7
+
+expr CameraYaw         = BaronVar1
+expr CameraTargetYaw   = BaronVar2
+expr CameraPitch       = BaronVar4
+expr CameraTargetPitch = BaronVar6
+expr CameraDistance    = BaronVar7
+expr CameraHeight      = field_63
+expr HeadIsCoco        = BaronVar1
+expr HeadSteering      = BaronVar7
+
+state Biplane_Camera_Init { // 0
+    stateflag 0x10001
+    statusc 0x0
+    code() {
+        ins72(0xA00, self)
+        GLOBAL_97 = self
+        player = parent
+        statusb = FLAG_ROT_Y | 0x2000
+        trotx = 180deg
+        yzapproach = 500deg
+        speed = parent -> speed
+        playnull()
+        ins72(0xA00, self)
+        if (!RESPAWNCOUNT || GLOBAL_105 == 2) {
+            spawn(DispC, DispC_S_ARROW, 1, 0, 100.0, 0)
+            CameraHeight = 0
+            unless (LEVEL == LEVEL_RingsOfPower || GLOBAL_105) {
+                goto follow;
+            }
+            player -> stateflag |= 0x2000
+            CameraYaw = player -> roty
+            CameraDistance = 1.7m
+            changestate(Biplane_Camera_Intro)
+        }
+        else {
+            follow:
+            player -> stateflag &= ~0x2000
+            CameraYaw = player -> roty + 180deg
+            CameraDistance = 2.7m
+            changestate(Biplane_Camera)
+        }
+    }
+}
+
+sub UpdateIntroCamera() { // S-38
+    GAMEFLAGS |= 0x40000000
+    vecx = player -> x
+    vecy = player -> y
+    vecz = player -> z
+    if (frametime - statetime >= 5s) {
+        player -> stateflag &= ~0x2000
+        changestate(Biplane_Camera)
+    }
+    else if (frametime - statetime >= 3s) {
+        CameraTargetYaw = player -> roty + 180deg
+        CameraYaw += degdist(CameraYaw, CameraTargetYaw) >> 4
+        CameraDistance = seek(CameraDistance, 2.7m, spd(0.5m))
+        CameraHeight = seek(CameraHeight, 1m, spd(0.5m))
+    }
+    else {
+        CameraTargetYaw = player -> roty
+        CameraYaw += degdist(CameraYaw, CameraTargetYaw) >> 4
+        if (STATUS_FIRSTFRAME) {
+            troty = atan2(player -> trans)
+            roty = troty
+        }
+    }
+    CameraTargetPitch = 0
+    CameraPitch += degdist(CameraPitch, CameraTargetPitch) >> 2
+    save (trotx, troty, trotz, vecx, vecy, vecz) {
+        SetTRot(CameraPitch, CameraYaw, CameraYaw)
+        vecx = player -> x
+        vecy = player -> y
+        vecz = player -> z
+        vectransf2(vvec, vtrans, CameraDistance, 0, 0)
+    }
+    y += field_63
+    if (y < 15m) {
+        y = 15m
+    }
+    troty = roty + (degdist(roty, atan2(player -> trans)) << 1) / 3
+    roty = troty
+    vecy += (field_63 << 3) / 10
+    trotz = -atan2_3d(self, vecx)
+    if (trotz < -33deg) {
+        trotz = -33deg
+    }
+    ins72(0xB00, self)
+}
+
+state Biplane_Camera_Intro { // 1
+    stateflag 0x10001
+    statusc 0x0
+    trans => sub UpdateIntroCamera
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Biplane_Camera_Init, e == Event19)
+        accevcstate(Biplane_Camera_Death, e == Event9)
+        accevif (e == Event15) {
+            creator = a[0]
+            interrupter = GLOBAL_110
+            sendevent(Event15, interrupter, degdist(roty, atan2(creator -> trans)))
+        }
+        accevif (e == Event20) {
+            interrupter = GLOBAL_110
+            sendevent(Event20, interrupter, a[0])
+        }
+    }
+}
+
+state Biplane_Camera { // 2
+    stateflag 0x10001
+    statusc 0x0
+    code => state Biplane_Camera_Intro
+    event => state Biplane_Camera_Intro
+    trans {
+        GAMEFLAGS |= 0x40000000
+        vecx = player -> x
+        vecy = player -> y
+        vecz = player -> z
+        CameraTargetYaw = player -> roty + 180deg
+        CameraYaw += degdist(CameraYaw, CameraTargetYaw) >> 4
+        CameraTargetPitch = -player -> rotx >> 1
+        CameraPitch += degdist(CameraPitch, CameraTargetPitch) >> 2
+        var range = 2.7m - ((6.025m - player -> speed) >> 3)
+        if (player -> stateflag & 0x80000) {
+            range += 2m
+        }
+        CameraDistance = seek(CameraDistance, range, abs(CameraDistance - range) >> 4)
+        save (trotx, troty, trotz, vecx, vecy, vecz) {
+            SetTRot(CameraPitch, CameraYaw, CameraYaw)
+            vecx = player -> x
+            vecy = player -> y
+            vecz = player -> z
+            vectransf2(vvec, vtrans, CameraDistance, 0, 0)
+        }
+        y += 1m
+        if (y < 15m) {
+            y = 15m
+        }
+        troty = player -> roty + (degdist(player -> roty, atan2(player -> trans)) << 1) / 3
+        roty = troty
+        vecy += 0.8m
+        trotz = -atan2_3d(self, vecx)
+        if (trotz < -33deg) {
+            trotz = -33deg
+        }
+        ins72(0xB00, self)
+    }
+}
+
+state Biplane_Camera_Death { // 3
+    stateflag 0x10001
+    statusc 0x0
+    code() {
+        sleepnull()
+    }
+    event(e, a) {
+        accevcstate(Biplane_Camera_Init, e == Event19)
+    }
+    trans {
+        troty += (degdist(troty, atan2(player -> trans)) << 1) / 3
+        vecx = player -> x
+        vecy = player -> y
+        vecz = player -> z
+        vecy += 0.8m
+        trotz = -atan2_3d(self, vecx)
+        setvel(-1m)
+        x = spd(x, velx)
+        z = spd(z, velz)
+        ins72(0xB00, self)
+    }
+}
+
+state SkyBox { // 4
+    stateflag 0x10001
+    statusc 0x0
+    code() {
+        movetolist(1.0, self)
+        statusb = FLAG_NO_CAMERA_CLIP
+        SetScale(1S)
+        zindex = -4000
+        sleepanim(0, SKYBOX)
+    }
+    trans {
+        x = CAMTRANSX
+        z = CAMTRANSZ
+        y = CAMTRANSY - (24.0 + ((CAMTRANSY - 16m) * 0.55 / 54.69))
+    }
+}
+
+state Biplane_Wheel { // 5
+    stateflag 0x1
+    statusc 0x0
+    code(vertex) {
+        SetRot(0deg)
+        setanim(BIPLANE_WHEEL)
+        SetScale(0.25S)
+        zindex = parent -> zindex
+        do {
+            vecx = CAMTRANSX
+            vecy = CAMTRANSY
+            vecz = CAMTRANSZ
+            getvert(vtrans, parent, vertex)
+            var0 = -(((parent -> roty << 20) - (atan2(self, vecx) << 20)) >> 20) + 5.65deg
+            if (abs(var0) < 90deg) {
+                rotz = parent -> rotz + parent -> field_63
+            }
+            else {
+                rotz = -(parent -> rotz + parent -> field_63)
+            }
+            playframe((((var0 & 0xFFF) >> 7) << 8) & 0xFFF)
+        } while (1)
+    }
+    event(e, a) {
+        accevcstate(Kill, e == Event12 || e == Event1)
+    }
+}
+
+state Cloud { // 6
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        field_61 = rand(360deg)
+        zindex = 50
+        do {
+            var0 = distance(player)
+            moda = 0
+            vecx = CAMTRANSX
+            vecy = CAMTRANSY
+            vecz = CAMTRANSZ
+            misc = var0 > 120m
+            unless (misc) {
+                troty = atan2(self, vecx)
+                misc = abs(((CAMROTY << 20) - (troty << 20)) >> 20) > 55deg
+                unless (misc) {
+                    misc = 0
+                }
+            }
+            if (misc) {
+                playnull()
+            }
+            else {
+                if (var0 > 100m) {
+                    setanim(CLOUD_HIGHQ)
+                    moda = (((var0 - 100m) >> 8) << 12) / 0x1F40
+                    vfx = (vfx & 0xFF00FFFF) | 0x20000
+                }
+                else if (var0 > 20m) {
+                    setanim(CLOUD_HIGHQ)
+                    vfx &= 0xFF00FFFF
+                }
+                else {
+                    setanim(CLOUD_LOWQ)
+                    vfx = (vfx & 0xFF00FFFF) | 0x10000
+                }
+                roty = CAMROTY
+                playframe(179.0 - (((((troty + field_61) & 0xFFF) / 22) % 180) << 8))
+            }
+        } while (1)
+    }
+}
+
+state Bullet { // 7
+    stateflag 0x400001
+    statusc 0x0
+    code(vertex, vx, vy, vz) {
+        zindex = -60
+        soundpitch(3.6 + rand(0.8))
+        sounddecay(1.2s)
+        soundplay([MGnjA], 0.5V)
+        SetColor3(0xFF, 0xFF, 0xFF)
+        getvert(vtrans, parent, vertex)
+        velx = vx + randi(-16.0, 16.0)
+        vely = vy + randi(-16.0, 16.0)
+        velz = vz + randi(-16.0, 16.0)
+        do (var start = frametime) {
+            sp = collider
+            broadcastevent(EventHit, 6, 0)
+            collider = misc
+            changestateif(Bullet_Impact, collider, sp)
+            vecx = x + velx
+            vecy = y + vely
+            vecz = z + velz
+            ins81(x, vecx)
+            playnull()
+            x += velx
+            y += vely
+            z += velz
+        } while (frametime - start < 12)
+    }
+}
+
+state Bullet_Impact { // 8
+    stateflag 0x400001
+    statusc 0x0
+    code() {
+        soundpitch(3.6 + rand(0.8))
+        sounddecay(1.2s)
+        soundplay([Rc1jA], 1V)
+        SetRot(0deg)
+        zindex = 40
+        playframes(SMOKE, 0.0, 15.0)
+    }
+}
+
+state Player_Head_Init { // 9
+    stateflag 0x1
+    statusc 0x0
+    code(coco) {
+        HeadIsCoco = coco
+        vfx = (vfx & 0xFFFFFF00) | 0x5
+        zindex = parent -> zindex
+        HeadSteering = 0
+        changestate(Player_Head_Idle)
+    }
+}
+
+state Player_Head_Idle { // 10
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        vfx = (vfx & 0xFFFFFF00) | 0x5
+        zindex = parent -> zindex
+        if (HeadIsCoco) {
+            sleepframes(SIS_HEAD, 0.0, 49.0)
+        }
+        else {
+            sleepframes(WILLY_HEAD, 0.0, 49.0)
+        }
+    }
+    event(e, a) {
+        accevcstate(Player_Parachute, e == Event9)
+        accevcstate(Kill, e == Event1 || e == Event12)
+    }
+    trans {
+        changestateif(Player_Head_SteerRight, HeadSteering == 2.0)
+        changestateif(Player_Head_SteerLeft, HeadSteering == 1.0)
+        UpdateHead()
+    }
+}
+
+sub UpdateHead() { // S-710
+    changestateif(Player_Head_Roll, parent -> stateflag & 0x8)
+    UpdateHeadPose()
+}
+
+sub UpdateHeadPose() { // S-714
+    CopyParentRot()
+    CopyParentTrans()
+    getvert(vvec, parent, 4.0, 3)
+    parent -> field_63 = atan(vecx - x, vecy - y)
+    unless (parent -> stateflag & 0x8) {
+        rotz += parent -> field_63
+    }
+    if (pad(0, 0, 2, 10)) {
+        HeadSteering = 2.0
+    }
+    else if (pad(0, 0, 2, 12)) {
+        HeadSteering = 1.0
+    }
+    else {
+        HeadSteering = 0.0
+    }
+}
+
+state Player_Head_SteerRight { // 11
+    stateflag 0x1
+    statusc 0x0
+    event => state Player_Head_Idle
+    trans => sub UpdateHead
+    code() {
+        do {
+            if (animseq == getanim(WILLY_HEAD_STEER_RIGHT) || animseq == getanim(SIS_HEAD_STEER_RIGHT)) {
+                animframe = 7.0
+            }
+            else {
+                animframe = -1.0
+            }
+            if (HeadIsCoco) {
+                setanim(SIS_HEAD_STEER_RIGHT_TRANS)
+            }
+            else {
+                setanim(WILLY_HEAD_STEER_RIGHT_TRANS)
+            }
+            do {
+                if (HeadSteering == 2.0) {
+                    var0 = 6.0
+                }
+                else {
+                    var0 = 0.0
+                }
+                playframe(seek(animframe, var0))
+            } while (var0 != animframe)
+            changestateifn(Player_Head_Idle, animframe)
+            while (HeadSteering == 2.0) {
+                if (HeadIsCoco) {
+                    if (animseq != getanim(SIS_HEAD_STEER_RIGHT)) {
+                        setanim(SIS_HEAD_STEER_RIGHT, -1.0)
+                    }
+                    playframe((animframe + 1.0) % 25.0)
+                }
+                else {
+                    if (animseq != getanim(WILLY_HEAD_STEER_RIGHT)) {
+                        setanim(WILLY_HEAD_STEER_RIGHT, -1.0)
+                    }
+                    playframe((animframe + 1.0) % 25.0)
+                }
+            }
+        } while (1)
+    }
+}
+
+state Player_Head_SteerLeft { // 12
+    stateflag 0x1
+    statusc 0x0
+    event => state Player_Head_Idle
+    trans => sub UpdateHead
+    code() {
+        do {
+            unless (animseq == getanim(WILLY_HEAD_STEER_LEFT) || animseq == getanim(SIS_HEAD_STEER_LEFT)) {
+                animframe = 8.0
+            }
+            else {
+                animframe = -1.0
+            }
+            if (HeadIsCoco) {
+                setanim(SIS_HEAD_STEER_LEFT_TRANS)
+            }
+            else {
+                setanim(WILLY_HEAD_STEER_LEFT_TRANS)
+            }
+            do {
+                if (HeadSteering != 1.0) {
+                    var0 = 7.0
+                }
+                else {
+                    var0 = 0.0
+                }
+                playframe(seek(animframe, var0))
+            } while (var0 != animframe)
+            changestateif(Player_Head_Idle, animframe == 7.0)
+            while (HeadSteering == 1.0) {
+                if (HeadIsCoco) {
+                    if (animseq != getanim(SIS_HEAD_STEER_LEFT)) {
+                        setanim(SIS_HEAD_STEER_LEFT, -24.0)
+                    }
+                    playframe((animframe + 24.0) % 25.0)
+                }
+                else {
+                    if (animseq != getanim(WILLY_HEAD_STEER_LEFT)) {
+                        setanim(WILLY_HEAD_STEER_LEFT, -24.0)
+                    }
+                    playframe((animframe + 24.0) % 25.0)
+                }
+            }
+        } while (1)
+    }
+}
+
+state Player_Head_Roll { // 13
+    stateflag 0x1
+    statusc 0x0
+    event => state Player_Head_Idle
+    code() {
+        do {
+            if (HeadIsCoco) {
+                if (parent -> stateflag & 0x200000) {
+                    setanim(SIS_HEAD_ROLL_LEFT)
+                }
+                else {
+                    setanim(SIS_HEAD_ROLL_RIGHT)
+                }
+            }
+            else {
+                if (parent -> stateflag & 0x200000) {
+                    setanim(WILLY_HEAD_ROLL_LEFT)
+                }
+                else {
+                    setanim(WILLY_HEAD_ROLL_RIGHT)
+                }
+            }
+            animframe = parent -> animframe
+            if (animframe >= 48.0) {
+                animframe = 0
+            }
+            playframe()
+        } while (1)
+    }
+    trans {
+        changestateifn(Player_Head_Idle, parent -> stateflag & 0x8)
+        UpdateHeadPose()
+    }
+}
+
+state Player_Parachute { // 14
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        statusb = FLAG_PHYSICS_ENGINE
+        velx = randi(-0.5m, 0.5m)
+        vely = -0.5m
+        velz = randi(-0.5m, 0.5m)
+        interrupter = GLOBAL_97
+        interrupter -> player = self
+        spawn(BarOC, S_PARACHUTE_CORDS)
+        if (HeadIsCoco) {
+            playframes(SIS_PARACHUTE_START, 0.0, 11.0)
+        }
+        else {
+            playframes(WILLY_PARACHUTE_START, 0.0, 11.0)
+        }
+        settrans(UpdateParachuteDrift)
+        statusb |= 0x2000
+        yzapproach = 10deg
+        sounddecay(0xFA)
+        soundpitch(0x3C5)
+        soundsetup(8, self, 8)
+        soundplay([Pa1jA], 1V)
+        if (HeadIsCoco) {
+            playframes(SIS_PARACHUTE, 0.0, 13.0)
+        }
+        else {
+            playframes(WILLY_PARACHUTE, 0.0, 13.0)
+        }
+        yzapproach = 60deg
+        sleep()
+    }
+    trans {
+        rotx = degseek(rotx, 0deg, 360deg)
+        rotz = degseek(rotz, 0deg, 360deg)
+    }
+}
+
+sub UpdateParachuteDrift() { // S-923
+    roty = spd(roty, 90deg)
+    trotz = cos(frametime << 7) >> 5
+}
+
+state Parachute_Cords { // 15
+    stateflag 0x1
+    statusc 0x0
+    code() {
+        zindex = parent -> zindex - 50
+        SetColor1(0x40, 0x40, 0x40)
+        SetColor3(0x40, 0x40, 0x40)
+        do {
+            getvert(vtrans, parent, 1.0)
+            do (var vertex = 0) {
+                getvert(vvec, parent, 2.0 + vertex)
+                ins81(x, vecx)
+            } while ({ vertex += 1.0 }; vertex < 4.0)
+            getvert(vtrans, parent, 0.0)
+            do (var vertex = 0) {
+                getvert(vvec, parent, 6.0 + vertex)
+                ins81(x, vecx)
+            } while ({ vertex += 1.0 }; vertex < 4.0)
+            playnull()
+        } while (1)
+    }
+}
+
+state HUD_Zeppelin_Info_Init { // 16
+    stateflag 0x10001
+    statusc 0x0
+    code() {
+        if (var level = LEVEL; level == LEVEL_ByeByeBlimps) {
+            BaronVar1 = 0x2800
+            BaronVar2 = 7
+            BaronVar4 = 1
+        }
+        else if (level == LEVEL_MadBombers) {
+            BaronVar1 = 0x2800
+            BaronVar2 = 5
+            BaronVar4 = 1
+        }
+        else if (level == LEVEL_RingsOfPower) {
+            BaronVar1 = 0
+            BaronVar2 = 30
+            BaronVar4 = 0
+        }
+        else {
+            BaronVar1 = 0
+            BaronVar2 = 0
+            BaronVar4 = 0
+        }
+        BaronVar3 = BaronVar2 << 8
+        BaronVar5 = 0
+        stalltime = 0
+        if (BaronVar4, BaronVar2 > 7) {
+            debugfunc(1)
+            BaronVar2 = 7
+        }
+        SetRot(0deg)
+        GLOBAL_11 = self
+        pathprog = parent -> pathprog
+        entity = parent -> entity
+        GLOBAL_170 = 0
+        TextDefaultScale()
+        TextDefaultColor()
+        SetVFX2D()
+        SetTrans(170.0, -101.0, 0.0)
+        spawn(BarOC, S_HUD_ZEPP)
+        spawn(BarOC, S_HUD_BACKGROUND)
+        playnull()
+        if (BaronVar4) {
+            RefreshTargetInfo()
+        }
+        changestate(HUD_Zeppelin_Info)
+    }
+}
+
+sub RefreshTargetInfo() { // S-1035
+    save (interrupter) {
+        BaronVar3 = 0
+        if (BaronVar1) {
+            while (var obj = BaronVar1, count = BaronVar2, index = 0; count) {
+                interrupter = objectget(obj)
+                misc = interrupter
+                if (misc) {
+                    misc = entitygetstate(interrupter -> id, 1)
+                    if (misc) {
+                        misc = !(interrupter -> stateflag & 0x20)
+                        if (!misc) {
+                            misc = 0
+                        }
+                    }
+                }
+                if (misc) {
+                    sp = interrupter
+                    sp = &BaronVar6
+                    setval(sp, index, sp)
+                    BaronVar3 += 1.0
+                }
+                else {
+                    sp = 0
+                    sp = &BaronVar6
+                    setval(sp, index, sp)
+                }
+                index += 1.0
+                obj += 1.0
+                count += -1
+            }
+            if (BaronVar3) {
+                settrans(UpdateArrowOBJ)
+            }
+        }
+    }
+}
+
+state HUD_Zeppelin_Info { // 17
+    stateflag 0x10001
+    statusc 0x0
+    code() {
+        if (BaronVar4) {
+            settrans(UpdateArrowOBJ)
+            UpdateArrowOBJ()
+        }
+        zindex = 26
+        do {
+            if (GLOBAL_170 >= 10.0) {
+                x = 154.0
+            }
+            else {
+                x = 170.0
+            }
+            if (BaronVar5) {
+                BaronVar5 -= 1
+                if (!BaronVar5) {
+                    RefreshTargetInfo()
+                }
+            }
+            var total = BaronVar2
+            var count = GLOBAL_170 >> 8
+            setanim(TEXT)
+            playframe(0)
+        } while (1)
+    }
+    event(e, a) {
+        accevif (e == EventTriggered) {
+            if (BaronVar4) {
+                RefreshTargetInfo()
+                GLOBAL_170 = (BaronVar2 - (BaronVar3 >> 8)) << 8
+            }
+            else {
+                GLOBAL_170 += 1.0
+                BaronVar3 -= 1.0
+            }
+            interrupter -> var0 = BaronVar3
+        }
+        accevif (e == Event19) {
+            if (BaronVar4) {
+                BaronVar5 = 4
+            }
+        }
+    }
+}
+
+sub UpdateArrowOBJ() { // S-1125
+    if (BaronVar1) {
+        stalltime = 0
+        vecx = CAMTRANSX
+        vecz = CAMTRANSZ
+        save (x, y, z) {
+            var count = BaronVar2
+            var index = 0
+            var best = 10000m
+            while (count) {
+                sp = &BaronVar6
+                interrupter = getval(sp, index)
+                if (interrupter) {
+                    CopyInterrupterTrans()
+                    var0 = distance(player, DIST_NO_Y)
+                    vecy = atan2(self, vecx)
+                    if (abs(degdist(vecy, CAMROTY)) <= 45deg) {
+                        var0 >>= 2
+                    }
+                    if (var0 < best) {
+                        best = var0
+                        stalltime = interrupter
+                    }
+                }
+                index += 1.0
+                count += -1
+            }
+        }
+    }
+    interrupter = GLOBAL_97
+    if (stalltime) {
+        sendevent(Event15, interrupter, stalltime)
+    }
+    else {
+        tpc = 0
+        sendevent(Event20, interrupter, 0)
+    }
+}
+
+state HUD_Zeppelin { // 18
+    stateflag 0x10001
+    statusc 0x0
+    code() {
+        scaley = 2.03
+        scalex = scaley << 1
+        if (var level = LEVEL; level == LEVEL_RingsOfPower) {
+            scalex >>= 1
+        }
+        SetVFX2D()
+        x += 24.0
+        y += 14.0
+        zindex = parent -> zindex - 1
+        do {
+            playanim(0, HUD_ZEPPELIN_1, 2)
+            playanim(1, HUD_ZEPPELIN_1, 2)
+            playanim(2, HUD_ZEPPELIN_1, 2)
+            playanim(3, HUD_ZEPPELIN_1, 2)
+            playanim(4, HUD_ZEPPELIN_1, 2)
+            playanim(5, HUD_ZEPPELIN_1, 2)
+            playanim(6, HUD_ZEPPELIN_1, 2)
+            playanim(7, HUD_ZEPPELIN_1, 2)
+            playframesdur(HUD_ZEPPELIN_2, 0.0, 23.0, 2)
+        } while (1)
+    }
+}
+
+state HUD_Zeppelin_Background { // 19
+    stateflag 0x10001
+    statusc 0x0
+    code() {
+        SetScale(0x28D, 0x40E, 0x1000)
+        SetVFX2D()
+        x += 24.0
+        y += 4.0
+        zindex = parent -> zindex - 2
+        do {
+            unless (child || LEVEL == LEVEL_MadBombers) {
+                spawn(48, 0)
+            }
+            playanim(0, HUD_ZEPPELIN_BACKGROUND)
+        } while (1)
+    }
+}
+
+state Player_Health { // 20
+    stateflag 0x10001
+    statusc 0x0
+    code() {
+        movetolist(1.0, self)
+        SetRot(0deg)
+        TextDefaultScale()
+        TextDefaultColor()
+        zindex = 30
+        SetVFX2D()
+        SetTrans(-202.0, -101.0, 0.0)
+        spawn(BarOC, S_HUD_HEALTH_BAR)
+        spawn(BarOC, S_HUD_PLAYER_ICON)
+        do {
+            var amount = player -> health >> 8
+            setanim(TEXT)
+            playframe(1.0)
+        } while (1)
+    }
+}
+
+state HUD_Health_Bar { // 21
+    stateflag 0x10001
+    statusc 0x0
+    code() {
+        SetScale(0x51B, 0x103, 0x1000)
+        x += 0x4400
+        SetVFX2D()
+        do {
+            scalex = (player -> health * 5.108) / 100.0
+            playanim(0, HUD_HEALTH_BAR)
+        } while (1)
+    }
+}
+
+state HUD_Player_Icon { // 22
+    stateflag 0x10001
+    statusc 0x0
+    code() {
+        x -= 18.0
+        y += 10.0
+        if (LEVEL == LEVEL_BossNGin2) {
+            SetScale(0x1EA, 0x30B, 0x1000)
+            y -= 9.0
+        }
+        else {
+            SetScale(0x28D, 0x40E, 0x1000)
+        }
+        SetVFX2D()
+        zindex = player -> zindex - 30
+        sleepanim(0, HUD_PLAYER_ICON)
+    }
+}
+
+sub PlayBoostParticle(perfect) { // S-1329
+    if (perfect) {
+        playanim(4, SPEED_PARTICLE_PURPLE)
+    }
+    else {
+        playanim(4, SPEED_PARTICLE_YELLOW)
+    }
+    playframe(3.0, 1)
+    playframe(4.0, 1)
+    playframe(2.0, 1)
+    playframe(1.0, 1)
+    playframe(0.0, 2)
+    save (animseq) {
+        playanim(0, SPEED_PARTICLE_WHITE)
+    }
+    playframe(0.0, 1)
+    playframe(1.0, 2)
+    playframe(2.0, 2)
+    save (animseq) {
+        playanim(0, SPEED_PARTICLE_WHITE)
+    }
+    playframe(3.0, 2)
+    playframe(4.0, 2)
+}
+
+state Boost_Particle { // 23
+    stateflag 0x28040
+    statusc 0x2
+    code(perfect, vertex) {
+        movetolist(3.0, self)
+        getvert(vtrans, creator, vertex)
+        zindex = 100
+        SetRot(0deg, 0deg, rand(360deg))
+        velx = parent -> velx + randi(-0.5m, 0.5m)
+        vely = parent -> vely + randi(-0.5m, 0.5m)
+        velz = parent -> velz + randi(-0.5m, 0.5m)
+        statusb = FLAG_PHYSICS_ENGINE
+        SetScale(0.4S)
+        PlayBoostParticle(perfect)
+    }
+}
+
+state Kill { // 24
+    stateflag 0x1
+    statusc 0x0
+    code() {}
+}
